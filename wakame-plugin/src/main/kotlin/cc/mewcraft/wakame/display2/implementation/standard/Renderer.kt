@@ -208,7 +208,7 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
 
     @JvmField
     val ENTITY_BUCKET_PROP: RenderingHandler<EntityBucket, AggregateValueRendererFormat> = configure("entity_bucket_prop") { data, format ->
-        format.render(data.allowedEntities) { Component.translatable(Registry.ENTITY_TYPE.getOrThrow(it)) }
+        format.render(data.allowedEntityTypes) { Component.translatable(Registry.ENTITY_TYPE.getOrThrow(it)) }
     }
 
     @JvmField

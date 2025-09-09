@@ -14,7 +14,7 @@ import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 /**
- * 用于向玩家展示实体信息.
+ * 用于向玩家展示“桶”里的实体信息.
  */
 sealed interface EntityBucketInfo {
 
@@ -46,7 +46,7 @@ sealed interface EntityBucketInfo {
     }
 
     interface Tameable {
-        val owner: String
+        val ownerName: String?
     }
 
     interface Variable {
@@ -203,7 +203,7 @@ data class BeeEntityBucketInfo(
 @ConfigSerializable
 data class CamelEntityBucketInfo(
     override val isAdult: Boolean = false,
-    override val owner: String = "none",
+    override val ownerName: String? = null,
 ) : EntityBucketInfo, EntityBucketInfo.Ageable, EntityBucketInfo.Tameable {
     override val type: EntityBucketInfoType get() = EntityBucketInfoTypes.CAMEL
     override val typeName: Component get() = Component.translatable(EntityType.CAMEL)
@@ -248,7 +248,7 @@ data class DolphinEntityBucketInfo(
 @ConfigSerializable
 data class DonkeyEntityBucketInfo(
     override val isAdult: Boolean = false,
-    override val owner: String = "none",
+    override val ownerName: String? = null,
 ) : EntityBucketInfo, EntityBucketInfo.Ageable, EntityBucketInfo.Tameable {
     override val type: EntityBucketInfoType get() = EntityBucketInfoTypes.DONKEY
     override val typeName: Component get() = Component.translatable(EntityType.DONKEY)
@@ -257,7 +257,8 @@ data class DonkeyEntityBucketInfo(
 @ConfigSerializable
 data class FoxEntityBucketInfo(
     override val isAdult: Boolean = false,
-) : EntityBucketInfo, EntityBucketInfo.Ageable {
+    override val variant: String = "none",
+) : EntityBucketInfo, EntityBucketInfo.Ageable, EntityBucketInfo.Variable {
     override val type: EntityBucketInfoType get() = EntityBucketInfoTypes.FOX
     override val typeName: Component get() = Component.translatable(EntityType.FOX)
 }
@@ -306,7 +307,7 @@ data class HoglinEntityBucketInfo(
 
 @ConfigSerializable
 data class HorseEntityBucketInfo(
-    override val owner: String = "none",
+    override val ownerName: String? = null,
 ) : EntityBucketInfo, EntityBucketInfo.Tameable {
     override val type: EntityBucketInfoType get() = EntityBucketInfoTypes.HORSE
     override val typeName: Component get() = Component.translatable(EntityType.HORSE)
@@ -315,7 +316,7 @@ data class HorseEntityBucketInfo(
 @ConfigSerializable
 data class LlamaEntityBucketInfo(
     override val variant: String = "none",
-    override val owner: String = "none",
+    override val ownerName: String? = null,
 ) : EntityBucketInfo, EntityBucketInfo.Variable, EntityBucketInfo.Tameable {
     override val type: EntityBucketInfoType get() = EntityBucketInfoTypes.LLAMA
     override val typeName: Component get() = Component.translatable(EntityType.LLAMA)
@@ -323,9 +324,10 @@ data class LlamaEntityBucketInfo(
 
 @ConfigSerializable
 data class MooshroomEntityBucketInfo(
+    override val isAdult: Boolean,
     override val readyToBeSheared: Boolean = false,
     override val variant: String = "none",
-) : EntityBucketInfo, EntityBucketInfo.Shearable, EntityBucketInfo.Variable {
+) : EntityBucketInfo, EntityBucketInfo.Ageable, EntityBucketInfo.Shearable, EntityBucketInfo.Variable {
     override val type: EntityBucketInfoType get() = EntityBucketInfoTypes.MOOSHROOM
     override val typeName: Component get() = Component.translatable(EntityType.MOOSHROOM)
 }
@@ -434,7 +436,7 @@ data class StriderEntityBucketInfo(
 data class TraderLlamaEntityBucketInfo(
     override val isAdult: Boolean = false,
     override val variant: String = "none",
-    override val owner: String = "none",
+    override val ownerName: String? = null,
 ) : EntityBucketInfo, EntityBucketInfo.Ageable, EntityBucketInfo.Variable, EntityBucketInfo.Tameable {
     override val type: EntityBucketInfoType get() = EntityBucketInfoTypes.TRADER_LLAMA
     override val typeName: Component get() = Component.translatable(EntityType.TRADER_LLAMA)
@@ -451,9 +453,11 @@ data class TurtleEntityBucketInfo(
 
 @ConfigSerializable
 data class WolfEntityBucketInfo(
+    override val isAdult: Boolean = false,
     override val collarColor: String = "none",
-    override val owner: String = "none",
-) : EntityBucketInfo, EntityBucketInfo.CollarColorable, EntityBucketInfo.Tameable {
+    override val ownerName: String? = null,
+    override val variant: String = "none",
+) : EntityBucketInfo, EntityBucketInfo.Ageable, EntityBucketInfo.CollarColorable, EntityBucketInfo.Tameable, EntityBucketInfo.Variable {
     override val type: EntityBucketInfoType get() = EntityBucketInfoTypes.WOLF
     override val typeName: Component get() = Component.translatable(EntityType.WOLF)
 }
@@ -462,8 +466,8 @@ data class WolfEntityBucketInfo(
 //<editor-fold desc="Animals Like">
 @ConfigSerializable
 data class AllayEntityBucketInfo(
-    val itemInMainhand: String = "none",
-    val itemInOffhand: String = "none",
+    val itemInMainhand: String? = null,
+    val itemInOffhand: String? = null,
 ) : EntityBucketInfo {
     override val type: EntityBucketInfoType get() = EntityBucketInfoTypes.ALLAY
     override val typeName: Component get() = Component.translatable(EntityType.ALLAY)

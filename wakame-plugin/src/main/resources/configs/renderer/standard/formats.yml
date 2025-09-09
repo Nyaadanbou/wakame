@@ -165,7 +165,7 @@ entity_bucket_info:
     collar_colorable:
       - "<!i><gray>项圈颜色: <yellow><collar_color>"
     shearable:
-      - "<!i><gray>已剪毛: <yellow><is_sheared>"
+      - "<!i><gray>可剪毛: <yellow><ready_to_be_sheared>"
     tameable:
       - "<!i><gray>已驯服"
       - "<!i><gray>从属于: <yellow><owner_name>"
@@ -211,8 +211,8 @@ entity_bucket_info:
       - "<!i><gray>已怀孕: <yellow><has_egg>"
     wolf: [ ]
     allay:
-      - "<!i><gray>左手物品: <yellow><left_item>"
-      - "<!i><gray>右手物品: <yellow><right_item>"
+      - "<!i><gray>左手物品: <yellow><item_in_mainhand>"
+      - "<!i><gray>右手物品: <yellow><item_in_offhand>"
     iron_golem:
       - "<!i><gray>人造: <yellow><is_player_created>"
     snow_golem:

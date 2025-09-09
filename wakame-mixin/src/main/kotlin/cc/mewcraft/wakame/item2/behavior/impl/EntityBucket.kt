@@ -21,7 +21,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 
 /**
- * 用桶捕捉生物的逻辑.
+ * 用“桶”捕捉生物的逻辑.
  */
 object EntityBucket : ItemBehavior {
 
@@ -56,11 +56,12 @@ object EntityBucket : ItemBehavior {
         val deserializedEntity = Bukkit.getUnsafe().deserializeEntity(entityData, player.world)
         deserializedEntity.spawnAt(loc, CreatureSpawnEvent.SpawnReason.BUCKET)
 
-        // 还原物品状态
+        // 还原物品状态, 也就是使其变成空桶
         if (player.gameMode != GameMode.CREATIVE) {
             itemstack.resetData(DataComponentTypes.CUSTOM_MODEL_DATA)
             itemstack.resetData(DataComponentTypes.MAX_STACK_SIZE)
             itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_DATA)
+            itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_INFO)
         }
 
         // TODO 播放交互音效
@@ -83,7 +84,7 @@ object EntityBucket : ItemBehavior {
 
         // 检查是否可以捕捉该生物
         val entityTypeKey = clicked.type.key
-        if (entityTypeKey !in entityBucket.allowedEntities ||
+        if (entityTypeKey !in entityBucket.allowedEntityTypes ||
             !player.hasPermission("koish.item.behavior.entity_bucket.capture.${entityTypeKey.asString()}")
         ) {
             return
@@ -126,6 +127,11 @@ object EntityBucket : ItemBehavior {
         // 确保 itemstack 不会叠加
         if (itemstack.getData(DataComponentTypes.MAX_STACK_SIZE) != 1) {
             itemstack.setData(DataComponentTypes.MAX_STACK_SIZE, 1)
+        }
+
+        // 播放一点音效和动画效果
+        if (clicked is LivingEntity) {
+            clicked.playHurtAnimation(0f)
         }
 
         when (clicked) {
@@ -205,7 +211,7 @@ object EntityBucket : ItemBehavior {
 
             is ZombieVillager -> asZombieVillagerBucket(itemstack, clicked, player)
 
-            else -> TODO("unsupported entity type: ${clicked.type}")
+            else -> throw IllegalStateException("unsupported entity type: ${clicked.type}")
         }
     }
 
@@ -244,14 +250,14 @@ object EntityBucket : ItemBehavior {
         itemstack.setEntityBucketInfo(
             CamelEntityBucketInfo(
                 isAdult = clicked.isAdult,
-                owner = clicked.owner?.name ?: "none"
+                ownerName = clicked.owner?.name
             )
         )
         // TODO 播放交互音效
     }
 
     private fun asCatBucket(itemstack: ItemStack, clicked: Cat, player: Player) {
-        itemstack.setCustomModelData("cat/white") // TODO 根据变种设置
+        itemstack.setCustomModelData("cat/${clicked.catType.key().value()}")
         itemstack.setEntityBucketInfo(
             CatEntityBucketInfo(
                 collarColor = clicked.collarColor.name,
@@ -262,170 +268,310 @@ object EntityBucket : ItemBehavior {
     }
 
     private fun asChickenBucket(itemstack: ItemStack, clicked: Chicken, player: Player) {
-        itemstack.setCustomModelData("chicken/temperate") // TODO 根据变种设置
-        itemstack.setEntityBucketInfo(ChickenEntityBucketInfo()) // TODO 填充生物信息
+        val variant = clicked.variant.key().value()
+        itemstack.setCustomModelData("chicken/$variant")
+        itemstack.setEntityBucketInfo(
+            ChickenEntityBucketInfo(
+                isAdult = clicked.isAdult,
+                variant = variant
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asCowBucket(itemstack: ItemStack, clicked: Cow, player: Player) {
-        itemstack.setCustomModelData("cow/temperate") // TODO 根据变种设置
-        itemstack.setEntityBucketInfo(CowEntityBucketInfo()) // TODO 填充生物信息
+        val variant = clicked.variant.key.value()
+        itemstack.setCustomModelData("cow/$variant")
+        itemstack.setEntityBucketInfo(
+            CowEntityBucketInfo(
+                isAdult = clicked.isAdult,
+                variant = variant,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asDolphinBucket(itemstack: ItemStack, clicked: Dolphin, player: Player) {
         itemstack.setCustomModelData("dolphin")
-        itemstack.setEntityBucketInfo(DolphinEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            DolphinEntityBucketInfo(
+                isAdult = clicked.isAdult,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asDonkeyBucket(itemstack: ItemStack, clicked: Donkey, player: Player) {
         itemstack.setCustomModelData("donkey")
-        itemstack.setEntityBucketInfo(DonkeyEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            DonkeyEntityBucketInfo(
+                isAdult = clicked.isAdult,
+                ownerName = clicked.owner?.name
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asFoxBucket(itemstack: ItemStack, clicked: Fox, player: Player) {
-        itemstack.setCustomModelData("fox/red") // TODO 根据变种设置
-        itemstack.setEntityBucketInfo(FoxEntityBucketInfo()) // TODO 填充生物信息
+        val variant = clicked.foxType.name.lowercase()
+        itemstack.setCustomModelData("fox/$variant")
+        itemstack.setEntityBucketInfo(
+            FoxEntityBucketInfo(
+                isAdult = clicked.isAdult,
+                variant = variant
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asFrogBucket(itemstack: ItemStack, clicked: Frog, player: Player) {
-        itemstack.setCustomModelData("frog/temperate") // TODO 根据变种设置
-        itemstack.setEntityBucketInfo(FrogEntityBucketInfo()) // TODO 填充生物信息
+        val variant = clicked.variant.key().value()
+        itemstack.setCustomModelData("frog/$variant")
+        itemstack.setEntityBucketInfo(
+            FrogEntityBucketInfo(
+                variant = variant,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asGlowSquidBucket(itemstack: ItemStack, clicked: GlowSquid, player: Player) {
         itemstack.setCustomModelData("glow_squid")
-        itemstack.setEntityBucketInfo(GlowSquidEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            GlowSquidEntityBucketInfo(
+                isAdult = clicked.isAdult,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asGoatBucket(itemstack: ItemStack, clicked: Goat, player: Player) {
         itemstack.setCustomModelData("goat")
-        itemstack.setEntityBucketInfo(GoatEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            GoatEntityBucketInfo(
+                hasLeftHorn = clicked.hasLeftHorn(),
+                hasRightHorn = clicked.hasRightHorn(),
+                isAdult = clicked.isAdult,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asHappyGhast(itemstack: ItemStack, clicked: HappyGhast, player: Player) {
         itemstack.setCustomModelData("happy_ghast")
-        itemstack.setEntityBucketInfo(HappyGhastEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            HappyGhastEntityBucketInfo(
+                isAdult = clicked.isAdult,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asHoglinBucket(itemstack: ItemStack, clicked: Hoglin, player: Player) {
         itemstack.setCustomModelData("hoglin")
-        itemstack.setEntityBucketInfo(HoglinEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            HoglinEntityBucketInfo(
+                isAdult = clicked.isAdult,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asHorseBucket(itemstack: ItemStack, clicked: Horse, player: Player) {
         itemstack.setCustomModelData("horse") // 由于可能性太多, 贴图不考虑品种
-        itemstack.setEntityBucketInfo(HorseEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            HorseEntityBucketInfo(
+                ownerName = clicked.owner?.name
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asLlamaBucket(itemstack: ItemStack, clicked: Llama, player: Player) {
-        itemstack.setCustomModelData("llama/creamy") // TODO 根据变种设置
-        itemstack.setEntityBucketInfo(LlamaEntityBucketInfo()) // TODO 填充生物信息
+        val variant = clicked.color.name.lowercase()
+        itemstack.setCustomModelData("llama/$variant")
+        itemstack.setEntityBucketInfo(
+            LlamaEntityBucketInfo(
+                variant = variant,
+                ownerName = clicked.owner?.name,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asMooshroom(itemstack: ItemStack, clicked: MushroomCow, player: Player) {
-        itemstack.setCustomModelData("mooshroom/red") // TODO 根据变种设置
-        itemstack.setEntityBucketInfo(MooshroomEntityBucketInfo()) // TODO 填充生物信息
+        val variant = clicked.variant.name.lowercase()
+        itemstack.setCustomModelData("mooshroom/$variant")
+        itemstack.setEntityBucketInfo(
+            MooshroomEntityBucketInfo(
+                isAdult = clicked.isAdult,
+                readyToBeSheared = clicked.readyToBeSheared(),
+                variant = variant,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asMuleBucket(itemstack: ItemStack, clicked: Mule, player: Player) {
         itemstack.setCustomModelData("mule")
-        itemstack.setEntityBucketInfo(MuleEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            MuleEntityBucketInfo(
+                isAdult = clicked.isAdult,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asOcelotBucket(itemstack: ItemStack, clicked: Ocelot, player: Player) {
         itemstack.setCustomModelData("ocelot")
-        itemstack.setEntityBucketInfo(OcelotEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            OcelotEntityBucketInfo(
+                trusting = clicked.isTrusting
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asPandaBucket(itemstack: ItemStack, clicked: Panda, player: Player) {
         itemstack.setCustomModelData("panda")
-        itemstack.setEntityBucketInfo(PandaEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            PandaEntityBucketInfo() // TODO 填充生物信息
+        )
         // TODO 播放交互音效
     }
 
     private fun asParrotBucket(itemstack: ItemStack, clicked: Parrot, player: Player) {
-        itemstack.setCustomModelData("parrot/red") // TODO 根据变种设置
-        itemstack.setEntityBucketInfo(ParrotEntityBucketInfo()) // TODO 填充生物信息
+        val variant = clicked.variant.name.lowercase()
+        itemstack.setCustomModelData("parrot/$variant")
+        itemstack.setEntityBucketInfo(
+            ParrotEntityBucketInfo(
+                variant = variant,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asPigBucket(itemstack: ItemStack, clicked: Pig, player: Player) {
-        itemstack.setCustomModelData("pig/temperate") // TODO 根据变种设置
-        itemstack.setEntityBucketInfo(PigEntityBucketInfo()) // TODO 填充生物信息
+        val variant = clicked.variant.key().value()
+        itemstack.setCustomModelData("pig/$variant")
+        itemstack.setEntityBucketInfo(
+            PigEntityBucketInfo(
+                isAdult = clicked.isAdult,
+                variant = variant
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asPolarBearBucket(itemstack: ItemStack, clicked: PolarBear, player: Player) {
         itemstack.setCustomModelData("polar_bear")
-        itemstack.setEntityBucketInfo(PolarBearEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            PolarBearEntityBucketInfo(
+                isAdult = clicked.isAdult,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asRabbitBucket(itemstack: ItemStack, clicked: Rabbit, player: Player) {
-        itemstack.setCustomModelData("rabbit/white") // TODO 根据变种设置
-        itemstack.setEntityBucketInfo(RabbitEntityBucketInfo()) // TODO 填充生物信息
+        val variant = clicked.rabbitType.name.lowercase()
+        itemstack.setCustomModelData("rabbit/$variant")
+        itemstack.setEntityBucketInfo(
+            RabbitEntityBucketInfo(
+                variant = variant,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asSheepBucket(itemstack: ItemStack, clicked: Sheep, player: Player) {
-        itemstack.setCustomModelData("sheep/white") // TODO 根据变种设置
-        itemstack.setEntityBucketInfo(SheepEntityBucketInfo()) // TODO 填充生物信息
+        val variant = clicked.color!!.name.lowercase()
+        itemstack.setCustomModelData("sheep/$variant")
+        itemstack.setEntityBucketInfo(
+            SheepEntityBucketInfo(
+                isAdult = clicked.isAdult,
+                readyToBeSheared = clicked.readyToBeSheared(),
+                variant = variant,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asSkeletonHorseBucket(itemstack: ItemStack, clicked: SkeletonHorse, player: Player) {
         itemstack.setCustomModelData("skeleton_horse")
-        itemstack.setEntityBucketInfo(SkeletonHorseEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            SkeletonHorseEntityBucketInfo(
+                isAdult = clicked.isAdult
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asSnifferBucket(itemstack: ItemStack, clicked: Sniffer, player: Player) {
         itemstack.setCustomModelData("sniffer")
-        itemstack.setEntityBucketInfo(SnifferEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            SnifferEntityBucketInfo(
+                isAdult = clicked.isAdult,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asSquidBucket(itemstack: ItemStack, clicked: Squid, player: Player) {
         itemstack.setCustomModelData("squid")
-        itemstack.setEntityBucketInfo(SquidEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            SquidEntityBucketInfo(
+                isAdult = clicked.isAdult,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asStriderBucket(itemstack: ItemStack, clicked: Strider, player: Player) {
         itemstack.setCustomModelData("strider")
-        itemstack.setEntityBucketInfo(StriderEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            StriderEntityBucketInfo(
+                isAdult = clicked.isAdult
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asTraderLlamaBucket(itemstack: ItemStack, clicked: TraderLlama, player: Player) {
-        itemstack.setCustomModelData("trader_llama/creamy") // TODO 根据变种设置
-        itemstack.setEntityBucketInfo(TraderLlamaEntityBucketInfo()) // TODO 填充生物信息
+        val variant = clicked.color.name.lowercase()
+        itemstack.setCustomModelData("trader_llama/$variant")
+        itemstack.setEntityBucketInfo(
+            TraderLlamaEntityBucketInfo(
+                isAdult = clicked.isAdult,
+                variant = variant,
+                ownerName = clicked.owner?.name,
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asTurtleBucket(itemstack: ItemStack, clicked: Turtle, player: Player) {
         itemstack.setCustomModelData("turtle")
-        itemstack.setEntityBucketInfo(TurtleEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            TurtleEntityBucketInfo(
+                isAdult = clicked.isAdult,
+                hasEgg = clicked.hasEgg(),
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asWolfBucket(itemstack: ItemStack, clicked: Wolf, player: Player) {
-        itemstack.setCustomModelData("wolf/pale") // TODO 根据变种设置
-        itemstack.setEntityBucketInfo(WolfEntityBucketInfo()) // TODO 填充生物信息
+        val variant = clicked.variant.key().value()
+        itemstack.setCustomModelData("wolf/$variant")
+        itemstack.setEntityBucketInfo(
+            WolfEntityBucketInfo(
+                isAdult = clicked.isAdult,
+                collarColor = clicked.collarColor.name,
+                ownerName = clicked.owner?.name,
+                variant = variant
+            )
+        )
         // TODO 播放交互音效
     }
     //</editor-fold>
@@ -439,13 +585,21 @@ object EntityBucket : ItemBehavior {
 
     private fun asSnowGolemBucket(itemstack: ItemStack, clicked: Snowman, player: Player) {
         itemstack.setCustomModelData("snow_golem")
-        itemstack.setEntityBucketInfo(SnowGolemEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            SnowGolemEntityBucketInfo(
+                hasPumpkin = !(clicked.isDerp)
+            )
+        )
         // TODO 播放交互音效
     }
 
     private fun asIronGolemBucket(itemstack: ItemStack, clicked: IronGolem, player: Player) {
         itemstack.setCustomModelData("iron_golem")
-        itemstack.setEntityBucketInfo(IronGolemEntityBucketInfo()) // TODO 填充生物信息
+        itemstack.setEntityBucketInfo(
+            IronGolemEntityBucketInfo(
+                isPlayerCreated = clicked.isPlayerCreated,
+            )
+        )
         // TODO 播放交互音效
     }
     //</editor-fold>

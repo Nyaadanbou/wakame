@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.entity.EntityType
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
@@ -98,24 +99,31 @@ internal data class EntityBucketInfoRendererFormat(
         // 先把抽象的部分加上
         if (info is EntityBucketInfo.Ageable) {
             val unparsed = abstract[AbstractType.AGEABLE] ?: emptyList()
-            val resolver = Placeholder.component("is_adult", if (info.isAdult) Component.text("是") else Component.text("否"))
+            val resolver = Placeholder.unparsed("is_adult", if (info.isAdult) "是" else "否")
             lines += unparsed.map { MM.deserialize(it, resolver) }
         }
         if (info is EntityBucketInfo.CollarColorable) {
             val unparsed = abstract[AbstractType.COLLAR_COLORABLE] ?: emptyList()
-            // TODO #404
+            val resolver = Placeholder.unparsed("collar_color", info.collarColor)
+            lines += unparsed.map { MM.deserialize(it, resolver) }
         }
         if (info is EntityBucketInfo.Shearable) {
             val unparsed = abstract[AbstractType.SHEARABLE] ?: emptyList()
-            // TODO #404
+            val resolver = Placeholder.unparsed("ready_to_be_sheared", if (info.readyToBeSheared) "是" else "否")
+            lines += unparsed.map { MM.deserialize(it, resolver) }
         }
         if (info is EntityBucketInfo.Tameable) {
-            val unparsed = abstract[AbstractType.TAMEABLE] ?: emptyList()
-            // TODO #404
+            val ownerName = info.ownerName
+            if (ownerName != null) {
+                val unparsed = abstract[AbstractType.TAMEABLE] ?: emptyList()
+                val resolver = Placeholder.unparsed("owner_name", ownerName)
+                lines += unparsed.map { MM.deserialize(it, resolver) }
+            }
         }
         if (info is EntityBucketInfo.Variable) {
             val unparsed = abstract[AbstractType.VARIABLE] ?: emptyList()
-            // TODO #404
+            val resolver = Placeholder.unparsed("variant", info.variant)
+            lines += unparsed.map { MM.deserialize(it, resolver) }
         }
 
         // 再把具体的部分加上
@@ -127,39 +135,68 @@ internal data class EntityBucketInfoRendererFormat(
             }
 
             is GoatEntityBucketInfo -> {
-                // TODO #404
+                val unparsed = specific[EntityType.GOAT] ?: emptyList()
+                val resolver = TagResolver.builder()
+                    .resolver(Placeholder.unparsed("has_left_horn", if (info.hasLeftHorn) "有" else "无"))
+                    .resolver(Placeholder.unparsed("has_right_horn", if (info.hasRightHorn) "有" else "无"))
+                    .build()
+                lines += unparsed.map { MM.deserialize(it, resolver) }
             }
 
             is OcelotEntityBucketInfo -> {
-                // TODO #404
+                val unparsed = specific[EntityType.OCELOT] ?: emptyList()
+                val resolver = Placeholder.unparsed("trusting", if (info.trusting) "是" else "否")
+                lines += unparsed.map { MM.deserialize(it, resolver) }
             }
 
             is TurtleEntityBucketInfo -> {
-                // TODO #404
+                val unparsed = specific[EntityType.TURTLE] ?: emptyList()
+                val resolver = Placeholder.unparsed("has_egg", if (info.hasEgg) "是" else "否")
+                lines += unparsed.map { MM.deserialize(it, resolver) }
             }
 
             is AllayEntityBucketInfo -> {
-                // TODO #404
+                val unparsed = specific[EntityType.ALLAY] ?: emptyList()
+                val resolver = TagResolver.builder()
+                    .resolver(Placeholder.unparsed("item_in_mainhand", info.itemInMainhand ?: "无"))
+                    .resolver(Placeholder.unparsed("item_in_offhand", info.itemInOffhand ?: "无"))
+                    .build()
+                lines += unparsed.map { MM.deserialize(it, resolver) }
             }
 
             is IronGolemEntityBucketInfo -> {
-                // TODO #404
+                val unparsed = specific[EntityType.IRON_GOLEM] ?: emptyList()
+                val resolver = Placeholder.unparsed("player_created", if (info.isPlayerCreated) "是" else "否")
+                lines += unparsed.map { MM.deserialize(it, resolver) }
             }
 
             is SnowGolemEntityBucketInfo -> {
-                // TODO #404
+                val unparsed = specific[EntityType.SNOW_GOLEM] ?: emptyList()
+                val resolver = Placeholder.unparsed("pumpkin_type", if (info.hasPumpkin) "有" else "无")
+                lines += unparsed.map { MM.deserialize(it, resolver) }
             }
 
             is VillagerEntityBucketInfo -> {
-                // TODO #404
+                val unparsed = specific[EntityType.VILLAGER] ?: emptyList()
+                val resolver = TagResolver.builder()
+                    .resolver(Placeholder.unparsed("level", info.level.toString()))
+                    .resolver(Placeholder.unparsed("region", info.region))
+                    .resolver(Placeholder.unparsed("profession", info.profession))
+                    .build()
+                lines += unparsed.map { MM.deserialize(it, resolver) }
             }
 
             is WanderingTraderEntityBucketInfo -> {
-                // TODO #404
+                lines += info.offers.map { Component.text(it) }
             }
 
             is ZombieVillagerEntityBucketInfo -> {
-                // TODO #404
+                val unparsed = specific[EntityType.ZOMBIE_VILLAGER] ?: emptyList()
+                val resolver = TagResolver.builder()
+                    .resolver(Placeholder.unparsed("region", info.region))
+                    .resolver(Placeholder.unparsed("profession", info.profession))
+                    .build()
+                lines += unparsed.map { MM.deserialize(it, resolver) }
             }
 
             else -> {}

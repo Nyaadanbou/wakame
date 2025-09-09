@@ -10,39 +10,57 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
  */
 @ConfigSerializable
 data class EntityBucket(
-    val allowedEntities: Set<Key>,
+    val allowedEntityTypes: Set<Key>,
 ) {
     companion object {
         val SUPPORT_ENTITY_TYPES: Set<NamespacedKey> = listOf(
-            EntityType.ALLAY,
+            // Animals
             EntityType.ARMADILLO,
-            EntityType.BAT,
+            EntityType.BEE,
             EntityType.CAMEL,
             EntityType.CAT,
             EntityType.CHICKEN,
             EntityType.COW,
-            //EntityType.DONKEY,
-            //EntityType.FROG,
-            //EntityType.GLOW_SQUID,
-            //EntityType.HAPPY_GHAST,
-            //EntityType.HORSE,
+            EntityType.DOLPHIN,
+            EntityType.DONKEY,
+            EntityType.FOX,
+            EntityType.FROG,
+            EntityType.GLOW_SQUID,
+            EntityType.GOAT,
+            EntityType.HAPPY_GHAST,
+            EntityType.HOGLIN,
+            EntityType.HORSE,
+            EntityType.LLAMA,
             EntityType.MOOSHROOM,
+            EntityType.MULE,
             EntityType.OCELOT,
-            //EntityType.PARROT,
+            EntityType.PANDA,
+            EntityType.PARROT,
             EntityType.PIG,
+            EntityType.POLAR_BEAR,
             EntityType.RABBIT,
             EntityType.SHEEP,
-            //EntityType.SKELETON_HORSE,
-            //EntityType.SNIFFER,
-            EntityType.SNOW_GOLEM,
-            //EntityType.SQUID,
-            //EntityType.STRIDER,
+            EntityType.SKELETON_HORSE,
+            EntityType.SNIFFER,
+            EntityType.SQUID,
+            EntityType.STRIDER,
+            EntityType.TRADER_LLAMA,
             EntityType.TURTLE,
+            EntityType.WOLF,
+
+            // Animals Like
+            EntityType.ALLAY,
+            EntityType.IRON_GOLEM,
+            EntityType.SNOW_GOLEM,
+
+            // NPCs
             EntityType.VILLAGER,
+            EntityType.WANDERING_TRADER,
+            EntityType.ZOMBIE_VILLAGER,
         ).mapTo(HashSet(32), EntityType::getKey)
     }
 
     init {
-        require(allowedEntities.subtract(SUPPORT_ENTITY_TYPES).isEmpty()) { "unsupported entity types: ${allowedEntities.subtract(SUPPORT_ENTITY_TYPES).joinToString(transform = Key::asString)}" }
+        require(allowedEntityTypes.subtract(SUPPORT_ENTITY_TYPES).isEmpty()) { "unsupported entity types: ${allowedEntityTypes.subtract(SUPPORT_ENTITY_TYPES).joinToString(transform = Key::asString)}" }
     }
 }
