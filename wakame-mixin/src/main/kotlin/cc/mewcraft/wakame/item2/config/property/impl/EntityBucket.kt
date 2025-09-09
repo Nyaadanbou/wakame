@@ -43,6 +43,6 @@ data class EntityBucket(
     }
 
     init {
-        require(allowedEntities.subtract(SUPPORT_ENTITY_TYPES).isNotEmpty()) { "unsupported entity types: ${allowedEntities.subtract(SUPPORT_ENTITY_TYPES).joinToString(transform = Key::asString)}" }
+        require(allowedEntities.subtract(SUPPORT_ENTITY_TYPES).isEmpty()) { "unsupported entity types: ${allowedEntities.subtract(SUPPORT_ENTITY_TYPES).joinToString(transform = Key::asString)}" }
     }
 }

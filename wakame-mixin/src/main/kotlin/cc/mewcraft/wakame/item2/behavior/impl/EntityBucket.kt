@@ -39,25 +39,25 @@ object EntityBucket : ItemBehavior {
             return // 不是点击的方块顶部
         }
 
-        wrappedEvent.event.isCancelled = true
         if (wrappedEvent.event.clickedBlock == null) {
             return // 没有点击方块 (什么情况下 BlockFace 不为 null 但 clickedBlock 为 null ?)
         }
+
+        wrappedEvent.event.isCancelled = true
+        wrappedEvent.actionPerformed = true
 
         val deserializedEntity = Bukkit.getUnsafe().deserializeEntity(entityData, player.world)
         deserializedEntity.spawnAt(loc, CreatureSpawnEvent.SpawnReason.BUCKET)
 
         // 还原物品状态
         if (player.gameMode != GameMode.CREATIVE) {
-            itemstack.unsetData(DataComponentTypes.CUSTOM_MODEL_DATA)
-            itemstack.unsetData(DataComponentTypes.CUSTOM_NAME)
-            itemstack.unsetData(DataComponentTypes.MAX_STACK_SIZE)
+            itemstack.resetData(DataComponentTypes.CUSTOM_MODEL_DATA)
+            itemstack.resetData(DataComponentTypes.CUSTOM_NAME)
+            itemstack.resetData(DataComponentTypes.MAX_STACK_SIZE)
             itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_DATA)
         }
 
         // TODO 播放交互音效
-
-        wrappedEvent.actionPerformed = true
     }
 
     // 当玩家手持一个生物桶右键生物时
@@ -74,14 +74,14 @@ object EntityBucket : ItemBehavior {
         // 检查是否可以捕捉该生物
         val entityTypeKey = clicked.type.key
         if (entityTypeKey !in entityBucket.allowedEntities ||
-            player.hasPermission("koish.item.behavior.entity_bucket.capture.${entityTypeKey.asString()}")
+            !player.hasPermission("koish.item.behavior.entity_bucket.capture.${entityTypeKey.asString()}")
         ) {
             return
         }
 
         // 处理创造模式和多桶叠加的情况
         if (itemstack.amount > 1 || player.gameMode == GameMode.CREATIVE) {
-            val newStack = ItemStack(itemstack.type, 1)
+            val newStack = itemstack.clone().asOne()
             asEntityBucket(newStack, clicked, player)
             if (player.gameMode != GameMode.CREATIVE) {
                 itemstack.subtract(1)

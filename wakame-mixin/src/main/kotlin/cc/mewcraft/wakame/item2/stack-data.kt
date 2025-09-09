@@ -45,11 +45,11 @@ fun <T> ItemStack.hasProp(type: ItemPropertyType<T>): Boolean = toNMS().hasProp(
 fun <T> ItemStack.getPropOrDefault(type: ItemPropertyType<out T>, fallback: T): T? = toNMS().getPropOrDefault(type, fallback)
 
 @Deprecated("Use getProp instead", ReplaceWith("hasProp(type)"))
-fun <T> ItemStack.hasProperty(type: ItemPropertyType<T>): Boolean = toNMS().hasProperty(type)
+fun <T> ItemStack.hasProperty(type: ItemPropertyType<T>): Boolean = hasProp(type)
 @Deprecated("Use hasProp instead", ReplaceWith("getProp(type)"))
-fun <T> ItemStack.getProperty(type: ItemPropertyType<out T>): T? = toNMS().getProperty(type)
+fun <T> ItemStack.getProperty(type: ItemPropertyType<out T>): T? = getProp(type)
 @Deprecated("Use getPropOrDefault instead", ReplaceWith("getPropOrDefault(type, fallback)"))
-fun <T> ItemStack.getPropertyOrDefault(type: ItemPropertyType<out T>, fallback: T): T? = toNMS().getPropertyOrDefault(type, fallback)
+fun <T> ItemStack.getPropertyOrDefault(type: ItemPropertyType<out T>, fallback: T): T? = toNMS().getPropOrDefault(type, fallback)
 
 /* ItemData */
 
