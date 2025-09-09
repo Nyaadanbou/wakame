@@ -1,26 +1,16 @@
 package cc.mewcraft.wakame.display2.implementation.standard
 
 import cc.mewcraft.wakame.MM
-import cc.mewcraft.wakame.display2.DerivedIndex
-import cc.mewcraft.wakame.display2.IndexedText
-import cc.mewcraft.wakame.display2.RendererFormat
-import cc.mewcraft.wakame.display2.SimpleIndexedText
-import cc.mewcraft.wakame.display2.TextMetaFactory
-import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
-import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreOrdinalFormat
-import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
-import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
-import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMetaFactory
-import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
-import cc.mewcraft.wakame.display2.implementation.common.computeIndex
+import cc.mewcraft.wakame.display2.*
+import cc.mewcraft.wakame.display2.implementation.common.*
 import cc.mewcraft.wakame.entity.player.AttackSpeed
-import cc.mewcraft.wakame.item2.data.impl.AttributeCore
-import cc.mewcraft.wakame.item2.data.impl.EmptyCore
+import cc.mewcraft.wakame.item2.data.impl.*
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import org.bukkit.entity.EntityType
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 @ConfigSerializable
@@ -84,5 +74,106 @@ internal data class AttackSpeedRendererFormat(
 
     companion object Shared {
         private val UNKNOWN_LEVEL = Component.text("???")
+    }
+}
+
+@ConfigSerializable
+internal data class EntityBucketInfoRendererFormat(
+    override val namespace: String,
+    private val content: List<String>,
+    private val abstract: Map<AbstractType, List<String>>,
+    private val specific: Map<EntityType, List<String>>,
+) : RendererFormat.Simple {
+    override val id: String = "entity_bucket_info"
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory.fixed()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate.literal(namespace, id)
+
+    fun render(info: EntityBucketInfo): IndexedText {
+        val lines = arrayListOf<Component>()
+
+        // 内容物加上
+        lines += content.map { MM.deserialize(it, Placeholder.component("entity_type", info.typeName)) }
+
+        // 先把抽象的部分加上
+        if (info is EntityBucketInfo.Ageable) {
+            val unparsed = abstract[AbstractType.AGEABLE] ?: emptyList()
+            val resolver = Placeholder.component("is_adult", if (info.isAdult) Component.text("是") else Component.text("否"))
+            lines += unparsed.map { MM.deserialize(it, resolver) }
+        }
+        if (info is EntityBucketInfo.CollarColorable) {
+            val unparsed = abstract[AbstractType.COLLAR_COLORABLE] ?: emptyList()
+            // TODO #404
+        }
+        if (info is EntityBucketInfo.Shearable) {
+            val unparsed = abstract[AbstractType.SHEARABLE] ?: emptyList()
+            // TODO #404
+        }
+        if (info is EntityBucketInfo.Tameable) {
+            val unparsed = abstract[AbstractType.TAMEABLE] ?: emptyList()
+            // TODO #404
+        }
+        if (info is EntityBucketInfo.Variable) {
+            val unparsed = abstract[AbstractType.VARIABLE] ?: emptyList()
+            // TODO #404
+        }
+
+        // 再把具体的部分加上
+        when (info) {
+            is ArmadilloEntityBucketInfo -> {
+                val unparsed = specific[EntityType.ARMADILLO] ?: emptyList()
+                val resolver = Placeholder.component("state", Component.text(info.state))
+                lines += unparsed.map { MM.deserialize(it, resolver) }
+            }
+
+            is GoatEntityBucketInfo -> {
+                // TODO #404
+            }
+
+            is OcelotEntityBucketInfo -> {
+                // TODO #404
+            }
+
+            is TurtleEntityBucketInfo -> {
+                // TODO #404
+            }
+
+            is AllayEntityBucketInfo -> {
+                // TODO #404
+            }
+
+            is IronGolemEntityBucketInfo -> {
+                // TODO #404
+            }
+
+            is SnowGolemEntityBucketInfo -> {
+                // TODO #404
+            }
+
+            is VillagerEntityBucketInfo -> {
+                // TODO #404
+            }
+
+            is WanderingTraderEntityBucketInfo -> {
+                // TODO #404
+            }
+
+            is ZombieVillagerEntityBucketInfo -> {
+                // TODO #404
+            }
+
+            else -> {}
+        }
+
+        // 返回最终结果
+        return SimpleIndexedText(index, lines)
+    }
+
+    enum class AbstractType {
+        AGEABLE,
+        COLLAR_COLORABLE,
+        SHEARABLE,
+        TAMEABLE,
+        VARIABLE
     }
 }

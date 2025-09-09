@@ -8,6 +8,29 @@ package cc.mewcraft.wakame.display2
  * 如果现有的构造函数无法满足需求, 应该添加更多的构造函数.
  */
 fun interface TextMetaFactoryPredicate {
+
+    companion object {
+        fun literal(namespace: String, pathLiteral: String): TextMetaFactoryPredicate {
+            return TextMetaFactoryPredicate { sourceIndex ->
+                sourceIndex.namespace() == namespace && sourceIndex.value() == pathLiteral
+            }
+        }
+
+        @JvmName("TextMetaFactoryPredicateLambda1")
+        fun predicate(namespace: String, pathPredicate: (String) -> Boolean): TextMetaFactoryPredicate {
+            return TextMetaFactoryPredicate { sourceIndex ->
+                sourceIndex.namespace() == namespace && pathPredicate(sourceIndex.value())
+            }
+        }
+
+        @JvmName("TextMetaFactoryPredicateLambda2")
+        fun predicate2(namespace: String, pathPredicate: (SourceIndex) -> Boolean): TextMetaFactoryPredicate {
+            return TextMetaFactoryPredicate { sourceIndex ->
+                sourceIndex.namespace() == namespace && pathPredicate(sourceIndex)
+            }
+        }
+    }
+
     /**
      * 检查该工厂是否可以从 [sourceIndex] 创建一个 [SimpleTextMeta].
      *
@@ -21,12 +44,14 @@ fun interface TextMetaFactoryPredicate {
     fun test(sourceIndex: SourceIndex): Boolean
 }
 
+@Deprecated("Use TextMetaFactoryPredicate.literal()", ReplaceWith("TextMetaFactoryPredicate.literal(namespaceLiteral, pathLiteral)"))
 fun TextMetaFactoryPredicate(namespaceLiteral: String, pathLiteral: String): TextMetaFactoryPredicate {
     return TextMetaFactoryPredicate { sourceIndex ->
         sourceIndex.namespace() == namespaceLiteral && sourceIndex.value() == pathLiteral
     }
 }
 
+@Deprecated("Use TextMetaFactoryPredicate.predicate()", ReplaceWith("TextMetaFactoryPredicate.predicate(namespaceLiteral, pathPredicate)"))
 @JvmName("TextMetaFactoryPredicateLambda1")
 fun TextMetaFactoryPredicate(namespaceLiteral: String, pathPredicate: (String) -> Boolean): TextMetaFactoryPredicate {
     return TextMetaFactoryPredicate { sourceIndex ->
@@ -34,6 +59,7 @@ fun TextMetaFactoryPredicate(namespaceLiteral: String, pathPredicate: (String) -
     }
 }
 
+@Deprecated("Use TextMetaFactoryPredicate.predicate2()", ReplaceWith("TextMetaFactoryPredicate.predicate2(namespaceLiteral, pathPredicate)"))
 @JvmName("TextMetaFactoryPredicateLambda2")
 fun TextMetaFactoryPredicate(namespaceLiteral: String, pathPredicate: (SourceIndex) -> Boolean): TextMetaFactoryPredicate {
     return TextMetaFactoryPredicate { sourceIndex ->
