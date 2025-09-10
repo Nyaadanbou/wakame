@@ -264,47 +264,49 @@ object EntityBucket : ItemBehavior {
         setData(ItemDataTypes.ENTITY_BUCKET_INFO, value)
     }
 
-    private val SOUND_MAP: Map<EntityType, Sound> = mapOf(
-        // Animals
-        EntityType.ARMADILLO to Sound.ENTITY_ARMADILLO_HURT,
-        EntityType.BEE to Sound.ENTITY_BEE_HURT,
-        EntityType.CAT to Sound.ENTITY_CAT_HURT,
-        EntityType.CHICKEN to Sound.ENTITY_CHICKEN_HURT,
-        EntityType.COW to Sound.ENTITY_COW_HURT,
-        EntityType.DOLPHIN to Sound.ENTITY_DOLPHIN_HURT,
-        EntityType.DONKEY to Sound.ENTITY_DONKEY_HURT,
-        EntityType.FOX to Sound.ENTITY_FOX_HURT,
-        EntityType.FROG to Sound.ENTITY_FROG_HURT,
-        EntityType.GOAT to Sound.ENTITY_GOAT_HURT,
-        EntityType.HORSE to Sound.ENTITY_HORSE_HURT,
-        EntityType.LLAMA to Sound.ENTITY_LLAMA_HURT,
-        EntityType.MOOSHROOM to Sound.ENTITY_COW_HURT,
-        EntityType.MULE to Sound.ENTITY_MULE_HURT,
-        EntityType.OCELOT to Sound.ENTITY_OCELOT_HURT,
-        EntityType.PANDA to Sound.ENTITY_PANDA_HURT,
-        EntityType.PARROT to Sound.ENTITY_PARROT_HURT,
-        EntityType.PIG to Sound.ENTITY_PIG_HURT,
-        EntityType.POLAR_BEAR to Sound.ENTITY_POLAR_BEAR_HURT,
-        EntityType.RABBIT to Sound.ENTITY_RABBIT_HURT,
-        EntityType.SHEEP to Sound.ENTITY_SHEEP_HURT,
-        EntityType.SKELETON_HORSE to Sound.ENTITY_SKELETON_HORSE_HURT,
-        EntityType.SNIFFER to Sound.ENTITY_SNIFFER_HURT,
-        EntityType.SQUID to Sound.ENTITY_SQUID_HURT,
-        EntityType.STRIDER to Sound.ENTITY_STRIDER_HURT,
-        EntityType.TRADER_LLAMA to Sound.ENTITY_LLAMA_HURT,
-        EntityType.TURTLE to Sound.ENTITY_TURTLE_HURT,
-        EntityType.WOLF to Sound.ENTITY_WOLF_HURT,
+    private val SOUND_MAP: Map<EntityType, Sound> by lazy { // make it lazy to avoid init error on server bootstrap phase
+        mapOf(
+            // Animals
+            EntityType.ARMADILLO to Sound.ENTITY_ARMADILLO_HURT,
+            EntityType.BEE to Sound.ENTITY_BEE_HURT,
+            EntityType.CAT to Sound.ENTITY_CAT_HURT,
+            EntityType.CHICKEN to Sound.ENTITY_CHICKEN_HURT,
+            EntityType.COW to Sound.ENTITY_COW_HURT,
+            EntityType.DOLPHIN to Sound.ENTITY_DOLPHIN_HURT,
+            EntityType.DONKEY to Sound.ENTITY_DONKEY_HURT,
+            EntityType.FOX to Sound.ENTITY_FOX_HURT,
+            EntityType.FROG to Sound.ENTITY_FROG_HURT,
+            EntityType.GOAT to Sound.ENTITY_GOAT_HURT,
+            EntityType.HORSE to Sound.ENTITY_HORSE_HURT,
+            EntityType.LLAMA to Sound.ENTITY_LLAMA_HURT,
+            EntityType.MOOSHROOM to Sound.ENTITY_COW_HURT,
+            EntityType.MULE to Sound.ENTITY_MULE_HURT,
+            EntityType.OCELOT to Sound.ENTITY_OCELOT_HURT,
+            EntityType.PANDA to Sound.ENTITY_PANDA_HURT,
+            EntityType.PARROT to Sound.ENTITY_PARROT_HURT,
+            EntityType.PIG to Sound.ENTITY_PIG_HURT,
+            EntityType.POLAR_BEAR to Sound.ENTITY_POLAR_BEAR_HURT,
+            EntityType.RABBIT to Sound.ENTITY_RABBIT_HURT,
+            EntityType.SHEEP to Sound.ENTITY_SHEEP_HURT,
+            EntityType.SKELETON_HORSE to Sound.ENTITY_SKELETON_HORSE_HURT,
+            EntityType.SNIFFER to Sound.ENTITY_SNIFFER_HURT,
+            EntityType.SQUID to Sound.ENTITY_SQUID_HURT,
+            EntityType.STRIDER to Sound.ENTITY_STRIDER_HURT,
+            EntityType.TRADER_LLAMA to Sound.ENTITY_LLAMA_HURT,
+            EntityType.TURTLE to Sound.ENTITY_TURTLE_HURT,
+            EntityType.WOLF to Sound.ENTITY_WOLF_HURT,
 
-        // Animals Like
-        EntityType.ALLAY to Sound.ENTITY_ALLAY_DEATH,
-        EntityType.IRON_GOLEM to Sound.ENTITY_IRON_GOLEM_HURT,
-        EntityType.SNOW_GOLEM to Sound.ENTITY_SNOW_GOLEM_HURT,
+            // Animals Like
+            EntityType.ALLAY to Sound.ENTITY_ALLAY_DEATH,
+            EntityType.IRON_GOLEM to Sound.ENTITY_IRON_GOLEM_HURT,
+            EntityType.SNOW_GOLEM to Sound.ENTITY_SNOW_GOLEM_HURT,
 
-        // NPCs
-        EntityType.VILLAGER to Sound.ENTITY_VILLAGER_HURT,
-        EntityType.WANDERING_TRADER to Sound.ENTITY_WANDERING_TRADER_HURT,
-        EntityType.ZOMBIE_VILLAGER to Sound.ENTITY_ZOMBIE_VILLAGER_HURT,
-    )
+            // NPCs
+            EntityType.VILLAGER to Sound.ENTITY_VILLAGER_HURT,
+            EntityType.WANDERING_TRADER to Sound.ENTITY_WANDERING_TRADER_HURT,
+            EntityType.ZOMBIE_VILLAGER to Sound.ENTITY_ZOMBIE_VILLAGER_HURT,
+        )
+    }
 
     private fun Entity.playBucketActionSound(player: Player) {
         if (this.isSilent) return
@@ -381,7 +383,6 @@ object EntityBucket : ItemBehavior {
                 isAdult = clicked.isAdult,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asDonkeyBucket(itemstack: ItemStack, clicked: Donkey, player: Player) {
