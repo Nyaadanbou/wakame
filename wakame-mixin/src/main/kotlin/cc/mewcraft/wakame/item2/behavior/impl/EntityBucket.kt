@@ -248,6 +248,11 @@ object EntityBucket : ItemBehavior {
         }
     }
 
+    /**
+     * 设置物品的 `minecraft:custom_model_data` 组件中的**字符串**值, 用于让不同的生物桶有不同的贴图 (你也不想让所有生物桶都长得一样吧).
+     *
+     * 为了使这个 `minecraft:custom_model_data` 组件真的生效, 你需要编写一个专门的 [Item Model Definition](https://minecraft.wiki/w/Items_model_definition#custom_model_data_3).
+     */
     private fun ItemStack.setCustomModelData(value: String) {
         setData(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelData.customModelData().addString(value))
     }
