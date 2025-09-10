@@ -10,7 +10,8 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
  */
 @ConfigSerializable
 data class EntityBucket(
-    val allowedEntityTypes: Set<Key>,
+    val itemNameFormat: String = "<entity_type>桶",
+    val allowedEntityTypes: Set<Key> = emptySet(),
 ) {
     companion object {
         val SUPPORT_ENTITY_TYPES: Set<NamespacedKey> = listOf(

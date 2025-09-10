@@ -6,9 +6,11 @@ import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.serialization.configurate.serializer.JsonComponentSerializer
 import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
+import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 /**
@@ -108,6 +110,16 @@ data object ItemDataTypes {
      */
     @JvmField
     val ENTITY_BUCKET_DATA: ItemDataType<ByteArray> = typeOf("entity_bucket_data")
+
+    /**
+     * 旧的 `minecraft:item_name` 信息, 用于在某些操作后将物品的 `minecraft:item_name` 恢复为原本的值.
+     */
+    @JvmField
+    val PREVIOUS_ITEM_NAME: ItemDataType<Component> = typeOf("previous_item_name") {
+        serializers {
+            register(JsonComponentSerializer)
+        }
+    }
 
     // ------------
     // 方便函数

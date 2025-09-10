@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item2.behavior.impl
 
+import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.item2.*
@@ -10,6 +11,8 @@ import cc.mewcraft.wakame.item2.data.impl.*
 import cc.mewcraft.wakame.util.adventure.plain
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.CustomModelData
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.block.BlockFace
@@ -27,14 +30,9 @@ object EntityBucket : ItemBehavior {
 
     // 当玩家手持一个生物桶右键方块顶部时
     override fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-        val entityData = itemstack.getData(ItemDataTypes.ENTITY_BUCKET_DATA) ?: return
+        val interactPt = wrappedEvent.event.interactionPoint ?: return // 没有交互点
 
-        val loc = wrappedEvent.event.interactionPoint
-        if (loc == null) {
-            return // 没有交互点
-        }
-
-        if (!ProtectionManager.canUseItem(player, itemstack, loc)) {
+        if (!ProtectionManager.canUseItem(player, itemstack, interactPt)) {
             return
         }
 
@@ -53,18 +51,27 @@ object EntityBucket : ItemBehavior {
         wrappedEvent.event.isCancelled = true
         wrappedEvent.actionPerformed = true
 
+        val entityData = itemstack.getData(ItemDataTypes.ENTITY_BUCKET_DATA) ?: return
         val deserializedEntity = Bukkit.getUnsafe().deserializeEntity(entityData, player.world)
-        deserializedEntity.spawnAt(loc, CreatureSpawnEvent.SpawnReason.BUCKET)
+        val successfullySpawned = deserializedEntity.spawnAt(interactPt, CreatureSpawnEvent.SpawnReason.BUCKET)
+        if (successfullySpawned) {
+            // 还原物品状态, 也就是使其变成空桶
+            if (player.gameMode != GameMode.CREATIVE) {
+                itemstack.resetData(DataComponentTypes.CUSTOM_MODEL_DATA)
+                itemstack.resetData(DataComponentTypes.MAX_STACK_SIZE)
+                itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_DATA)
+                itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_INFO)
 
-        // 还原物品状态, 也就是使其变成空桶
-        if (player.gameMode != GameMode.CREATIVE) {
-            itemstack.resetData(DataComponentTypes.CUSTOM_MODEL_DATA)
-            itemstack.resetData(DataComponentTypes.MAX_STACK_SIZE)
-            itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_DATA)
-            itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_INFO)
+                val prevItemName = itemstack.getData(ItemDataTypes.PREVIOUS_ITEM_NAME)
+                if (prevItemName != null) {
+                    itemstack.setData(DataComponentTypes.ITEM_NAME, prevItemName)
+                }
+            }
+
+            if (deserializedEntity is LivingEntity) {
+                deserializedEntity.playHurtAnimation(0f)
+            }
         }
-
-        // TODO 播放交互音效
     }
 
     // 当玩家手持一个生物桶右键生物时
@@ -128,6 +135,16 @@ object EntityBucket : ItemBehavior {
         if (itemstack.getData(DataComponentTypes.MAX_STACK_SIZE) != 1) {
             itemstack.setData(DataComponentTypes.MAX_STACK_SIZE, 1)
         }
+
+        // 设置 itemstack 的 `minecraft:item_name`
+        val entityBucket = itemstack.getProp(ItemPropertyTypes.ENTITY_BUCKET)!!
+        val oldItemName = itemstack.getData(DataComponentTypes.ITEM_NAME)
+        if (oldItemName != null) {
+            // 储存 itemstack 当前的 `minecraft:item_name` 组件 - 用于将生物放生时, 恢复物品原本的 `minecraft:item_name`
+            itemstack.setData(ItemDataTypes.PREVIOUS_ITEM_NAME, oldItemName)
+        }
+        val newItemName = MM.deserialize(entityBucket.itemNameFormat, Placeholder.component("entity_type", Component.translatable(clicked.type)))
+        itemstack.setData(DataComponentTypes.ITEM_NAME, newItemName)
 
         // 播放一点音效和动画效果
         if (clicked is LivingEntity) {
