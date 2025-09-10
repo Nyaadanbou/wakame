@@ -19,6 +19,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
+import org.bukkit.Sound
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.*
 import org.bukkit.event.block.Action
@@ -82,6 +83,7 @@ object EntityBucket : ItemBehavior {
 
             if (deserializedEntity is LivingEntity) {
                 deserializedEntity.playHurtAnimation(0f)
+                deserializedEntity.playBucketActionSound(player)
             }
         }
     }
@@ -165,6 +167,7 @@ object EntityBucket : ItemBehavior {
         // 播放一点音效和动画效果
         if (clicked is LivingEntity) {
             clicked.playHurtAnimation(0f)
+            clicked.playBucketActionSound(player)
         }
 
         when (clicked) {
@@ -261,6 +264,54 @@ object EntityBucket : ItemBehavior {
         setData(ItemDataTypes.ENTITY_BUCKET_INFO, value)
     }
 
+    private val SOUND_MAP: Map<EntityType, Sound> = mapOf(
+        // Animals
+        EntityType.ARMADILLO to Sound.ENTITY_ARMADILLO_HURT,
+        EntityType.BEE to Sound.ENTITY_BEE_HURT,
+        EntityType.CAT to Sound.ENTITY_CAT_HURT,
+        EntityType.CHICKEN to Sound.ENTITY_CHICKEN_HURT,
+        EntityType.COW to Sound.ENTITY_COW_HURT,
+        EntityType.DOLPHIN to Sound.ENTITY_DOLPHIN_HURT,
+        EntityType.DONKEY to Sound.ENTITY_DONKEY_HURT,
+        EntityType.FOX to Sound.ENTITY_FOX_HURT,
+        EntityType.FROG to Sound.ENTITY_FROG_HURT,
+        EntityType.GOAT to Sound.ENTITY_GOAT_HURT,
+        EntityType.HORSE to Sound.ENTITY_HORSE_HURT,
+        EntityType.LLAMA to Sound.ENTITY_LLAMA_HURT,
+        EntityType.MOOSHROOM to Sound.ENTITY_COW_HURT,
+        EntityType.MULE to Sound.ENTITY_MULE_HURT,
+        EntityType.OCELOT to Sound.ENTITY_OCELOT_HURT,
+        EntityType.PANDA to Sound.ENTITY_PANDA_HURT,
+        EntityType.PARROT to Sound.ENTITY_PARROT_HURT,
+        EntityType.PIG to Sound.ENTITY_PIG_HURT,
+        EntityType.POLAR_BEAR to Sound.ENTITY_POLAR_BEAR_HURT,
+        EntityType.RABBIT to Sound.ENTITY_RABBIT_HURT,
+        EntityType.SHEEP to Sound.ENTITY_SHEEP_HURT,
+        EntityType.SKELETON_HORSE to Sound.ENTITY_SKELETON_HORSE_HURT,
+        EntityType.SNIFFER to Sound.ENTITY_SNIFFER_HURT,
+        EntityType.SQUID to Sound.ENTITY_SQUID_HURT,
+        EntityType.STRIDER to Sound.ENTITY_STRIDER_HURT,
+        EntityType.TRADER_LLAMA to Sound.ENTITY_LLAMA_HURT,
+        EntityType.TURTLE to Sound.ENTITY_TURTLE_HURT,
+        EntityType.WOLF to Sound.ENTITY_WOLF_HURT,
+
+        // Animals Like
+        EntityType.ALLAY to Sound.ENTITY_ALLAY_DEATH,
+        EntityType.IRON_GOLEM to Sound.ENTITY_IRON_GOLEM_HURT,
+        EntityType.SNOW_GOLEM to Sound.ENTITY_SNOW_GOLEM_HURT,
+
+        // NPCs
+        EntityType.VILLAGER to Sound.ENTITY_VILLAGER_HURT,
+        EntityType.WANDERING_TRADER to Sound.ENTITY_WANDERING_TRADER_HURT,
+        EntityType.ZOMBIE_VILLAGER to Sound.ENTITY_ZOMBIE_VILLAGER_HURT,
+    )
+
+    private fun Entity.playBucketActionSound(player: Player) {
+        if (this.isSilent) return
+        val sound = SOUND_MAP[this.type] ?: return
+        player.playSound(this, sound, 1f, 1f)
+    }
+
     //<editor-fold desc="Animals">
     private fun asArmadilloBucket(itemstack: ItemStack, clicked: Armadillo, player: Player) {
         itemstack.setCustomModelData("armadillo")
@@ -270,7 +321,6 @@ object EntityBucket : ItemBehavior {
                 isAdult = clicked.isAdult,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asBeeBucket(itemstack: ItemStack, clicked: Bee, player: Player) {
@@ -280,7 +330,6 @@ object EntityBucket : ItemBehavior {
                 isAdult = clicked.isAdult,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asCamelBucket(itemstack: ItemStack, clicked: Camel, player: Player) {
@@ -291,7 +340,6 @@ object EntityBucket : ItemBehavior {
                 ownerName = clicked.owner?.name
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asCatBucket(itemstack: ItemStack, clicked: Cat, player: Player) {
@@ -302,7 +350,6 @@ object EntityBucket : ItemBehavior {
                 variant = clicked.catType.key.value()
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asChickenBucket(itemstack: ItemStack, clicked: Chicken, player: Player) {
@@ -314,7 +361,6 @@ object EntityBucket : ItemBehavior {
                 variant = variant
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asCowBucket(itemstack: ItemStack, clicked: Cow, player: Player) {
@@ -326,7 +372,6 @@ object EntityBucket : ItemBehavior {
                 variant = variant,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asDolphinBucket(itemstack: ItemStack, clicked: Dolphin, player: Player) {
@@ -347,7 +392,6 @@ object EntityBucket : ItemBehavior {
                 ownerName = clicked.owner?.name
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asFoxBucket(itemstack: ItemStack, clicked: Fox, player: Player) {
@@ -359,7 +403,6 @@ object EntityBucket : ItemBehavior {
                 variant = variant
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asFrogBucket(itemstack: ItemStack, clicked: Frog, player: Player) {
@@ -370,7 +413,6 @@ object EntityBucket : ItemBehavior {
                 variant = variant,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asGlowSquidBucket(itemstack: ItemStack, clicked: GlowSquid, player: Player) {
@@ -380,7 +422,6 @@ object EntityBucket : ItemBehavior {
                 isAdult = clicked.isAdult,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asGoatBucket(itemstack: ItemStack, clicked: Goat, player: Player) {
@@ -392,7 +433,6 @@ object EntityBucket : ItemBehavior {
                 isAdult = clicked.isAdult,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asHappyGhast(itemstack: ItemStack, clicked: HappyGhast, player: Player) {
@@ -402,7 +442,6 @@ object EntityBucket : ItemBehavior {
                 isAdult = clicked.isAdult,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asHoglinBucket(itemstack: ItemStack, clicked: Hoglin, player: Player) {
@@ -412,7 +451,6 @@ object EntityBucket : ItemBehavior {
                 isAdult = clicked.isAdult,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asHorseBucket(itemstack: ItemStack, clicked: Horse, player: Player) {
@@ -422,7 +460,6 @@ object EntityBucket : ItemBehavior {
                 ownerName = clicked.owner?.name
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asLlamaBucket(itemstack: ItemStack, clicked: Llama, player: Player) {
@@ -434,7 +471,6 @@ object EntityBucket : ItemBehavior {
                 ownerName = clicked.owner?.name,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asMooshroom(itemstack: ItemStack, clicked: MushroomCow, player: Player) {
@@ -447,7 +483,6 @@ object EntityBucket : ItemBehavior {
                 variant = variant,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asMuleBucket(itemstack: ItemStack, clicked: Mule, player: Player) {
@@ -457,7 +492,6 @@ object EntityBucket : ItemBehavior {
                 isAdult = clicked.isAdult,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asOcelotBucket(itemstack: ItemStack, clicked: Ocelot, player: Player) {
@@ -467,7 +501,6 @@ object EntityBucket : ItemBehavior {
                 trusting = clicked.isTrusting
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asPandaBucket(itemstack: ItemStack, clicked: Panda, player: Player) {
@@ -475,7 +508,6 @@ object EntityBucket : ItemBehavior {
         itemstack.setEntityBucketInfo(
             PandaEntityBucketInfo() // TODO 填充生物信息
         )
-        // TODO 播放交互音效
     }
 
     private fun asParrotBucket(itemstack: ItemStack, clicked: Parrot, player: Player) {
@@ -486,7 +518,6 @@ object EntityBucket : ItemBehavior {
                 variant = variant,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asPigBucket(itemstack: ItemStack, clicked: Pig, player: Player) {
@@ -498,7 +529,6 @@ object EntityBucket : ItemBehavior {
                 variant = variant
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asPolarBearBucket(itemstack: ItemStack, clicked: PolarBear, player: Player) {
@@ -508,7 +538,6 @@ object EntityBucket : ItemBehavior {
                 isAdult = clicked.isAdult,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asRabbitBucket(itemstack: ItemStack, clicked: Rabbit, player: Player) {
@@ -519,7 +548,6 @@ object EntityBucket : ItemBehavior {
                 variant = variant,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asSheepBucket(itemstack: ItemStack, clicked: Sheep, player: Player) {
@@ -532,7 +560,6 @@ object EntityBucket : ItemBehavior {
                 variant = variant,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asSkeletonHorseBucket(itemstack: ItemStack, clicked: SkeletonHorse, player: Player) {
@@ -542,7 +569,6 @@ object EntityBucket : ItemBehavior {
                 isAdult = clicked.isAdult
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asSnifferBucket(itemstack: ItemStack, clicked: Sniffer, player: Player) {
@@ -552,7 +578,6 @@ object EntityBucket : ItemBehavior {
                 isAdult = clicked.isAdult,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asSquidBucket(itemstack: ItemStack, clicked: Squid, player: Player) {
@@ -562,7 +587,6 @@ object EntityBucket : ItemBehavior {
                 isAdult = clicked.isAdult,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asStriderBucket(itemstack: ItemStack, clicked: Strider, player: Player) {
@@ -572,7 +596,6 @@ object EntityBucket : ItemBehavior {
                 isAdult = clicked.isAdult
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asTraderLlamaBucket(itemstack: ItemStack, clicked: TraderLlama, player: Player) {
@@ -585,7 +608,6 @@ object EntityBucket : ItemBehavior {
                 ownerName = clicked.owner?.name,
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asTurtleBucket(itemstack: ItemStack, clicked: Turtle, player: Player) {
@@ -596,7 +618,6 @@ object EntityBucket : ItemBehavior {
                 hasEgg = clicked.hasEgg(),
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asWolfBucket(itemstack: ItemStack, clicked: Wolf, player: Player) {
@@ -610,7 +631,6 @@ object EntityBucket : ItemBehavior {
                 variant = variant
             )
         )
-        // TODO 播放交互音效
     }
     //</editor-fold>
 
@@ -618,7 +638,6 @@ object EntityBucket : ItemBehavior {
     private fun asAllayBucket(itemstack: ItemStack, clicked: Allay, player: Player) {
         itemstack.setCustomModelData("allay")
         itemstack.setEntityBucketInfo(AllayEntityBucketInfo()) // TODO 填充生物信息
-        // TODO 播放交互音效
     }
 
     private fun asSnowGolemBucket(itemstack: ItemStack, clicked: Snowman, player: Player) {
@@ -628,7 +647,6 @@ object EntityBucket : ItemBehavior {
                 hasPumpkin = !(clicked.isDerp)
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asIronGolemBucket(itemstack: ItemStack, clicked: IronGolem, player: Player) {
@@ -638,7 +656,6 @@ object EntityBucket : ItemBehavior {
                 isPlayerCreated = clicked.isPlayerCreated,
             )
         )
-        // TODO 播放交互音效
     }
     //</editor-fold>
 
@@ -652,7 +669,6 @@ object EntityBucket : ItemBehavior {
                 profession = clicked.profession.key().value()
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asWanderingTraderBucket(itemstack: ItemStack, clicked: WanderingTrader, player: Player) {
@@ -674,7 +690,6 @@ object EntityBucket : ItemBehavior {
                 }
             )
         )
-        // TODO 播放交互音效
     }
 
     private fun asZombieVillagerBucket(itemstack: ItemStack, clicked: ZombieVillager, player: Player) {
@@ -685,7 +700,6 @@ object EntityBucket : ItemBehavior {
                 profession = clicked.villagerProfession.key().value()
             )
         )
-        // TODO 播放交互音效
     }
     //</editor-fold>
 }
