@@ -9,6 +9,10 @@ import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.*
 import cc.mewcraft.wakame.util.adventure.plain
+import cc.mewcraft.wakame.util.metadata.Empty
+import cc.mewcraft.wakame.util.metadata.ExpiringValue
+import cc.mewcraft.wakame.util.metadata.Metadata
+import cc.mewcraft.wakame.util.metadata.MetadataKey
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.CustomModelData
 import net.kyori.adventure.text.Component
@@ -22,11 +26,15 @@ import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
+import java.util.concurrent.TimeUnit
 
 /**
  * 用“桶”捕捉生物的逻辑.
  */
 object EntityBucket : ItemBehavior {
+
+    // 用于防止玩家在同一 tick 同时捕捉和放生生物
+    private val JUST_BUCKETED_ENTITY: MetadataKey<Empty> = MetadataKey.createEmptyKey("just_bucketed_entity")
 
     // 当玩家手持一个生物桶右键方块顶部时
     override fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
@@ -36,7 +44,7 @@ object EntityBucket : ItemBehavior {
             return
         }
 
-        if (!wrappedEvent.event.action.isRightClick /*|| !hasEntityBucketBehavior(itemstack)*/) {
+        if (wrappedEvent.event.action != Action.RIGHT_CLICK_BLOCK /*|| !hasEntityBucketBehavior(itemstack)*/) {
             return // 不是右键点击
         }
 
@@ -46,6 +54,10 @@ object EntityBucket : ItemBehavior {
 
         if (wrappedEvent.event.clickedBlock == null) {
             return // 没有点击方块 (什么情况下 BlockFace 不为 null 但 clickedBlock 为 null ?)
+        }
+
+        if (Metadata.provideForPlayer(player).has(JUST_BUCKETED_ENTITY)) {
+            return
         }
 
         wrappedEvent.event.isCancelled = true
@@ -110,7 +122,11 @@ object EntityBucket : ItemBehavior {
             asEntityBucket(itemstack, clicked, player)
         }
 
+        // 移除实体
         clicked.remove()
+        // 标记玩家已捕捉过生物
+        Metadata.provideForPlayer(player).put(JUST_BUCKETED_ENTITY, ExpiringValue.of(Empty.instance(), 1, TimeUnit.SECONDS))
+        // 取消事件
         event.isCancelled = true
     }
 
