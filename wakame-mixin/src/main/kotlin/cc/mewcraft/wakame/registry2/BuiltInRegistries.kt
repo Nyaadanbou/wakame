@@ -29,6 +29,8 @@ import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.CoreType
 import cc.mewcraft.wakame.item2.data.impl.CoreTypes
+import cc.mewcraft.wakame.item2.data.impl.EntityBucketInfoType
+import cc.mewcraft.wakame.item2.data.impl.EntityBucketInfoTypes
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.loot.LootTable
 import cc.mewcraft.wakame.loot.entry.LootPoolEntries
@@ -195,6 +197,12 @@ object BuiltInRegistries {
     val CORE_TYPE: WritableRegistry<CoreType> = registerSimple(BuiltInRegistryKeys.CORE_TYPE) { CoreTypes }
 
     /**
+     * EntityBucketInfo 的类型.
+     */
+    @JvmField
+    val ENTITY_BUCKET_INFO_TYPE: WritableRegistry<EntityBucketInfoType> = registerSimple(BuiltInRegistryKeys.ENTITY_BUCKET_INFO_TYPE) { EntityBucketInfoTypes }
+
+    /**
      * 攻击速度.
      */
     @JvmField
@@ -234,7 +242,6 @@ object BuiltInRegistries {
     init {
         INITIALIZERS.forEach { initializer -> initializer() }
     }
-
 
     // ------------
     // 方便函数

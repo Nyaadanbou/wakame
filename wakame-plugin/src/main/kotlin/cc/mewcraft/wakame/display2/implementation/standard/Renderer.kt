@@ -2,20 +2,8 @@ package cc.mewcraft.wakame.display2.implementation.standard
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
-import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
-import cc.mewcraft.wakame.display2.implementation.common.CoreRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.EnchantmentRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.common.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaTypes
@@ -23,15 +11,10 @@ import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCustomName
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemName
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.config.property.impl.Arrow
+import cc.mewcraft.wakame.item2.config.property.impl.EntityBucket
 import cc.mewcraft.wakame.item2.config.property.impl.ExtraLore
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.item2.data.impl.AttributeCore
-import cc.mewcraft.wakame.item2.data.impl.Core
-import cc.mewcraft.wakame.item2.data.impl.EmptyCore
-import cc.mewcraft.wakame.item2.data.impl.ItemCrate
-import cc.mewcraft.wakame.item2.data.impl.ItemLevel
-import cc.mewcraft.wakame.item2.data.impl.ReforgeHistory
-import cc.mewcraft.wakame.item2.data.impl.VirtualCore
+import cc.mewcraft.wakame.item2.data.impl.*
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -40,17 +23,14 @@ import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.item.fastLore
-import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
-import cc.mewcraft.wakame.util.item.hideAttributeModifiers
-import cc.mewcraft.wakame.util.item.hideEnchantments
-import cc.mewcraft.wakame.util.item.hideStoredEnchantments
+import cc.mewcraft.wakame.util.item.*
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.FoodProperties
 import io.papermc.paper.datacomponent.item.ItemEnchantments
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import org.bukkit.Registry
 import org.bukkit.inventory.ItemStack
 import java.nio.file.Path
 
@@ -91,6 +71,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         item.process(ItemPropertyTypes.ARROW) { data -> StandardRenderingHandlerRegistry.ARROW.process(collector, data) }
         item.process(ItemPropertyTypes.ATTACK_SPEED) { data -> StandardRenderingHandlerRegistry.ATTACK_SPEED.process(collector, data) }
         item.process(ItemPropertyTypes.EXTRA_LORE) { data -> StandardRenderingHandlerRegistry.LORE.process(collector, data) }
+        item.process(ItemPropertyTypes.ENTITY_BUCKET) { data -> StandardRenderingHandlerRegistry.ENTITY_BUCKET_PROP.process(collector, data) }
 
         // 对于最可能被频繁修改的 `item_name`, `custom_name` 直接读取配置模板里的内容
         item.process(ItemMetaTypes.ITEM_NAME) { data -> StandardRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
@@ -107,6 +88,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
             val data2 = data2 ?: ReforgeHistory.ZERO
             StandardRenderingHandlerRegistry.RARITY.process(collector, data1, data2)
         }
+        item.process(ItemDataTypes.ENTITY_BUCKET_INFO) { data -> StandardRenderingHandlerRegistry.ENTITY_BUCKET_INFO.process(collector, data) }
 
         item.process(DataComponentTypes.ENCHANTMENTS) { data -> StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
         item.process(DataComponentTypes.DAMAGE_RESISTANT) { data -> StandardRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, Unit) }
@@ -223,4 +205,14 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
 
     @JvmField
     val RARITY: RenderingHandler2<RegistryEntry<Rarity>, ReforgeHistory, RarityRendererFormat> = CommonRenderingHandlers.RARITY(this)
+
+    @JvmField
+    val ENTITY_BUCKET_PROP: RenderingHandler<EntityBucket, AggregateValueRendererFormat> = configure("entity_bucket_prop") { data, format ->
+        format.render(data.allowedEntityTypes) { Component.translatable(Registry.ENTITY_TYPE.getOrThrow(it)) }
+    }
+
+    @JvmField
+    val ENTITY_BUCKET_INFO: RenderingHandler<EntityBucketInfo, EntityBucketInfoRendererFormat> = configure("entity_bucket_info") { data, format ->
+        format.render(data)
+    }
 }

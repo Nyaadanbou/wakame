@@ -13,7 +13,7 @@ arrow:
   tooltip:
     - "<!i><blue>穿透: <pierce_level>"
 
-# id: `arrow`
+# id: `attack_speed`
 attack_speed:
   namespace: topmost
   tooltip:
@@ -123,8 +123,8 @@ lore:
   # <line> 描述内容
   tooltip:
     line: "<dark_gray><line>"
-    header: []
-    bottom: []
+    header: [ ]
+    bottom: [ ]
 
 # id: `core`
 core:
@@ -140,3 +140,88 @@ rarity:
   simple: "<!i><rarity_display_name>"
   # 重铸次数不为零的格式
   complex: "<!i><rarity_display_name><white>[<reforge_mod_count>]"
+
+# id: `entity_bucket_prop`
+entity_bucket_prop:
+  namespace: special
+  # 可用标签
+  # <merged> 多个实体类型合并后的文本
+  # <single> 单个实体类型
+  tooltip:
+    merged: "<!i><gray>此桶可捕捉: <merged>"
+    single: "<!i><white><single>"
+    separator: "<gray>, </gray>"
+
+# id: `entity_bucket_info`
+entity_bucket_info:
+  namespace: special
+  # 内容物描述
+  content:
+    - "<!i><gray>此桶装有一只<entity_type>"
+  # 抽象描述
+  abstract:
+    ageable:
+      - "<!i><gray>已成年: <yellow><is_adult>"
+    collar_colorable:
+      - "<!i><gray>项圈颜色: <yellow><collar_color>"
+    shearable:
+      - "<!i><gray>可剪毛: <yellow><ready_to_be_sheared>"
+    tameable:
+      - "<!i><gray>已驯服"
+      - "<!i><gray>从属于: <yellow><owner_name>"
+    variable:
+      - "<!i><gray>变体: <yellow><variant>"
+  # 具体描述
+  specific:
+    armadillo:
+      - "<!i><gray>状态: <yellow><state>"
+    bee: [ ]
+    camel: [ ]
+    cat: [ ]
+    chicken: [ ]
+    cow: [ ]
+    dolphin: [ ]
+    donkey: [ ]
+    fox: [ ]
+    frog: [ ]
+    glow_squid: [ ]
+    goat:
+      - "<!i><gray>有左角: <yellow><has_left_horn>"
+      - "<!i><gray>有右角: <yellow><has_right_horn>"
+    happy_ghast: [ ]
+    hoglin: [ ]
+    horse: [ ]
+    llama: [ ]
+    mooshroom: [ ]
+    mule: [ ]
+    ocelot:
+      - "<!i><gray>信任玩家: <yellow><trusting>"
+    panda: [ ]
+    parrot: [ ]
+    pig: [ ]
+    polar_bear: [ ]
+    rabbit: [ ]
+    sheep: [ ]
+    skeleton_horse: [ ]
+    sniffer: [ ]
+    squid: [ ]
+    strider: [ ]
+    trader_llama: [ ]
+    turtle:
+      - "<!i><gray>已怀孕: <yellow><has_egg>"
+    wolf: [ ]
+    allay:
+      - "<!i><gray>左手物品: <yellow><item_in_mainhand>"
+      - "<!i><gray>右手物品: <yellow><item_in_offhand>"
+    iron_golem:
+      - "<!i><gray>人造: <yellow><is_player_created>"
+    snow_golem:
+      - "<!i><gray>南瓜: <yellow><has_pumpkin>"
+    villager:
+      - "<!i><gray>等级: <yellow><level>"
+      - "<!i><gray>区域: <yellow><region>"
+      - "<!i><gray>职业: <yellow><profession>"
+    wandering_trader: [ ]
+    zombie_villager:
+      - "<!i><gray>区域: <yellow><region>"
+      - "<!i><gray>职业: <yellow><profession>"

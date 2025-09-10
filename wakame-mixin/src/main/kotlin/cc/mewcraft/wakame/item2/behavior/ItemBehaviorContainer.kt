@@ -116,7 +116,7 @@ private class SimpleItemBehaviorContainer(
     }
 
     override fun <T : ItemBehavior> get(type: KClass<T>): T? {
-        return behaviorMap.first { type.isInstance(it) } as T?
+        return behaviorMap.firstOrNull { type.isInstance(it) } as T?
     }
 
     override fun add(behavior: ItemBehavior) {

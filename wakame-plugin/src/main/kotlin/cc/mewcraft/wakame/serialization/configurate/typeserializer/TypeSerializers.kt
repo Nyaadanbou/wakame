@@ -8,21 +8,7 @@ import cc.mewcraft.wakame.loot.entry.ComposableEntryContainer
 import cc.mewcraft.wakame.molang.ExpressionSerializer
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.DynamicRegistries
-import cc.mewcraft.wakame.serialization.configurate.serializer.AttributeModifierSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.BlockTypeListSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.ComponentSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.EntityTypeSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.IdentifierSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.IntRangeSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.ItemTypeListSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.MaterialSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.NamespacedKeySerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.PotionEffectSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.StyleBuilderApplicableSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.StyleSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.Vector3fSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.*
 import cc.mewcraft.wakame.util.RandomizedValueSerializer
 import cc.mewcraft.wakame.util.register
 import io.papermc.paper.registry.RegistryKey
@@ -38,9 +24,9 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     .register(RandomizedValueSerializer)
     .register(ExpressionSerializer)
     // Text
-    .register(ComponentSerializer)
-    .register(StyleSerializer)
-    .register(StyleBuilderApplicableSerializer)
+    .register(MiniMessageComponentSerializer)
+    .register(MiniMessageStyleSerializer)
+    .register(MiniMessageStyleBuilderApplicableSerializer)
     // Guava
     .register(IntRangeSerializer)
     // Namespaced

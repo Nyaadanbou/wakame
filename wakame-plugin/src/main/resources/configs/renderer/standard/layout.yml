@@ -56,6 +56,8 @@ primary:
   - (fixed:special)<st><dark_gray>             </dark_gray></st>
   - special:crate
   - special:core
+  - special:entity_bucket_prop
+  - special:entity_bucket_info
 
   - (fixed:general)<st><dark_gray>             </dark_gray></st>
   - general:kizami

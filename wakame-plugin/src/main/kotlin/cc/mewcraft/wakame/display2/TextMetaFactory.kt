@@ -30,6 +30,7 @@ fun interface TextMetaFactory {
 /**
  * 如果要创建的 [TextMeta] 符合 [FixedSimpleTextMeta] 的描述, 可以使用这个构造函数.
  */
+@Deprecated("Use TextMetaFactory.fixed()", ReplaceWith("TextMetaFactory.fixed()"))
 fun TextMetaFactory(): TextMetaFactory {
     return TextMetaFactory { sourceIndex, sourceOrdinal, defaultText ->
         FixedSimpleTextMeta(sourceIndex, sourceOrdinal, defaultText)
