@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack
  * @param item 使用的物品, 永远不为空气
  * @param hand 使用的手, 必为主手或副手
  */
+@Deprecated("已失效，即将移除")
 class PlayerItemLeftClickEvent(
     player: Player,
     val item: ItemStack,
