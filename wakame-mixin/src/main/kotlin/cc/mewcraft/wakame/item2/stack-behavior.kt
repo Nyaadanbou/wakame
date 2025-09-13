@@ -2,8 +2,6 @@
 
 package cc.mewcraft.wakame.item2
 
-import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
-import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
@@ -44,12 +42,6 @@ inline fun <reified T : ItemBehavior> ItemStack.getBehavior(): T? = toNMS().getB
 inline fun ItemStack.handleBehavior(action: (ItemBehavior) -> Unit) = toNMS().handleBehavior(action)
 
 // 注: 这些 handle... 函数都是为了方便遍历 ItemBehavior
-
-fun ItemStack.handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) =
-    handleBehavior { it.handleLeftClick(player, itemstack, event) }
-
-fun ItemStack.handleRightClick(player: Player, itemstack: ItemStack, hand: EquipmentSlot, event: PlayerItemRightClickEvent) =
-    handleBehavior { it.handleRightClick(player, itemstack, hand, event) }
 
 fun ItemStack.handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) =
     handleBehavior { it.handleInteract(player, itemstack, action, wrappedEvent) }

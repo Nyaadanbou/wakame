@@ -3,16 +3,16 @@ package cc.mewcraft.wakame.item2.behavior.impl.weapon
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.entity.player.attributeContainer
-import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
+import cc.mewcraft.wakame.item2.behavior.AttackContext
+import cc.mewcraft.wakame.item2.behavior.InteractionResult
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.extension.addCooldown
 import cc.mewcraft.wakame.item2.extension.damageItem
 import cc.mewcraft.wakame.item2.extension.isOnCooldown
-import cc.mewcraft.wakame.item2.getProperty
+import cc.mewcraft.wakame.item2.getProp
 import org.bukkit.FluidCollisionMode
 import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.EquipmentSlot
 
 /**
  * 一般近战武器的物品行为.
@@ -20,9 +20,11 @@ import org.bukkit.inventory.ItemStack
  * 此类物品只有攻击到生物才会进入冷却.
  */
 object Melee : Weapon {
-    override fun handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) {
-        if (itemstack.isOnCooldown(player)) return
-        val melee = itemstack.getProperty(ItemPropertyTypes.MELEE) ?: return
+    override fun handleSimpleAttack(context: AttackContext): InteractionResult {
+        val itemStack = context.itemStack
+        val player = context.player
+        if (itemStack.isOnCooldown(player)) return InteractionResult.FAIL
+        val melee = itemStack.getProp(ItemPropertyTypes.MELEE) ?: return InteractionResult.FAIL
 
         val world = player.world
         val attrContainer = player.attributeContainer
@@ -40,7 +42,7 @@ object Melee : Weapon {
         }
         // 未命中实体
         if (rayTraceResult == null || rayTraceResult.hitBlock != null) {
-            return
+            return InteractionResult.FAIL
         }
         val hitEntity = rayTraceResult.hitEntity
         if (hitEntity != null && hitEntity is LivingEntity) {
@@ -52,11 +54,12 @@ object Melee : Weapon {
             // 造成伤害
             hitEntity.hurt(damageMetadata, player, true)
 
-            // 设置耐久
-            player.damageItem(event.hand, melee.itemDamagePerAttack)
+            // 设置耐久 FIXME 造成伤害才扣耐久
+            player.damageItem(EquipmentSlot.HAND, melee.itemDamagePerAttack)
             // 设置冷却
             // 命中实体才进入冷却
-            itemstack.addCooldown(player, melee.attackCooldown)
+            itemStack.addCooldown(player, melee.attackCooldown)
         }
+        return InteractionResult.SUCCESS
     }
 }

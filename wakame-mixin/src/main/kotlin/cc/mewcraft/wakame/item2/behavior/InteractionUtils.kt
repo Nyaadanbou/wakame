@@ -131,6 +131,13 @@ enum class InteractionResult {
     SUCCESS_AND_CANCEL,
 
     /**
+     * 交互失败.
+     * 此时代码中断, 不会再执行后续的任何交互行为.
+     * 此时取消事件.
+     */
+    FAIL_AND_CANCEL,
+
+    /**
      * 交互成功.
      * 此时代码中断, 不会再执行后续的任何交互行为.
      * 此时不会取消事件.
@@ -156,7 +163,7 @@ fun InteractionResult.isSuccess(): Boolean {
 }
 
 fun InteractionResult.shouldCancel(): Boolean {
-    return this == InteractionResult.SUCCESS_AND_CANCEL
+    return this == InteractionResult.SUCCESS_AND_CANCEL || this == InteractionResult.FAIL_AND_CANCEL
 }
 
 private object InteractableBlocks {

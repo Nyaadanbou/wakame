@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.item2.behavior
 
-import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
-import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
@@ -79,12 +77,6 @@ interface ItemBehavior {
      * 玩家手持该物品对实体按下攻击键(默认为鼠标左键)进行交互执行的行为.
      */
     fun handleAttackEntity(context: AttackEntityContext) = InteractionResult.PASS
-
-    @Deprecated("use handleAttack/handleAttackOn/handleAttackEntity instead")
-    fun handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) = Unit
-
-    @Deprecated("use handleUseOn/handleUse instead")
-    fun handleRightClick(player: Player, itemstack: ItemStack, hand: EquipmentSlot, event: PlayerItemRightClickEvent) = Unit
 
     @Deprecated("use handleUseOn/handleUse instead")
     fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit

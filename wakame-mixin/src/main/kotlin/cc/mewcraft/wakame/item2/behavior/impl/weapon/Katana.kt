@@ -11,10 +11,12 @@ import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
-import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
-import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.item2.ItemSlotChanges
+import cc.mewcraft.wakame.item2.behavior.AttackContext
+import cc.mewcraft.wakame.item2.behavior.InteractionHand
+import cc.mewcraft.wakame.item2.behavior.InteractionResult
+import cc.mewcraft.wakame.item2.behavior.UseContext
 import cc.mewcraft.wakame.item2.behavior.impl.weapon.WeaponUtils.getInputDirection
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.Katana
@@ -50,10 +52,12 @@ private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "d
  */
 object Katana : Weapon {
 
-    override fun handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) {
-        val katanaState = player.koishify().getOrNull(KatanaState) ?: return
-        if (katanaState.isArmed.not()) return
-        if (itemstack.isOnCooldown(player)) return
+    override fun handleSimpleAttack(context: AttackContext): InteractionResult {
+        val itemStack = context.itemStack
+        val player = context.player
+        val katanaState = player.koishify().getOrNull(KatanaState) ?: return InteractionResult.FAIL
+        if (katanaState.isArmed.not()) return InteractionResult.FAIL
+        if (itemStack.isOnCooldown(player)) return InteractionResult.FAIL
 
         val currentAction = katanaState.currentAction
         when (currentAction) {
@@ -63,7 +67,8 @@ object Katana : Weapon {
                 if (player.isSneaking) {
                     // 能够发动气刃斩1
                     if (katanaState.canUseSpiritBladeSlash1()) {
-                        return spiritBladeSlash1(player, itemstack, katanaState)
+                        spiritBladeSlash1(player, itemStack, katanaState)
+                        return InteractionResult.SUCCESS
                     }
                 }
             }
@@ -72,7 +77,8 @@ object Katana : Weapon {
                 if (player.isSneaking) {
                     // 能够发动气刃斩2
                     if (katanaState.canUseSpiritBladeSlash2()) {
-                        return spiritBladeSlash2(player, itemstack, katanaState)
+                        spiritBladeSlash2(player, itemStack, katanaState)
+                        return InteractionResult.SUCCESS
                     }
                 }
             }
@@ -81,7 +87,8 @@ object Katana : Weapon {
                 if (player.isSneaking) {
                     // 能够发动气刃斩3
                     if (katanaState.canUseSpiritBladeSlash3()) {
-                        return spiritBladeSlash3(player, itemstack, katanaState)
+                        spiritBladeSlash3(player, itemStack, katanaState)
+                        return InteractionResult.SUCCESS
                     }
                 }
             }
@@ -90,7 +97,8 @@ object Katana : Weapon {
                 if (player.isSneaking) {
                     // 能够发动气刃大回旋斩
                     if (katanaState.canUseRoundSlash()) {
-                        return roundSlash(player, itemstack, katanaState)
+                        roundSlash(player, itemStack, katanaState)
+                        return InteractionResult.SUCCESS
                     }
                 }
             }
@@ -103,15 +111,18 @@ object Katana : Weapon {
         }
         // 如果前面的状态都没有 return
         // 则发动发动横斩
-        return horizontalSlash(player, itemstack, katanaState)
+        horizontalSlash(player, itemStack, katanaState)
+        return InteractionResult.SUCCESS
     }
 
-    override fun handleRightClick(player: Player, itemstack: ItemStack, hand: EquipmentSlot, event: PlayerItemRightClickEvent) {
-        if (hand != EquipmentSlot.HAND) return
+    override fun handleSimpleUse(context: UseContext): InteractionResult {
+        val itemStack = context.itemStack
+        val player = context.player
+        if (context.hand != InteractionHand.MAIN_HAND) return InteractionResult.FAIL
 
-        val katanaState = player.koishify().getOrNull(KatanaState) ?: return
-        if (katanaState.isArmed.not()) return
-        if (itemstack.isOnCooldown(player)) return
+        val katanaState = player.koishify().getOrNull(KatanaState) ?: return InteractionResult.FAIL
+        if (katanaState.isArmed.not()) return InteractionResult.FAIL
+        if (itemStack.isOnCooldown(player)) return InteractionResult.FAIL
 
         val currentAction = katanaState.currentAction
         val config = katanaState.config
@@ -120,7 +131,7 @@ object Katana : Weapon {
             KatanaState.ActionType.FORESIGHT_SLASH -> {
                 // 气刃大回旋斩之后不能看破斩
                 // 看破斩之后不能看破斩(不能复读)
-                return
+                return InteractionResult.FAIL
             }
 
             KatanaState.ActionType.IDLE,
@@ -130,10 +141,12 @@ object Katana : Weapon {
             KatanaState.ActionType.SPIRIT_BLADE_SLASH_3 -> {
                 return if (katanaState.currentBladeSpirit >= config.foresightSlashSpiritRequire) {
                     // 气刃值足够发动正常看破斩
-                    foresightSlash(player, itemstack, katanaState)
+                    foresightSlash(player, itemStack, katanaState)
+                    InteractionResult.SUCCESS
                 } else {
                     // 气刃值不足以发动正常看破斩
-                    weakForesightSlash(player, itemstack, katanaState)
+                    weakForesightSlash(player, itemStack, katanaState)
+                    InteractionResult.SUCCESS
                 }
             }
 
