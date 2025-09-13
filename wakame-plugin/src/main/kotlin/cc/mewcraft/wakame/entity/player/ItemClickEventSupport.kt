@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
-import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import io.papermc.paper.event.player.PlayerArmSwingEvent
 import io.papermc.paper.event.player.PrePlayerAttackEntityEvent
@@ -29,7 +28,6 @@ internal object ItemClickEventSupport : Listener {
 
     @InitFun
     fun init() {
-        registerEvents()
     }
 
     // 记录了当前 tick 将要左键点击的玩家

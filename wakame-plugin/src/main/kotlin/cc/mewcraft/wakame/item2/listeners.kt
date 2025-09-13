@@ -5,11 +5,13 @@ import cc.mewcraft.wakame.entity.player.isInventoryListenable
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.extensions.toVector3d
 import cc.mewcraft.wakame.item2.behavior.AttackContext
+import cc.mewcraft.wakame.item2.behavior.AttackEntityContext
 import cc.mewcraft.wakame.item2.behavior.AttackOnContext
 import cc.mewcraft.wakame.item2.behavior.BlockInteractContext
 import cc.mewcraft.wakame.item2.behavior.InteractionHand
 import cc.mewcraft.wakame.item2.behavior.InteractionResult
 import cc.mewcraft.wakame.item2.behavior.UseContext
+import cc.mewcraft.wakame.item2.behavior.UseEntityContext
 import cc.mewcraft.wakame.item2.behavior.UseOnContext
 import cc.mewcraft.wakame.item2.behavior.isInteractable
 import cc.mewcraft.wakame.item2.behavior.isSuccess
@@ -23,6 +25,7 @@ import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
+import io.papermc.paper.event.player.PrePlayerAttackEntityEvent
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import org.bukkit.GameMode
 import org.bukkit.entity.AbstractArrow
@@ -39,6 +42,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
@@ -73,18 +77,21 @@ internal object ItemBehaviorListener : Listener {
         }
     }
 
-    // 记录本tick内成功结算交互的玩家
     @JvmStatic
     private val alreadySuccessfulUsePlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
     private val alreadySuccessfulAttackPlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
+    private val alreadyCallInteractEntityWithMainHandPlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
+    private val alreadyCallInteractEntityWithOffHandPlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
 
     @EventHandler
     fun onServerTick(event: ServerTickStartEvent) {
         alreadySuccessfulUsePlayers.clear()
         alreadySuccessfulAttackPlayers.clear()
+        alreadyCallInteractEntityWithMainHandPlayers.clear()
+        alreadyCallInteractEntityWithOffHandPlayers.clear()
     }
 
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW)
     fun onRightClickInteract(event: PlayerInteractEvent) {
         val action = event.action
         val player = event.player
@@ -110,10 +117,24 @@ internal object ItemBehaviorListener : Listener {
             EquipmentSlot.OFF_HAND -> InteractionHand.OFF_HAND
             else -> return
         }
+        // 玩家手中没有物品 - 不处理
         val itemStack = event.item?.takeUnlessEmpty() ?: return
 
         if (action == Action.RIGHT_CLICK_AIR) {
             // 玩家交互空气
+            // 若玩家已右键交互实体 - 不处理
+            // 避免同时触发 Use 和 UseEntity 行为
+            if (hand == InteractionHand.MAIN_HAND) {
+                if (alreadyCallInteractEntityWithMainHandPlayers.contains(player)) {
+                    event.isCancelled = true
+                    return
+                }
+            } else {
+                if (alreadyCallInteractEntityWithOffHandPlayers.contains(player)) {
+                    event.isCancelled = true
+                    return
+                }
+            }
             val useContext = UseContext(player, hand, itemStack)
             itemStack.handleBehavior { behavior ->
                 val result = behavior.handleUse(useContext)
@@ -163,7 +184,55 @@ internal object ItemBehaviorListener : Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW)
+    fun onInteractEntity(event: PlayerInteractEntityEvent) {
+        val player = event.player
+        // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
+        if (!player.isInventoryListenable) return
+
+        // 玩家处于旁观者模式 - 不处理
+        if (player.gameMode == GameMode.SPECTATOR) return
+
+        // 限制每tick只能成功交互一次, 并取消多余的交互事件
+        if (alreadySuccessfulUsePlayers.contains(player)) {
+            event.isCancelled = true
+            return
+        }
+
+        val hand = when (event.hand) {
+            EquipmentSlot.HAND -> InteractionHand.MAIN_HAND
+            EquipmentSlot.OFF_HAND -> InteractionHand.OFF_HAND
+            else -> return
+        }
+        // 玩家手中没有物品 - 不处理
+        val itemStack = if (hand == InteractionHand.MAIN_HAND) {
+            alreadyCallInteractEntityWithMainHandPlayers.add(player)
+            player.inventory.itemInMainHand
+        } else {
+            alreadyCallInteractEntityWithOffHandPlayers.add(player)
+            player.inventory.itemInOffHand
+        }.takeUnlessEmpty() ?: return
+        val entity = event.rightClicked
+
+        // 判定玩家手中的物品和实体是否存在原版交互
+        // 实体存在原版交互 - 不处理
+        if (entity.isInteractable(player, itemStack)) return
+        val useEntityContext = UseEntityContext(player, hand, itemStack,entity)
+        itemStack.handleBehavior { behavior ->
+            val result = behavior.handleUseEntity(useEntityContext)
+            if (result.isSuccess()) {
+                alreadySuccessfulUsePlayers.add(player)
+            }
+            if (result.shouldCancel()) {
+                event.isCancelled = true
+            }
+            if (result != InteractionResult.PASS) {
+                return
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
     fun onLeftClickInteract(event: PlayerInteractEvent) {
         val action = event.action
         val player = event.player
@@ -176,13 +245,13 @@ internal object ItemBehaviorListener : Listener {
         if (!action.isLeftClick) return
 
         // 限制每tick只能成功交互一次, 并取消多余的交互事件
-        if (alreadySuccessfulUsePlayers.contains(player)) {
+        if (alreadySuccessfulAttackPlayers.contains(player)) {
             event.isCancelled = true
             return
         }
 
         // 左键交互只可能是主手
-        if (event.hand != EquipmentSlot.HAND)  return
+        if (event.hand != EquipmentSlot.HAND) return
         val itemStack = event.item?.takeUnlessEmpty() ?: return
 
         if (action == Action.LEFT_CLICK_AIR) {
@@ -204,15 +273,8 @@ internal object ItemBehaviorListener : Listener {
             // 玩家交互方块
             // 方块不存在 - 不处理, 但该情况不可能发生
             val block = event.clickedBlock ?: return
-            // 交互位置不存在 - 不处理, 但该情况不可能发生
-            val interactPoint = event.interactionPoint ?: return
 
-            val blockInteractContext = BlockInteractContext(
-                block.location.toVector3d(),
-                event.blockFace,
-                interactPoint.toVector3d()
-            )
-            val attackOnContext = AttackOnContext(player, itemStack, blockInteractContext)
+            val attackOnContext = AttackOnContext(player, itemStack, block.location.toVector3d(), event.blockFace)
             itemStack.handleBehavior { behavior ->
                 val result = behavior.handleAttackOn(attackOnContext)
                 if (result.isSuccess()) {
@@ -228,7 +290,36 @@ internal object ItemBehaviorListener : Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.LOW)
+    fun onPreAttack(event: PrePlayerAttackEntityEvent){
+        val player = event.player
+        // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
+        if (!player.isInventoryListenable) return
 
+        // 玩家处于旁观者模式 - 不处理
+        if (player.gameMode == GameMode.SPECTATOR) return
+
+        // 限制每tick只能成功交互一次, 并取消多余的交互事件
+        if (alreadySuccessfulAttackPlayers.contains(player)) {
+            event.isCancelled = true
+            return
+        }
+
+        val itemStack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+        val attackEntityContext = AttackEntityContext(player, itemStack, event.attacked)
+        itemStack.handleBehavior { behavior ->
+            val result = behavior.handleAttackEntity(attackEntityContext)
+            if (result.isSuccess()) {
+                alreadySuccessfulAttackPlayers.add(player)
+            }
+            if (result.shouldCancel()) {
+                event.isCancelled = true
+            }
+            if (result != InteractionResult.PASS) {
+                return
+            }
+        }
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(event: PlayerInteractAtEntityEvent) {
