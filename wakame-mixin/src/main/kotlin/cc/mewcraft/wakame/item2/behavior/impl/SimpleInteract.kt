@@ -13,7 +13,7 @@ import cc.mewcraft.wakame.item2.behavior.UseOnContext
  * 方便接口.
  * 用于不细分交互场景时的物品行为.
  */
-interface SimpleInteractBehavior : ItemBehavior {
+interface SimpleInteract : ItemBehavior {
     /**
      * 玩家手持该物品按下使用键(默认为鼠标右键)进行交互执行的行为.
      * 即无论是对空气, 对方块, 还是对实体使用, 均调用.

@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.util.text.arguments
 import io.papermc.paper.registry.keys.SoundEventKeys
 import net.kyori.adventure.sound.Sound
 
-object BrewRecipe : SimpleInteractBehavior {
+object BrewRecipe : SimpleInteract {
 
     /** TODO 简化
      * 当玩家手持一个未学习的配方并右键时, 学习该配方.

@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item2.behavior
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.extensions.toLocation
 import cc.mewcraft.wakame.item2.behavior.InteractableBlocks.INTERACTABLE_BLOCKS
 import cc.mewcraft.wakame.item2.behavior.InteractableEntities.INTERACTABLE_ENTITIES
 import io.papermc.paper.entity.Shearable
@@ -8,6 +9,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Tag
@@ -53,6 +55,18 @@ data class UseOnContext(
     constructor(player: Player, hand: InteractionHand, itemStack: ItemStack, interactContext: BlockInteractContext) : this(
         player, player.world, hand, itemStack, interactContext
     )
+
+    val blockLocation: Location
+        get() = this.interactContext.blockPosition.toLocation(this.world)
+
+    val blockPosition: Vector3d
+        get() = interactContext.blockPosition
+
+    val interactFace: BlockFace
+        get() = interactContext.interactFace
+
+    val interactPoint: Vector3d
+        get() = interactContext.interactPoint
 }
 
 data class UseContext(

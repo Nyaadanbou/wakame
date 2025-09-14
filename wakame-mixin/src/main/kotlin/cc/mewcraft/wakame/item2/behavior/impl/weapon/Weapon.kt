@@ -1,14 +1,14 @@
 package cc.mewcraft.wakame.item2.behavior.impl.weapon
 
 import cc.mewcraft.wakame.damage.DamageMetadata
-import cc.mewcraft.wakame.item2.behavior.impl.SimpleInteractBehavior
+import cc.mewcraft.wakame.item2.behavior.impl.SimpleInteract
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 /**
  * 代表一种武器的物品行为.
  */
-sealed interface Weapon : SimpleInteractBehavior {
+sealed interface Weapon : SimpleInteract {
 
     /**
      * 玩家使用该武器类型可造成的 [DamageMetadata].

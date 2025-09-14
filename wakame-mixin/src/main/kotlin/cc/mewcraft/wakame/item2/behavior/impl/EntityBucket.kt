@@ -1,13 +1,58 @@
 package cc.mewcraft.wakame.item2.behavior.impl
 
 import cc.mewcraft.wakame.MM
-import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
-import cc.mewcraft.wakame.item2.*
+import cc.mewcraft.wakame.item2.behavior.InteractionResult
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
+import cc.mewcraft.wakame.item2.behavior.UseEntityContext
+import cc.mewcraft.wakame.item2.behavior.UseOnContext
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.item2.data.impl.*
+import cc.mewcraft.wakame.item2.data.impl.AllayEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.ArmadilloEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.BeeEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.CamelEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.CatEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.ChickenEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.CowEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.DolphinEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.DonkeyEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.EntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.FoxEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.FrogEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.GlowSquidEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.GoatEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.HappyGhastEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.HoglinEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.HorseEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.IronGolemEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.LlamaEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.MooshroomEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.MuleEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.OcelotEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.PandaEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.ParrotEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.PigEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.PolarBearEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.RabbitEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.SheepEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.SkeletonHorseEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.SnifferEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.SnowGolemEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.SquidEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.StriderEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.TraderLlamaEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.TurtleEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.VillagerEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.WanderingTraderEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.WolfEntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.ZombieVillagerEntityBucketInfo
+import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item2.getProp
+import cc.mewcraft.wakame.item2.hasData
+import cc.mewcraft.wakame.item2.hasProp
+import cc.mewcraft.wakame.item2.removeData
+import cc.mewcraft.wakame.item2.setData
 import cc.mewcraft.wakame.util.adventure.plain
 import cc.mewcraft.wakame.util.metadata.Empty
 import cc.mewcraft.wakame.util.metadata.ExpiringValue
@@ -21,10 +66,49 @@ import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.block.BlockFace
-import org.bukkit.entity.*
-import org.bukkit.event.block.Action
+import org.bukkit.entity.Allay
+import org.bukkit.entity.Armadillo
+import org.bukkit.entity.Bee
+import org.bukkit.entity.Camel
+import org.bukkit.entity.Cat
+import org.bukkit.entity.Chicken
+import org.bukkit.entity.Cow
+import org.bukkit.entity.Dolphin
+import org.bukkit.entity.Donkey
+import org.bukkit.entity.Entity
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.Fox
+import org.bukkit.entity.Frog
+import org.bukkit.entity.GlowSquid
+import org.bukkit.entity.Goat
+import org.bukkit.entity.HappyGhast
+import org.bukkit.entity.Hoglin
+import org.bukkit.entity.Horse
+import org.bukkit.entity.IronGolem
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Llama
+import org.bukkit.entity.Mule
+import org.bukkit.entity.MushroomCow
+import org.bukkit.entity.Ocelot
+import org.bukkit.entity.Panda
+import org.bukkit.entity.Parrot
+import org.bukkit.entity.Pig
+import org.bukkit.entity.Player
+import org.bukkit.entity.PolarBear
+import org.bukkit.entity.Rabbit
+import org.bukkit.entity.Sheep
+import org.bukkit.entity.SkeletonHorse
+import org.bukkit.entity.Sniffer
+import org.bukkit.entity.Snowman
+import org.bukkit.entity.Squid
+import org.bukkit.entity.Strider
+import org.bukkit.entity.TraderLlama
+import org.bukkit.entity.Turtle
+import org.bukkit.entity.Villager
+import org.bukkit.entity.WanderingTrader
+import org.bukkit.entity.Wolf
+import org.bukkit.entity.ZombieVillager
 import org.bukkit.event.entity.CreatureSpawnEvent
-import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import java.util.concurrent.TimeUnit
@@ -38,47 +122,38 @@ object EntityBucket : ItemBehavior {
     private val JUST_BUCKETED_ENTITY: MetadataKey<Empty> = MetadataKey.createEmptyKey("just_bucketed_entity")
 
     // 当玩家手持一个生物桶右键方块顶部时
-    override fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-        val interactPt = wrappedEvent.event.interactionPoint ?: return // 没有交互点
-
-        if (!ProtectionManager.canUseItem(player, itemstack, interactPt)) {
-            return
+    override fun handleUseOn(context: UseOnContext): InteractionResult {
+        val player=context.player
+        val itemStack = context.itemStack
+        // 区域保护检查不通过 - 交互失败
+        if (!ProtectionManager.canUseItem(player, itemStack, context.blockLocation)) {
+            return InteractionResult.FAIL
         }
 
-        if (wrappedEvent.event.action != Action.RIGHT_CLICK_BLOCK /*|| !hasEntityBucketBehavior(itemstack)*/) {
-            return // 不是右键点击
-        }
-
-        if (wrappedEvent.event.blockFace != BlockFace.UP) {
-            return // 不是点击的方块顶部
-        }
-
-        if (wrappedEvent.event.clickedBlock == null) {
-            return // 没有点击方块 (什么情况下 BlockFace 不为 null 但 clickedBlock 为 null ?)
+        // 不是点击的方块顶部 - 交互失败
+        if (context.interactFace != BlockFace.UP) {
+            return InteractionResult.FAIL
         }
 
         if (Metadata.provideForPlayer(player).has(JUST_BUCKETED_ENTITY)) {
-            return
+            return InteractionResult.FAIL
         }
 
-        wrappedEvent.event.isCancelled = true
-        wrappedEvent.actionPerformed = true
-
-        val entityData = itemstack.getData(ItemDataTypes.ENTITY_BUCKET_DATA) ?: return
+        val entityData = itemStack.getData(ItemDataTypes.ENTITY_BUCKET_DATA) ?: return InteractionResult.FAIL
         val deserializedEntity = Bukkit.getUnsafe().deserializeEntity(entityData, player.world)
-        val successfullySpawned = deserializedEntity.spawnAt(interactPt, CreatureSpawnEvent.SpawnReason.BUCKET)
+        val successfullySpawned = deserializedEntity.spawnAt(context.blockLocation, CreatureSpawnEvent.SpawnReason.BUCKET)
         if (successfullySpawned) {
             // 还原物品状态, 也就是使其变成空桶时的状态
             if (player.gameMode != GameMode.CREATIVE) {
-                itemstack.resetData(DataComponentTypes.CUSTOM_MODEL_DATA)
-                itemstack.resetData(DataComponentTypes.MAX_STACK_SIZE)
-                itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_DATA)
-                itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_INFO)
+                itemStack.resetData(DataComponentTypes.CUSTOM_MODEL_DATA)
+                itemStack.resetData(DataComponentTypes.MAX_STACK_SIZE)
+                itemStack.removeData(ItemDataTypes.ENTITY_BUCKET_DATA)
+                itemStack.removeData(ItemDataTypes.ENTITY_BUCKET_INFO)
 
-                val prevItemName = itemstack.getData(ItemDataTypes.PREVIOUS_ITEM_NAME)
+                val prevItemName = itemStack.getData(ItemDataTypes.PREVIOUS_ITEM_NAME)
                 if (prevItemName != null) {
-                    itemstack.removeData(ItemDataTypes.PREVIOUS_ITEM_NAME)
-                    itemstack.setData(DataComponentTypes.ITEM_NAME, prevItemName)
+                    itemStack.removeData(ItemDataTypes.PREVIOUS_ITEM_NAME)
+                    itemStack.setData(DataComponentTypes.ITEM_NAME, prevItemName)
                 }
             }
 
@@ -87,50 +162,52 @@ object EntityBucket : ItemBehavior {
                 deserializedEntity.playBucketActionSound(player)
             }
         }
+        return InteractionResult.SUCCESS
     }
 
     // 当玩家手持一个生物桶右键生物时
-    override fun handleInteractAtEntity(player: Player, itemstack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
-        val entityBucket = itemstack.getProp(ItemPropertyTypes.ENTITY_BUCKET) ?: return
-        val entityBucketData = itemstack.getData(ItemDataTypes.ENTITY_BUCKET_DATA)
+    override fun handleUseEntity(context: UseEntityContext): InteractionResult {
+        val player=context.player
+        val itemStack = context.itemStack
+        val entity = context.entity
+        val entityBucket = itemStack.getProp(ItemPropertyTypes.ENTITY_BUCKET) ?: return InteractionResult.FAIL
+        val entityBucketData = itemStack.getData(ItemDataTypes.ENTITY_BUCKET_DATA)
 
-        if (!ProtectionManager.canInteractWithEntity(player, clicked, itemstack)) {
-            return
+        if (!ProtectionManager.canInteractWithEntity(player, entity, itemStack)) {
+            return InteractionResult.FAIL
         }
 
         // 已经是一个装有生物的生物桶了
         if (entityBucketData != null) {
-            event.isCancelled = true
-            return
+            return InteractionResult.FAIL
         }
 
         // 检查是否可以捕捉该生物
-        val entityTypeKey = clicked.type.key
+        val entityTypeKey = entity.type.key
         if (entityTypeKey !in entityBucket.allowedEntityTypes ||
             !player.hasPermission("koish.item.behavior.entity_bucket.capture.${entityTypeKey.asString()}")
         ) {
-            return
+            return InteractionResult.FAIL
         }
 
         // 处理创造模式和多桶叠加的情况
-        if (itemstack.amount > 1 || player.gameMode == GameMode.CREATIVE) {
-            val newStack = itemstack.clone().asOne()
-            asEntityBucket(newStack, clicked, player)
+        if (itemStack.amount > 1 || player.gameMode == GameMode.CREATIVE) {
+            val newStack = itemStack.clone().asOne()
+            asEntityBucket(newStack, entity, player)
             if (player.gameMode != GameMode.CREATIVE) {
                 // 非创造模式下, 扣除一个空桶
-                itemstack.subtract(1)
+                itemStack.subtract(1)
             }
             player.inventory.addItem(newStack)
         } else {
-            asEntityBucket(itemstack, clicked, player)
+            asEntityBucket(itemStack, entity, player)
         }
 
         // 移除实体
-        clicked.remove()
+        entity.remove()
         // 标记玩家已捕捉过生物
         Metadata.provideForPlayer(player).put(JUST_BUCKETED_ENTITY, ExpiringValue.of(Empty.instance(), 1, TimeUnit.SECONDS))
-        // 取消事件
-        event.isCancelled = true
+        return InteractionResult.SUCCESS
     }
 
     private fun hasEntityBucketBehavior(itemstack: ItemStack): Boolean {
