@@ -20,12 +20,12 @@ import cc.mewcraft.wakame.entity.attribute.AttributeMapSnapshot
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorTypes
+import cc.mewcraft.wakame.item2.behavior.getBehavior
+import cc.mewcraft.wakame.item2.behavior.hasBehaviorExact
 import cc.mewcraft.wakame.item2.behavior.impl.weapon.Weapon
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.item2.getBehavior
 import cc.mewcraft.wakame.item2.getData
-import cc.mewcraft.wakame.item2.hasBehaviorExact
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.RecursionGuard

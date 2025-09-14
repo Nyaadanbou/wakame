@@ -1,10 +1,7 @@
-@file:JvmName("KoishStackBehavior")
-
-package cc.mewcraft.wakame.item2
+package cc.mewcraft.wakame.item2.behavior
 
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
-import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.item2.behavior.ItemBehavior
+import cc.mewcraft.wakame.item2.koishItem
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toNMS
 import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
@@ -13,18 +10,37 @@ import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
-import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 
+enum class BehaviorResult {
+    /**
+     * 物品行为执行完毕.
+     * 此时代码中断, 不会再执行后续的任何同类物品行为.
+     * 此时不取消相关事件.
+     */
+    FINISH,
+
+    /**
+     * 物品行为执行完毕.
+     * 此时代码中断, 不会再执行后续的任何同类物品行为.
+     * 此时取消相关事件.
+     */
+    FINISH_AND_CANCEL,
+
+    /**
+     * 跳过此次物品行为.
+     * 此时仍然会继续尝试执行后续的同类物品行为.
+     */
+    PASS
+}
 
 // ------------
 // 用于访问 `org.bukkit.inventory.ItemStack` 上的 ItemBehavior
@@ -42,12 +58,6 @@ inline fun <reified T : ItemBehavior> ItemStack.getBehavior(): T? = toNMS().getB
 inline fun ItemStack.handleBehavior(action: (ItemBehavior) -> Unit) = toNMS().handleBehavior(action)
 
 // 注: 这些 handle... 函数都是为了方便遍历 ItemBehavior
-
-fun ItemStack.handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) =
-    handleBehavior { it.handleInteract(player, itemstack, action, wrappedEvent) }
-
-fun ItemStack.handleInteractAtEntity(player: Player, itemstack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) =
-    handleBehavior { it.handleInteractAtEntity(player, itemstack, clicked, event) }
 
 fun ItemStack.handlePlayerReceiveDamage(player: Player, itemstack: ItemStack, damageSource: DamageSource, event: PostprocessDamageEvent) =
     handleBehavior { it.handlePlayerReceiveDamage(player, itemstack, damageSource, event) }
