@@ -3,8 +3,9 @@
 package cc.mewcraft.wakame.item2.behavior.impl
 
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
-import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.item2.behavior.ItemBehavior
+import cc.mewcraft.wakame.item2.behavior.AttackContext
+import cc.mewcraft.wakame.item2.behavior.InteractionResult
+import cc.mewcraft.wakame.item2.behavior.UseContext
 import cc.mewcraft.wakame.util.item.damage
 import cc.mewcraft.wakame.util.item.isDamageable
 import cc.mewcraft.wakame.util.item.maxDamage
@@ -12,25 +13,31 @@ import net.kyori.adventure.text.Component.text
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
-import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 
-object HoldLastDamage : ItemBehavior {
+object HoldLastDamage : SimpleInteract {
 
     override fun handlePlayerAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: PostprocessDamageEvent) {
         tryCancelEvent(itemstack, player, event)
     }
 
-    override fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-        tryCancelEvent(itemstack, player, wrappedEvent.event)
+    override fun handleSimpleUse(context: UseContext): InteractionResult {
+        return if (context.itemStack.isLastDamage()) {
+            InteractionResult.FAIL_AND_CANCEL
+        } else {
+            InteractionResult.PASS
+        }
     }
 
-    override fun handleInteractAtEntity(player: Player, itemstack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
-        tryCancelEvent(itemstack, player, event)
+    override fun handleSimpleAttack(context: AttackContext): InteractionResult {
+        return if (context.itemStack.isLastDamage()) {
+            InteractionResult.FAIL_AND_CANCEL
+        } else {
+            InteractionResult.PASS
+        }
     }
 
     override fun handlePlayerBreakBlock(player: Player, itemstack: ItemStack, event: BlockBreakEvent) {
@@ -60,6 +67,10 @@ object HoldLastDamage : ItemBehavior {
             event.isCancelled = true
             player.sendMessage(text("无法使用完全损坏的物品"))
         }
+    }
+
+    private fun ItemStack.isLastDamage(): Boolean {
+        return this.damage >= this.maxDamage
     }
 
 }
