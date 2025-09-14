@@ -13,6 +13,20 @@ import cc.mewcraft.wakame.item2.behavior.InteractionResult
 import cc.mewcraft.wakame.item2.behavior.UseContext
 import cc.mewcraft.wakame.item2.behavior.UseEntityContext
 import cc.mewcraft.wakame.item2.behavior.UseOnContext
+import cc.mewcraft.wakame.item2.behavior.handleBehavior
+import cc.mewcraft.wakame.item2.behavior.handleBreak
+import cc.mewcraft.wakame.item2.behavior.handleBreakBlock
+import cc.mewcraft.wakame.item2.behavior.handleConsume
+import cc.mewcraft.wakame.item2.behavior.handleDamage
+import cc.mewcraft.wakame.item2.behavior.handleEquip
+import cc.mewcraft.wakame.item2.behavior.handleInventoryClick
+import cc.mewcraft.wakame.item2.behavior.handleInventoryClickOnCursor
+import cc.mewcraft.wakame.item2.behavior.handleInventoryHotbarSwap
+import cc.mewcraft.wakame.item2.behavior.handleItemProjectileHit
+import cc.mewcraft.wakame.item2.behavior.handleItemProjectileLaunch
+import cc.mewcraft.wakame.item2.behavior.handlePlayerAttackEntity
+import cc.mewcraft.wakame.item2.behavior.handlePlayerReceiveDamage
+import cc.mewcraft.wakame.item2.behavior.handleRelease
 import cc.mewcraft.wakame.item2.behavior.isInteractable
 import cc.mewcraft.wakame.item2.behavior.isSuccess
 import cc.mewcraft.wakame.item2.behavior.shouldCancel
@@ -41,7 +55,6 @@ import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
@@ -321,16 +334,7 @@ internal object ItemBehaviorListener : Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun on(event: PlayerInteractAtEntityEvent) {
-        val player = event.player
-        if (!player.isInventoryListenable) return
-        val itemstack = event.player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-
-        itemstack.handleInteractAtEntity(event.player, itemstack, event.rightClicked, event)
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW)
     fun onReceive(event: PostprocessDamageEvent) {
         val damagee = event.damagee as? Player ?: return
         if (!damagee.isInventoryListenable) return

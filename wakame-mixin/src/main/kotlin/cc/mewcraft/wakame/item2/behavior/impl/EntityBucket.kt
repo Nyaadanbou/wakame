@@ -123,7 +123,7 @@ object EntityBucket : ItemBehavior {
 
     // 当玩家手持一个生物桶右键方块顶部时
     override fun handleUseOn(context: UseOnContext): InteractionResult {
-        val player=context.player
+        val player = context.player
         val itemStack = context.itemStack
         // 区域保护检查不通过 - 交互失败
         if (!ProtectionManager.canUseItem(player, itemStack, context.blockLocation)) {
@@ -167,7 +167,7 @@ object EntityBucket : ItemBehavior {
 
     // 当玩家手持一个生物桶右键生物时
     override fun handleUseEntity(context: UseEntityContext): InteractionResult {
-        val player=context.player
+        val player = context.player
         val itemStack = context.itemStack
         val entity = context.entity
         val entityBucket = itemStack.getProp(ItemPropertyTypes.ENTITY_BUCKET) ?: return InteractionResult.FAIL

@@ -1,19 +1,16 @@
 package cc.mewcraft.wakame.item2.behavior
 
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
-import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
-import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
@@ -77,12 +74,6 @@ interface ItemBehavior {
      * 玩家手持该物品对实体按下攻击键(默认为鼠标左键)进行交互执行的行为.
      */
     fun handleAttackEntity(context: AttackEntityContext) = InteractionResult.PASS
-
-    @Deprecated("use handleUseOn/handleUse instead")
-    fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
-
-    @Deprecated("use handleUseEntity instead")
-    fun handleInteractAtEntity(player: Player, itemstack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
 
     // TODO 以下需要整理和重命名
     fun handlePlayerReceiveDamage(player: Player, itemstack: ItemStack, damageSource: DamageSource, event: PostprocessDamageEvent) = Unit
