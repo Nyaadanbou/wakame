@@ -2,11 +2,7 @@ package cc.mewcraft.wakame.display2.implementation.simple
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
+import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
@@ -22,7 +18,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.util.item.fastLore
-import cc.mewcraft.wakame.util.item.hideAll
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import org.bukkit.inventory.ItemStack
 import java.nio.file.Path
@@ -64,13 +59,10 @@ internal object SimpleItemRenderer : AbstractItemRenderer<Nothing>() {
 
         item.process(ItemMetaTypes.CUSTOM_NAME) { data -> SimpleRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
         item.process(ItemMetaTypes.ITEM_NAME) { data -> SimpleRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
-
         item.process(ItemPropertyTypes.EXTRA_LORE) { data -> SimpleRenderingHandlerRegistry.LORE.process(collector, data) }
 
         val lore = textAssembler.assemble(collector)
         item.fastLore(lore)
-
-        item.hideAll()
     }
 }
 

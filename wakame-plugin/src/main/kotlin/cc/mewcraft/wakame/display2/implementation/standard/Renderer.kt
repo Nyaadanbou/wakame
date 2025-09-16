@@ -111,10 +111,6 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
                 }
             }
         })
-
-        item.hideAttributeModifiers()
-        item.hideEnchantments()
-        item.hideStoredEnchantments()
     }
 
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, core: Core) {

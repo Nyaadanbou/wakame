@@ -44,13 +44,13 @@ internal object ItemBehaviorListener : Listener {
     // ------------
     // Item Behavior
     // ------------
-    
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(event: EntityEquipmentChangedEvent) {
         val player = event.entity as? Player ?: return
         if (!player.isInventoryListenable) return
         for ((slot, change) in event.equipmentChanges) {
-            val previous  = change.oldItem().takeUnlessEmpty()
+            val previous = change.oldItem().takeUnlessEmpty()
             val current = change.newItem().takeUnlessEmpty()
             if (previous == current)
                 continue
