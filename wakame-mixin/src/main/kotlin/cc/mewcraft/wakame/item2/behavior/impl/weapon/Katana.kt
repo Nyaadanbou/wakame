@@ -11,11 +11,12 @@ import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
-import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.item2.ItemSlotChanges
 import cc.mewcraft.wakame.item2.behavior.AttackContext
+import cc.mewcraft.wakame.item2.behavior.BehaviorResult
 import cc.mewcraft.wakame.item2.behavior.InteractionHand
 import cc.mewcraft.wakame.item2.behavior.InteractionResult
+import cc.mewcraft.wakame.item2.behavior.ReceiveDamageContext
 import cc.mewcraft.wakame.item2.behavior.UseContext
 import cc.mewcraft.wakame.item2.behavior.impl.weapon.WeaponUtils.getInputDirection
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
@@ -33,7 +34,6 @@ import com.github.quillraven.fleks.IteratingSystem
 import io.papermc.paper.registry.keys.SoundEventKeys
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
-import org.bukkit.damage.DamageSource
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -154,11 +154,12 @@ object Katana : Weapon {
         }
     }
 
-    override fun handlePlayerReceiveDamage(player: Player, itemstack: ItemStack, damageSource: DamageSource, event: PostprocessDamageEvent) {
-        val katanaState = player.koishify().getOrNull(KatanaState) ?: return
-        if (katanaState.isArmed.not()) return
+    override fun handleReceiveDamage(context: ReceiveDamageContext): BehaviorResult {
+        val player = context.player
+        val katanaState = player.koishify().getOrNull(KatanaState) ?: return BehaviorResult.PASS
+        if (katanaState.isArmed.not()) return BehaviorResult.PASS
 
-        foresightSlashCheck(player, katanaState, event)
+        return foresightSlashCheck(player, katanaState, context)
     }
 
     /**
@@ -406,32 +407,31 @@ object Katana : Weapon {
      * 检查玩家受伤时是否满足看破斩成功条件.
      * 若满足成功条件则给予奖励.
      */
-    private fun foresightSlashCheck(player: Player, katanaState: KatanaState, event: PostprocessDamageEvent) {
+    private fun foresightSlashCheck(player: Player, katanaState: KatanaState, context: ReceiveDamageContext): BehaviorResult {
         val config = katanaState.config
-        // 免除伤害:
         // 不存在伤害来源实体 - 不处理
-        event.damageSource.causingEntity as? LivingEntity ?: return
+        context.damageSource.causingEntity as? LivingEntity ?: return BehaviorResult.PASS
         // 玩家不处于看破斩判定时间内 - 不处理
-        if (katanaState.remainingForesightSlashTicks <= 0) return
-        // 处于无敌时间都取消伤害
-        // 即使看破斩未命中生物
-        event.isCancelled = true
+        if (katanaState.remainingForesightSlashTicks <= 0) return BehaviorResult.PASS
 
-        // 给予气刃值奖励:
-        // 看破斩命中生物 且 看破斩期间内玩家受伤, 才给予气刃值奖励
-        // 看破斩未命中生物 - 不处理
-        if (!katanaState.isForesightSlashHitTarget) return
-        // 已经给予过看破斩奖励 - 不处理
-        if (katanaState.isForesightSlashAlreadyReward) return
-        // 修改标记
-        katanaState.isForesightSlashAlreadyReward = true
-        // 加气刃值
-        katanaState.addBladeSpirit(config.foresightSlashSpiritReward)
-        // 播放音效 // TODO 音效和特效: 叮~
-        player.playSound(player) {
-            type(SoundEventKeys.ENTITY_EXPERIENCE_ORB_PICKUP)
-            source(SoundSource.PLAYER)
+        // 判定看破斩奖励
+        // 前提: 玩家在看破斩期间受伤(执行到这里说明已满足该条件)
+        // 看破斩命中生物 且 看破斩奖励未给予, 才奖励气刃值
+        if (katanaState.isForesightSlashHitTarget && !katanaState.isForesightSlashAlreadyReward) {
+            // 修改标记
+            katanaState.isForesightSlashAlreadyReward = true
+            // 加气刃值
+            katanaState.addBladeSpirit(config.foresightSlashSpiritReward)
+            // 播放音效 // TODO 音效和特效: 叮~
+            player.playSound(player) {
+                type(SoundEventKeys.ENTITY_EXPERIENCE_ORB_PICKUP)
+                source(SoundSource.PLAYER)
+            }
         }
+
+        // 处于无敌时间都取消伤害
+        // 即使看破斩奖励判定未成功
+        return BehaviorResult.FINISH_AND_CANCEL
     }
 
 

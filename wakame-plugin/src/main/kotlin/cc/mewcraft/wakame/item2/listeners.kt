@@ -7,26 +7,22 @@ import cc.mewcraft.wakame.extensions.toVector3d
 import cc.mewcraft.wakame.item2.behavior.AttackContext
 import cc.mewcraft.wakame.item2.behavior.AttackEntityContext
 import cc.mewcraft.wakame.item2.behavior.AttackOnContext
+import cc.mewcraft.wakame.item2.behavior.BehaviorResult
 import cc.mewcraft.wakame.item2.behavior.BlockInteractContext
+import cc.mewcraft.wakame.item2.behavior.CauseDamageContext
+import cc.mewcraft.wakame.item2.behavior.ConsumeContext
+import cc.mewcraft.wakame.item2.behavior.DurabilityDecreaseContext
 import cc.mewcraft.wakame.item2.behavior.InteractionHand
 import cc.mewcraft.wakame.item2.behavior.InteractionResult
+import cc.mewcraft.wakame.item2.behavior.ItemStackActivationChecker.isActive
+import cc.mewcraft.wakame.item2.behavior.ProjectileHitContext
+import cc.mewcraft.wakame.item2.behavior.ProjectileLaunchContext
+import cc.mewcraft.wakame.item2.behavior.ReceiveDamageContext
+import cc.mewcraft.wakame.item2.behavior.StopUseContext
 import cc.mewcraft.wakame.item2.behavior.UseContext
 import cc.mewcraft.wakame.item2.behavior.UseEntityContext
 import cc.mewcraft.wakame.item2.behavior.UseOnContext
 import cc.mewcraft.wakame.item2.behavior.handleBehavior
-import cc.mewcraft.wakame.item2.behavior.handleBreak
-import cc.mewcraft.wakame.item2.behavior.handleBreakBlock
-import cc.mewcraft.wakame.item2.behavior.handleConsume
-import cc.mewcraft.wakame.item2.behavior.handleDamage
-import cc.mewcraft.wakame.item2.behavior.handleEquip
-import cc.mewcraft.wakame.item2.behavior.handleInventoryClick
-import cc.mewcraft.wakame.item2.behavior.handleInventoryClickOnCursor
-import cc.mewcraft.wakame.item2.behavior.handleInventoryHotbarSwap
-import cc.mewcraft.wakame.item2.behavior.handleItemProjectileHit
-import cc.mewcraft.wakame.item2.behavior.handleItemProjectileLaunch
-import cc.mewcraft.wakame.item2.behavior.handlePlayerAttackEntity
-import cc.mewcraft.wakame.item2.behavior.handlePlayerReceiveDamage
-import cc.mewcraft.wakame.item2.behavior.handleRelease
 import cc.mewcraft.wakame.item2.behavior.isInteractable
 import cc.mewcraft.wakame.item2.behavior.isSuccess
 import cc.mewcraft.wakame.item2.behavior.shouldCancel
@@ -37,7 +33,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
-import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import io.papermc.paper.event.player.PrePlayerAttackEntityEvent
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
@@ -50,14 +45,10 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
-import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
-import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
@@ -74,21 +65,6 @@ internal object ItemBehaviorListener : Listener {
     // ------------
     // Item Behavior
     // ------------
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun on(event: EntityEquipmentChangedEvent) {
-        val player = event.entity as? Player ?: return
-        if (!player.isInventoryListenable) return
-        for ((slot, change) in event.equipmentChanges) {
-            val previous = change.oldItem().takeUnlessEmpty()
-            val current = change.newItem().takeUnlessEmpty()
-            if (previous == current)
-                continue
-
-            change.oldItem().takeUnlessEmpty()?.handleEquip(player, change.oldItem(), slot, false, event)
-            change.newItem().takeUnlessEmpty()?.handleEquip(player, change.newItem(), slot, true, event)
-        }
-    }
 
     @JvmStatic
     private val alreadySuccessfulUsePlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
@@ -148,7 +124,7 @@ internal object ItemBehaviorListener : Listener {
                     return
                 }
             }
-            val useContext = UseContext(player, hand, itemStack)
+            val useContext = UseContext(player, itemStack, hand)
             itemStack.handleBehavior { behavior ->
                 val result = behavior.handleUse(useContext)
                 if (result.isSuccess()) {
@@ -181,7 +157,7 @@ internal object ItemBehaviorListener : Listener {
             if (!player.isSneaking && interactable) return
             // 遍历物品上的所有行为, 依次执行所有 handleUseOn 逻辑
             // 执行顺序取决于注册顺序, 因此用需要取消后续行为的行为应更早注册
-            val useOnContext = UseOnContext(player, hand, itemStack, blockInteractContext)
+            val useOnContext = UseOnContext(player, itemStack, hand, blockInteractContext)
             itemStack.handleBehavior { behavior ->
                 val result = behavior.handleUseOn(useOnContext)
                 if (result.isSuccess()) {
@@ -230,7 +206,7 @@ internal object ItemBehaviorListener : Listener {
         // 判定玩家手中的物品和实体是否存在原版交互
         // 实体存在原版交互 - 不处理
         if (entity.isInteractable(player, itemStack)) return
-        val useEntityContext = UseEntityContext(player, hand, itemStack,entity)
+        val useEntityContext = UseEntityContext(player, itemStack, hand, entity)
         itemStack.handleBehavior { behavior ->
             val result = behavior.handleUseEntity(useEntityContext)
             if (result.isSuccess()) {
@@ -304,7 +280,7 @@ internal object ItemBehaviorListener : Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    fun onPreAttack(event: PrePlayerAttackEntityEvent){
+    fun onPreAttack(event: PrePlayerAttackEntityEvent) {
         val player = event.player
         // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
         if (!player.isInventoryListenable) return
@@ -335,106 +311,167 @@ internal object ItemBehaviorListener : Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    fun onReceive(event: PostprocessDamageEvent) {
-        val damagee = event.damagee as? Player ?: return
-        if (!damagee.isInventoryListenable) return
+    fun onPostprocessDamage(event: PostprocessDamageEvent) {
+        val causingEntity = event.damageSource.causingEntity
+        if (causingEntity is Player) {
+            // 确保此时玩家的背包可以监听
+            if (!causingEntity.isInventoryListenable) return
+            // 遍历所有 Koish 关心的槽位
+            for (slot in ItemSlotRegistry.itemSlots()) {
+                // 该槽位没有物品 - 跳转至下一循环
+                val itemStack = slot.getItem(causingEntity) ?: continue
+                // 该槽位的物品不处于激活状态 - 跳转至下一循环
+                if (!itemStack.isActive(slot, causingEntity)) continue
 
-        val damageSource = event.damageSource
-        for (slot in ItemSlotRegistry.itemSlots()) {
-            val itemstack = slot.getItem(damagee) ?: continue
-            itemstack.handlePlayerReceiveDamage(damagee, itemstack, damageSource, event)
+                val context = CauseDamageContext(causingEntity, itemStack, event.damagee, event.finalDamageContext)
+                itemStack.handleBehavior { behavior ->
+                    val result = behavior.handleCauseDamage(context)
+                    if (result == BehaviorResult.FINISH_AND_CANCEL) {
+                        event.isCancelled = true
+                    }
+                    if (result != BehaviorResult.PASS) {
+                        return
+                    }
+                }
+            }
+        }
+
+        val damagee = event.damagee
+        if (damagee is Player) {
+            // 确保此时玩家的背包可以监听
+            if (!damagee.isInventoryListenable) return
+            // 遍历所有 Koish 关心的槽位
+            for (slot in ItemSlotRegistry.itemSlots()) {
+                // 该槽位没有物品 - 跳转至下一循环
+                val itemStack = slot.getItem(damagee) ?: continue
+                // 该槽位的物品不处于激活状态 - 跳转至下一循环
+                if (!itemStack.isActive(slot, damagee)) continue
+
+                val context = ReceiveDamageContext(damagee, itemStack, event.damageSource, event.finalDamageContext)
+                itemStack.handleBehavior { behavior ->
+                    val result = behavior.handleReceiveDamage(context)
+                    if (result == BehaviorResult.FINISH_AND_CANCEL) {
+                        event.isCancelled = true
+                    }
+                    if (result != BehaviorResult.PASS) {
+                        return
+                    }
+                }
+            }
         }
     }
 
-    @EventHandler()
-    fun onAttack(event: PostprocessDamageEvent) {
-        val player = event.damageSource.causingEntity as? Player ?: return
-        if (!player.isInventoryListenable) return
-        val itemstack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-
-        itemstack.handlePlayerAttackEntity(player, itemstack, event.damagee, event)
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun on(event: ProjectileLaunchEvent) {
+    @EventHandler(priority = EventPriority.LOW)
+    fun onProjectileLaunch(event: ProjectileLaunchEvent) {
         val projectile = event.entity
-        val itemstack = projectile.itemStack ?: return
+        // 弹射物实体的主人UUID不存在 - 不处理
         val ownerUniqueId = projectile.ownerUniqueId ?: return
+        // 发射弹射物的玩家不存在(玩家不在线) - 不处理
         val player = SERVER.getPlayer(ownerUniqueId) ?: return
+        // 确保此时玩家的背包可以监听
         if (!player.isInventoryListenable) return
+        // 无法获取弹射物实体对应的物品 - 不处理
+        val itemStack = projectile.itemStack ?: return
 
-        itemstack.handleItemProjectileLaunch(player, itemstack, projectile, event)
+        val context = ProjectileLaunchContext(player, itemStack, projectile)
+        itemStack.handleBehavior { behavior ->
+            val result = behavior.handleProjectileLaunch(context)
+            if (result == BehaviorResult.FINISH_AND_CANCEL) {
+                event.isCancelled = true
+            }
+            if (result != BehaviorResult.PASS) {
+                return
+            }
+        }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun on(event: ProjectileHitEvent) {
+    @EventHandler(priority = EventPriority.LOW)
+    fun onProjectileHit(event: ProjectileHitEvent) {
         val projectile = event.entity
-        val itemstack = projectile.itemStack ?: return
+        // 弹射物实体的主人UUID不存在 - 不处理
         val ownerUniqueId = projectile.ownerUniqueId ?: return
+        // 发射弹射物的玩家不存在(玩家不在线) - 不处理
         val player = SERVER.getPlayer(ownerUniqueId) ?: return
+        // 确保此时玩家的背包可以监听
         if (!player.isInventoryListenable) return
+        // 无法获取弹射物实体对应的物品 - 不处理
+        val itemStack = projectile.itemStack ?: return
 
-        itemstack.handleItemProjectileHit(player, itemstack, projectile, event)
+        val context = ProjectileHitContext(player, itemStack, projectile, event.hitEntity, event.hitBlock, event.hitBlockFace)
+        itemStack.handleBehavior { behavior ->
+            val result = behavior.handleProjectileHit(context)
+            if (result == BehaviorResult.FINISH_AND_CANCEL) {
+                event.isCancelled = true
+            }
+            if (result != BehaviorResult.PASS) {
+                return
+            }
+        }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun on(event: BlockBreakEvent) {
-        val player = event.player
-        if (!player.isInventoryListenable) return
-        val itemstack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-
-        itemstack.handleBreakBlock(player, itemstack, event)
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW)
     fun on(event: PlayerItemDamageEvent) {
         val player = event.player
+        // 确保此时玩家的背包可以监听
         if (!player.isInventoryListenable) return
-        val itemstack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+        val itemStack = event.item
 
-        itemstack.handleDamage(player, itemstack, event)
-    }
-
-    @EventHandler(priority = EventPriority.HIGH)
-    fun on(event: PlayerItemBreakEvent) {
-        val player = event.player
-        if (!player.isInventoryListenable) return
-        val itemstack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-
-        itemstack.handleBreak(player, itemstack, event)
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    fun on(event: InventoryClickEvent) {
-        val player = event.whoClicked as Player
-        if (!player.isInventoryListenable) return
-        val clickedItem = event.currentItem
-        val cursorItem = event.cursor.takeUnlessEmpty()
-
-        clickedItem?.handleInventoryClick(player, clickedItem, event)
-        cursorItem?.handleInventoryClickOnCursor(player, cursorItem, event)
-        if (event.click == ClickType.NUMBER_KEY) {
-            val hotbarItem = player.inventory.getItem(event.hotbarButton)
-            hotbarItem?.handleInventoryHotbarSwap(player, hotbarItem, event)
+        val context = DurabilityDecreaseContext(player, itemStack, event.damage, event.originalDamage)
+        itemStack.handleBehavior { behavior ->
+            val result = behavior.handleDurabilityDecrease(context)
+            if (result == BehaviorResult.FINISH_AND_CANCEL) {
+                event.isCancelled = true
+            }
+            if (context.willModifyDurabilityDecreaseValue) {
+                event.damage = context.newDurabilityDecreaseValue
+            }
+            if (result != BehaviorResult.PASS) {
+                return
+            }
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOW)
     fun on(event: PlayerStopUsingItemEvent) {
         val player = event.player
+        // 确保此时玩家的背包可以监听
         if (!player.isInventoryListenable) return
-        val itemstack = event.item.takeUnlessEmpty() ?: return
+        val itemStack = event.item
 
-        itemstack.handleRelease(player, itemstack, event)
+        val context = StopUseContext(player, itemStack, event.ticksHeldFor)
+        itemStack.handleBehavior { behavior ->
+            val result = behavior.handleStopUse(context)
+            if (result != BehaviorResult.PASS) {
+                return
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(event: PlayerItemConsumeEvent) {
         val player = event.player
+        // 确保此时玩家的背包可以监听
         if (!player.isInventoryListenable) return
-        val itemstack = event.item.takeUnlessEmpty() ?: return
+        val itemStack = event.item
+        val hand = when (event.hand) {
+            EquipmentSlot.HAND -> InteractionHand.MAIN_HAND
+            EquipmentSlot.OFF_HAND -> InteractionHand.OFF_HAND
+            else -> return
+        }
 
-        itemstack.handleConsume(player, itemstack, event)
+        val context = ConsumeContext(player, itemStack, hand, event.replacement)
+        itemStack.handleBehavior { behavior ->
+            val result = behavior.handleConsume(context)
+            if (result == BehaviorResult.FINISH_AND_CANCEL) {
+                event.isCancelled = true
+            }
+            if (context.willModifyReplacement) {
+                event.replacement = context.newReplacement
+            }
+            if (result != BehaviorResult.PASS) {
+                return
+            }
+        }
     }
 
     private val Projectile.itemStack: ItemStack?

@@ -46,15 +46,13 @@ import org.bukkit.inventory.ItemType
 import org.joml.Vector3d
 
 data class UseOnContext(
-    val player: Player,
-    val world: World,
+    override val player: Player,
+    override val itemStack: ItemStack,
     val hand: InteractionHand,
-    val itemStack: ItemStack,
     val interactContext: BlockInteractContext
-) {
-    constructor(player: Player, hand: InteractionHand, itemStack: ItemStack, interactContext: BlockInteractContext) : this(
-        player, player.world, hand, itemStack, interactContext
-    )
+): ItemBehaviorContext {
+    val world: World
+        get() = player.world
 
     val blockLocation: Location
         get() = this.interactContext.blockPosition.toLocation(this.world)
@@ -70,59 +68,49 @@ data class UseOnContext(
 }
 
 data class UseContext(
-    val player: Player,
-    val world: World,
+    override val player: Player,
+    override val itemStack: ItemStack,
     val hand: InteractionHand,
-    val itemStack: ItemStack,
-) {
-    constructor(player: Player, hand: InteractionHand, item: ItemStack) : this(
-        player, player.world, hand, item
-    )
+): ItemBehaviorContext {
+    val world: World
+        get() = player.world
 }
 
 data class UseEntityContext(
-    val player: Player,
-    val world: World,
+    override val player: Player,
+    override val itemStack: ItemStack,
     val hand: InteractionHand,
-    val itemStack: ItemStack,
     val entity: Entity
-) {
-    constructor(player: Player, hand: InteractionHand, item: ItemStack, entity: Entity) : this(
-        player, player.world, hand, item, entity
-    )
+): ItemBehaviorContext {
+    val world: World
+        get() = player.world
 }
 
 data class AttackOnContext(
-    val player: Player,
-    val world: World,
-    val itemStack: ItemStack,
+    override val player: Player,
+    override val itemStack: ItemStack,
     val blockPosition: Vector3d,
     val interactFace: BlockFace,
-) {
-    constructor(player: Player, itemStack: ItemStack, blockPosition: Vector3d, interactFace: BlockFace) : this(
-        player, player.world, itemStack, blockPosition, interactFace
-    )
+): ItemBehaviorContext {
+    val world: World
+        get() = player.world
 }
 
 data class AttackContext(
-    val player: Player,
-    val world: World,
-    val itemStack: ItemStack,
-) {
-    constructor(player: Player, item: ItemStack) : this(
-        player, player.world, item
-    )
+    override val player: Player,
+    override val itemStack: ItemStack,
+): ItemBehaviorContext {
+    val world: World
+        get() = player.world
 }
 
 data class AttackEntityContext(
-    val player: Player,
-    val world: World,
-    val itemStack: ItemStack,
+    override val player: Player,
+    override val itemStack: ItemStack,
     val entity: Entity
-) {
-    constructor(player: Player, item: ItemStack, entity: Entity) : this(
-        player, player.world, item, entity
-    )
+): ItemBehaviorContext {
+    val world: World
+        get() = player.world
 }
 
 data class BlockInteractContext(

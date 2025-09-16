@@ -2,7 +2,14 @@ package cc.mewcraft.wakame.item2.config.property
 
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.entity.player.AttackSpeed
-import cc.mewcraft.wakame.item2.config.property.impl.*
+import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
+import cc.mewcraft.wakame.item2.config.property.impl.Arrow
+import cc.mewcraft.wakame.item2.config.property.impl.EntityBucket
+import cc.mewcraft.wakame.item2.config.property.impl.ExtraLore
+import cc.mewcraft.wakame.item2.config.property.impl.HoldLastDamageFlags
+import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
+import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
+import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotGroup
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.DualSword
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.Katana
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.Melee
@@ -62,6 +69,9 @@ data object ItemPropTypes {
 
     @JvmField
     val ARROW: ItemPropertyType<Arrow> = typeOf("arrow")
+
+    @JvmField
+    val HOLD_LAST_DAMAGE_FLAGS: ItemPropertyType<HoldLastDamageFlags> = typeOf("hold_last_damage")
 
     @JvmField
     val CASTABLE: ItemPropertyType<Unit> = typeOf("castable")

@@ -27,7 +27,7 @@ interface SimpleInteract : ItemBehavior {
     fun handleSimpleAttack(context: AttackContext): InteractionResult = InteractionResult.PASS
 
     override fun handleUseOn(context: UseOnContext): InteractionResult {
-        return handleSimpleUse(UseContext(context.player, context.hand, context.itemStack))
+        return handleSimpleUse(UseContext(context.player, context.itemStack, context.hand))
     }
 
     override fun handleUse(context: UseContext): InteractionResult {
@@ -35,7 +35,7 @@ interface SimpleInteract : ItemBehavior {
     }
 
     override fun handleUseEntity(context: UseEntityContext): InteractionResult {
-        return handleSimpleUse(UseContext(context.player, context.hand, context.itemStack))
+        return handleSimpleUse(UseContext(context.player, context.itemStack, context.hand))
     }
 
     override fun handleAttackOn(context: AttackOnContext): InteractionResult {

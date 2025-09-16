@@ -2,74 +2,143 @@
 
 package cc.mewcraft.wakame.item2.behavior.impl
 
-import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.item2.behavior.AttackContext
+import cc.mewcraft.wakame.item2.behavior.BehaviorResult
+import cc.mewcraft.wakame.item2.behavior.CauseDamageContext
+import cc.mewcraft.wakame.item2.behavior.ConsumeContext
+import cc.mewcraft.wakame.item2.behavior.DurabilityDecreaseContext
 import cc.mewcraft.wakame.item2.behavior.InteractionResult
+import cc.mewcraft.wakame.item2.behavior.ReceiveDamageContext
 import cc.mewcraft.wakame.item2.behavior.UseContext
+import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item2.getProp
 import cc.mewcraft.wakame.util.item.damage
-import cc.mewcraft.wakame.util.item.isDamageable
 import cc.mewcraft.wakame.util.item.maxDamage
-import net.kyori.adventure.text.Component.text
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
-import org.bukkit.event.Cancellable
-import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 
+/**
+ * 保留物品最后耐久(维持在0)的行为.
+ * 可实现物品耐久耗尽时变为不可用状态(“损坏”状态)而不是直接消失.
+ */
 object HoldLastDamage : SimpleInteract {
 
-    override fun handlePlayerAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: PostprocessDamageEvent) {
-        tryCancelEvent(itemstack, player, event)
-    }
-
     override fun handleSimpleUse(context: UseContext): InteractionResult {
-        return if (context.itemStack.isLastDamage()) {
-            InteractionResult.FAIL_AND_CANCEL
+        val itemStack = context.itemStack
+        val player = context.player
+        if (itemStack.isBroken()) {
+            val holdLastDamageFlags = itemStack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_FLAGS)
+            return if (holdLastDamageFlags?.cancelUse != false) {
+                // cancel标记为true时, 中断后续物品行为并取消相应事件.
+                // 值得一提的是, 未指定(如直接没有Property)时, 视为true以防止忘记配置标记产生恶性后果.
+                player.sendActionBar(holdLastDamageFlags?.msgUse ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_USE)
+                InteractionResult.FAIL_AND_CANCEL
+            } else if (holdLastDamageFlags.finishUse != false) {
+                // finish标记为true时, 仅中断后续物品行为.
+                player.sendActionBar(holdLastDamageFlags.msgUse ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_USE)
+                InteractionResult.FAIL
+            } else {
+                InteractionResult.PASS
+            }
         } else {
-            InteractionResult.PASS
+            return InteractionResult.PASS
         }
     }
 
     override fun handleSimpleAttack(context: AttackContext): InteractionResult {
-        return if (context.itemStack.isLastDamage()) {
-            InteractionResult.FAIL_AND_CANCEL
+        val itemStack = context.itemStack
+        val player = context.player
+        if (itemStack.isBroken()) {
+            val holdLastDamageFlags = itemStack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_FLAGS)
+            return if (holdLastDamageFlags?.cancelAttack != false) {
+                player.sendActionBar(holdLastDamageFlags?.msgAttack ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_ATTACK)
+                InteractionResult.FAIL_AND_CANCEL
+            } else if (holdLastDamageFlags.finishAttack != false) {
+                player.sendActionBar(holdLastDamageFlags.msgAttack ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_ATTACK)
+                InteractionResult.FAIL
+            } else {
+                InteractionResult.PASS
+            }
         } else {
-            InteractionResult.PASS
+            return InteractionResult.PASS
         }
     }
 
-    override fun handlePlayerBreakBlock(player: Player, itemstack: ItemStack, event: BlockBreakEvent) {
-        tryCancelEvent(itemstack, player, event)
-    }
-
-    override fun handleDamage(player: Player, itemstack: ItemStack, event: PlayerItemDamageEvent) {
-        if (!itemstack.isDamageable) return
-        // 物品要损坏了
-        // 取消掉耐久事件, 设为 0 耐久
-        val damage = itemstack.damage
-        val maxDamage = itemstack.maxDamage
-        if (damage + event.damage >= maxDamage) {
-            event.isCancelled = true
-            itemstack.damage = maxDamage
+    override fun handleCauseDamage(context: CauseDamageContext): BehaviorResult {
+        val itemStack = context.itemStack
+        val player = context.player
+        if (itemStack.isBroken()) {
+            val holdLastDamageFlags = itemStack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_FLAGS)
+            return if (holdLastDamageFlags?.cancelCauseDamage != false) {
+                player.sendActionBar(holdLastDamageFlags?.msgCauseDamage ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_CAUSE_DAMAGE)
+                BehaviorResult.FINISH_AND_CANCEL
+            } else if (holdLastDamageFlags.finishCauseDamage != false) {
+                player.sendActionBar(holdLastDamageFlags.msgCauseDamage ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_CAUSE_DAMAGE)
+                BehaviorResult.FINISH
+            } else {
+                BehaviorResult.PASS
+            }
+        } else {
+            return BehaviorResult.PASS
         }
     }
 
-    override fun handleConsume(player: Player, itemstack: ItemStack, event: PlayerItemConsumeEvent) {
-        tryCancelEvent(itemstack, player, event)
-    }
-
-    private fun tryCancelEvent(itemstack: ItemStack, player: Player, event: Cancellable) {
-        val damage = itemstack.damage
-        val maxDamage = itemstack.maxDamage
-        if (damage >= maxDamage) {
-            event.isCancelled = true
-            player.sendMessage(text("无法使用完全损坏的物品"))
+    override fun handleReceiveDamage(context: ReceiveDamageContext): BehaviorResult {
+        val itemStack = context.itemStack
+        val player = context.player
+        if (itemStack.isBroken()) {
+            val holdLastDamageFlags = itemStack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_FLAGS)
+            // “玩家受到伤害”没有设计cancel标记.
+            // 毕竟一般情况下不会去取消玩家受伤事件.
+            return if (holdLastDamageFlags?.finishReceiveDamage != false) {
+                player.sendActionBar(holdLastDamageFlags?.msgReceiveDamage ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_RECEIVE_DAMAGE)
+                BehaviorResult.FINISH
+            } else {
+                BehaviorResult.PASS
+            }
+        } else {
+            return BehaviorResult.PASS
         }
     }
 
-    private fun ItemStack.isLastDamage(): Boolean {
+    override fun handleConsume(context: ConsumeContext): BehaviorResult {
+        val itemStack = context.itemStack
+        val player = context.player
+        if (itemStack.isBroken()) {
+            val holdLastDamageFlags = itemStack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_FLAGS)
+            return if (holdLastDamageFlags?.cancelConsume != false) {
+                player.sendActionBar(holdLastDamageFlags?.msgConsume ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_CONSUME)
+                BehaviorResult.FINISH_AND_CANCEL
+            } else if (holdLastDamageFlags.finishConsume != false) {
+                player.sendActionBar(holdLastDamageFlags.msgConsume ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_CONSUME)
+                BehaviorResult.FINISH
+            } else {
+                BehaviorResult.PASS
+            }
+        } else {
+            return BehaviorResult.PASS
+        }
+    }
+
+    override fun handleDurabilityDecrease(context: DurabilityDecreaseContext): BehaviorResult {
+        val itemStack = context.itemStack
+        val currentDamage = itemStack.damage
+        val maxDamage = itemStack.maxDamage
+        // 如果物品要损坏了
+        if (currentDamage + context.originalDurabilityDecreaseValue >= maxDamage) {
+            // 设为 0 耐久
+            itemStack.damage = maxDamage
+            // 取消掉耐久事件
+            return BehaviorResult.FINISH_AND_CANCEL
+        } else {
+            return BehaviorResult.PASS
+        }
+    }
+
+    /**
+     * 判断物品是否处于"损坏"状态.
+     */
+    private fun ItemStack.isBroken(): Boolean {
         return this.damage >= this.maxDamage
     }
 
