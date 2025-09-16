@@ -1,13 +1,18 @@
 # 锻造升级配方, 参考: https://minecraft.wiki/w/Recipe#smithing_transform
 type: smithing_transform
 
-# 表示要被锻造升级的基础物品
+# 表示要被锻造升级的基础材料
 base:
   - minecraft:cobblestone
   - minecraft:stone
 
-# 表示升级基础物品时所需的锻造原材料
-addition: minecraft:ender_pearl
+# 表示锻造升级所需要的额外材料
+addition:
+  - minecraft:ender_pearl
+
+# 表示锻造升级所需要的模板物品
+template:
+  - minecraft:netherite_ingot
 
 # 经过锻造升级后得到的输出物品
 result:

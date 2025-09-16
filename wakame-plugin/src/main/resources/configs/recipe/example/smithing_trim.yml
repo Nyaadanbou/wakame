@@ -4,7 +4,8 @@ type: smithing_trim
 # 表示要被添加纹饰的基础物品, 一般为盔甲
 base: example/bronze_helmet
 
-# 表示为基础物品添加纹饰时所需的锻造原材料, 以确定添加到基础物品上的纹饰材料
+# 表示为基础物品添加纹饰时所需的额外材料
+# 以确定添加到基础物品上的纹饰材料
 addition:
   - minecraft:amethyst_shard
   - minecraft:copper_ingot
@@ -17,7 +18,8 @@ addition:
   - minecraft:quartz
   - minecraft:redstone
 
-# 表示为基础物品添加纹饰时所需的锻造模板, 以确定基础物品的纹饰图案
+# 表示为基础物品添加纹饰时所需的模板物品
+# 以确定基础物品的纹饰图案
 template:
   - minecraft:coast_armor_trim_smithing_template
   - minecraft:dune_armor_trim_smithing_template
