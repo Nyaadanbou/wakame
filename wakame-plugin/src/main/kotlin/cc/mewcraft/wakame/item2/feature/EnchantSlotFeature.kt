@@ -22,10 +22,12 @@ import org.bukkit.Sound
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.enchantment.EnchantItemEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
+import org.bukkit.event.inventory.PrepareSmithingEvent
 import org.bukkit.event.inventory.SmithItemEvent
 import org.bukkit.inventory.AnvilInventory
 import org.bukkit.inventory.ItemStack
@@ -246,19 +248,41 @@ object EnchantSlotFeature : Listener {
     }
 
     // 监听玩家在锻造台 (Smithing Table) 合成物品时, 自动设置和校验物品的魔咒容量, 防止超出自定义的最大"魔咒槽"容量
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     private fun on(event: SmithItemEvent) {
+        if (event.isCancelled) return
+
         val player = event.whoClicked as? Player ?: return
         val inventory = event.inventory
-        val result = inventory.result?.takeUnlessEmpty() ?: return
-        val slotLimit = getSlotLimit(result)
-        val slotUsed = getSlotUsed(result)
+
+        //val firstItem = inventory.inputTemplate?.takeUnlessEmpty()
+        val secondItem = inventory.inputEquipment?.takeUnlessEmpty() ?: return
+        //val thirdItem = inventory.inputMineral?.takeUnlessEmpty()
+        val resultItem = inventory.result?.takeUnlessEmpty() ?: return
+
+        // 计算 result 物品的槽位容量 (= result 物品的基础槽位容量 + second 物品的额外槽位容量)
+        val slotLimit = getSlotTotal(resultItem)
+        val slotUsed = getSlotUsed(resultItem)
         if (slotUsed > slotLimit) {
             event.isCancelled = true
             player.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
             player.sendMessage(TranslatableMessages.MSG_NO_FREE_ENCHANT_SLOTS)
             player.playSound(player, Sound.ENTITY_SHULKER_HURT, 1f, 1f)
-            return
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    private fun on(event: PrepareSmithingEvent) {
+        val inventory = event.inventory
+
+        val secondItem = inventory.inputEquipment?.takeUnlessEmpty() ?: return
+        val resultItem = event.result?.takeUnlessEmpty() ?: return
+
+        // 将 second slot 物品的额外槽位信息传递给 result 物品
+        val extraEnchantSlotOnSecondItem = secondItem.getData(ItemDataTypes.EXTRA_ENCHANT_SLOTS)
+        if (extraEnchantSlotOnSecondItem != null) {
+            setSlotExtra(resultItem, extraEnchantSlotOnSecondItem)
+            event.result = resultItem
         }
     }
 }
