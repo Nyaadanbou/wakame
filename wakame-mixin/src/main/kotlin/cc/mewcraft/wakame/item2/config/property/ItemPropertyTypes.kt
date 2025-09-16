@@ -19,6 +19,9 @@ import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
+@Deprecated("请使用 ItemPropTypes", ReplaceWith("ItemPropTypes"))
+typealias ItemPropertyTypes = ItemPropTypes
+
 /**
  * 该 `object` 包含了所有可用的 [ItemPropertyType].
  *
@@ -27,7 +30,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
  *
  * @see cc.mewcraft.wakame.item2.data.ItemDataTypes
  */
-data object ItemPropertyTypes {
+data object ItemPropTypes {
 
     // ------------
     // 注册表
