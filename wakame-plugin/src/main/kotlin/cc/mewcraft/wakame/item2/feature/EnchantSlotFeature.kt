@@ -177,6 +177,7 @@ object EnchantSlotFeature : Listener {
         val player = event.whoClicked as? Player ?: return
         if (player.gameMode == GameMode.CREATIVE) return // 直接安静的忽略创造模式, 不发送任何提示信息
         val targetItem = event.currentItem?.takeUnlessEmpty() ?: return
+        if (!targetItem.isExactKoish) return // 不对套皮物品进行修改
         val extraItem = event.cursor.takeUnlessEmpty() ?: return
 
         val isExtraItem = extraItem.hasProp(ItemPropTypes.ENCHANT_SLOT_ADDER)
