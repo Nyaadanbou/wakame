@@ -1,24 +1,146 @@
 package cc.mewcraft.wakame.item2.behavior
 
-import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
+import cc.mewcraft.wakame.damage.FinalDamageContext
+import cc.mewcraft.wakame.entity.player.koishLevel
+import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
+import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotGroup
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item2.getProp
 import cc.mewcraft.wakame.item2.koishItem
 import cc.mewcraft.wakame.util.MojangStack
+import cc.mewcraft.wakame.util.item.damage
+import cc.mewcraft.wakame.util.item.isDamageable
+import cc.mewcraft.wakame.util.item.maxDamage
 import cc.mewcraft.wakame.util.item.toNMS
-import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
-import io.papermc.paper.event.player.PlayerStopUsingItemEvent
+import org.bukkit.World
+import org.bukkit.block.Block
+import org.bukkit.block.BlockFace
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
-import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.entity.ProjectileHitEvent
-import org.bukkit.event.entity.ProjectileLaunchEvent
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.PlayerItemBreakEvent
-import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.event.player.PlayerItemDamageEvent
-import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+
+interface ItemBehaviorContext {
+    val player: Player
+    val itemStack: ItemStack
+}
+
+data class CauseDamageContext(
+    override val player: Player,
+    override val itemStack: ItemStack,
+    val damagee: Entity,
+    val finalDamageContext: FinalDamageContext,
+) : ItemBehaviorContext {
+    val world: World
+        get() = player.world
+
+    // 2025/9/14 芙兰
+    // 需要用到更多方便的get方法的话, 自行在下方补充即可
+    val finalDamage: Double
+        get() = finalDamageContext.finalDamageMap.values.sum()
+}
+
+data class ReceiveDamageContext(
+    override val player: Player,
+    override val itemStack: ItemStack,
+    val damageSource: DamageSource,
+    val finalDamageContext: FinalDamageContext,
+) : ItemBehaviorContext {
+    val world: World
+        get() = player.world
+
+    // 2025/9/14 芙兰
+    // 需要用到更多方便的get方法的话, 自行在下方补充即可
+    val finalDamage: Double
+        get() = finalDamageContext.finalDamageMap.values.sum()
+}
+
+data class ProjectileLaunchContext(
+    override val player: Player,
+    override val itemStack: ItemStack,
+    val projectile: Projectile
+) : ItemBehaviorContext {
+    val world: World
+        get() = player.world
+}
+
+data class ProjectileHitContext(
+    override val player: Player,
+    override val itemStack: ItemStack,
+    val projectile: Projectile,
+    val hitEntity: Entity?,
+    val hitBlock: Block?,
+    val hitBlockFace: BlockFace?
+) : ItemBehaviorContext {
+    val world: World
+        get() = player.world
+}
+
+data class DurabilityDecreaseContext(
+    override val player: Player,
+    override val itemStack: ItemStack,
+    /**
+     * 物品失去的耐久度的原始值.
+     * 对应 [org.bukkit.event.player.PlayerItemDamageEvent.damage].
+     */
+    val originalDurabilityDecreaseValue: Int,
+    /**
+     * 物品在计算耐久附魔之前, 将要失去的耐久度.
+     * 此值只读, 切勿与 [originalDurabilityDecreaseValue] 混淆.
+     */
+    val durabilityDecreaseValueBeforeEnchantment: Int
+) : ItemBehaviorContext {
+    val world: World
+        get() = player.world
+
+    var newDurabilityDecreaseValue: Int = 0
+    var willModifyDurabilityDecreaseValue: Boolean = false
+
+    /**
+     * 修改该物品失去的耐久度.
+     */
+    fun modifyDurabilityDecreaseValue(value: Int) {
+        willModifyDurabilityDecreaseValue = true
+        newDurabilityDecreaseValue = value
+    }
+}
+
+data class StopUseContext(
+    override val player: Player,
+    override val itemStack: ItemStack,
+    val ticksHeldFor: Int,
+) : ItemBehaviorContext {
+    val world: World
+        get() = player.world
+}
+
+data class ConsumeContext(
+    override val player: Player,
+    override val itemStack: ItemStack,
+    val hand: InteractionHand,
+    /**
+     * 物品消耗后返还的物品的原始值.
+     * 对应 [org.bukkit.event.player.PlayerItemConsumeEvent.replacement].
+     */
+    val originalReplacement: ItemStack?
+) : ItemBehaviorContext {
+    val world: World
+        get() = player.world
+
+    var newReplacement: ItemStack? = null
+    var willModifyReplacement: Boolean = false
+
+    /**
+     * 修改该物品消耗后返还的物品.
+     */
+    fun modifyReplacement(itemStack: ItemStack?) {
+        willModifyReplacement = true
+        newReplacement = itemStack
+    }
+}
 
 enum class BehaviorResult {
     /**
@@ -42,6 +164,58 @@ enum class BehaviorResult {
     PASS
 }
 
+/**
+ * 用于检查一个物品堆叠是否满足“激活”的条件.
+ * 例如: 物品是否处于有效的槽位, 物品是否已损坏等.
+ */
+object ItemStackActivationChecker {
+    /**
+     * 方便函数.
+     * 进行所有必要的检查.
+     */
+    fun ItemStack.isActive(slot: ItemSlot, player: Player): Boolean {
+        return isInValidSlot(slot) && isPlayerLevelEnough(player) && isNotBroken()
+    }
+
+    /**
+     * 检查物品是否处于有效的槽位.
+     */
+    fun ItemStack.isInValidSlot(slot: ItemSlot): Boolean {
+        if (koishItem == null) return false
+        val slotGroup = getProp(ItemPropertyTypes.SLOT) ?: ItemSlotGroup.empty()
+        return slotGroup.contains(slot)
+    }
+
+    /**
+     * 检查玩家的冒险等级是否满足物品的等级需求.
+     */
+    fun ItemStack.isPlayerLevelEnough(player: Player): Boolean {
+        // 如果不是萌芽物品, 那么认为玩家的等级足够
+        if (koishItem == null) return true
+        val itemLevel = getData(ItemDataTypes.LEVEL)?.level
+
+        // 如果物品没有等级, 那么认为玩家的等级足够
+        if (itemLevel == null) return true
+
+        val playerLevel = player.koishLevel
+        return itemLevel <= playerLevel
+    }
+
+    /**
+     * 检查物品是否不处于损坏状态.
+     * @see cc.mewcraft.wakame.item2.behavior.impl.HoldLastDamage
+     */
+    fun ItemStack.isNotBroken(): Boolean {
+        // 如果物品有“无法破坏”或耐久组件不完整, 那么认为物品没有耐久度, 应该返回 true
+        if (!isDamageable) return true
+
+        // 如果物品损伤值等于最大耐久度, 那么认为物品损坏了
+        // HoldLastDamage 物品行为存在时, 会使物品耐久度最低维持在0
+        // 此时物品损伤值等于最大耐久度, 该函数返回 false, 符合预期逻辑
+        return damage < maxDamage
+    }
+}
+
 // ------------
 // 用于访问 `org.bukkit.inventory.ItemStack` 上的 ItemBehavior
 // ------------
@@ -56,47 +230,6 @@ inline fun <reified T : ItemBehavior> ItemStack.hasBehavior(): Boolean = toNMS()
 inline fun <reified T : ItemBehavior> ItemStack.getBehavior(): T? = toNMS().getBehavior<T>()
 
 inline fun ItemStack.handleBehavior(action: (ItemBehavior) -> Unit) = toNMS().handleBehavior(action)
-
-// 注: 这些 handle... 函数都是为了方便遍历 ItemBehavior
-
-fun ItemStack.handlePlayerReceiveDamage(player: Player, itemstack: ItemStack, damageSource: DamageSource, event: PostprocessDamageEvent) =
-    handleBehavior { it.handlePlayerReceiveDamage(player, itemstack, damageSource, event) }
-
-fun ItemStack.handlePlayerAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: PostprocessDamageEvent) =
-    handleBehavior { it.handlePlayerAttackEntity(player, itemstack, damagee, event) }
-
-fun ItemStack.handleItemProjectileLaunch(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileLaunchEvent) =
-    handleBehavior { it.handleItemProjectileLaunch(player, itemstack, projectile, event) }
-
-fun ItemStack.handleItemProjectileHit(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileHitEvent) =
-    handleBehavior { it.handleItemProjectileHit(player, itemstack, projectile, event) }
-
-fun ItemStack.handleBreakBlock(player: Player, itemstack: ItemStack, event: BlockBreakEvent) =
-    handleBehavior { it.handlePlayerBreakBlock(player, itemstack, event) }
-
-fun ItemStack.handleDamage(player: Player, itemstack: ItemStack, event: PlayerItemDamageEvent) =
-    handleBehavior { it.handleDamage(player, itemstack, event) }
-
-fun ItemStack.handleBreak(player: Player, itemstack: ItemStack, event: PlayerItemBreakEvent) =
-    handleBehavior { it.handleBreak(player, itemstack, event) }
-
-fun ItemStack.handleEquip(player: Player, itemstack: ItemStack, slot: EquipmentSlot, equipped: Boolean, event: EntityEquipmentChangedEvent) =
-    handleBehavior { it.handleEquip(player, itemstack, slot, equipped, event) }
-
-fun ItemStack.handleInventoryClick(player: Player, itemstack: ItemStack, event: InventoryClickEvent) =
-    handleBehavior { it.handleInventoryClick(player, itemstack, event) }
-
-fun ItemStack.handleInventoryClickOnCursor(player: Player, itemstack: ItemStack, event: InventoryClickEvent) =
-    handleBehavior { it.handleInventoryClickOnCursor(player, itemstack, event) }
-
-fun ItemStack.handleInventoryHotbarSwap(player: Player, itemstack: ItemStack, event: InventoryClickEvent) =
-    handleBehavior { it.handleInventoryHotbarSwap(player, itemstack, event) }
-
-fun ItemStack.handleRelease(player: Player, itemstack: ItemStack, event: PlayerStopUsingItemEvent) =
-    handleBehavior { it.handleRelease(player, itemstack, event) }
-
-fun ItemStack.handleConsume(player: Player, itemstack: ItemStack, event: PlayerItemConsumeEvent) =
-    handleBehavior { it.handleConsume(player, itemstack, event) }
 
 // ------------
 // 用于访问 `net.minecraft.world.item.ItemStack` 上的 ItemBehavior

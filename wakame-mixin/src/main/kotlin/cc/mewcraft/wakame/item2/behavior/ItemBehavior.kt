@@ -1,22 +1,5 @@
 package cc.mewcraft.wakame.item2.behavior
 
-import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
-import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
-import io.papermc.paper.event.player.PlayerStopUsingItemEvent
-import org.bukkit.damage.DamageSource
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
-import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.entity.ProjectileHitEvent
-import org.bukkit.event.entity.ProjectileLaunchEvent
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.PlayerItemBreakEvent
-import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.event.player.PlayerItemDamageEvent
-import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.inventory.ItemStack
-
 /**
  * 代表一个“物品交互结果”的封装.
  *
@@ -42,64 +25,75 @@ import org.bukkit.inventory.ItemStack
  * 也就是说, 玩家登录时对于背包里的每个非空气物品都会触发一次该事件.
  */
 interface ItemBehavior {
-
-    // 除非特别说明，所有函数的 ItemStack 参数都保证已经是合法的 KoishItem
-
     /**
-     * 玩家手持该物品对方块按下使用键(默认为鼠标右键)进行交互执行的行为.
+     * 玩家手持该物品对方块按下使用键(默认为鼠标右键)进行交互时, 执行的行为.
      */
     fun handleUseOn(context: UseOnContext): InteractionResult = InteractionResult.PASS
 
     /**
-     * 玩家手持该物品对空气按下使用键(默认为鼠标右键)进行交互执行的行为.
+     * 玩家手持该物品对空气按下使用键(默认为鼠标右键)进行交互时, 执行的行为.
      */
     fun handleUse(context: UseContext): InteractionResult = InteractionResult.PASS
 
     /**
-     * 玩家手持该物品对实体按下使用键(默认为鼠标右键)进行交互执行的行为.
+     * 玩家手持该物品对实体按下使用键(默认为鼠标右键)进行交互时, 执行的行为.
      */
     fun handleUseEntity(context: UseEntityContext): InteractionResult = InteractionResult.PASS
 
     /**
-     * 玩家手持该物品对方块按下攻击键(默认为鼠标左键)进行交互执行的行为.
+     * 玩家手持该物品对方块按下攻击键(默认为鼠标左键)进行交互时, 执行的行为.
      */
     fun handleAttackOn(context: AttackOnContext) = InteractionResult.PASS
 
     /**
-     * 玩家手持该物品对空气按下攻击键(默认为鼠标左键)进行交互执行的行为.
+     * 玩家手持该物品对空气按下攻击键(默认为鼠标左键)进行交互时, 执行的行为.
      */
     fun handleAttack(context: AttackContext) = InteractionResult.PASS
 
     /**
-     * 玩家手持该物品对实体按下攻击键(默认为鼠标左键)进行交互执行的行为.
+     * 玩家手持该物品对实体按下攻击键(默认为鼠标左键)进行交互时, 执行的行为.
      */
     fun handleAttackEntity(context: AttackEntityContext) = InteractionResult.PASS
 
-    // TODO 以下需要整理和重命名
-    fun handlePlayerReceiveDamage(player: Player, itemstack: ItemStack, damageSource: DamageSource, event: PostprocessDamageEvent) = Unit
+    /**
+     * 该物品处于激活状态且玩家造成伤害时, 执行的行为.
+     */
+    fun handleCauseDamage(context: CauseDamageContext) = BehaviorResult.PASS
 
-    fun handlePlayerAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: PostprocessDamageEvent) = Unit
+    /**
+     * 该物品处于激活状态且玩家受到伤害时, 执行的行为.
+     */
+    fun handleReceiveDamage(context: ReceiveDamageContext) = BehaviorResult.PASS
 
-    fun handleItemProjectileLaunch(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileLaunchEvent) = Unit
+    /**
+     * 该物品作为箭矢/光灵箭/三叉戟射出时, 执行的行为.
+     */
+    fun handleProjectileLaunch(context: ProjectileLaunchContext) = BehaviorResult.PASS
 
-    fun handleItemProjectileHit(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileHitEvent) = Unit
+    /**
+     * 该物品作为箭矢/光灵箭/三叉戟命中目标时, 执行的行为.
+     */
+    fun handleProjectileHit(context: ProjectileHitContext) = BehaviorResult.PASS
 
-    fun handlePlayerBreakBlock(player: Player, itemstack: ItemStack, event: BlockBreakEvent) = Unit
+    /**
+     * 该物品失去耐久度时, 执行的行为.
+     */
+    fun handleDurabilityDecrease(context: DurabilityDecreaseContext) = BehaviorResult.PASS
 
-    fun handleDamage(player: Player, itemstack: ItemStack, event: PlayerItemDamageEvent) = Unit
+    /**
+     * 玩家手持该物品并停止使用时, 执行的行为.
+     * 相关事件无法取消(取消也没有意义).
+     */
+    fun handleStopUse(context: StopUseContext) = BehaviorResult.PASS
 
-    fun handleBreak(player: Player, itemstack: ItemStack, event: PlayerItemBreakEvent) = Unit
+    /**
+     * 玩家手持该物品并消耗(Consumable组件)时, 执行的行为.
+     */
+    fun handleConsume(context: ConsumeContext) = BehaviorResult.PASS
 
-    fun handleEquip(player: Player, itemstack: ItemStack, slot: EquipmentSlot, equipped: Boolean, event: EntityEquipmentChangedEvent) = Unit
-
-    fun handleInventoryClick(player: Player, itemstack: ItemStack, event: InventoryClickEvent) = Unit
-
-    fun handleInventoryClickOnCursor(player: Player, itemstack: ItemStack, event: InventoryClickEvent) = Unit
-
-    fun handleInventoryHotbarSwap(player: Player, itemstack: ItemStack, event: InventoryClickEvent) = Unit
-
-    fun handleRelease(player: Player, itemstack: ItemStack, event: PlayerStopUsingItemEvent) = Unit
-
-    fun handleConsume(player: Player, itemstack: ItemStack, event: PlayerItemConsumeEvent) = Unit
-
+    // 2025/9/17 芙兰
+    // 当确实需要用到上述handle未囊括的事件时, 再进行添加, 不建议写一堆无用的handle.
+    // 添加新handle时, 注意考虑 HoldLastDamage 行为是否需要处理它.
+    // 例如StopUse就不被 HoldLastDamage 行为处理, 毕竟StopUse只可能由交互产生.
+    // 而交互已然被 HoldLastDamage 行为考虑在内, 因此无需冗余代码.
 }
