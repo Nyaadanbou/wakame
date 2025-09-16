@@ -41,9 +41,9 @@ import org.bukkit.inventory.view.AnvilView
 @Init(stage = InitStage.POST_WORLD)
 object EnchantSlotFeature : Listener {
 
-    private val BASE_ENCHANTMENT_SLOT_PROVIDER: BaseSlotProviderType by MAIN_CONFIG.entryOrElse<BaseSlotProviderType>(BaseSlotProviderType.NONE, "base_enchantment_slot_provider")
+    private val ENCHANT_SLOT_BASE_PROVIDER: SlotBaseProviderType by MAIN_CONFIG.entryOrElse<SlotBaseProviderType>(SlotBaseProviderType.NONE, "enchant_slot_base_provider")
 
-    enum class BaseSlotProviderType {
+    enum class SlotBaseProviderType {
         NONE,
         PROP,
         RARITY
@@ -70,7 +70,7 @@ object EnchantSlotFeature : Listener {
     }
 
     /**
-     * 为物品设置额外的魔咒槽位数量.
+     * 为物品设置额外的魔咒槽位容量.
      */
     fun setSlotExtra(item: ItemStack, amount: Int) {
         require(amount >= 0) { "amount must be greater than 0" }
@@ -92,40 +92,40 @@ object EnchantSlotFeature : Listener {
     }
 
     /**
-     * 返回物品的魔咒槽位基本数量.
+     * 返回物品的魔咒槽位基本容量.
      */
     fun getSlotBase(item: ItemStack): Int {
-        val amount = when (BASE_ENCHANTMENT_SLOT_PROVIDER) {
-            BaseSlotProviderType.NONE -> Int.MIN_VALUE
-            BaseSlotProviderType.PROP -> item.getProp(ItemPropertyTypes.ENCHANT_SLOT_BASE) ?: 0
-            BaseSlotProviderType.RARITY -> item.getData(ItemDataTypes.RARITY)?.unwrap()?.enchantSlotBase ?: 0
+        val amount = when (ENCHANT_SLOT_BASE_PROVIDER) {
+            SlotBaseProviderType.NONE -> Int.MIN_VALUE
+            SlotBaseProviderType.PROP -> item.getProp(ItemPropertyTypes.ENCHANT_SLOT_BASE) ?: 0
+            SlotBaseProviderType.RARITY -> item.getData(ItemDataTypes.RARITY)?.unwrap()?.enchantSlotBase ?: 0
         }
         return amount
     }
 
     /**
-     * 返回物品的魔咒槽位额外数量.
+     * 返回物品的魔咒槽位额外容量.
      */
     fun getSlotExtra(item: ItemStack): Int {
         return item.getData(ItemDataTypes.EXTRA_ENCHANT_SLOTS) ?: 0
     }
 
     /**
-     * 返回物品的魔咒槽位最大数量.
+     * 返回物品的魔咒槽位最大容量.
      */
     fun getSlotLimit(item: ItemStack): Int {
         return item.getData(ItemDataTypes.RARITY)?.unwrap()?.enchantSlotLimit ?: 0
     }
 
     /**
-     * 返回物品的魔咒槽位总数量 (基础 + 额外).
+     * 返回物品的魔咒槽位总容量 (基础 + 额外).
      */
     fun getSlotTotal(item: ItemStack): Int {
         return getSlotBase(item) + getSlotExtra(item)
     }
 
     /**
-     * 返回物品当前已使用的魔咒槽位数量.
+     * 返回物品当前已使用的魔咒槽位容量.
      */
     fun getSlotUsed(item: ItemStack): Int {
         return getSlotCapacity(item, item.enchantments)
@@ -133,7 +133,6 @@ object EnchantSlotFeature : Listener {
 
     @EventHandler
     private fun on(event: InventoryClickEvent) {
-        handleIntrinsicSlots(event)
         handleExtraSlots(event)
         handleAnvil(event)
     }
@@ -170,12 +169,7 @@ object EnchantSlotFeature : Listener {
         if (player.totalExperience > 0) player.giveExp(1)
     }
 
-    // 监听玩家在背包界面点击物品时, 根据配置和物品类型, 自动为物品设置默认的"魔咒槽"数量
-    private fun handleIntrinsicSlots(event: InventoryClickEvent) {
-
-    }
-
-    // 监听玩家在背包中用"额外槽物品"对目标物品进行右键或左键操作时, 给目标物品增加"魔咒槽"数量, 并做各种校验和反馈
+    // 监听玩家在背包中用"额外槽物品"对目标物品进行右键或左键操作时, 给目标物品增加"魔咒槽"容量, 并做各种校验和反馈
     private fun handleExtraSlots(event: InventoryClickEvent) {
         if (event.isCancelled) return
         if (!event.isRightClick && !event.isLeftClick) return
@@ -208,7 +202,7 @@ object EnchantSlotFeature : Listener {
         runTaskLater(1) { player.updateInventory() } // 必须延迟 1t 否则被打额外槽位的物品会从视觉上消失
     }
 
-    // 监听玩家在魔咒台为物品魔咒时, 限制物品的魔咒数量, 防止超出自定义的最大"魔咒槽"数量
+    // 监听玩家在魔咒台为物品魔咒时, 限制物品的魔咒容量, 防止超出自定义的最大"魔咒槽"容量
     @EventHandler
     private fun on(event: EnchantItemEvent) {
         val player = event.enchanter
@@ -250,7 +244,7 @@ object EnchantSlotFeature : Listener {
         player.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
     }
 
-    // 监听玩家在锻造台 (Smithing Table) 合成物品时, 自动设置和校验物品的魔咒数量, 防止超出自定义的最大"魔咒槽"数量
+    // 监听玩家在锻造台 (Smithing Table) 合成物品时, 自动设置和校验物品的魔咒容量, 防止超出自定义的最大"魔咒槽"容量
     @EventHandler
     private fun on(event: SmithItemEvent) {
         val player = event.whoClicked as? Player ?: return
