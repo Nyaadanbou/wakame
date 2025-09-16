@@ -4,3 +4,5 @@ version: 1
 name: "<color:#708fff>稀有"
 styles: "<color:#708fff>"
 color: AQUA
+enchant_slot_base: 3
+enchant_slot_limit: 4

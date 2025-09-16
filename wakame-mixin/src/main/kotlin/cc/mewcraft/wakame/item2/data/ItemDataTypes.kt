@@ -121,6 +121,12 @@ data object ItemDataTypes {
         }
     }
 
+    /**
+     * 额外附加在物品上的附魔槽位数量.
+     */
+    @JvmField
+    val EXTRA_ENCHANT_SLOTS: ItemDataType<Int> = typeOf("extra_enchant_slots")
+
     // ------------
     // 方便函数
     // ------------

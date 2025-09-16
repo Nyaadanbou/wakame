@@ -1,16 +1,7 @@
 package cc.mewcraft.wakame.item2.config.datagen
 
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaBrewRecipe
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCooldownGroup
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCoreContainer
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCustomName
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaElement
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemLevel
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemName
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaKizami
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaRarity
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaUseCooldown
+import cc.mewcraft.wakame.item2.config.datagen.impl.*
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyContainer
 import cc.mewcraft.wakame.item2.data.impl.Core
 import cc.mewcraft.wakame.item2.data.impl.CoreContainer
@@ -23,7 +14,9 @@ import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeS
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.registerExact
+import io.papermc.paper.datacomponent.item.TooltipDisplay
 import io.papermc.paper.datacomponent.item.UseCooldown
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
@@ -73,6 +66,9 @@ data object ItemMetaTypes {
     val CUSTOM_NAME: ItemMetaType<MetaCustomName, Component> = typeOf("custom_name")
 
     @JvmField
+    val TOOLTIP_DISPLAY: ItemMetaType<MetaTooltipDisplay, TooltipDisplay> = typeOf("tooltip_display")
+
+    @JvmField
     val KIZAMI: ItemMetaType<MetaKizami, Set<RegistryEntry<Kizami>>> = typeOf("kizami") {
         serializers {
             registerExact(MetaKizami.SERIALIZER)
@@ -108,6 +104,9 @@ data object ItemMetaTypes {
             registerAll(MetaBrewRecipe.SERIALIZERS)
         }
     }
+
+    @JvmField
+    val REMOVED_COMPONENTS: ItemMetaType<MetaRemovedComponents, Set<Key>> = typeOf("removed_components")
 
     // ------------
     // 方便函数

@@ -4,3 +4,5 @@ version: 1
 name: "<color:#e637e6>史诗"
 styles: "<color:#e637e6>"
 color: DARK_PURPLE
+enchant_slot_base: 5
+enchant_slot_limit: 6

@@ -21,6 +21,7 @@ import cc.mewcraft.wakame.item2.KoishItemProxy
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaType
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
+import cc.mewcraft.wakame.item2.config.property.impl.EnchantSlotCapacityType
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.item2.data.impl.CoreType
 import cc.mewcraft.wakame.item2.data.impl.EntityBucketInfoType
@@ -106,6 +107,9 @@ object BuiltInRegistryKeys {
 
     @JvmField
     val ENTITY_BUCKET_INFO_TYPE = createRegistryKey<EntityBucketInfoType>("entity_bucket_info_type")
+
+    @JvmField
+    val ENCHANT_SLOT_CAPACITY_TYPE = createRegistryKey<EnchantSlotCapacityType>("enchant_slot_capacity_type")
 
     @JvmField
     val ATTACK_SPEED = createRegistryKey<AttackSpeed>("attack_speed")

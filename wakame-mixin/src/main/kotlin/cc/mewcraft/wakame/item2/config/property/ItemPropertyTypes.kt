@@ -133,6 +133,32 @@ data object ItemPropTypes {
     @JvmField
     val ENTITY_BUCKET: ItemPropertyType<EntityBucket> = typeOf("entity_bucket")
 
+    /**
+     * 物品的附魔槽位基本数量.
+     *
+     * 只有将 configs/config > base_enchantment_slot_provider 设置为 "prop" 时才有效.
+     */
+    @JvmField
+    val ENCHANT_SLOT_BASE: ItemPropertyType<Int> = typeOf("enchant_slot_base")
+
+    /**
+     * 存在该 prop 表示物品可以用来给一个有附魔槽位的物品添加 1 个额外的附魔槽位.
+     */
+    @JvmField
+    val ENCHANT_SLOT_ADDER: ItemPropertyType<Unit> = typeOf("enchant_slot_adder")
+
+    /**
+     * 用于单独设置某个附魔在该物品上所占用的槽位数量 (≠1).
+     *
+     * 实现上如果不存在该 prop 那么应该直接返回 1 作为某个附魔占用的槽位数量.
+     */
+    @JvmField
+    val ENCHANT_SLOT_CAPACITY: ItemPropertyType<EnchantSlotCapacity> = typeOf("enchant_slot_capacity") {
+        serializers {
+            registerAll(EnchantSlotCapacity.serializers())
+        }
+    }
+
     // ------------
     // 方便函数
     // ------------

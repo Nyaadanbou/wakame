@@ -4,3 +4,5 @@ version: 1
 name: "<color:#4ce64c>罕见"
 styles: "<color:#4ce64c>"
 color: GREEN
+enchant_slot_base: 2
+enchant_slot_limit: 3

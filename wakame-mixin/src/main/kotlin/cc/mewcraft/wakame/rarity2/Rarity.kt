@@ -20,6 +20,8 @@ import java.util.stream.Stream
  *
  * @property weight 稀有度的权重
  * @property color 稀有度的颜色, 目前仅用于高亮掉落物
+ * @property enchantSlotBase 附魔栏位的基础值
+ * @property enchantSlotLimit 附魔栏位的上限值
  */
 class Rarity
 @ApiStatus.Internal
@@ -28,6 +30,8 @@ constructor(
     override val displayStyles: Array<StyleBuilderApplicable>,
     val weight: Int,
     val color: NamedTextColor?,
+    val enchantSlotBase: Int,
+    val enchantSlotLimit: Int,
 ) : Keyed, Examinable, PlayerFriendlyNamed, Comparable<Rarity> {
 
     override fun key(): Key {
@@ -43,7 +47,9 @@ constructor(
         ExaminableProperty.of("displayName", displayName.plain),
         ExaminableProperty.of("displayStyles", displayStyles),
         ExaminableProperty.of("weight", weight),
-        ExaminableProperty.of("glowColor", color),
+        ExaminableProperty.of("color", color),
+        ExaminableProperty.of("enchantSlotBase", enchantSlotBase),
+        ExaminableProperty.of("enchantSlotLimit", enchantSlotLimit),
     )
 
     override fun toString(): String = toSimpleString()
