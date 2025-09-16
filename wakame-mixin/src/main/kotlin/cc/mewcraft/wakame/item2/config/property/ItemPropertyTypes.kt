@@ -136,7 +136,7 @@ data object ItemPropTypes {
     /**
      * 物品的附魔槽位基本数量.
      *
-     * 只有将 configs/config > base_enchantment_slot_provider 设置为 "prop" 时才有效.
+     * 只有将 configs/config > enchant_slot_base_provider 设置为 "prop" 时才有效.
      */
     @JvmField
     val ENCHANT_SLOT_BASE: ItemPropertyType<Int> = typeOf("enchant_slot_base")
