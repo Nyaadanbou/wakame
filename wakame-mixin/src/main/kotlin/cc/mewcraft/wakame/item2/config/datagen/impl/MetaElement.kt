@@ -23,8 +23,8 @@ sealed interface MetaElement : ItemMetaEntry<Set<RegistryEntry<Element>>> {
         )
     }
 
-    override fun write(value: Set<RegistryEntry<Element>>, itemStack: MojangStack) {
-        itemStack.ensureSetData(ItemDataTypes.ELEMENT, value)
+    override fun write(value: Set<RegistryEntry<Element>>, itemstack: MojangStack) {
+        itemstack.ensureSetData(ItemDataTypes.ELEMENT, value)
     }
 
     @ConfigSerializable

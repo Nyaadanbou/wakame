@@ -25,7 +25,7 @@ interface ItemMetaEntry<V> {
      * 如果要写入的数据是自定义数据类型, 而不是 Minecraft 自带的数据类型,
      * 应该使用函数 [cc.mewcraft.wakame.util.MojangStack.ensureSetData] 来确保数据可以写入成功.
      */
-    fun write(value: V, itemStack: MojangStack)
+    fun write(value: V, itemstack: MojangStack)
 
     /**
      * 向该物品堆叠写入数据 [T], *无论该物品堆叠是否为合法的自定义物品*.

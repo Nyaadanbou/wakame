@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item2.config.datagen.impl
 
-import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toBukkit
@@ -21,7 +21,7 @@ data class MetaUseCooldown(
         return ItemMetaResult.of(useCooldown)
     }
 
-    override fun write(value: UseCooldown, itemStack: MojangStack) {
-        itemStack.toBukkit().setData(DataComponentTypes.USE_COOLDOWN, value)
+    override fun write(value: UseCooldown, itemstack: MojangStack) {
+        itemstack.toBukkit().setData(DataComponentTypes.USE_COOLDOWN, value)
     }
 }
