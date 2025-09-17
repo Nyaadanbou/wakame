@@ -2,16 +2,18 @@
 
 package cc.mewcraft.wakame.item2.behavior.impl
 
-import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.item2.behavior.AttackContext
 import cc.mewcraft.wakame.item2.behavior.BehaviorResult
 import cc.mewcraft.wakame.item2.behavior.CauseDamageContext
 import cc.mewcraft.wakame.item2.behavior.ConsumeContext
 import cc.mewcraft.wakame.item2.behavior.DurabilityDecreaseContext
 import cc.mewcraft.wakame.item2.behavior.InteractionResult
+import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContext
 import cc.mewcraft.wakame.item2.behavior.ReceiveDamageContext
 import cc.mewcraft.wakame.item2.behavior.UseContext
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item2.config.property.impl.HoldLastDamageAction
+import cc.mewcraft.wakame.item2.config.property.impl.ItemBehaviorHandlerType
 import cc.mewcraft.wakame.item2.getProp
 import cc.mewcraft.wakame.util.item.damage
 import cc.mewcraft.wakame.util.item.maxDamage
@@ -24,100 +26,23 @@ import org.bukkit.inventory.ItemStack
 object HoldLastDamage : SimpleInteract {
 
     override fun handleSimpleUse(context: UseContext): InteractionResult {
-        val itemStack = context.itemStack
-        val player = context.player
-        if (itemStack.isBroken()) {
-            val holdLastDamageFlags = itemStack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_FLAGS)
-            return if (holdLastDamageFlags?.cancelUse != false) {
-                // cancel标记为true时, 中断后续物品行为并取消相应事件.
-                // 值得一提的是, 未指定(如直接没有Property)时, 视为true以防止忘记配置标记产生恶性后果.
-                player.sendActionBar(holdLastDamageFlags?.msgUse ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_USE)
-                InteractionResult.FAIL_AND_CANCEL
-            } else if (holdLastDamageFlags.finishUse != false) {
-                // finish标记为true时, 仅中断后续物品行为.
-                player.sendActionBar(holdLastDamageFlags.msgUse ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_USE)
-                InteractionResult.FAIL
-            } else {
-                InteractionResult.PASS
-            }
-        } else {
-            return InteractionResult.PASS
-        }
+        return handleInteract(ItemBehaviorHandlerType.SIMPLE_USE, context)
     }
 
     override fun handleSimpleAttack(context: AttackContext): InteractionResult {
-        val itemStack = context.itemStack
-        val player = context.player
-        if (itemStack.isBroken()) {
-            val holdLastDamageFlags = itemStack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_FLAGS)
-            return if (holdLastDamageFlags?.cancelAttack != false) {
-                player.sendActionBar(holdLastDamageFlags?.msgAttack ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_ATTACK)
-                InteractionResult.FAIL_AND_CANCEL
-            } else if (holdLastDamageFlags.finishAttack != false) {
-                player.sendActionBar(holdLastDamageFlags.msgAttack ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_ATTACK)
-                InteractionResult.FAIL
-            } else {
-                InteractionResult.PASS
-            }
-        } else {
-            return InteractionResult.PASS
-        }
+        return handleInteract(ItemBehaviorHandlerType.SIMPLE_ATTACK, context)
     }
 
     override fun handleCauseDamage(context: CauseDamageContext): BehaviorResult {
-        val itemStack = context.itemStack
-        val player = context.player
-        if (itemStack.isBroken()) {
-            val holdLastDamageFlags = itemStack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_FLAGS)
-            return if (holdLastDamageFlags?.cancelCauseDamage != false) {
-                player.sendActionBar(holdLastDamageFlags?.msgCauseDamage ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_CAUSE_DAMAGE)
-                BehaviorResult.FINISH_AND_CANCEL
-            } else if (holdLastDamageFlags.finishCauseDamage != false) {
-                player.sendActionBar(holdLastDamageFlags.msgCauseDamage ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_CAUSE_DAMAGE)
-                BehaviorResult.FINISH
-            } else {
-                BehaviorResult.PASS
-            }
-        } else {
-            return BehaviorResult.PASS
-        }
+        return handle(ItemBehaviorHandlerType.CAUSE_DAMAGE, context)
     }
 
     override fun handleReceiveDamage(context: ReceiveDamageContext): BehaviorResult {
-        val itemStack = context.itemStack
-        val player = context.player
-        if (itemStack.isBroken()) {
-            val holdLastDamageFlags = itemStack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_FLAGS)
-            // “玩家受到伤害”没有设计cancel标记.
-            // 毕竟一般情况下不会去取消玩家受伤事件.
-            return if (holdLastDamageFlags?.finishReceiveDamage != false) {
-                player.sendActionBar(holdLastDamageFlags?.msgReceiveDamage ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_RECEIVE_DAMAGE)
-                BehaviorResult.FINISH
-            } else {
-                BehaviorResult.PASS
-            }
-        } else {
-            return BehaviorResult.PASS
-        }
+        return handle(ItemBehaviorHandlerType.RECEIVE_DAMAGE, context)
     }
 
     override fun handleConsume(context: ConsumeContext): BehaviorResult {
-        val itemStack = context.itemStack
-        val player = context.player
-        if (itemStack.isBroken()) {
-            val holdLastDamageFlags = itemStack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_FLAGS)
-            return if (holdLastDamageFlags?.cancelConsume != false) {
-                player.sendActionBar(holdLastDamageFlags?.msgConsume ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_CONSUME)
-                BehaviorResult.FINISH_AND_CANCEL
-            } else if (holdLastDamageFlags.finishConsume != false) {
-                player.sendActionBar(holdLastDamageFlags.msgConsume ?: TranslatableMessages.MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_CONSUME)
-                BehaviorResult.FINISH
-            } else {
-                BehaviorResult.PASS
-            }
-        } else {
-            return BehaviorResult.PASS
-        }
+        return handle(ItemBehaviorHandlerType.CONSUME, context)
     }
 
     override fun handleDurabilityDecrease(context: DurabilityDecreaseContext): BehaviorResult {
@@ -132,6 +57,54 @@ object HoldLastDamage : SimpleInteract {
             return BehaviorResult.FINISH_AND_CANCEL
         } else {
             return BehaviorResult.PASS
+        }
+    }
+
+    /**
+     * 方便函数.
+     */
+    private fun handleInteract(type: ItemBehaviorHandlerType, context: ItemBehaviorContext): InteractionResult {
+        val itemStack = context.itemStack
+        val player = context.player
+        if (!itemStack.isBroken()) return InteractionResult.PASS
+
+        val settings = itemStack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_SETTINGS)
+        val action = settings?.getAction(type) ?: type.defaultAction
+        val message = settings?.getMessage(type) ?: type.defaultMessage
+
+        // 向玩家发送动作栏信息
+        if (action != HoldLastDamageAction.NONE) {
+            player.sendActionBar(message)
+        }
+
+        return when (action) {
+            HoldLastDamageAction.NONE -> InteractionResult.PASS
+            HoldLastDamageAction.FINISH -> InteractionResult.FAIL
+            HoldLastDamageAction.CANCEL -> InteractionResult.FAIL_AND_CANCEL
+        }
+    }
+
+    /**
+     * 方便函数.
+     */
+    private fun handle(type: ItemBehaviorHandlerType, context: ItemBehaviorContext): BehaviorResult {
+        val itemStack = context.itemStack
+        val player = context.player
+        if (!itemStack.isBroken()) return BehaviorResult.PASS
+
+        val settings = itemStack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_SETTINGS)
+        val action = settings?.getAction(type) ?: type.defaultAction
+        val message = settings?.getMessage(type) ?: type.defaultMessage
+
+        // 向玩家发送动作栏信息
+        if (action != HoldLastDamageAction.NONE) {
+            player.sendActionBar(message)
+        }
+
+        return when (action) {
+            HoldLastDamageAction.NONE -> BehaviorResult.PASS
+            HoldLastDamageAction.FINISH -> BehaviorResult.FINISH
+            HoldLastDamageAction.CANCEL -> BehaviorResult.FINISH_AND_CANCEL
         }
     }
 

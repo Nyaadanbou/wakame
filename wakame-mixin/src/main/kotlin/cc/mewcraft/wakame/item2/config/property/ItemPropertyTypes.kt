@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
 import cc.mewcraft.wakame.item2.config.property.impl.Arrow
 import cc.mewcraft.wakame.item2.config.property.impl.EntityBucket
 import cc.mewcraft.wakame.item2.config.property.impl.ExtraLore
-import cc.mewcraft.wakame.item2.config.property.impl.HoldLastDamageFlags
+import cc.mewcraft.wakame.item2.config.property.impl.HoldLastDamageSettings
 import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotGroup
@@ -71,7 +71,7 @@ data object ItemPropTypes {
     val ARROW: ItemPropertyType<Arrow> = typeOf("arrow")
 
     @JvmField
-    val HOLD_LAST_DAMAGE_FLAGS: ItemPropertyType<HoldLastDamageFlags> = typeOf("hold_last_damage")
+    val HOLD_LAST_DAMAGE_SETTINGS: ItemPropertyType<HoldLastDamageSettings> = typeOf("hold_last_damage")
 
     @JvmField
     val CASTABLE: ItemPropertyType<Unit> = typeOf("castable")
