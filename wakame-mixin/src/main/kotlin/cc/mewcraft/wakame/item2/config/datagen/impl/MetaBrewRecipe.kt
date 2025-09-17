@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item2.config.datagen.impl
 
 import cc.mewcraft.wakame.brewery.BrewRecipeManager
-import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.ItemBrewRecipe
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
@@ -35,8 +35,8 @@ interface MetaBrewRecipe : ItemMetaEntry<String> {
             .build()
     }
 
-    override fun write(value: String, itemStack: MojangStack) {
-        itemStack.ensureSetData(ItemDataTypes.BREW_RECIPE, ItemBrewRecipe(value, false))
+    override fun write(value: String, itemstack: MojangStack) {
+        itemstack.ensureSetData(ItemDataTypes.BREW_RECIPE, ItemBrewRecipe(value, false))
     }
 
     /**

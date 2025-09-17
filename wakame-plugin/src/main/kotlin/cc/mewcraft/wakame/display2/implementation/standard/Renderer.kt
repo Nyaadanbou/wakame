@@ -15,6 +15,7 @@ import cc.mewcraft.wakame.item2.config.property.impl.EntityBucket
 import cc.mewcraft.wakame.item2.config.property.impl.ExtraLore
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.*
+import cc.mewcraft.wakame.item2.feature.EnchantSlotFeature
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -23,13 +24,15 @@ import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.item.*
+import cc.mewcraft.wakame.util.item.fastLore
+import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.FoodProperties
 import io.papermc.paper.datacomponent.item.ItemEnchantments
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Registry
 import org.bukkit.inventory.ItemStack
 import java.nio.file.Path
@@ -94,6 +97,8 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         item.process(DataComponentTypes.DAMAGE_RESISTANT) { data -> StandardRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, Unit) }
         item.process(DataComponentTypes.FOOD) { data -> StandardRenderingHandlerRegistry.FOOD.process(collector, data) }
 
+        StandardRenderingHandlerRegistry.ENCHANT_SLOTS.process(collector, item)
+
         val lore = textAssembler.assemble(collector)
         item.fastLore(run {
             // 尝试在物品原本的 lore 的第一行插入我们渲染的 lore.
@@ -111,10 +116,6 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
                 }
             }
         })
-
-        item.hideAttributeModifiers()
-        item.hideEnchantments()
-        item.hideStoredEnchantments()
     }
 
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, core: Core) {
@@ -169,6 +170,22 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
     @JvmField
     val ENCHANTMENTS: RenderingHandler<ItemEnchantments, EnchantmentRendererFormat> = configure("enchantments") { data, format ->
         format.render(data.enchantments())
+    }
+
+    @JvmField
+    val ENCHANT_SLOTS: RenderingHandler<ItemStack, SingleValueRendererFormat> = configure("enchant_slots") { data, format ->
+        val used = EnchantSlotFeature.getSlotUsed(data)
+        val maxBase = EnchantSlotFeature.getSlotBase(data)
+        val maxExtra = EnchantSlotFeature.getSlotExtra(data)
+        val maxTotal = maxBase + maxExtra
+        if (maxTotal <= 0) return@configure IndexedText.NOP
+        val resolver = TagResolver.resolver(
+            Placeholder.component("used", Component.text(used)),
+            Placeholder.component("max_base", Component.text(maxBase)),
+            Placeholder.component("max_extra", Component.text(maxExtra)),
+            Placeholder.component("max_total", Component.text(maxTotal)),
+        )
+        format.render(resolver)
     }
 
     @JvmField

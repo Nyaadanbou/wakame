@@ -81,11 +81,15 @@ internal object RarityRegistryLoader : RegistryLoader {
         val styles = node.node("styles").get<Array<StyleBuilderApplicable>>(emptyArray())
         val weight = node.node("weight").get<Int>(0)
         val color = node.node("color").get<NamedTextColor>()
+        val enchantSlotBase = node.node("enchant_slot_base").get<Int>(0)
+        val enchantSlotLimit = node.node("enchant_slot_limit").get<Int>(Int.MIN_VALUE)
         val rarityType = Rarity(
             displayName = name,
             displayStyles = styles,
             weight = weight,
-            color = color
+            color = color,
+            enchantSlotBase = enchantSlotBase,
+            enchantSlotLimit = enchantSlotLimit,
         )
 
         return id to rarityType

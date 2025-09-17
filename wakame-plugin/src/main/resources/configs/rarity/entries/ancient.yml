@@ -4,3 +4,5 @@ version: 1
 name: "<color:#ff3b44>上古"
 styles: "<color:#ff3b44>"
 color: GOLD
+enchant_slot_base: 6
+enchant_slot_limit: 7

@@ -9,7 +9,6 @@ import org.jetbrains.annotations.ApiStatus
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
-import xyz.xenondevs.commons.reflection.rawType
 import java.lang.reflect.Type
 
 /**
@@ -115,7 +114,7 @@ private class SimpleItemPropertyContainer(
     }
 
     override fun setUnsafe(type: ItemPropertyType<*>, value: Any): Any? {
-        require(type.typeToken.type.rawType.isInstance(value)) { "Value type mismatch: ${type.typeToken.type.rawType.name} != ${value.javaClass.name}" }
+        // 警告: 实现上必须确保这里传入的 value 类型一定是正确的
         return propertyMap.put(type, value)
     }
 

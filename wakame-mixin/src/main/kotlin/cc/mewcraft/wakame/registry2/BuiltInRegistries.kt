@@ -25,6 +25,8 @@ import cc.mewcraft.wakame.item2.config.datagen.ItemMetaType
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaTypes
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item2.config.property.impl.EnchantSlotCapacityType
+import cc.mewcraft.wakame.item2.config.property.impl.EnchantSlotCapacityTypes
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.CoreType
@@ -201,6 +203,12 @@ object BuiltInRegistries {
      */
     @JvmField
     val ENTITY_BUCKET_INFO_TYPE: WritableRegistry<EntityBucketInfoType> = registerSimple(BuiltInRegistryKeys.ENTITY_BUCKET_INFO_TYPE) { EntityBucketInfoTypes }
+
+    /**
+     * EnchantSlotCapacity 的类型.
+     */
+    @JvmField
+    val ENCHANT_SLOT_CAPACITY_TYPE: WritableRegistry<EnchantSlotCapacityType> = registerSimple(BuiltInRegistryKeys.ENCHANT_SLOT_CAPACITY_TYPE) { EnchantSlotCapacityTypes }
 
     /**
      * 攻击速度.

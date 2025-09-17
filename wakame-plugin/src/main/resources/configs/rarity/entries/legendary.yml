@@ -4,3 +4,5 @@ version: 1
 name: "<color:#ffd12b>传说"
 styles: "<color:#ffd12b>"
 color: GOLD
+enchant_slot_base: 4
+enchant_slot_limit: 5

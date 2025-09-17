@@ -75,6 +75,10 @@ object TranslatableMessages {
     val MSG_REVEALED_BREW_RECIPE = create("msg_revealed_brew_recipe")
     val MSG_ALREADY_REVEALED_BREW_RECIPE = create("msg_already_revealed_brew_recipe")
     val MSG_ITEM_NOT_PURCHASABLE = create("msg_item_not_purchasable")
+    val MSG_CREATIVE_MODE_NOT_ALLOWED = create("msg_creative_mode_not_allowed")
+    val MSG_MAX_ENCHANT_SLOT_REACHED = create("msg_max_enchant_slot_reached")
+    val MSG_NO_FREE_ENCHANT_SLOTS = create("msg_no_free_enchant_slots")
+    val MSG_REMOVED_EXCESS_ENCHANTMENTS = create("msg_removed_excess_enchantments")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

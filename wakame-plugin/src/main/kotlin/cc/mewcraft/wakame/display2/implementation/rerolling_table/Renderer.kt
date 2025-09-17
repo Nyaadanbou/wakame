@@ -2,13 +2,7 @@ package cc.mewcraft.wakame.display2.implementation.rerolling_table
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler3
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
+import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
@@ -18,12 +12,7 @@ import cc.mewcraft.wakame.item2.config.datagen.ItemMetaTypes
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCustomName
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemName
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.item2.data.impl.AttributeCore
-import cc.mewcraft.wakame.item2.data.impl.Core
-import cc.mewcraft.wakame.item2.data.impl.EmptyCore
-import cc.mewcraft.wakame.item2.data.impl.ItemLevel
-import cc.mewcraft.wakame.item2.data.impl.ReforgeHistory
-import cc.mewcraft.wakame.item2.data.impl.VirtualCore
+import cc.mewcraft.wakame.item2.data.impl.*
 import cc.mewcraft.wakame.item2.isNetworkRewrite
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -34,7 +23,6 @@ import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.item.fastLore
-import cc.mewcraft.wakame.util.item.hideAll
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import org.bukkit.inventory.ItemStack
 import java.nio.file.Path
@@ -98,8 +86,6 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<RerollingTable
 
         val lore = textAssembler.assemble(collector)
         item.fastLore(lore)
-
-        item.hideAll()
     }
 
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, id: String, core: Core, context: RerollingTableContext) {

@@ -50,6 +50,7 @@ primary:
 
   - (fixed:vanilla)<st><dark_gray>             </dark_gray></st>
   - vanilla:enchantments
+  - special:enchant_slots
   - vanilla:damage_resistant
   - vanilla:food
 

@@ -2,24 +2,12 @@ package cc.mewcraft.wakame.display2.implementation.crafting_station
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
-import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
-import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.common.*
 import cc.mewcraft.wakame.display2.implementation.standard.AttackSpeedRendererFormat
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaTypes
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCoreContainer
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCustomName
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaElement
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemName
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaKizami
+import cc.mewcraft.wakame.item2.config.datagen.impl.*
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.config.property.impl.ExtraLore
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
@@ -34,9 +22,6 @@ import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.loot.context.LootContext
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.item.fastLore
-import cc.mewcraft.wakame.util.item.hideAttributeModifiers
-import cc.mewcraft.wakame.util.item.hideEnchantments
-import cc.mewcraft.wakame.util.item.hideStoredEnchantments
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.DamageResistant
 import io.papermc.paper.datacomponent.item.FoodProperties
@@ -114,10 +99,6 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<CraftingStati
 
         val lore = textAssembler.assemble(collector)
         item.fastLore(lore)
-
-        item.hideAttributeModifiers()
-        item.hideEnchantments()
-        item.hideStoredEnchantments()
     }
 }
 

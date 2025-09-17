@@ -70,8 +70,8 @@ data class MetaItemLevel(
             .let { lvl -> ItemMetaResult.of(ItemLevel(lvl)) }
     }
 
-    override fun write(value: ItemLevel, itemStack: MojangStack) {
-        itemStack.ensureSetData(ItemDataTypes.LEVEL, value)
+    override fun write(value: ItemLevel, itemstack: MojangStack) {
+        itemstack.ensureSetData(ItemDataTypes.LEVEL, value)
     }
 
     private enum class Option {

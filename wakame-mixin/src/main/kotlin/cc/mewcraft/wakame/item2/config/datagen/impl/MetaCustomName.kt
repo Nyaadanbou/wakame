@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item2.config.datagen.impl
 
-import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.adventure.toNMSComponent
 import net.kyori.adventure.text.Component
@@ -20,7 +20,7 @@ data class MetaCustomName(
         return ItemMetaResult.of(customName)
     }
 
-    override fun write(value: Component, itemStack: MojangStack) {
-        itemStack.set(DataComponents.CUSTOM_NAME, value.toNMSComponent())
+    override fun write(value: Component, itemstack: MojangStack) {
+        itemstack.set(DataComponents.CUSTOM_NAME, value.toNMSComponent())
     }
 }

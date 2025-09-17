@@ -89,6 +89,13 @@ right_click_interactable_blocks:
   # - "minecraft:trial_spawner
   # - "minecraft:vault
 
+# Koish 如何计算物品的附魔槽位的基础容量
+# 可用选项:
+#   none: 不计算 (相当于原版)
+#   prop: 根据物品的 `enchant_slot_base` prop 计算
+#   rarity: 根据物品的稀有度 (rarity) 计算
+enchant_slot_base_provider: rarity
+
 # 关于调试模式
 debug:
   # 调试模式信息记录控制

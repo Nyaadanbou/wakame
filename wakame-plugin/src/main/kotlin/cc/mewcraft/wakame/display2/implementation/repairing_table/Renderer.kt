@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.util.item.fastLore
-import cc.mewcraft.wakame.util.item.hideAll
 import cc.mewcraft.wakame.util.item.isNetworkRewrite
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component.text
@@ -64,8 +63,6 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<RepairingTable
 
         val lore = textAssembler.assemble(collector)
         item.fastLore(lore)
-
-        item.hideAll()
     }
 }
 

@@ -25,8 +25,8 @@ sealed interface MetaCoreContainer : ItemMetaEntry<CoreContainer> {
         )
     }
 
-    override fun write(value: CoreContainer, itemStack: MojangStack) {
-        itemStack.ensureSetData(ItemDataTypes.CORE_CONTAINER, value)
+    override fun write(value: CoreContainer, itemstack: MojangStack) {
+        itemstack.ensureSetData(ItemDataTypes.CORE_CONTAINER, value)
     }
 
     @ConfigSerializable

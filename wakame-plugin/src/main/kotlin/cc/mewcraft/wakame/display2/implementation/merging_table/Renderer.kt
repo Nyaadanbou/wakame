@@ -2,17 +2,8 @@ package cc.mewcraft.wakame.display2.implementation.merging_table
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
-import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
-import cc.mewcraft.wakame.display2.implementation.common.CoreRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.common.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaTypes
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCustomName
@@ -31,7 +22,6 @@ import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.reforge.merge.MergingSession
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.item.fastLore
-import cc.mewcraft.wakame.util.item.hideAll
 import io.papermc.paper.datacomponent.DataComponentTypes
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import org.bukkit.inventory.ItemStack
@@ -104,8 +94,6 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<MergingTableCont
         // 导致在菜单里显示的是玩家自己设置的(奇葩)名字.
         // 我们在这里统一清除掉这个组件.
         item.resetData(DataComponentTypes.CUSTOM_NAME)
-
-        item.hideAll()
     }
 }
 

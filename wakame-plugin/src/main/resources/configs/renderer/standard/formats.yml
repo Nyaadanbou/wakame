@@ -75,6 +75,16 @@ element:
 enchantments:
   namespace: vanilla
 
+# id: `enchant_slots`
+enchant_slots:
+  namespace: special
+  # 可用标签
+  # <used> 使用掉的附魔槽位数量
+  # <max_base> 附魔槽位数量的基础上限
+  # <max_extra> 附魔槽位数量的额外上限
+  # <max_total> 附魔槽位数量的总上限 (base + extra)
+  tooltip: "<!i><gray>附魔槽位: <white><used>/<max_base>(+<max_extra>)"
+
 # id: `damage_resistant`
 damage_resistant:
   namespace: vanilla
