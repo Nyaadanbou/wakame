@@ -52,7 +52,11 @@ public class CustomItemStack {
             // 目前的临时考虑: 对于 ExactChoice 中的非 Koish 物品, 只考虑 Minecraft 物品类型, 忽略其所有额外组件
             // 这实际上破坏了 Bukkit API 中关于 ExactChoice 的定义, 但实际情况是, 只要没有其他插件注册使用了 ExactChoice 的配方, 那么就没有问题
             // 我们需要考虑更好的实现, 即保证 ExactChoice 的语义不被破坏, 同时又能让 Koish 物品在配方中只考虑物品类型(ID)
+
+            // 只考虑物品类型
             return 31 * h;
+
+            // 考虑物品类型 + 组件
             //return 31 * h + stack.getComponents().hashCode();
         }
     }
@@ -66,12 +70,16 @@ public class CustomItemStack {
      */
     public static boolean equals(@Nullable ItemStack first, @Nullable ItemStack second) {
         // FIXME #396
+
+        // 只考虑物品类型
         return first == second || first != null && second != null && first.isEmpty() == second.isEmpty() && (isSameKoishItemType(first, second) || ItemStack.isSameItem(first, second));
+
+        // 考虑物品类型 + 组件
         //return first == second || first != null && second != null && first.isEmpty() == second.isEmpty() && (isSameKoishItemType(first, second) || ItemStack.isSameItemSameComponents(first, second));
     }
 
     /**
-     * 检查两个物品堆叠是否属于同一个 Koish 物品类型.
+     * 检查两个物品堆叠(Koish 物品类型) 是否一样.
      *
      * @param first  第一个物品堆叠
      * @param second 第二个物品堆叠

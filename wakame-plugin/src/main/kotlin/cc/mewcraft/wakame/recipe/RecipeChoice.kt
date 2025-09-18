@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
@@ -37,10 +36,9 @@ data class SingleRecipeChoice(
     val item: ItemRef,
 ) : RecipeChoice {
     override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
-        val itemStack = item.createItemStack()
-        return BukkitRecipeChoice.ExactChoice(itemStack)
+        val itemstack = item.createItemStack()
+        return BukkitRecipeChoice.ExactChoice(itemstack)
     }
-
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("item", item),
@@ -56,12 +54,8 @@ data class MultiRecipeChoice(
     val items: List<ItemRef>,
 ) : RecipeChoice {
     override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
-        val itemStacks: MutableList<ItemStack> = mutableListOf()
-        items.forEach {
-            val itemStack = it.createItemStack()
-            itemStacks.add(itemStack)
-        }
-        return BukkitRecipeChoice.ExactChoice(itemStacks)
+        val itemstacks = items.map { it.createItemStack() }
+        return BukkitRecipeChoice.ExactChoice(itemstacks)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -76,11 +70,11 @@ data class MultiRecipeChoice(
  */
 internal object RecipeChoiceSerializer : TypeSerializer2<RecipeChoice> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeChoice {
-        val itemXList = node.getList<ItemRef>(emptyList())
-        return when (itemXList.size) {
+        val itemList = node.getList<ItemRef>(emptyList())
+        return when (itemList.size) {
             0 -> throw SerializationException(node, type, "Recipe choice must have at least 1 element")
-            1 -> SingleRecipeChoice(itemXList[0])
-            else -> MultiRecipeChoice(itemXList)
+            1 -> SingleRecipeChoice(itemList[0])
+            else -> MultiRecipeChoice(itemList)
         }
     }
 }

@@ -336,7 +336,7 @@ class StonecuttingRecipe(
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("identifier", identifier),
-        ExaminableProperty.of("recipe_result", result),
+        ExaminableProperty.of("result", result),
         ExaminableProperty.of("input", input)
     )
 
