@@ -59,6 +59,7 @@ primary:
   - special:core
   - special:entity_bucket_prop
   - special:entity_bucket_info
+  - special:fuel
 
   - (fixed:general)<st><dark_gray>             </dark_gray></st>
   - general:kizami

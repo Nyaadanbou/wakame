@@ -159,6 +159,12 @@ data object ItemPropTypes {
         }
     }
 
+    /**
+     * 使物品成为自定义燃料.
+     */
+    @JvmField
+    val FUEL: ItemPropertyType<Fuel> = typeOf("fuel")
+
     // ------------
     // 方便函数
     // ------------

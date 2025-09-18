@@ -235,3 +235,13 @@ entity_bucket_info:
     zombie_villager:
       - "<!i><gray>区域: <yellow><region>"
       - "<!i><gray>职业: <yellow><profession>"
+
+# id: `fuel`
+fuel:
+  namespace: special
+  # 可用标签
+  # <burn_time> 燃烧时间 (tick)
+  # <consume> 是否会被消耗
+  tooltip:
+    - "<!i><blue>燃烧时间: <burn_time>t"
+    - "<!i><blue>是否消耗: <consume>"

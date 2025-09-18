@@ -9,10 +9,11 @@ import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaTypes
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCustomName
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemName
-import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item2.config.property.ItemPropTypes
 import cc.mewcraft.wakame.item2.config.property.impl.Arrow
 import cc.mewcraft.wakame.item2.config.property.impl.EntityBucket
 import cc.mewcraft.wakame.item2.config.property.impl.ExtraLore
+import cc.mewcraft.wakame.item2.config.property.impl.Fuel
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.*
 import cc.mewcraft.wakame.item2.feature.EnchantSlotFeature
@@ -71,10 +72,11 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
     override fun render(item: ItemStack, context: Nothing?) {
         val collector = ReferenceOpenHashSet<IndexedText>()
 
-        item.process(ItemPropertyTypes.ARROW) { data -> StandardRenderingHandlerRegistry.ARROW.process(collector, data) }
-        item.process(ItemPropertyTypes.ATTACK_SPEED) { data -> StandardRenderingHandlerRegistry.ATTACK_SPEED.process(collector, data) }
-        item.process(ItemPropertyTypes.EXTRA_LORE) { data -> StandardRenderingHandlerRegistry.LORE.process(collector, data) }
-        item.process(ItemPropertyTypes.ENTITY_BUCKET) { data -> StandardRenderingHandlerRegistry.ENTITY_BUCKET_PROP.process(collector, data) }
+        item.process(ItemPropTypes.ARROW) { data -> StandardRenderingHandlerRegistry.ARROW.process(collector, data) }
+        item.process(ItemPropTypes.ATTACK_SPEED) { data -> StandardRenderingHandlerRegistry.ATTACK_SPEED.process(collector, data) }
+        item.process(ItemPropTypes.EXTRA_LORE) { data -> StandardRenderingHandlerRegistry.LORE.process(collector, data) }
+        item.process(ItemPropTypes.ENTITY_BUCKET) { data -> StandardRenderingHandlerRegistry.ENTITY_BUCKET_PROP.process(collector, data) }
+        item.process(ItemPropTypes.FUEL) { data -> StandardRenderingHandlerRegistry.FUEL.process(collector, data) }
 
         // 对于最可能被频繁修改的 `item_name`, `custom_name` 直接读取配置模板里的内容
         item.process(ItemMetaTypes.ITEM_NAME) { data -> StandardRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
@@ -231,5 +233,13 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
     @JvmField
     val ENTITY_BUCKET_INFO: RenderingHandler<EntityBucketInfo, EntityBucketInfoRendererFormat> = configure("entity_bucket_info") { data, format ->
         format.render(data)
+    }
+
+    @JvmField
+    val FUEL: RenderingHandler<Fuel, ListValueRendererFormat> = configure("fuel") { data, format ->
+        format.render(
+            Placeholder.component("burn_time", Component.text(data.burnTime)),
+            Placeholder.component("consume", Component.text(data.consume))
+        )
     }
 }
