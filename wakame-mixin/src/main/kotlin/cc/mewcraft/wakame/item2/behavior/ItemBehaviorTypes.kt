@@ -5,7 +5,13 @@ import cc.mewcraft.wakame.item2.behavior.impl.BrewRecipe
 import cc.mewcraft.wakame.item2.behavior.impl.EntityBucket
 import cc.mewcraft.wakame.item2.behavior.impl.HoldLastDamage
 import cc.mewcraft.wakame.item2.behavior.impl.test.TestInteract
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.*
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Bow
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Crossbow
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.DualSword
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Katana
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Mace
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Melee
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Trident
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 
 /**
@@ -24,6 +30,12 @@ object ItemBehaviorTypes {
      */
     @JvmField
     val TEST_INTERACT = typeOf("test_interact", TestInteract)
+
+    /**
+     * 物品具有该行为时, 可以触发技能组合键.
+     */
+    @JvmField
+    val CASTABLE = typeOf("castable", TestInteract)
 
     /**
      * 将物品作为自定义箭矢的逻辑.
