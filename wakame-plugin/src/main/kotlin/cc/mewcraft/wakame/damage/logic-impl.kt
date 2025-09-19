@@ -352,7 +352,13 @@ internal object DamageManager : DamageManagerApi {
         // 受伤者抗性提升状态效果等级
         val resistanceLevel = damagee.getPotionEffect(PotionEffectType.RESISTANCE)?.amplifier?.plus(1) ?: 0
 
-        return DefenseMetadata(damageeAttributes, resistanceLevel)
+        // 受伤者是否格挡
+        // 只有玩家有格挡机制
+        return if (damagee is Player) {
+            DefenseMetadata(damageeAttributes, resistanceLevel, damagee.isBlocking)
+        } else {
+            DefenseMetadata(damageeAttributes, resistanceLevel)
+        }
     }
 
     /**
@@ -459,13 +465,13 @@ internal object DamageManager : DamageManagerApi {
     ): Reference2DoubleMap<RegistryEntry<Element>> {
         val map = Reference2DoubleOpenHashMap<RegistryEntry<Element>>()
         val elements = baseDamageMap.keys
-        if (!damageMetadata.ignoreBlocking) {
+        if (defenseMetadata.isBlocking && !damageMetadata.ignoreBlocking) {
             val blockingDamageReductionMap = defenseMetadata.blockingDamageReductionMap
             elements.forEach { element ->
                 val baseDamage = baseDamageMap.getOrDefault(element, 0.0)
                 val blockingDamageReduction = blockingDamageReductionMap.getOrDefault(element, 0.0)
                 val blockingDamage = -min(baseDamage, blockingDamageReduction)
-                if (baseDamage < 0) {
+                if (blockingDamage < 0) {
                     map.put(element, blockingDamage)
                 }
             }
