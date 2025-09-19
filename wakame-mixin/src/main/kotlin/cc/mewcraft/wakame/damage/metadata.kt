@@ -240,23 +240,30 @@ data class DefenseMetadata(
      * 受伤者抗性提升状态效果等级.
      */
     val resistanceLevel: Int,
+
+    /**
+     * 受伤者是否格挡.
+     */
+    val isBlocking: Boolean,
 ) {
     constructor(
         damageeAttributes: AttributeMap,
-        resistanceLevel: Int
+        resistanceLevel: Int,
+        isBlocking: Boolean = false
     ) : this(
-       damageeAttributes.getDefenseMap(),
-       damageeAttributes.getIncomingDamageRateMap(),
-       damageeAttributes.getBlockingDamageReductionMap(),
-       resistanceLevel
+        damageeAttributes.getDefenseMap(),
+        damageeAttributes.getIncomingDamageRateMap(),
+        damageeAttributes.getBlockingDamageReductionMap(),
+        resistanceLevel,
+        isBlocking
     )
 
-    fun getElementDefense(elementType:RegistryEntry<Element>): Double{
+    fun getElementDefense(elementType: RegistryEntry<Element>): Double {
         // 默认值是0.0
         return defenseMap.getDouble(elementType)
     }
 
-    fun getElementIncomingDamageRate(elementType:RegistryEntry<Element>): Double{
+    fun getElementIncomingDamageRate(elementType: RegistryEntry<Element>): Double {
         // 默认值是1.0
         return incomingDamageRateMap.getDouble(elementType)
     }
