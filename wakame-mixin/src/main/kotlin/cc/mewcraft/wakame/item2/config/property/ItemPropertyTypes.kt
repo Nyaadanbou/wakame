@@ -74,9 +74,6 @@ data object ItemPropTypes {
     val HOLD_LAST_DAMAGE_SETTINGS: ItemPropertyType<HoldLastDamageSettings> = typeOf("hold_last_damage")
 
     @JvmField
-    val CASTABLE: ItemPropertyType<Unit> = typeOf("castable")
-
-    @JvmField
     val GLOWABLE: ItemPropertyType<Unit> = typeOf("glowable")
 
     @JvmField
