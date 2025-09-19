@@ -25,10 +25,10 @@ import org.bukkit.inventory.EquipmentSlot
 object DualSword : Weapon {
 
     override fun handleSimpleAttack(context: AttackContext): InteractionResult {
-        val itemStack = context.itemStack
+        val itemstack = context.itemstack
         val player = context.player
-        if (itemStack.isOnCooldown(player)) return InteractionResult.FAIL
-        val sword = itemStack.getProp(ItemPropertyTypes.DUAL_SWORD) ?: return InteractionResult.FAIL
+        if (itemstack.isOnCooldown(player)) return InteractionResult.FAIL
+        val sword = itemstack.getProp(ItemPropertyTypes.DUAL_SWORD) ?: return InteractionResult.FAIL
         // 造成伤害
         val attrContainer = player.attributeContainer
         val damageMetadata = PlayerDamageMetadata(attrContainer) {
@@ -44,12 +44,12 @@ object DualSword : Weapon {
             player.damageItem(EquipmentSlot.HAND, sword.itemDamagePerAttack)
         }
         // 设置冷却
-        itemStack.addCooldown(player, sword.attackCooldown)
+        itemstack.addCooldown(player, sword.attackCooldown)
         return InteractionResult.SUCCESS
     }
 
     override fun handleSimpleUse(context: UseContext): InteractionResult {
-        val itemStack = context.itemStack
+        val itemstack = context.itemstack
         val player = context.player
         // 右键事件不是主手触发的 - 不处理
         // 这样做的目的是确保副手剑的攻击是通过主手剑触发的
@@ -66,11 +66,11 @@ object DualSword : Weapon {
 
         val attributeContainerSnapshot = player.attributeContainer.getSnapshot()
         // 如果主手剑位于主手时提供属性修饰符, 才需要移除
-        val coresOnMainSword = itemStack.getData(ItemDataTypes.CORE_CONTAINER)
-        val slotGroup = itemStack.getProp(ItemPropertyTypes.SLOT) ?: ItemSlotGroup.empty()
+        val coresOnMainSword = itemstack.getData(ItemDataTypes.CORE_CONTAINER)
+        val slotGroup = itemstack.getProp(ItemPropertyTypes.SLOT) ?: ItemSlotGroup.empty()
         if (slotGroup.contains(MinecraftItemSlot.MAINHAND)){
             // 移除主手剑上的属性修饰符
-            val modifiersOnMainSword = coresOnMainSword?.collectAttributeModifiers(itemStack, MinecraftItemSlot.MAINHAND)
+            val modifiersOnMainSword = coresOnMainSword?.collectAttributeModifiers(itemstack, MinecraftItemSlot.MAINHAND)
             if (modifiersOnMainSword != null) {
                 attributeContainerSnapshot.removeModifiers(modifiersOnMainSword)
             }

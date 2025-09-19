@@ -25,12 +25,12 @@ import org.bukkit.inventory.ItemStack
 
 interface ItemBehaviorContext {
     val player: Player
-    val itemStack: ItemStack
+    val itemstack: ItemStack
 }
 
 data class CauseDamageContext(
     override val player: Player,
-    override val itemStack: ItemStack,
+    override val itemstack: ItemStack,
     val damagee: Entity,
     val finalDamageContext: FinalDamageContext,
 ) : ItemBehaviorContext {
@@ -45,7 +45,7 @@ data class CauseDamageContext(
 
 data class ReceiveDamageContext(
     override val player: Player,
-    override val itemStack: ItemStack,
+    override val itemstack: ItemStack,
     val damageSource: DamageSource,
     val finalDamageContext: FinalDamageContext,
 ) : ItemBehaviorContext {
@@ -60,7 +60,7 @@ data class ReceiveDamageContext(
 
 data class ProjectileLaunchContext(
     override val player: Player,
-    override val itemStack: ItemStack,
+    override val itemstack: ItemStack,
     val projectile: Projectile
 ) : ItemBehaviorContext {
     val world: World
@@ -69,7 +69,7 @@ data class ProjectileLaunchContext(
 
 data class ProjectileHitContext(
     override val player: Player,
-    override val itemStack: ItemStack,
+    override val itemstack: ItemStack,
     val projectile: Projectile,
     val hitEntity: Entity?,
     val hitBlock: Block?,
@@ -81,7 +81,7 @@ data class ProjectileHitContext(
 
 data class DurabilityDecreaseContext(
     override val player: Player,
-    override val itemStack: ItemStack,
+    override val itemstack: ItemStack,
     /**
      * 物品失去的耐久度的原始值.
      * 对应 [org.bukkit.event.player.PlayerItemDamageEvent.damage].
@@ -110,7 +110,7 @@ data class DurabilityDecreaseContext(
 
 data class StopUseContext(
     override val player: Player,
-    override val itemStack: ItemStack,
+    override val itemstack: ItemStack,
     val ticksHeldFor: Int,
 ) : ItemBehaviorContext {
     val world: World
@@ -119,7 +119,7 @@ data class StopUseContext(
 
 data class ConsumeContext(
     override val player: Player,
-    override val itemStack: ItemStack,
+    override val itemstack: ItemStack,
     val hand: InteractionHand,
     /**
      * 物品消耗后返还的物品的原始值.

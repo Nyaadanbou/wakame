@@ -47,7 +47,7 @@ import org.joml.Vector3d
 
 data class UseOnContext(
     override val player: Player,
-    override val itemStack: ItemStack,
+    override val itemstack: ItemStack,
     val hand: InteractionHand,
     val interactContext: BlockInteractContext
 ): ItemBehaviorContext {
@@ -69,7 +69,7 @@ data class UseOnContext(
 
 data class UseContext(
     override val player: Player,
-    override val itemStack: ItemStack,
+    override val itemstack: ItemStack,
     val hand: InteractionHand,
 ): ItemBehaviorContext {
     val world: World
@@ -78,7 +78,7 @@ data class UseContext(
 
 data class UseEntityContext(
     override val player: Player,
-    override val itemStack: ItemStack,
+    override val itemstack: ItemStack,
     val hand: InteractionHand,
     val entity: Entity
 ): ItemBehaviorContext {
@@ -88,7 +88,7 @@ data class UseEntityContext(
 
 data class AttackOnContext(
     override val player: Player,
-    override val itemStack: ItemStack,
+    override val itemstack: ItemStack,
     val blockPosition: Vector3d,
     val interactFace: BlockFace,
 ): ItemBehaviorContext {
@@ -98,7 +98,7 @@ data class AttackOnContext(
 
 data class AttackContext(
     override val player: Player,
-    override val itemStack: ItemStack,
+    override val itemstack: ItemStack,
 ): ItemBehaviorContext {
     val world: World
         get() = player.world
@@ -106,7 +106,7 @@ data class AttackContext(
 
 data class AttackEntityContext(
     override val player: Player,
-    override val itemStack: ItemStack,
+    override val itemstack: ItemStack,
     val entity: Entity
 ): ItemBehaviorContext {
     val world: World

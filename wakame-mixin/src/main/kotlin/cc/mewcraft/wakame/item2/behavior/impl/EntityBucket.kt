@@ -124,9 +124,9 @@ object EntityBucket : ItemBehavior {
     // 当玩家手持一个生物桶右键方块顶部时
     override fun handleUseOn(context: UseOnContext): InteractionResult {
         val player = context.player
-        val itemStack = context.itemStack
+        val itemstack = context.itemstack
         // 区域保护检查不通过 - 交互失败
-        if (!ProtectionManager.canUseItem(player, itemStack, context.blockLocation)) {
+        if (!ProtectionManager.canUseItem(player, itemstack, context.blockLocation)) {
             return InteractionResult.FAIL
         }
 
@@ -139,21 +139,21 @@ object EntityBucket : ItemBehavior {
             return InteractionResult.FAIL
         }
 
-        val entityData = itemStack.getData(ItemDataTypes.ENTITY_BUCKET_DATA) ?: return InteractionResult.FAIL
+        val entityData = itemstack.getData(ItemDataTypes.ENTITY_BUCKET_DATA) ?: return InteractionResult.FAIL
         val deserializedEntity = Bukkit.getUnsafe().deserializeEntity(entityData, player.world)
         val successfullySpawned = deserializedEntity.spawnAt(context.blockLocation, CreatureSpawnEvent.SpawnReason.BUCKET)
         if (successfullySpawned) {
             // 还原物品状态, 也就是使其变成空桶时的状态
             if (player.gameMode != GameMode.CREATIVE) {
-                itemStack.resetData(DataComponentTypes.CUSTOM_MODEL_DATA)
-                itemStack.resetData(DataComponentTypes.MAX_STACK_SIZE)
-                itemStack.removeData(ItemDataTypes.ENTITY_BUCKET_DATA)
-                itemStack.removeData(ItemDataTypes.ENTITY_BUCKET_INFO)
+                itemstack.resetData(DataComponentTypes.CUSTOM_MODEL_DATA)
+                itemstack.resetData(DataComponentTypes.MAX_STACK_SIZE)
+                itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_DATA)
+                itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_INFO)
 
-                val prevItemName = itemStack.getData(ItemDataTypes.PREVIOUS_ITEM_NAME)
+                val prevItemName = itemstack.getData(ItemDataTypes.PREVIOUS_ITEM_NAME)
                 if (prevItemName != null) {
-                    itemStack.removeData(ItemDataTypes.PREVIOUS_ITEM_NAME)
-                    itemStack.setData(DataComponentTypes.ITEM_NAME, prevItemName)
+                    itemstack.removeData(ItemDataTypes.PREVIOUS_ITEM_NAME)
+                    itemstack.setData(DataComponentTypes.ITEM_NAME, prevItemName)
                 }
             }
 
@@ -168,12 +168,12 @@ object EntityBucket : ItemBehavior {
     // 当玩家手持一个生物桶右键生物时
     override fun handleUseEntity(context: UseEntityContext): InteractionResult {
         val player = context.player
-        val itemStack = context.itemStack
+        val itemstack = context.itemstack
         val entity = context.entity
-        val entityBucket = itemStack.getProp(ItemPropertyTypes.ENTITY_BUCKET) ?: return InteractionResult.FAIL
-        val entityBucketData = itemStack.getData(ItemDataTypes.ENTITY_BUCKET_DATA)
+        val entityBucket = itemstack.getProp(ItemPropertyTypes.ENTITY_BUCKET) ?: return InteractionResult.FAIL
+        val entityBucketData = itemstack.getData(ItemDataTypes.ENTITY_BUCKET_DATA)
 
-        if (!ProtectionManager.canInteractWithEntity(player, entity, itemStack)) {
+        if (!ProtectionManager.canInteractWithEntity(player, entity, itemstack)) {
             return InteractionResult.FAIL
         }
 
@@ -191,16 +191,16 @@ object EntityBucket : ItemBehavior {
         }
 
         // 处理创造模式和多桶叠加的情况
-        if (itemStack.amount > 1 || player.gameMode == GameMode.CREATIVE) {
-            val newStack = itemStack.clone().asOne()
+        if (itemstack.amount > 1 || player.gameMode == GameMode.CREATIVE) {
+            val newStack = itemstack.clone().asOne()
             asEntityBucket(newStack, entity, player)
             if (player.gameMode != GameMode.CREATIVE) {
                 // 非创造模式下, 扣除一个空桶
-                itemStack.subtract(1)
+                itemstack.subtract(1)
             }
             player.inventory.addItem(newStack)
         } else {
-            asEntityBucket(itemStack, entity, player)
+            asEntityBucket(itemstack, entity, player)
         }
 
         // 移除实体

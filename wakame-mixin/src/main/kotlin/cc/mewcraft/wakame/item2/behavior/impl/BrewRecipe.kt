@@ -25,9 +25,9 @@ object BrewRecipe : SimpleInteract {
      * 一个带有酒酿配方的物品, 其“已学习”的状态会影响其最终的物品渲染效果.
      */
     override fun handleSimpleUse(context: UseContext): InteractionResult {
-        val itemStack = context.itemStack
+        val itemstack = context.itemstack
         val player = context.player
-        val itemBrewRecipe = itemStack.getData(ItemDataTypes.BREW_RECIPE)
+        val itemBrewRecipe = itemstack.getData(ItemDataTypes.BREW_RECIPE)
         // 物品上不存在配方数据 - 不处理
         if (itemBrewRecipe == null) return InteractionResult.FAIL
         // 配方已被学习 - 返回交互成功
@@ -37,7 +37,7 @@ object BrewRecipe : SimpleInteract {
         }
 
         // 设置配方数据为已被学习
-        itemStack.setData(ItemDataTypes.BREW_RECIPE, itemBrewRecipe.copy(learned = true))
+        itemstack.setData(ItemDataTypes.BREW_RECIPE, itemBrewRecipe.copy(learned = true))
 
         val recipeId = itemBrewRecipe.recipeId
         val recipe = BrewRecipeManager.INSTANCE.get(recipeId)
