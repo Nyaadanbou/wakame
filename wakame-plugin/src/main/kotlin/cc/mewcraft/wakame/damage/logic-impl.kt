@@ -29,7 +29,9 @@ import cc.mewcraft.wakame.item2.getData
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.RecursionGuard
+import cc.mewcraft.wakame.util.handle
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
+import cc.mewcraft.wakame.util.serverLevel
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
@@ -43,6 +45,7 @@ import net.kyori.adventure.text.LinearComponents
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
+import org.bukkit.damage.DamageSource
 import org.bukkit.entity.AbstractArrow
 import org.bukkit.entity.Arrow
 import org.bukkit.entity.Entity
@@ -86,6 +89,7 @@ internal object DamageManager : DamageManagerApi {
 
     // 特殊值, 方便识别. 仅用于触发事件, 以被事件系统监听&修改.
     private const val PLACEHOLDER_DAMAGE_VALUE: Double = 4.95
+    private const val PLACEHOLDER_DAMAGE_VALUE_FLOAT: Float = 4.95f
 
     /**
      * 作为 direct_entity 时能够造成伤害的 entity(projectile) 类型.
@@ -169,13 +173,44 @@ internal object DamageManager : DamageManagerApi {
         victim.registerDamage(metadata)
 
         // 如果自定义伤害有源且需要取消击退.
-        // 这里修复了: 无源伤害 (即没有造成伤害的 LivingEntity) 不会触发击退事件.
+        // 无源伤害 (即没有造成伤害的 LivingEntity) 不会触发击退事件.
         if (!knockback && damager != null) {
             victim.registerCancelKnockback()
         }
 
         // 造成伤害
         DamageApplier.INSTANCE.damage(victim, damager, PLACEHOLDER_DAMAGE_VALUE)
+    }
+
+    /**
+     * 对 [victim] 造成由 [metadata] 指定的萌芽伤害.
+     *
+     * @return 是否真的造成了伤害及其附加效果. 诸如生物无敌, 免疫该伤害, 伤害事件被取消等情况会返回 false.
+     */
+    fun hurt(
+        victim: LivingEntity,
+        metadata: DamageMetadata,
+        source: DamageSource,
+        knockback: Boolean,
+    ): Boolean {
+        victim.registerDamage(metadata)
+
+        // 如果自定义伤害有源且需要取消击退.
+        // 无源伤害 (不存在来源实体) 不会触发击退事件.
+        if (!knockback && source.causingEntity != null) {
+            victim.registerCancelKnockback()
+        }
+
+        // 直接调用nms方法造成伤害.
+        // 原因是只有nms的方法会返回布尔值, bukkit方法直接吃掉了布尔值.
+        return victim.handle.hurtServer(victim.world.serverLevel, source.handle, PLACEHOLDER_DAMAGE_VALUE_FLOAT)
+    }
+
+    /**
+     * 方便函数.
+     */
+    fun LivingEntity.hurt(metadata: DamageMetadata, source: DamageSource, knockback: Boolean): Boolean {
+        return hurt(this, metadata, source, knockback)
     }
 
     /**

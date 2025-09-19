@@ -30,9 +30,12 @@ import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.CraftWorld
+import org.bukkit.craftbukkit.damage.CraftDamageSource
 import org.bukkit.craftbukkit.enchantments.CraftEnchantment
+import org.bukkit.craftbukkit.entity.CraftEntity
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
+import org.bukkit.damage.DamageSource
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -57,6 +60,12 @@ val Chunk.levelChunk: LevelChunk
 
 val Player.serverPlayer: ServerPlayer
     get() = (this as CraftPlayer).handle
+
+val Entity.handle: MojangEntity
+    get() = (this as CraftEntity).handle
+
+val DamageSource.handle: MojangDamageSource
+    get() = (this as CraftDamageSource).handle
 
 val serverTick: Int
     get() = MINECRAFT_SERVER.tickCount
