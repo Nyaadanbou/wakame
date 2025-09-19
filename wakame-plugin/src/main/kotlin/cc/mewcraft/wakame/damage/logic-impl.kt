@@ -187,7 +187,7 @@ internal object DamageManager : DamageManagerApi {
      *
      * @return 是否真的造成了伤害及其附加效果. 诸如生物无敌, 免疫该伤害, 伤害事件被取消等情况会返回 false.
      */
-    fun hurt(
+    override fun hurt(
         victim: LivingEntity,
         metadata: DamageMetadata,
         source: DamageSource,
@@ -204,13 +204,6 @@ internal object DamageManager : DamageManagerApi {
         // 直接调用nms方法造成伤害.
         // 原因是只有nms的方法会返回布尔值, bukkit方法直接吃掉了布尔值.
         return victim.handle.hurtServer(victim.world.serverLevel, source.handle, PLACEHOLDER_DAMAGE_VALUE_FLOAT)
-    }
-
-    /**
-     * 方便函数.
-     */
-    fun LivingEntity.hurt(metadata: DamageMetadata, source: DamageSource, knockback: Boolean): Boolean {
-        return hurt(this, metadata, source, knockback)
     }
 
     /**
