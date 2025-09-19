@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.item2.behavior.impl
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.brewery.BrewRecipeManager
 import cc.mewcraft.wakame.brewery.BrewRecipeRenderer
-import cc.mewcraft.wakame.item2.behavior.InteractionHand
 import cc.mewcraft.wakame.item2.behavior.InteractionResult
 import cc.mewcraft.wakame.item2.behavior.UseContext
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
@@ -18,23 +17,26 @@ import net.kyori.adventure.sound.Sound
 object BrewRecipe : SimpleInteract {
 
     /** TODO 简化
-     * 当玩家手持一个未学习的配方并右键时, 学习该配方.
+     * 当玩家手持一个未揭示的配方并进行使用交互时, 揭示该配方.
      *
-     * 这里的“学习”指的是修改物品上的酒酿配方数据 - 将其修改为“已学习”, 跟玩家自身的状态没有关系.
-     * 也就是说玩家可以无限的学习酒酿配方, 无论他先前有没有学习过这个酒酿配方.
+     * 这里的“揭示”指的是修改物品上的酒酿配方数据, 将其修改为“已学习”.
+     * 这与玩家自身的状态没有关系, 并非指玩家学会了新的可用配方.
+     * 玩家可以无限的揭示酒酿配方, 无论他先前有没有揭示过这个酒酿配方.
      * 一个带有酒酿配方的物品, 其“已学习”的状态会影响其最终的物品渲染效果.
      */
     override fun handleSimpleUse(context: UseContext): InteractionResult {
         val itemStack = context.itemStack
         val player = context.player
         val itemBrewRecipe = itemStack.getData(ItemDataTypes.BREW_RECIPE)
+        // 物品上不存在配方数据 - 不处理
         if (itemBrewRecipe == null) return InteractionResult.FAIL
+        // 配方已被学习 - 返回交互成功
         if (itemBrewRecipe.learned) {
             player.sendMessage(TranslatableMessages.MSG_ALREADY_REVEALED_BREW_RECIPE)
             return InteractionResult.SUCCESS
         }
-        if (context.hand != InteractionHand.MAIN_HAND) return InteractionResult.FAIL
 
+        // 设置配方数据为已被学习
         itemStack.setData(ItemDataTypes.BREW_RECIPE, itemBrewRecipe.copy(learned = true))
 
         val recipeId = itemBrewRecipe.recipeId
