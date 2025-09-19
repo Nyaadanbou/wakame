@@ -8,6 +8,9 @@ import cc.mewcraft.wakame.item2.behavior.InteractionHand
 import cc.mewcraft.wakame.item2.behavior.InteractionResult
 import cc.mewcraft.wakame.item2.behavior.UseContext
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
+import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
+import cc.mewcraft.wakame.item2.config.property.ItemPropTypes
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotGroup
 import cc.mewcraft.wakame.item2.config.property.impl.MinecraftItemSlot
@@ -17,6 +20,8 @@ import cc.mewcraft.wakame.item2.extension.damageItem
 import cc.mewcraft.wakame.item2.extension.isOnCooldown
 import cc.mewcraft.wakame.item2.getData
 import cc.mewcraft.wakame.item2.getProp
+import cc.mewcraft.wakame.item2.getProp
+import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 
 /**
@@ -28,7 +33,7 @@ object DualSword : Weapon {
         val itemstack = context.itemstack
         val player = context.player
         if (itemstack.isOnCooldown(player)) return InteractionResult.FAIL
-        val sword = itemstack.getProp(ItemPropertyTypes.DUAL_SWORD) ?: return InteractionResult.FAIL
+        val sword = itemstack.getProp(ItemPropTypes.DUAL_SWORD) ?: return InteractionResult.FAIL
         // 造成伤害
         val attrContainer = player.attributeContainer
         val damageMetadata = PlayerDamageMetadata(attrContainer) {
@@ -37,9 +42,12 @@ object DualSword : Weapon {
             }
         }
         val hitEntities = WeaponUtils.getHitEntities(player, 5.0, sword.attackHalfExtentsBase)
-        if (hitEntities.isNotEmpty()) {
-            // 造成伤害
-            hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
+        val damageSource = WeaponUtils.buildPlayerAttackDamageSource(player)
+        val flag = hitEntities.any { entity ->
+            entity.hurt(damageMetadata, damageSource, true)
+        }
+        // 如果成功造成了伤害
+        if (flag) {
             // 设置耐久
             player.damageItem(EquipmentSlot.HAND, sword.itemDamagePerAttack)
         }
@@ -62,13 +70,13 @@ object DualSword : Weapon {
         // 副手物品处于冷却 - 不处理
         if (itemInOffHand.isOnCooldown(player)) return InteractionResult.FAIL
         // 副手物品不是剑 - 不处理
-        val offSword = itemInOffHand.getProp(ItemPropertyTypes.DUAL_SWORD) ?: return InteractionResult.FAIL
+        val offSword = itemInOffHand.getProp(ItemPropTypes.DUAL_SWORD) ?: return
 
         val attributeContainerSnapshot = player.attributeContainer.getSnapshot()
         // 如果主手剑位于主手时提供属性修饰符, 才需要移除
         val coresOnMainSword = itemstack.getData(ItemDataTypes.CORE_CONTAINER)
-        val slotGroup = itemstack.getProp(ItemPropertyTypes.SLOT) ?: ItemSlotGroup.empty()
-        if (slotGroup.contains(MinecraftItemSlot.MAINHAND)){
+        val slotGroup = itemstack.getProp(ItemPropTypes.SLOT) ?: ItemSlotGroup.empty()
+        if (slotGroup.contains(MinecraftItemSlot.MAINHAND)) {
             // 移除主手剑上的属性修饰符
             val modifiersOnMainSword = coresOnMainSword?.collectAttributeModifiers(itemstack, MinecraftItemSlot.MAINHAND)
             if (modifiersOnMainSword != null) {
@@ -89,10 +97,13 @@ object DualSword : Weapon {
             }
         }
         val hitEntities = WeaponUtils.getHitEntities(player, 5.0, offSword.attackHalfExtentsBase)
-        if (hitEntities.isNotEmpty()) {
-            // 造成伤害
-            hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
-            // 设置耐久 FIXME
+        val damageSource = WeaponUtils.buildPlayerAttackDamageSource(player)
+        val flag = hitEntities.any { entity ->
+            entity.hurt(damageMetadata, damageSource, true)
+        }
+        // 如果成功造成了伤害
+        if (flag) {
+            // 设置耐久
             player.damageItem(EquipmentSlot.OFF_HAND, offSword.itemDamagePerAttack)
         }
         // 设置冷却
