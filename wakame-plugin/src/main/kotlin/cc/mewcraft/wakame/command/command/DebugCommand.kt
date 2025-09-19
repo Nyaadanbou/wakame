@@ -95,7 +95,7 @@ internal object DebugCommand : KoishCommandFactory<Source> {
         val damage = context.get<Double>("damage")
         val target = context.getOrNull<MultipleEntitySelector>("target")?.values() ?: listOf(sender)
         target.filterIsInstance<LivingEntity>().forEach { entity ->
-            val damageMeta = PlayerDamageMetadata(
+            val damageMetadata = PlayerDamageMetadata(
                 attributes = sender.attributeContainer.getSnapshot(),
                 damageBundle = damageBundle {
                     default {
@@ -107,7 +107,7 @@ internal object DebugCommand : KoishCommandFactory<Source> {
                     }
                 }
             )
-            entity.hurt(damageMetadata = damageMeta, source = sender)
+            entity.hurt(damageMetadata, sender, true)
         }
     }
 

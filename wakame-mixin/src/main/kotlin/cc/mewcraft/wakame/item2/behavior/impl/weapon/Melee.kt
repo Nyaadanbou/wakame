@@ -51,11 +51,14 @@ object Melee : Weapon {
                     standard()
                 }
             }
+            val damageSource = WeaponUtils.buildPlayerAttackDamageSource(player)
             // 造成伤害
-            hitEntity.hurt(damageMetadata, player, true)
-
-            // 设置耐久 FIXME 造成伤害才扣耐久
-            player.damageItem(EquipmentSlot.HAND, melee.itemDamagePerAttack)
+            val flag = hitEntity.hurt(damageMetadata, damageSource, true)
+            // 如果成功造成了伤害
+            if (flag) {
+                // 设置耐久
+                player.damageItem(event.hand, melee.itemDamagePerAttack)
+            }
             // 设置冷却
             // 命中实体才进入冷却
             itemstack.addCooldown(player, melee.attackCooldown)
