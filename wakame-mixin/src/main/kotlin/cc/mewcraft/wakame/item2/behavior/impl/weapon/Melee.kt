@@ -21,10 +21,10 @@ import org.bukkit.inventory.EquipmentSlot
  */
 object Melee : Weapon {
     override fun handleSimpleAttack(context: AttackContext): InteractionResult {
-        val itemStack = context.itemStack
+        val itemstack = context.itemstack
         val player = context.player
-        if (itemStack.isOnCooldown(player)) return InteractionResult.FAIL
-        val melee = itemStack.getProp(ItemPropertyTypes.MELEE) ?: return InteractionResult.FAIL
+        if (itemstack.isOnCooldown(player)) return InteractionResult.FAIL
+        val melee = itemstack.getProp(ItemPropertyTypes.MELEE) ?: return InteractionResult.FAIL
 
         val world = player.world
         val attrContainer = player.attributeContainer
@@ -58,7 +58,7 @@ object Melee : Weapon {
             player.damageItem(EquipmentSlot.HAND, melee.itemDamagePerAttack)
             // 设置冷却
             // 命中实体才进入冷却
-            itemStack.addCooldown(player, melee.attackCooldown)
+            itemstack.addCooldown(player, melee.attackCooldown)
         }
         return InteractionResult.SUCCESS
     }

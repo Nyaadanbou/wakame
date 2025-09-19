@@ -46,13 +46,13 @@ object HoldLastDamage : SimpleInteract {
     }
 
     override fun handleDurabilityDecrease(context: DurabilityDecreaseContext): BehaviorResult {
-        val itemStack = context.itemStack
-        val currentDamage = itemStack.damage
-        val maxDamage = itemStack.maxDamage
+        val itemstack = context.itemstack
+        val currentDamage = itemstack.damage
+        val maxDamage = itemstack.maxDamage
         // 如果物品要损坏了
         if (currentDamage + context.originalDurabilityDecreaseValue >= maxDamage) {
             // 设为 0 耐久
-            itemStack.damage = maxDamage
+            itemstack.damage = maxDamage
             // 取消掉耐久事件
             return BehaviorResult.FINISH_AND_CANCEL
         } else {
@@ -64,11 +64,11 @@ object HoldLastDamage : SimpleInteract {
      * 方便函数.
      */
     private fun handleInteract(type: ItemBehaviorHandlerType, context: ItemBehaviorContext): InteractionResult {
-        val itemStack = context.itemStack
+        val itemstack = context.itemstack
         val player = context.player
-        if (!itemStack.isBroken()) return InteractionResult.PASS
+        if (!itemstack.isBroken()) return InteractionResult.PASS
 
-        val settings = itemStack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_SETTINGS)
+        val settings = itemstack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_SETTINGS)
         val action = settings?.getAction(type) ?: type.defaultAction
         val message = settings?.getMessage(type) ?: type.defaultMessage
 
@@ -88,11 +88,11 @@ object HoldLastDamage : SimpleInteract {
      * 方便函数.
      */
     private fun handle(type: ItemBehaviorHandlerType, context: ItemBehaviorContext): BehaviorResult {
-        val itemStack = context.itemStack
+        val itemstack = context.itemstack
         val player = context.player
-        if (!itemStack.isBroken()) return BehaviorResult.PASS
+        if (!itemstack.isBroken()) return BehaviorResult.PASS
 
-        val settings = itemStack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_SETTINGS)
+        val settings = itemstack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_SETTINGS)
         val action = settings?.getAction(type) ?: type.defaultAction
         val message = settings?.getMessage(type) ?: type.defaultMessage
 

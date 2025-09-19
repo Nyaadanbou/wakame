@@ -53,7 +53,7 @@ private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "d
 object Katana : Weapon {
 
     override fun handleSimpleAttack(context: AttackContext): InteractionResult {
-        val itemStack = context.itemStack
+        val itemStack = context.itemstack
         val player = context.player
         val katanaState = player.koishify().getOrNull(KatanaState) ?: return InteractionResult.FAIL
         if (katanaState.isArmed.not()) return InteractionResult.FAIL
@@ -116,7 +116,7 @@ object Katana : Weapon {
     }
 
     override fun handleSimpleUse(context: UseContext): InteractionResult {
-        val itemStack = context.itemStack
+        val itemStack = context.itemstack
         val player = context.player
         if (context.hand != InteractionHand.MAIN_HAND) return InteractionResult.FAIL
 

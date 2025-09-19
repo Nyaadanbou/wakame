@@ -22,11 +22,11 @@ object Arrow : ItemBehavior {
      * - 发光时间
      */
     override fun handleProjectileLaunch(context: ProjectileLaunchContext): BehaviorResult {
-        val itemStack = context.itemStack
+        val itemstack = context.itemstack
         val projectile = context.projectile
         if (projectile !is AbstractArrow) return BehaviorResult.PASS
 
-        val arrowProperty = itemStack.getProp(ItemPropertyTypes.ARROW) ?: return BehaviorResult.PASS
+        val arrowProperty = itemstack.getProp(ItemPropertyTypes.ARROW) ?: return BehaviorResult.PASS
 
         projectile.pierceLevel = arrowProperty.pierceLevel
         projectile.pickupStatus = arrowProperty.pickupStatus
@@ -44,12 +44,12 @@ object Arrow : ItemBehavior {
      * - 命中冰冻时间
      */
     override fun handleProjectileHit(context: ProjectileHitContext): BehaviorResult {
-        val itemStack = context.itemStack
+        val itemstack = context.itemstack
         val projectile = context.projectile
         val hitEntity = context.hitEntity ?: return BehaviorResult.PASS
         if (projectile !is AbstractArrow) return BehaviorResult.PASS
 
-        val arrowProperty = itemStack.getProp(ItemPropertyTypes.ARROW) ?: return BehaviorResult.PASS
+        val arrowProperty = itemstack.getProp(ItemPropertyTypes.ARROW) ?: return BehaviorResult.PASS
 
         if (hitEntity.fireTicks < arrowProperty.hitFireTicks) hitEntity.fireTicks = arrowProperty.hitFireTicks
         if (hitEntity.freezeTicks < arrowProperty.hitFrozenTicks) hitEntity.freezeTicks = arrowProperty.hitFrozenTicks
