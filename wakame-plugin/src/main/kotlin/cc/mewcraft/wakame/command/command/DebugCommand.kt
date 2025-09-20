@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.command.command
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
+import cc.mewcraft.wakame.damage.KoishDamageSources
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.damageBundle
 import cc.mewcraft.wakame.damage.hurt
@@ -107,7 +108,7 @@ internal object DebugCommand : KoishCommandFactory<Source> {
                     }
                 }
             )
-            entity.hurt(damageMetadata, sender, true)
+            entity.hurt(damageMetadata, KoishDamageSources.playerAttack(sender), true)
         }
     }
 

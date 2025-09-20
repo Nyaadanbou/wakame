@@ -8,8 +8,6 @@ import cc.mewcraft.wakame.extensions.mul
 import cc.mewcraft.wakame.extensions.plus
 import cc.mewcraft.wakame.util.collision.OBB
 import cc.mewcraft.wakame.util.collision.calculateOrthonormalBasis
-import org.bukkit.damage.DamageSource
-import org.bukkit.damage.DamageType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.joml.Vector3f
@@ -21,10 +19,6 @@ import kotlin.math.sin
 object WeaponUtils {
 
     private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "attack_hitbox").orElse(false)
-
-    fun buildPlayerAttackDamageSource(player: Player): DamageSource {
-        return DamageSource.builder(DamageType.PLAYER_ATTACK).withCausingEntity(player).withDirectEntity(player).build()
-    }
 
     /**
      * 获取基于 [player] 和 特定参数OBB 判定攻击到的生物.

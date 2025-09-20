@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item2.behavior.impl.weapon
 
+import cc.mewcraft.wakame.damage.KoishDamageSources
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.entity.player.attributeContainer
@@ -42,7 +43,7 @@ object DualSword : Weapon {
             }
         }
         val hitEntities = WeaponUtils.getHitEntities(player, 5.0, sword.attackHalfExtentsBase)
-        val damageSource = WeaponUtils.buildPlayerAttackDamageSource(player)
+        val damageSource = KoishDamageSources.playerAttack(player)
         val flag = hitEntities.any { entity ->
             entity.hurt(damageMetadata, damageSource, true)
         }
@@ -97,7 +98,7 @@ object DualSword : Weapon {
             }
         }
         val hitEntities = WeaponUtils.getHitEntities(player, 5.0, offSword.attackHalfExtentsBase)
-        val damageSource = WeaponUtils.buildPlayerAttackDamageSource(player)
+        val damageSource = KoishDamageSources.playerAttack(player)
         val flag = hitEntities.any { entity ->
             entity.hurt(damageMetadata, damageSource, true)
         }
