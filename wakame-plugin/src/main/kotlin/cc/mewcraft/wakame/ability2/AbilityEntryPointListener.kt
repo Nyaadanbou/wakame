@@ -1,9 +1,5 @@
 package cc.mewcraft.wakame.ability2
 
-import cc.mewcraft.wakame.ability2.trigger.AbilitySingleTrigger
-import cc.mewcraft.wakame.entity.player.combo
-import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
-import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerManaConsumeEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerNotEnoughManaEvent
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
@@ -31,18 +27,6 @@ internal object AbilityEntryPointListener : Listener {
     // ------------
     // Ability Entry Point
     // ------------
-
-    @EventHandler
-    fun onLeftClickItem(event: PlayerItemLeftClickEvent) {
-        val player = event.player
-        player.combo.handleTrigger(AbilitySingleTrigger.LEFT_CLICK)
-    }
-
-    @EventHandler
-    fun onRightClickItem(event: PlayerItemRightClickEvent) {
-        val player = event.player
-        player.combo.handleTrigger(AbilitySingleTrigger.RIGHT_CLICK)
-    }
 
     @EventHandler
     fun onManaCost(event: PlayerManaConsumeEvent) {

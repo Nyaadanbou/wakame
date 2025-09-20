@@ -4,7 +4,14 @@ import cc.mewcraft.wakame.item2.behavior.impl.Arrow
 import cc.mewcraft.wakame.item2.behavior.impl.BrewRecipe
 import cc.mewcraft.wakame.item2.behavior.impl.EntityBucket
 import cc.mewcraft.wakame.item2.behavior.impl.HoldLastDamage
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.*
+import cc.mewcraft.wakame.item2.behavior.impl.test.TestInteract
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Bow
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Crossbow
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.DualSword
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Katana
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Mace
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Melee
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Trident
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 
 /**
@@ -17,45 +24,58 @@ object ItemBehaviorTypes {
     // ------------
     // 注册表
     // ------------
+    /**
+     * 物品具有该行为时, 可以测试各种交互.
+     * 仅作为内部测试行为使用.
+     */
+    @JvmField
+    val TEST_INTERACT = typeOf("test_interact", TestInteract)
 
     /**
-     * 将物品作为自定义箭矢的逻辑.
+     * 物品具有该行为时, 可以触发技能组合键.
+     */
+    @JvmField
+    val CASTABLE = typeOf("castable", Castable)
+
+    /**
+     * 物品具有该行为时, 作为箭矢射出和命中时可执行自定义效果.
      */
     @JvmField
     val ARROW = typeOf("arrow", Arrow)
 
     /**
-     * 使物品耐久耗尽后进入“损坏状态”而非直接消失的逻辑.
+     * 物品具有该行为时, 会保留最后的耐久(维持在0).
+     * 可实现物品耐久耗尽时变为不可用状态(“损坏”状态)而不是直接消失.
      */
     @JvmField
     val HOLD_LAST_DAMAGE = typeOf("hold_last_damage", HoldLastDamage)
 
     /**
-     * 当物品是未学习的酒酿配方时, 物品所具有的逻辑.
+     * 物品具有该行为时, 可以使用以揭示酒酿配方.
      */
     @JvmField
     val BREW_RECIPE = typeOf("brew_recipe", BrewRecipe) // ID 故意和 ItemBrewRecipe(ItemData) 保持一致
 
     /**
-     * 作为弓的逻辑.
+     * 物品具有该行为时, 会附加 Koish 对原版弓的额外逻辑.
      */
     @JvmField
     val BOW = typeOf("bow", Bow)
 
     /**
-     * 作为弩的逻辑.
+     * 物品具有该行为时, 会附加 Koish 对原版弩的额外逻辑.
      */
     @JvmField
     val CROSSBOW = typeOf("crossbow", Crossbow)
 
     /**
-     * 作为太刀的逻辑.
+     * 物品具有该行为时, 会附加 Koish 对原版三叉戟的额外逻辑.
      */
     @JvmField
-    val KATANA = typeOf("katana", Katana)
+    val TRIDENT = typeOf("trident", Trident)
 
     /**
-     * 作为锤的逻辑.
+     * 物品具有该行为时, 会附加 Koish 对原版重锤的额外逻辑.
      */
     @JvmField
     val MACE = typeOf("mace", Mace)
@@ -68,19 +88,19 @@ object ItemBehaviorTypes {
     val MELEE = typeOf("melee", Melee)
 
     /**
-     * 作为剑的逻辑.
+     * 物品具有该行为时, 可以作为双剑武器.
      */
     @JvmField
     val DUAL_SWORD = typeOf("dual_sword", DualSword)
 
     /**
-     * 作为三叉戟的逻辑.
+     * 物品具有该行为时, 可以作为太刀武器.
      */
     @JvmField
-    val TRIDENT = typeOf("trident", Trident)
+    val KATANA = typeOf("katana", Katana)
 
     /**
-     * 用桶捕捉生物的逻辑.
+     * 物品具有该行为时, 可以捕捉和释放生物.
      */
     @JvmField
     val ENTITY_BUCKET = typeOf("entity_bucket", EntityBucket)
