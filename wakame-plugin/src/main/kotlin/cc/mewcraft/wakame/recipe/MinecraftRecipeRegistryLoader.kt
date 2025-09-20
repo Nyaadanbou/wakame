@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.eventbus.MapEventBus
@@ -34,7 +35,7 @@ internal object MinecraftRecipeRegistryLoader {
         runTask(::postLoad)
     }
 
-    @InitFun
+    @ReloadFun
     fun reload() {
         load()
         runTask(::postLoad)
