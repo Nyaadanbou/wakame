@@ -15,32 +15,11 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.RESISTANCE
 import org.jetbrains.annotations.ApiStatus
 
 
-fun LivingEntity.hurt(metadata: DamageMetadata, damager: LivingEntity? = null, knockback: Boolean = false) {
-    DamageManagerApi.INSTANCE.hurt(this, metadata, damager, knockback)
-}
-
 fun LivingEntity.hurt(metadata: DamageMetadata, source: DamageSource, knockback: Boolean): Boolean {
     return DamageManagerApi.INSTANCE.hurt(this, metadata, source, knockback)
 }
 
 interface DamageManagerApi {
-
-    /**
-     * 对 [victim] 造成由 [metadata] 指定的自定义伤害.
-     *
-     * 当 [damager] 为 `null` 时, 伤害属于无源, 不会产生击退效果.
-     *
-     * @param victim 受到伤害的实体
-     * @param metadata 伤害的元数据
-     * @param damager 造成伤害的实体
-     * @param knockback 是否产生击退效果
-     */
-    fun hurt(
-        victim: LivingEntity,
-        metadata: DamageMetadata,
-        damager: LivingEntity? = null,
-        knockback: Boolean = true,
-    )
 
     /**
      * 对 [victim] 造成由 [metadata] 指定的自定义伤害.
@@ -55,7 +34,7 @@ interface DamageManagerApi {
         victim: LivingEntity,
         metadata: DamageMetadata,
         source: DamageSource,
-        knockback: Boolean = true,
+        knockback: Boolean,
     ): Boolean
 
     /**
