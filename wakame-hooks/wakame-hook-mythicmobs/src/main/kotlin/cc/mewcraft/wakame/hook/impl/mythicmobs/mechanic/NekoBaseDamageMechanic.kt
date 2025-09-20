@@ -1,6 +1,14 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.mechanic
 
-import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.damage.CriticalStrikeMetadata
+import cc.mewcraft.wakame.damage.CriticalStrikeState
+import cc.mewcraft.wakame.damage.DamageBundle
+import cc.mewcraft.wakame.damage.DamageBundleFactory
+import cc.mewcraft.wakame.damage.DamageManagerApi
+import cc.mewcraft.wakame.damage.DamageMetadata
+import cc.mewcraft.wakame.damage.DamagePacket
+import cc.mewcraft.wakame.damage.KoishDamageSources
+import cc.mewcraft.wakame.util.RecursionGuard
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.ITargetedEntitySkill
@@ -10,7 +18,10 @@ import io.lumine.mythic.api.skills.ThreadSafetyLevel
 import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble
 import io.lumine.mythic.core.skills.SkillExecutor
 import io.lumine.mythic.core.skills.SkillMechanic
+import org.bukkit.damage.DamageSource
+import org.bukkit.damage.DamageType
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
 import java.io.File
 
 class NekoBaseDamageMechanic(
@@ -53,7 +64,14 @@ class NekoBaseDamageMechanic(
                         // 配置文件内指定 element, min, max, rate, defense_penetration
                         5 -> split[0] to DamagePacket(split[0], split[1].toPlaceholderDouble()[data], split[2].toPlaceholderDouble()[data], split[3].toPlaceholderDouble()[data], split[4].toPlaceholderDouble()[data])
                         // 配置文件内指定 element, min, max, rate, defense_penetration, defense_penetration_rate
-                        6 -> split[0] to DamagePacket(split[0], split[1].toPlaceholderDouble()[data], split[2].toPlaceholderDouble()[data], split[3].toPlaceholderDouble()[data], split[4].toPlaceholderDouble()[data], split[5].toPlaceholderDouble()[data])
+                        6 -> split[0] to DamagePacket(
+                            split[0],
+                            split[1].toPlaceholderDouble()[data],
+                            split[2].toPlaceholderDouble()[data],
+                            split[3].toPlaceholderDouble()[data],
+                            split[4].toPlaceholderDouble()[data],
+                            split[5].toPlaceholderDouble()[data]
+                        )
 
                         else -> throw IllegalArgumentException("Invalid damage packet: '$rawPacketString'")
                     }
@@ -83,9 +101,22 @@ class NekoBaseDamageMechanic(
         )
 
         val casterEntity = data.caster?.entity?.bukkitEntity as? LivingEntity
+        val damageSource = if (casterEntity == null) {
+            DamageSource.builder(DamageType.GENERIC).build()
+        } else if (casterEntity is Player) {
+            KoishDamageSources.playerAttack(casterEntity)
+        } else {
+            KoishDamageSources.mobAttack(casterEntity)
+        }
 
-        // 对目标生物造成自定义的萌芽伤害
-        DamageManagerApi.INSTANCE.hurt(entity, damageMetadata, casterEntity, knockback)
+        // 对目标生物造成自定义的萌芽伤害.
+        // 由于愚蠢的mm是监听伤害事件来判断生物进行了攻击, 在某些技能触发器下会产生堆栈溢出.
+        // 在不使用mm的勾丝api的情况下, 可通过直接阻断循环调用来解决问题.
+        RecursionGuard.with(
+            functionName = "hurt", silenceLogs = true
+        ) {
+            DamageManagerApi.INSTANCE.hurt(entity, damageMetadata, damageSource, knockback)
+        }
 
         return SkillResult.SUCCESS
     }

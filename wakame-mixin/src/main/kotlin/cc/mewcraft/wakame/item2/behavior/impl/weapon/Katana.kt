@@ -162,7 +162,7 @@ object Katana : Weapon {
             }
         }
         val hitEntities = WeaponUtils.getHitEntities(player, 5.0, config.horizontalSlashHalfExtentsBase)
-        val damageSource = WeaponUtils.buildPlayerAttackDamageSource(player)
+        val damageSource = KoishDamageSources.playerAttack(player)
         // 造成伤害
         val flag = hitEntities.any { entity ->
             entity.hurt(damageMetadata, damageSource, true)
@@ -204,7 +204,7 @@ object Katana : Weapon {
             }
         }
         val hitEntities = WeaponUtils.getHitEntities(player, 5.0, config.spiritBladeSlashHalfExtentsBase, angel)
-        val damageSource = WeaponUtils.buildPlayerAttackDamageSource(player)
+        val damageSource = KoishDamageSources.playerAttack(player)
         // 造成伤害
         val flag = hitEntities.any { entity ->
             entity.hurt(damageMetadata, damageSource, true)
@@ -302,7 +302,7 @@ object Katana : Weapon {
                 }
             }
         }
-        val damageSource = WeaponUtils.buildPlayerAttackDamageSource(player)
+        val damageSource = KoishDamageSources.playerAttack(player)
         // 造成伤害
         val flag = hitEntities.any { entity ->
             entity.hurt(damageMetadata, damageSource, true)
@@ -348,7 +348,7 @@ object Katana : Weapon {
             }
         }
         val hitEntities = WeaponUtils.getHitEntities(player, 5.0, config.foresightSlashHalfExtentsBase)
-        val damageSource = WeaponUtils.buildPlayerAttackDamageSource(player)
+        val damageSource = KoishDamageSources.playerAttack(player)
         // 造成伤害
         val flag = hitEntities.any { entity ->
             entity.hurt(damageMetadata, damageSource, true)
