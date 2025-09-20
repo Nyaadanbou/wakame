@@ -4,8 +4,10 @@ import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
 import cc.mewcraft.wakame.item2.config.property.impl.Arrow
+import cc.mewcraft.wakame.item2.config.property.impl.EnchantSlotCapacity
 import cc.mewcraft.wakame.item2.config.property.impl.EntityBucket
 import cc.mewcraft.wakame.item2.config.property.impl.ExtraLore
+import cc.mewcraft.wakame.item2.config.property.impl.Fuel
 import cc.mewcraft.wakame.item2.config.property.impl.HoldLastDamageSettings
 import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
