@@ -162,9 +162,13 @@ object Katana : Weapon {
             }
         }
         val hitEntities = WeaponUtils.getHitEntities(player, 5.0, config.horizontalSlashHalfExtentsBase)
-        if (hitEntities.isNotEmpty()) {
-            // 造成伤害
-            hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
+        val damageSource = KoishDamageSources.playerAttack(player)
+        // 造成伤害
+        val flag = hitEntities.any { entity ->
+            entity.hurt(damageMetadata, damageSource, true)
+        }
+        // 如果成功造成了伤害
+        if (flag) {
             // 增加气刃值
             katanaState.addBladeSpirit(config.horizontalSlashSpiritReward)
             // 设置耐久
@@ -200,9 +204,13 @@ object Katana : Weapon {
             }
         }
         val hitEntities = WeaponUtils.getHitEntities(player, 5.0, config.spiritBladeSlashHalfExtentsBase, angel)
-        if (hitEntities.isNotEmpty()) {
-            // 造成伤害
-            hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
+        val damageSource = KoishDamageSources.playerAttack(player)
+        // 造成伤害
+        val flag = hitEntities.any { entity ->
+            entity.hurt(damageMetadata, damageSource, true)
+        }
+        // 如果成功造成了伤害
+        if (flag) {
             // 设置耐久
             player.damageItem(EquipmentSlot.HAND, config.itemDamagePerAttack)
         }
@@ -294,9 +302,13 @@ object Katana : Weapon {
                 }
             }
         }
-        if (hitEntities.isNotEmpty()) {
-            // 造成伤害
-            hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
+        val damageSource = KoishDamageSources.playerAttack(player)
+        // 造成伤害
+        val flag = hitEntities.any { entity ->
+            entity.hurt(damageMetadata, damageSource, true)
+        }
+        // 如果成功造成了伤害
+        if (flag) {
             // 提升气刃等级
             katanaState.upgradeBladeLevel()
             // 设置耐久
@@ -336,9 +348,13 @@ object Katana : Weapon {
             }
         }
         val hitEntities = WeaponUtils.getHitEntities(player, 5.0, config.foresightSlashHalfExtentsBase)
-        if (hitEntities.isNotEmpty()) {
-            // 造成伤害
-            hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
+        val damageSource = KoishDamageSources.playerAttack(player)
+        // 造成伤害
+        val flag = hitEntities.any { entity ->
+            entity.hurt(damageMetadata, damageSource, true)
+        }
+        // 如果成功造成了伤害
+        if (flag) {
             // 设置耐久
             player.damageItem(EquipmentSlot.HAND, config.itemDamagePerAttack)
             // 标记命中生物

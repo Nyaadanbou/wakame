@@ -14,11 +14,9 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BLOCKING
 import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.RESISTANCE
 import org.jetbrains.annotations.ApiStatus
 
-/**
- * @see DamageManagerApi.hurt
- */
-fun LivingEntity.hurt(damageMetadata: DamageMetadata, source: LivingEntity? = null, knockback: Boolean = false) {
-    DamageManagerApi.INSTANCE.hurt(this, damageMetadata, source, knockback)
+
+fun LivingEntity.hurt(metadata: DamageMetadata, source: DamageSource, knockback: Boolean): Boolean {
+    return DamageManagerApi.INSTANCE.hurt(this, metadata, source, knockback)
 }
 
 interface DamageManagerApi {
@@ -26,19 +24,18 @@ interface DamageManagerApi {
     /**
      * 对 [victim] 造成由 [metadata] 指定的自定义伤害.
      *
-     * 当 [damager] 为 `null` 时, 伤害属于无源, 不会产生击退效果.
-     *
      * @param victim 受到伤害的实体
      * @param metadata 伤害的元数据
-     * @param damager 造成伤害的实体
+     * @param source 伤害来源信息
      * @param knockback 是否产生击退效果
+     * @return 是否真的造成了伤害及其附加效果. 诸如生物无敌, 免疫该伤害, 伤害事件被取消等情况会返回 false.
      */
     fun hurt(
         victim: LivingEntity,
         metadata: DamageMetadata,
-        damager: LivingEntity? = null,
-        knockback: Boolean = false,
-    )
+        source: DamageSource,
+        knockback: Boolean,
+    ): Boolean
 
     /**
      * 将插入到原版伤害系统触发 [EntityDamageEvent] 之后、造成实际伤害效果(扣血, 装备损失耐久等)之前的位置.

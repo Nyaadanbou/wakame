@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.command.command
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
+import cc.mewcraft.wakame.damage.KoishDamageSources
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.damageBundle
 import cc.mewcraft.wakame.damage.hurt
@@ -95,7 +96,7 @@ internal object DebugCommand : KoishCommandFactory<Source> {
         val damage = context.get<Double>("damage")
         val target = context.getOrNull<MultipleEntitySelector>("target")?.values() ?: listOf(sender)
         target.filterIsInstance<LivingEntity>().forEach { entity ->
-            val damageMeta = PlayerDamageMetadata(
+            val damageMetadata = PlayerDamageMetadata(
                 attributes = sender.attributeContainer.getSnapshot(),
                 damageBundle = damageBundle {
                     default {
@@ -107,7 +108,7 @@ internal object DebugCommand : KoishCommandFactory<Source> {
                     }
                 }
             )
-            entity.hurt(damageMetadata = damageMeta, source = sender)
+            entity.hurt(damageMetadata, KoishDamageSources.playerAttack(sender), true)
         }
     }
 

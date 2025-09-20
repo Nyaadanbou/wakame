@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item2.behavior.impl.weapon
 
+import cc.mewcraft.wakame.damage.KoishDamageSources
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.entity.player.attributeContainer
@@ -49,11 +50,14 @@ object Melee : Weapon {
                     standard()
                 }
             }
+            val damageSource = KoishDamageSources.playerAttack(player)
             // 造成伤害
-            hitEntity.hurt(damageMetadata, player, true)
-
-            // 设置耐久
-            player.damageItem(event.hand, melee.itemDamagePerAttack)
+            val flag = hitEntity.hurt(damageMetadata, damageSource, true)
+            // 如果成功造成了伤害
+            if (flag) {
+                // 设置耐久
+                player.damageItem(event.hand, melee.itemDamagePerAttack)
+            }
             // 设置冷却
             // 命中实体才进入冷却
             itemstack.addCooldown(player, melee.attackCooldown)
