@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item2.behavior
 
 import cc.mewcraft.wakame.item2.behavior.impl.Arrow
 import cc.mewcraft.wakame.item2.behavior.impl.BrewRecipe
+import cc.mewcraft.wakame.item2.behavior.impl.Castable
 import cc.mewcraft.wakame.item2.behavior.impl.EntityBucket
 import cc.mewcraft.wakame.item2.behavior.impl.HoldLastDamage
 import cc.mewcraft.wakame.item2.behavior.impl.test.TestInteract
