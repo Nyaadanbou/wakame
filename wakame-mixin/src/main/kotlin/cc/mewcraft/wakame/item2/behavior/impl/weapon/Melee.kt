@@ -58,7 +58,7 @@ object Melee : Weapon {
             // 如果成功造成了伤害
             if (flag) {
                 // 设置耐久
-                player.damageItem(event.hand, melee.itemDamagePerAttack)
+                player.damageItem(EquipmentSlot.HAND, melee.itemDamagePerAttack)
             }
             // 设置冷却
             // 命中实体才进入冷却
