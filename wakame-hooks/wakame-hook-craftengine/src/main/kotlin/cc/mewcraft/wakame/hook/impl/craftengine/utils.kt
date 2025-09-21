@@ -40,11 +40,13 @@ fun UseOnContext.toCraftEngine(): CEUseOnContext {
 fun CEInteractionResult.toKoish(): InteractionResult {
     return when (this) {
         CEInteractionResult.PASS -> InteractionResult.PASS
-        CEInteractionResult.FAIL -> InteractionResult.FAIL
-        CEInteractionResult.SUCCESS -> InteractionResult.SUCCESS
+
+        // 取消事件是为了不触发后续ce对交互的判定
+        CEInteractionResult.FAIL -> InteractionResult.FAIL_AND_CANCEL
+        CEInteractionResult.SUCCESS,
         CEInteractionResult.SUCCESS_AND_CANCEL -> InteractionResult.SUCCESS_AND_CANCEL
+
         // 在 Koish 的物品行为系统中不可能发生, 因为 Koish 物品行为触发时必定有物品
-        // 为了代码优雅, 恰好可以返回一个失败且取消事件
         CEInteractionResult.TRY_EMPTY_HAND -> InteractionResult.FAIL_AND_CANCEL
     }
 }
