@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item2.config.property
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
@@ -185,6 +186,17 @@ data object ItemPropTypes {
     private inline fun <reified T> typeOf(id: String, block: ItemPropertyType.Builder<T>.() -> Unit = {}): ItemPropertyType<T> {
         val type = ItemPropertyType.builder(typeTokenOf<T>()).apply(block).build()
         return type.also { BuiltInRegistries.ITEM_PROPERTY_TYPE.add(id, it) }
+    }
+
+    /**
+     * 提供给外部注册物品属性.
+     */
+    inline fun <reified T> register(id: String, block: ItemPropertyType.Builder<T>.() -> Unit = {}): ItemPropertyType<T> {
+        val type = ItemPropertyType.builder(typeTokenOf<T>()).apply(block).build()
+        return type.also {
+            BuiltInRegistries.ITEM_PROPERTY_TYPE.add(id, it)
+            LOGGER.info("Registered extra item property: $id")
+        }
     }
 
     // ------------

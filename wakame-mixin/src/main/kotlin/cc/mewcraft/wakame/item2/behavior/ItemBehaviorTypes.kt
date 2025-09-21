@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item2.behavior
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item2.behavior.impl.Arrow
 import cc.mewcraft.wakame.item2.behavior.impl.BrewRecipe
 import cc.mewcraft.wakame.item2.behavior.impl.Castable
@@ -112,6 +113,16 @@ object ItemBehaviorTypes {
 
     private fun typeOf(id: String, type: ItemBehavior): ItemBehavior {
         return type.also { BuiltInRegistries.ITEM_BEHAVIOR.add(id, it) }
+    }
+
+    /**
+     * 提供给外部注册物品行为.
+     */
+    fun register(id: String, type: ItemBehavior): ItemBehavior {
+        return type.also {
+            BuiltInRegistries.ITEM_BEHAVIOR.add(id, it)
+            LOGGER.info("Registered extra item behavior: $id")
+        }
     }
 
 }

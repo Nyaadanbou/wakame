@@ -1,25 +1,30 @@
 package cc.mewcraft.wakame.hook.impl.craftengine
 
+import cc.mewcraft.wakame.hook.impl.craftengine.item.behavior.impl.PlaceBlock
+import cc.mewcraft.wakame.hook.impl.craftengine.item.behavior.impl.PlaceDoubleHighBlock
+import cc.mewcraft.wakame.hook.impl.craftengine.item.behavior.impl.PlaceLiquidCollisionBlock
 import cc.mewcraft.wakame.integration.Hook
-import net.momirealms.craftengine.bukkit.api.BukkitAdaptors
-import net.momirealms.craftengine.core.entity.furniture.FurnitureExtraData
-import net.momirealms.craftengine.core.plugin.CraftEngine
-import net.momirealms.craftengine.core.util.Key
-import net.momirealms.craftengine.core.world.WorldPosition
-import net.momirealms.craftengine.libraries.nbt.CompoundTag
-import org.bukkit.Location
-import kotlin.jvm.optionals.getOrNull
+import cc.mewcraft.wakame.item2.behavior.ItemBehaviorTypes
+import cc.mewcraft.wakame.item2.config.property.ItemPropTypes
+import cc.mewcraft.wakame.util.Identifier
 
 @Hook(plugins = ["CraftEngine"])
 object CraftEngineHook {
+    init {
+        // 触发子 object 的初始化
+        ExtraItemPropTypes
+        ExtraItemBehaviorTypes
+    }
 
-    // TODO Koish 需要有一套基本的家具接口
+    object ExtraItemPropTypes {
+        val PLACE_BLOCK = ItemPropTypes.register<Identifier>("place_block")
+        val PLACE_LIQUID_COLLISION_BLOCK = ItemPropTypes.register<Identifier>("place_liquid_collision_block")
+        val PLACE_DOUBLE_HIGH_BLOCK = ItemPropTypes.register<Identifier>("place_double_high_block")
+    }
 
-    fun test(loc: Location) {
-        val furniture = CraftEngine.instance().furnitureManager().furnitureById(Key.of("furniture", "chair")).getOrNull() ?: return
-        val worldPos = WorldPosition(BukkitAdaptors.adapt(loc.world), loc.x, loc.y, loc.z)
-        val extraData = FurnitureExtraData(CompoundTag())
-        val playSound = true
-        CraftEngine.instance().furnitureManager().place(worldPos, furniture, extraData, playSound)
+    object ExtraItemBehaviorTypes {
+        val PLACE_BLOCK = ItemBehaviorTypes.register("place_block", PlaceBlock)
+        val PLACE_LIQUID_COLLISION_BLOCK = ItemBehaviorTypes.register("place_liquid_collision_block", PlaceLiquidCollisionBlock)
+        val PLACE_DOUBLE_HIGH_BLOCK = ItemBehaviorTypes.register("place_double_high_block", PlaceDoubleHighBlock)
     }
 }
