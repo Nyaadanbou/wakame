@@ -9,7 +9,12 @@ import cc.mewcraft.wakame.entity.hologram.AnimationData
 import cc.mewcraft.wakame.entity.hologram.Hologram
 import cc.mewcraft.wakame.entity.hologram.TextHologramData
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
-import cc.mewcraft.wakame.extensions.*
+import cc.mewcraft.wakame.extensions.cross
+import cc.mewcraft.wakame.extensions.minus
+import cc.mewcraft.wakame.extensions.mul
+import cc.mewcraft.wakame.extensions.plus
+import cc.mewcraft.wakame.extensions.toLocation
+import cc.mewcraft.wakame.extensions.toVector3f
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -27,7 +32,11 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.Color
 import org.bukkit.Location
-import org.bukkit.entity.*
+import org.bukkit.entity.Display
+import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+import org.bukkit.entity.TextDisplay
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.joml.Vector3f
@@ -75,7 +84,7 @@ internal object DamageDisplay : Listener {
         registerEvents()
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     fun on(event: PostprocessDamageEvent) {
         val damagee = event.damagee as? LivingEntity ?: return
         val damageeLoc = damagee.location
