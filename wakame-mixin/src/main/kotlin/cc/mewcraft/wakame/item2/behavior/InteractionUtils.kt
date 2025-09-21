@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item2.behavior
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.extensions.toLocation
+import cc.mewcraft.wakame.item2.behavior.CustomBlockChecker.Companion.isCustomBlock
 import cc.mewcraft.wakame.item2.behavior.InteractableBlocks.INTERACTABLE_BLOCKS
 import cc.mewcraft.wakame.item2.behavior.InteractableEntities.INTERACTABLE_ENTITIES
 import io.papermc.paper.entity.Shearable
@@ -43,6 +44,7 @@ import org.bukkit.entity.memory.MemoryKey
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
+import org.jetbrains.annotations.ApiStatus
 import org.joml.Vector3d
 
 data class UseOnContext(
@@ -50,7 +52,7 @@ data class UseOnContext(
     override val itemstack: ItemStack,
     val hand: InteractionHand,
     val interactContext: BlockInteractContext
-): ItemBehaviorContext {
+) : ItemBehaviorContext {
     val world: World
         get() = player.world
 
@@ -71,7 +73,7 @@ data class UseContext(
     override val player: Player,
     override val itemstack: ItemStack,
     val hand: InteractionHand,
-): ItemBehaviorContext {
+) : ItemBehaviorContext {
     val world: World
         get() = player.world
 }
@@ -81,7 +83,7 @@ data class UseEntityContext(
     override val itemstack: ItemStack,
     val hand: InteractionHand,
     val entity: Entity
-): ItemBehaviorContext {
+) : ItemBehaviorContext {
     val world: World
         get() = player.world
 }
@@ -91,7 +93,7 @@ data class AttackOnContext(
     override val itemstack: ItemStack,
     val blockPosition: Vector3d,
     val interactFace: BlockFace,
-): ItemBehaviorContext {
+) : ItemBehaviorContext {
     val world: World
         get() = player.world
 }
@@ -99,7 +101,7 @@ data class AttackOnContext(
 data class AttackContext(
     override val player: Player,
     override val itemstack: ItemStack,
-): ItemBehaviorContext {
+) : ItemBehaviorContext {
     val world: World
         get() = player.world
 }
@@ -108,7 +110,7 @@ data class AttackEntityContext(
     override val player: Player,
     override val itemstack: ItemStack,
     val entity: Entity
-): ItemBehaviorContext {
+) : ItemBehaviorContext {
     val world: World
         get() = player.world
 }
@@ -170,6 +172,11 @@ fun InteractionResult.shouldCancel(): Boolean {
 
 private object InteractableBlocks {
     val INTERACTABLE_BLOCKS: Reference2ObjectMap<BlockType, (player: Player, itemStack: ItemStack, blockData: BlockData, interactContext: BlockInteractContext) -> Boolean> = Reference2ObjectOpenHashMap()
+
+    init {
+        // 载入默认的自定义方块检查器
+        CustomBlockChecker.register(DefaultCustomBlockChecker)
+    }
 
     // 该列表并不全面, 但基本够用
     // 例如, 未考虑: 可参与营火配方的物品会触发营火的方块交互, 炼药锅的各种交互
@@ -832,6 +839,11 @@ private object InteractableEntities {
  * 那如果希望堆肥的时候触发自定义行为该怎么办呢? 应该新增一个handlePlayerCompostItem(...), 而不是在交互行为里面去实现.
  */
 fun Block.isInteractable(player: Player, itemStack: ItemStack, interactContext: BlockInteractContext): Boolean {
+    // 如果方块是自定义方块, 认为不可交互
+    // 自定义方块的交互判定在 Koish 的交互判定之前, 代码执行到此处, 自定义方块的交互早已检查过
+    // 如果当时自定义方块可交互, 代码不会执行到此处
+    // 因此, 此时自定义方块方块必然不可交互
+    if (isCustomBlock()) return false
     val blockType = this.type.asBlockType() ?: return false // 不可能在此处return
     val checkLogic = INTERACTABLE_BLOCKS[blockType] ?: return false
     return checkLogic(player, itemStack, blockData, interactContext)
@@ -846,3 +858,40 @@ fun Entity.isInteractable(player: Player, itemStack: ItemStack): Boolean {
     val checkLogic = INTERACTABLE_ENTITIES[this.type] ?: return false
     return checkLogic(player, itemStack, this)
 }
+
+/**
+ * 自定义方块检查器.
+ */
+interface CustomBlockChecker {
+    fun isCustomBlock(block: Block): Boolean
+
+    /**
+     * 伴生对象, 提供 [CustomBlockChecker] 的实例.
+     */
+    companion object {
+
+        @get:JvmName("getInstance")
+        lateinit var INSTANCE: CustomBlockChecker
+            private set
+
+        @ApiStatus.Internal
+        fun register(instance: CustomBlockChecker) {
+            this.INSTANCE = instance
+        }
+
+        fun Block.isCustomBlock(): Boolean {
+            return INSTANCE.isCustomBlock(this)
+        }
+
+    }
+}
+
+/**
+ * 默认的自定义方块检查器.
+ */
+object DefaultCustomBlockChecker : CustomBlockChecker {
+    override fun isCustomBlock(block: Block): Boolean {
+        return false
+    }
+}
+
