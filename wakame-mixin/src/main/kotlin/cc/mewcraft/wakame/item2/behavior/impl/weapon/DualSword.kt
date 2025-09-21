@@ -8,9 +8,6 @@ import cc.mewcraft.wakame.item2.behavior.AttackContext
 import cc.mewcraft.wakame.item2.behavior.InteractionHand
 import cc.mewcraft.wakame.item2.behavior.InteractionResult
 import cc.mewcraft.wakame.item2.behavior.UseContext
-import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
-import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
-import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.item2.config.property.ItemPropTypes
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotGroup
@@ -21,8 +18,6 @@ import cc.mewcraft.wakame.item2.extension.damageItem
 import cc.mewcraft.wakame.item2.extension.isOnCooldown
 import cc.mewcraft.wakame.item2.getData
 import cc.mewcraft.wakame.item2.getProp
-import cc.mewcraft.wakame.item2.getProp
-import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 
 /**
@@ -71,7 +66,7 @@ object DualSword : Weapon {
         // 副手物品处于冷却 - 不处理
         if (itemInOffHand.isOnCooldown(player)) return InteractionResult.FAIL
         // 副手物品不是剑 - 不处理
-        val offSword = itemInOffHand.getProp(ItemPropTypes.DUAL_SWORD) ?: return
+        val offSword = itemInOffHand.getProp(ItemPropTypes.DUAL_SWORD) ?: return InteractionResult.FAIL
 
         val attributeContainerSnapshot = player.attributeContainer.getSnapshot()
         // 如果主手剑位于主手时提供属性修饰符, 才需要移除
@@ -110,7 +105,7 @@ object DualSword : Weapon {
         // 设置冷却
         itemInOffHand.addCooldown(player, offSword.attackCooldown)
         // 挥动副手动画
-        player.swingOffHand() //FIXME 副手动画会触发交互事件
+        player.swingOffHand() // FIXME 副手动画会触发交互事件
         return InteractionResult.SUCCESS
     }
 }
