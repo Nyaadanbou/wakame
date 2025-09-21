@@ -28,7 +28,6 @@ import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.getData
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.RecursionGuard
 import cc.mewcraft.wakame.util.handle
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.serverLevel
@@ -156,31 +155,6 @@ internal object DamageManager : DamageManagerApi {
         EntityType.ARROW,
         EntityType.SPECTRAL_ARROW
     )
-
-    /**
-     * 对 [victim] 造成由 [metadata] 指定的萌芽伤害.
-     *
-     * 当 [damager] 为 `null` 时伤害属于无源, 不会产生击退.
-     */
-    override fun hurt(
-        victim: LivingEntity,
-        metadata: DamageMetadata,
-        damager: LivingEntity?,
-        knockback: Boolean,
-    ) = RecursionGuard.with(
-        functionName = "hurt", silenceLogs = true
-    ) {
-        victim.registerDamage(metadata)
-
-        // 如果自定义伤害有源且需要取消击退.
-        // 无源伤害 (即没有造成伤害的 LivingEntity) 不会触发击退事件.
-        if (!knockback && damager != null) {
-            victim.registerCancelKnockback()
-        }
-
-        // 造成伤害
-        DamageApplier.INSTANCE.damage(victim, damager, PLACEHOLDER_DAMAGE_VALUE)
-    }
 
     /**
      * 对 [victim] 造成由 [metadata] 指定的萌芽伤害.
