@@ -69,6 +69,13 @@ data object ItemMetaTypes {
     val TOOLTIP_DISPLAY: ItemMetaType<MetaTooltipDisplay, TooltipDisplay> = typeOf("tooltip_display")
 
     @JvmField
+    val ITEM_MODEL: ItemMetaType<MetaItemModel, Key> = typeOf("item_model") {
+        serializers {
+            registerExact(MetaItemModel.SERIALIZER)
+        }
+    }
+
+    @JvmField
     val KIZAMI: ItemMetaType<MetaKizami, Set<RegistryEntry<Kizami>>> = typeOf("kizami") {
         serializers {
             registerExact(MetaKizami.SERIALIZER)
