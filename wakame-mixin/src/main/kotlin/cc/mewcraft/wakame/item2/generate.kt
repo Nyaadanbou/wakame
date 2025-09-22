@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaContainer
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaType
-import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item2.config.property.ItemPropTypes
 import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
 import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
@@ -66,27 +66,24 @@ object KoishStackGenerator {
         dataContainer[ItemDataTypes.VERSION] = SharedConstants.DATA_VERSION
         dataContainer[ItemDataTypes.VARIANT] = 0
 
-        // 测试写入类型为 Unit 的数据
-        dataContainer[ItemDataTypes.BYPASS_NETWORK_REWRITE] = Unit
-
         // 直接操作 MojangStack 以提高生成物品的速度
-        val itemBase = type.properties.getOrDefault(ItemPropertyTypes.BASE, ItemBase.EMPTY)
-        val itemStack = itemBase.createMojang()
+        val itembase = type.properties.getOrDefault(ItemPropTypes.BASE, ItemBase.EMPTY)
+        val itemstack = itembase.createMojang()
 
         // 在把 ItemStack 传递到 ItemMetaEntry 之前, 需要先将 ItemDataContainer 写入到 ItemStack.
         // 否则按照目前的实现, 简单的使用 ItemStack.setData 是无法将数据写入到 ItemStack 的,
         // 因为 ItemStack.setData 只有在 ItemDataContainer 存在时才能写入数据
-        itemStack.set(ExtraDataComponents.DATA_CONTAINER, dataContainer.build())
+        itemstack.set(ExtraDataComponents.DATA_CONTAINER, dataContainer.build())
 
         // 获取 ItemData 的“配置文件” (ItemMetaContainer)
         val dataConfig = type.dataConfig
 
         // 从 ItemMetaContainer 生成数据, 然后写入到物品堆叠上
         for (metaType in BuiltInRegistries.ITEM_META_TYPE) {
-            makePersistentDataThenWrite(metaType, dataConfig, itemStack, context)
+            makePersistentDataThenWrite(metaType, dataConfig, itemstack, context)
         }
 
-        return itemStack.toBukkit()
+        return itemstack.toBukkit()
     }
 
     private fun <U : ItemMetaEntry<V>, V> makePersistentDataThenWrite(
