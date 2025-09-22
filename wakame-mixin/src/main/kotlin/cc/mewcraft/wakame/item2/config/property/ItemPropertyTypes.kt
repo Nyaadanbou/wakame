@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item2.config.property
 
-import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
@@ -13,6 +12,7 @@ import cc.mewcraft.wakame.item2.config.property.impl.HoldLastDamageSettings
 import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotGroup
+import cc.mewcraft.wakame.item2.config.property.impl.hook.craftengine.LiquidCollisionBlockSettings
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.DualSword
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.Katana
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.Melee
@@ -175,6 +175,17 @@ data object ItemPropTypes {
     @JvmField
     val FUEL: ItemPropertyType<Fuel> = typeOf("fuel")
 
+    // 需要安装对应插件才能正常运行
+    // 需要 CraftEngine
+    @JvmField
+    val PLACE_BLOCK = typeOf<Identifier>("place_block")
+
+    @JvmField
+    val PLACE_LIQUID_COLLISION_BLOCK = typeOf<LiquidCollisionBlockSettings>("place_liquid_collision_block")
+
+    @JvmField
+    val PLACE_DOUBLE_HIGH_BLOCK = typeOf<Identifier>("place_double_high_block")
+
     // ------------
     // 方便函数
     // ------------
@@ -186,17 +197,6 @@ data object ItemPropTypes {
     private inline fun <reified T> typeOf(id: String, block: ItemPropertyType.Builder<T>.() -> Unit = {}): ItemPropertyType<T> {
         val type = ItemPropertyType.builder(typeTokenOf<T>()).apply(block).build()
         return type.also { BuiltInRegistries.ITEM_PROPERTY_TYPE.add(id, it) }
-    }
-
-    /**
-     * 提供给外部注册物品属性.
-     */
-    inline fun <reified T> register(id: String, block: ItemPropertyType.Builder<T>.() -> Unit = {}): ItemPropertyType<T> {
-        val type = ItemPropertyType.builder(typeTokenOf<T>()).apply(block).build()
-        return type.also {
-            BuiltInRegistries.ITEM_PROPERTY_TYPE.add(id, it)
-            LOGGER.info("Registered extra item property: $id")
-        }
     }
 
     // ------------

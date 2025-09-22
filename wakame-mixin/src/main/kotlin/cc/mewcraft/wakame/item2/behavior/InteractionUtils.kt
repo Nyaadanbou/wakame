@@ -173,11 +173,6 @@ fun InteractionResult.shouldCancel(): Boolean {
 private object InteractableBlocks {
     val INTERACTABLE_BLOCKS: Reference2ObjectMap<BlockType, (player: Player, itemStack: ItemStack, blockData: BlockData, interactContext: BlockInteractContext) -> Boolean> = Reference2ObjectOpenHashMap()
 
-    init {
-        // 载入默认的自定义方块检查器
-        CustomBlockChecker.register(DefaultCustomBlockChecker)
-    }
-
     // 该列表并不全面, 但基本够用
     // 例如, 未考虑: 可参与营火配方的物品会触发营火的方块交互, 炼药锅的各种交互
     // 这些交互都很复杂, 但共同点是都有特定的物品要求
@@ -871,7 +866,7 @@ interface CustomBlockChecker {
     companion object {
 
         @get:JvmName("getInstance")
-        lateinit var INSTANCE: CustomBlockChecker
+        var INSTANCE: CustomBlockChecker = Default
             private set
 
         @ApiStatus.Internal
@@ -889,7 +884,7 @@ interface CustomBlockChecker {
 /**
  * 默认的自定义方块检查器.
  */
-object DefaultCustomBlockChecker : CustomBlockChecker {
+private object Default : CustomBlockChecker {
     override fun isCustomBlock(block: Block): Boolean {
         return false
     }

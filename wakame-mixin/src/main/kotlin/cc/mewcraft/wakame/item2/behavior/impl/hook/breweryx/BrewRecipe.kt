@@ -1,10 +1,11 @@
-package cc.mewcraft.wakame.item2.behavior.impl
+package cc.mewcraft.wakame.item2.behavior.impl.hook.breweryx
 
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.brewery.BrewRecipeManager
 import cc.mewcraft.wakame.brewery.BrewRecipeRenderer
 import cc.mewcraft.wakame.item2.behavior.InteractionResult
 import cc.mewcraft.wakame.item2.behavior.UseContext
+import cc.mewcraft.wakame.item2.behavior.impl.SimpleInteract
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.getData
 import cc.mewcraft.wakame.item2.setData

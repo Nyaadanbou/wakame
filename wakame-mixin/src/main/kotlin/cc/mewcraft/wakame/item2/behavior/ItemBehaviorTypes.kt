@@ -1,11 +1,13 @@
 package cc.mewcraft.wakame.item2.behavior
 
-import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item2.behavior.impl.Arrow
-import cc.mewcraft.wakame.item2.behavior.impl.BrewRecipe
 import cc.mewcraft.wakame.item2.behavior.impl.Castable
 import cc.mewcraft.wakame.item2.behavior.impl.EntityBucket
 import cc.mewcraft.wakame.item2.behavior.impl.HoldLastDamage
+import cc.mewcraft.wakame.item2.behavior.impl.hook.breweryx.BrewRecipe
+import cc.mewcraft.wakame.item2.behavior.impl.hook.craftengine.PlaceBlock
+import cc.mewcraft.wakame.item2.behavior.impl.hook.craftengine.PlaceDoubleHighBlock
+import cc.mewcraft.wakame.item2.behavior.impl.hook.craftengine.PlaceLiquidCollisionBlock
 import cc.mewcraft.wakame.item2.behavior.impl.test.TestInteract
 import cc.mewcraft.wakame.item2.behavior.impl.weapon.Bow
 import cc.mewcraft.wakame.item2.behavior.impl.weapon.Crossbow
@@ -51,12 +53,6 @@ object ItemBehaviorTypes {
      */
     @JvmField
     val HOLD_LAST_DAMAGE = typeOf("hold_last_damage", HoldLastDamage)
-
-    /**
-     * 物品具有该行为时, 可以使用以揭示酒酿配方.
-     */
-    @JvmField
-    val BREW_RECIPE = typeOf("brew_recipe", BrewRecipe) // ID 故意和 ItemBrewRecipe(ItemData) 保持一致
 
     /**
      * 物品具有该行为时, 会附加 Koish 对原版弓的额外逻辑.
@@ -107,22 +103,39 @@ object ItemBehaviorTypes {
     @JvmField
     val ENTITY_BUCKET = typeOf("entity_bucket", EntityBucket)
 
+    // 需要安装对应插件才能正常运行
+    // 需要 BreweryX
+    /**
+     * 物品具有该行为时, 可以使用以揭示酒酿配方.
+     */
+    @JvmField
+    val BREW_RECIPE = typeOf("brew_recipe", BrewRecipe) // ID 故意和 ItemBrewRecipe(ItemData) 保持一致
+
+    // 需要 CraftEngine
+    /**
+     * 物品具有该行为时, 可以使用以放置普通自定义方块(类似石头、台阶等原版方块).
+     */
+    @JvmField
+    val PLACE_BLOCK = typeOf("place_block", PlaceBlock)
+
+    /**
+     * 物品具有该行为时, 可以使用以放置流体碰撞方块(类似睡莲等原版方块).
+     */
+    @JvmField
+    val PLACE_LIQUID_COLLISION_BLOCK = typeOf("place_liquid_collision_block", PlaceLiquidCollisionBlock)
+
+    /**
+     * 物品具有该行为时, 可以使用以放置两格高方块(类似门等原版方块).
+     */
+    @JvmField
+    val PLACE_DOUBLE_HIGH_BLOCK = typeOf("place_double_high_block", PlaceDoubleHighBlock)
+
     // ------------
     // 方便函数
     // ------------
 
     private fun typeOf(id: String, type: ItemBehavior): ItemBehavior {
         return type.also { BuiltInRegistries.ITEM_BEHAVIOR.add(id, it) }
-    }
-
-    /**
-     * 提供给外部注册物品行为.
-     */
-    fun register(id: String, type: ItemBehavior): ItemBehavior {
-        return type.also {
-            BuiltInRegistries.ITEM_BEHAVIOR.add(id, it)
-            LOGGER.info("Registered extra item behavior: $id")
-        }
     }
 
 }

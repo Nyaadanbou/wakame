@@ -97,3 +97,8 @@ interface ItemBehavior {
     // 例如StopUse就不被 HoldLastDamage 行为处理, 毕竟StopUse只可能由交互产生.
     // 而交互已然被 HoldLastDamage 行为考虑在内, 因此无需冗余代码.
 }
+
+/**
+ * 无任何行为的 [ItemBehavior].
+ */
+object EmptyItemBehavior : ItemBehavior

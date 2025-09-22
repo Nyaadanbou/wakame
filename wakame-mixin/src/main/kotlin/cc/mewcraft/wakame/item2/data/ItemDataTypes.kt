@@ -1,7 +1,14 @@
 package cc.mewcraft.wakame.item2.data
 
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item2.data.impl.*
+import cc.mewcraft.wakame.item2.data.impl.Core
+import cc.mewcraft.wakame.item2.data.impl.CoreContainer
+import cc.mewcraft.wakame.item2.data.impl.EntityBucketInfo
+import cc.mewcraft.wakame.item2.data.impl.ItemBrewRecipe
+import cc.mewcraft.wakame.item2.data.impl.ItemCrate
+import cc.mewcraft.wakame.item2.data.impl.ItemId
+import cc.mewcraft.wakame.item2.data.impl.ItemLevel
+import cc.mewcraft.wakame.item2.data.impl.ReforgeHistory
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
@@ -87,9 +94,6 @@ data object ItemDataTypes {
     }
 
     @JvmField
-    val BREW_RECIPE: ItemDataType<ItemBrewRecipe> = typeOf("brew_recipe")
-
-    @JvmField
     val CRATE: ItemDataType<ItemCrate> = typeOf("crate")
 
     @JvmField
@@ -126,6 +130,11 @@ data object ItemDataTypes {
      */
     @JvmField
     val EXTRA_ENCHANT_SLOTS: ItemDataType<Int> = typeOf("extra_enchant_slots")
+
+    // 需要安装对应插件才能正常运行
+    // 需要 BreweryX
+    @JvmField
+    val BREW_RECIPE: ItemDataType<ItemBrewRecipe> = typeOf("brew_recipe")
 
     // ------------
     // 方便函数
