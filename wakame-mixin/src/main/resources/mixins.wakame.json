@@ -26,7 +26,6 @@
     "MixinLootPoolEntries",
     "MixinRegistryDataLoader",
     "MixinRepairItemRecipe",
-    "MixinServerPlayer",
     "MixinSpawnerData",
     "MixinStackedContentsExtrasMap",
     "MixinTippedArrowRecipe",
