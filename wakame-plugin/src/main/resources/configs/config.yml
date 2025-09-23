@@ -40,6 +40,12 @@ world_weather_control_use_interval_ticks: 12000
 #   rarity: 根据物品的稀有度 (rarity) 计算
 enchant_slot_base_provider: rarity
 
+# 禁止玩家在以下世界中与村民进行交易
+disable_villager_trade_in_worlds:
+  - koish:eden
+  - koish:dune
+  - koish:hollow
+
 # 关于调试模式
 debug:
   # 调试模式信息记录控制
