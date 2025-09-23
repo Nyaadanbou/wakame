@@ -49,7 +49,8 @@ public class MixinHashedPatchMap {
     //   在 matches 函数一开始就先移除服务端侧 patch 中的 `minecraft:lore` 和 `koish:data_container` 物品组件,
     //   然后在已经忽略客户端侧 `minecraft:lore` 组件哈希的前提下, 比较服务端侧和客户端侧的物品哈希.
     // 潜在问题:
-    //   未知
+    //   如果忽略的数据实际上发生了变化 (例如 `koish:data_container`), 那么不会触发强制同步
+    //   这种情况发生了的话, 需手动触发背包更新 (org.bukkit.entity.Player#updateInventory)
     @ModifyVariable(
             method = "matches",
             at = @At("HEAD"),
