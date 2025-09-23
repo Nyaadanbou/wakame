@@ -1,39 +1,50 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import cc.mewcraft.wakame.mixin.support.CustomContainerListener;
-import com.mojang.authlib.GameProfile;
+import cc.mewcraft.wakame.mixin.support.ExtraCriteriaTriggers;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ContainerListener;
-import net.minecraft.world.level.Level;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
-import org.jspecify.annotations.NonNull;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = ServerPlayer.class)
-public abstract class MixinServerPlayer extends Player {
+@Mixin(targets = "net/minecraft/server/level/ServerPlayer$2")
+public class MixinServerPlayer {
 
-    protected MixinServerPlayer(final Level world, final GameProfile gameProfile) {
-        super(world, gameProfile);
+    @Final
+    @Shadow
+    ServerPlayer this$0; // 以这种方式获取 net/minecraft/server/level/ServerPlayer 的实例
+
+    /**
+     * 在 `minecraft:inventory_changed` 之后额外触发 `koish:inventory_changed`.
+     */
+    @Inject(
+            method = "slotChanged(Lnet/minecraft/world/inventory/AbstractContainerMenu;ILnet/minecraft/world/item/ItemStack;)V",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/advancements/critereon/InventoryChangeTrigger;trigger(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/item/ItemStack;)V",
+                    shift = At.Shift.AFTER
+            )
+    )
+    private void injected0(AbstractContainerMenu containerToSend, int dataSlotIndex, ItemStack stack, CallbackInfo ci) {
+        ExtraCriteriaTriggers.INVENTORY_CHANGED.trigger(this$0, this$0.getInventory(), stack);
     }
 
-    @Shadow
-    @Final
-    @Mutable
-    private ContainerListener containerListener;
-
-    @Shadow
-    abstract public @NonNull CraftPlayer getBukkitEntity();
-
-    @Inject(method = "<init>", at = @At("RETURN"))
-    public void onConstruction(CallbackInfo callback) {
-        // 替换成我们自己的 ContainerListener
-        this.containerListener = new CustomContainerListener((ServerPlayer) (Object) this);
+    /**
+     * 在 `minecraft:inventory_changed` 之后额外触发 `koish:inventory_changed`.
+     */
+    @Inject(
+            method = "slotChanged(Lnet/minecraft/world/inventory/AbstractContainerMenu;ILnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)V",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/advancements/critereon/InventoryChangeTrigger;trigger(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/item/ItemStack;)V",
+                    shift = At.Shift.AFTER
+            )
+    )
+    private void injected1(AbstractContainerMenu containerToSend, int dataSlotIndex, ItemStack oldStack, ItemStack stack, CallbackInfo ci) {
+        ExtraCriteriaTriggers.INVENTORY_CHANGED.trigger(this$0, this$0.getInventory(), stack);
     }
 }
