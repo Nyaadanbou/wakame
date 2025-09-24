@@ -1,37 +1,19 @@
 package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.catalog.item.recipe.CatalogBlastingRecipe
-import cc.mewcraft.wakame.catalog.item.recipe.CatalogCampfireRecipe
-import cc.mewcraft.wakame.catalog.item.recipe.CatalogFurnaceRecipe
-import cc.mewcraft.wakame.catalog.item.recipe.CatalogRecipe
-import cc.mewcraft.wakame.catalog.item.recipe.CatalogShapedRecipe
-import cc.mewcraft.wakame.catalog.item.recipe.CatalogShapelessRecipe
-import cc.mewcraft.wakame.catalog.item.recipe.CatalogSmithingTransformRecipe
-import cc.mewcraft.wakame.catalog.item.recipe.CatalogSmithingTrimRecipe
-import cc.mewcraft.wakame.catalog.item.recipe.CatalogSmokingRecipe
-import cc.mewcraft.wakame.catalog.item.recipe.CatalogStandardRecipe
-import cc.mewcraft.wakame.catalog.item.recipe.CatalogStonecuttingRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.*
 import cc.mewcraft.wakame.event.map.MinecraftRecipeRegistrationDoneEvent
-import cc.mewcraft.wakame.item2.ItemRef
+import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.registry2.DynamicRegistries
+import cc.mewcraft.wakame.registry.DynamicRegistries
 import cc.mewcraft.wakame.util.eventbus.MapEventBus
 import com.google.common.graph.ImmutableNetwork
 import com.google.common.graph.MutableNetwork
 import com.google.common.graph.NetworkBuilder
 import org.bukkit.Bukkit
-import org.bukkit.inventory.BlastingRecipe
-import org.bukkit.inventory.CampfireRecipe
-import org.bukkit.inventory.FurnaceRecipe
-import org.bukkit.inventory.ShapedRecipe
-import org.bukkit.inventory.ShapelessRecipe
-import org.bukkit.inventory.SmithingTransformRecipe
-import org.bukkit.inventory.SmithingTrimRecipe
-import org.bukkit.inventory.SmokingRecipe
-import org.bukkit.inventory.StonecuttingRecipe
+import org.bukkit.inventory.*
 import java.util.*
 import org.bukkit.inventory.Recipe as BukkitRecipe
 

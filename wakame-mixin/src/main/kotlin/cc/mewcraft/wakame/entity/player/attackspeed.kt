@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.entity.player
 
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.PlayerFriendlyNamed

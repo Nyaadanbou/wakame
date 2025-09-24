@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.adventure
 
 import cc.mewcraft.wakame.MM
-import cc.mewcraft.wakame.item2.network.sendItemNameChangeInMainHand
+import cc.mewcraft.wakame.item.network.sendItemNameChangeInMainHand
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require

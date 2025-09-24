@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.thebrewingproject
 
-import cc.mewcraft.wakame.item2.ItemRefHandler
+import cc.mewcraft.wakame.item.ItemRefHandler
 import cc.mewcraft.wakame.util.Identifier
 import dev.jsinco.brewery.brew.Brew
 import dev.jsinco.brewery.brew.BrewImpl

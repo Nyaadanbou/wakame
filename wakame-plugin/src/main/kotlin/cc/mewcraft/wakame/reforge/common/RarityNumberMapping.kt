@@ -12,7 +12,7 @@ import java.lang.reflect.Type
 import java.util.stream.Stream
 
 /**
- * 用于将 [稀有度][cc.mewcraft.wakame.rarity2.Rarity] 映射成浮点数.
+ * 用于将 [稀有度][cc.mewcraft.wakame.rarity.Rarity] 映射成浮点数.
  */
 fun interface RarityNumberMapping : Examinable {
     companion object {

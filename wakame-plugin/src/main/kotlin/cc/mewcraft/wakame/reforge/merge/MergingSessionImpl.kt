@@ -5,9 +5,9 @@ import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundleTrait
 import cc.mewcraft.wakame.integration.economy.EconomyManager
-import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.item2.data.impl.AttributeCore
-import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item.data.ItemDataTypes
+import cc.mewcraft.wakame.item.data.impl.AttributeCore
+import cc.mewcraft.wakame.item.getData
 import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.util.ItemStackDelegates

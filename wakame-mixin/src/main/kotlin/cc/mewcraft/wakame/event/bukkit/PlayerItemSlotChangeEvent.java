@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.event.bukkit;
 
-import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot;
+import cc.mewcraft.wakame.item.property.impl.ItemSlot;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;

@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.ecs.FleksPatcher
-import cc.mewcraft.wakame.kizami2.system.ApplyKizamiEffects
-import cc.mewcraft.wakame.kizami2.system.InitKizamiContainer
+import cc.mewcraft.wakame.kizami.system.ApplyKizamiEffects
+import cc.mewcraft.wakame.kizami.system.InitKizamiContainer
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage

@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.attribute.AttributeMapLike
 import cc.mewcraft.wakame.entity.attribute.Attributes
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
-import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.registry.BuiltInRegistries
+import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import kotlin.math.absoluteValue
@@ -249,7 +249,7 @@ data class DefenseMetadata(
     constructor(
         damageeAttributes: AttributeMap,
         resistanceLevel: Int,
-        isBlocking: Boolean = false
+        isBlocking: Boolean = false,
     ) : this(
         damageeAttributes.getDefenseMap(),
         damageeAttributes.getIncomingDamageRateMap(),

@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.loot.LootPool
 import cc.mewcraft.wakame.loot.LootTable
 import cc.mewcraft.wakame.loot.entry.ComposableEntryContainer
 import cc.mewcraft.wakame.molang.ExpressionSerializer
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
-import cc.mewcraft.wakame.registry2.DynamicRegistries
+import cc.mewcraft.wakame.registry.BuiltInRegistries
+import cc.mewcraft.wakame.registry.DynamicRegistries
 import cc.mewcraft.wakame.serialization.configurate.serializer.*
 import cc.mewcraft.wakame.util.RandomizedValueSerializer
 import cc.mewcraft.wakame.util.register

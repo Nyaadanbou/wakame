@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.reforge.common
 
-import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item.data.ItemDataTypes
+import cc.mewcraft.wakame.item.getData
 import cc.mewcraft.wakame.util.bindInstance
 import cc.mewcraft.wakame.util.item.damage
 import org.bukkit.inventory.ItemStack

@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.element.ElementRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.Attributes
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.test.TestOnly
 import cc.mewcraft.wakame.util.test.TestPath
 import io.mockk.mockk

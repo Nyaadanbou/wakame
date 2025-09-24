@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import cc.mewcraft.wakame.item2.KoishStackData;
+import cc.mewcraft.wakame.item.KoishStackData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingBookCategory;

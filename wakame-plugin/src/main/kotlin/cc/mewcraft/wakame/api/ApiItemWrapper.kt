@@ -2,10 +2,10 @@ package cc.mewcraft.wakame.api
 
 import cc.mewcraft.wakame.api.block.KoishBlock
 import cc.mewcraft.wakame.entity.player.koishLevel
-import cc.mewcraft.wakame.item2.KoishItem
-import cc.mewcraft.wakame.item2.KoishStackGenerator
-import cc.mewcraft.wakame.item2.context.ItemGenerationContext
-import cc.mewcraft.wakame.item2.name
+import cc.mewcraft.wakame.item.KoishItem
+import cc.mewcraft.wakame.item.KoishStackGenerator
+import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
+import cc.mewcraft.wakame.item.name
 import cc.mewcraft.wakame.util.adventure.plain
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component

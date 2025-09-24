@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.craftingstation.SimpleCraftingStation
 import cc.mewcraft.wakame.craftingstation.recipe.ExpChoice
 import cc.mewcraft.wakame.craftingstation.recipe.ItemChoice
 import cc.mewcraft.wakame.craftingstation.recipe.ItemResult
-import cc.mewcraft.wakame.item2.ItemRef
+import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.test.TestOnly
 import cc.mewcraft.wakame.util.test.TestPath
@@ -19,11 +19,7 @@ import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
-import kotlin.test.Test
-import kotlin.test.assertContentEquals
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
-import kotlin.test.assertNotNull
+import kotlin.test.*
 
 class StationSerializationTest {
 

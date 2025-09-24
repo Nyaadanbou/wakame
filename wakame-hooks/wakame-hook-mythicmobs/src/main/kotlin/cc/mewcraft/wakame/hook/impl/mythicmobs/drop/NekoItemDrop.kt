@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.drop
 
-import cc.mewcraft.wakame.item2.ItemRef
+import cc.mewcraft.wakame.item.ItemRef
 import io.lumine.mythic.api.adapters.AbstractItemStack
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.drops.DropMetadata

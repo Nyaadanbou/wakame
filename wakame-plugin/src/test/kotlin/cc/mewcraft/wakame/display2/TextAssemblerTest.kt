@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.display2
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.display2.implementation.BlankStaticTextMeta
-import cc.mewcraft.wakame.display2.implementation.CustomStaticTextMeta
+import cc.mewcraft.wakame.item.display.*
+import cc.mewcraft.wakame.item.display.implementation.BlankStaticTextMeta
+import cc.mewcraft.wakame.item.display.implementation.CustomStaticTextMeta
 import cc.mewcraft.wakame.util.test.TestOnly
 import cc.mewcraft.wakame.util.test.TestPath
 import io.mockk.every

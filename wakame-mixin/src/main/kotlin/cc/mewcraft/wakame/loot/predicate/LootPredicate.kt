@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.loot.predicate
 
 import cc.mewcraft.wakame.loot.context.LootContext
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get

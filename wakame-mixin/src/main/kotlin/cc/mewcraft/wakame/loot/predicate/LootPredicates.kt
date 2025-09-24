@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.loot.predicate
 
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
-import cc.mewcraft.wakame.registry2.Registry
+import cc.mewcraft.wakame.registry.BuiltInRegistries
+import cc.mewcraft.wakame.registry.Registry
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.typeTokenOf

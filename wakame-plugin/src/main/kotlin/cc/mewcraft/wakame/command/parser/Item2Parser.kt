@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
-import cc.mewcraft.wakame.item2.KoishItem
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.item.KoishItem
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys

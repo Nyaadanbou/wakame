@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.entity.attribute
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.registerEvents
 import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.thebrewingproject
 
 import cc.mewcraft.wakame.integration.Hook
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 
 @Hook(plugins = ["TheBrewingProject"])
 object TheBrewingProjectHook {

@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.ElementRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.attribute.Attributes
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
-import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.registry.BuiltInRegistries
+import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.test.TestOnly
 import cc.mewcraft.wakame.util.test.TestPath
 import io.mockk.every

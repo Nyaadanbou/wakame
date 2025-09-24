@@ -8,21 +8,17 @@ import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInitStage
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
-import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.EntityCreateContext
-import com.github.quillraven.fleks.EntityUpdateContext
-import com.github.quillraven.fleks.World
-import com.github.quillraven.fleks.configureWorld
+import com.github.quillraven.fleks.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
 @InternalInit(stage = InternalInitStage.POST_WORLD)
-internal object KoishFleks : Listener, Fleks , FleksPatcher {
+internal object KoishFleks : Listener, Fleks, FleksPatcher {
 
     private val SYSTEM_ORDER: List<Identifier> = listOf(
         "init_ability_container",

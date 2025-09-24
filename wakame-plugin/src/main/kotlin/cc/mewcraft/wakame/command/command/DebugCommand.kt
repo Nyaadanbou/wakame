@@ -8,11 +8,11 @@ import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.damageBundle
 import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.entity.player.attributeContainer
-import cc.mewcraft.wakame.item2.ItemRef
-import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.item2.getData
-import cc.mewcraft.wakame.item2.isKoish
-import cc.mewcraft.wakame.item2.setData
+import cc.mewcraft.wakame.item.ItemRef
+import cc.mewcraft.wakame.item.data.ItemDataTypes
+import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.isKoish
+import cc.mewcraft.wakame.item.setData
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import com.google.gson.GsonBuilder

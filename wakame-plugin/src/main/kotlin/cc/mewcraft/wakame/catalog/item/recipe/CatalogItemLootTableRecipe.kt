@@ -1,14 +1,9 @@
 package cc.mewcraft.wakame.catalog.item.recipe
 
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.item2.ItemRef
+import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.mixin.support.KoishLootItem
-import cc.mewcraft.wakame.shadow.loot.ShadowCompositeEntryBase
-import cc.mewcraft.wakame.shadow.loot.ShadowLootItem
-import cc.mewcraft.wakame.shadow.loot.ShadowLootPool
-import cc.mewcraft.wakame.shadow.loot.ShadowLootTable
-import cc.mewcraft.wakame.shadow.loot.ShadowNestedLootTable
-import cc.mewcraft.wakame.shadow.loot.ShadowTagEntry
+import cc.mewcraft.wakame.shadow.loot.*
 import cc.mewcraft.wakame.util.MINECRAFT_SERVER
 import cc.mewcraft.wakame.util.namespacedKey
 import cc.mewcraft.wakame.util.shadow

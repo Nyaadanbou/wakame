@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.brewery.BrewRecipe
 import cc.mewcraft.wakame.brewery.BrewRecipeRenderer
 import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.item2.display.SlotDisplayLoreData
+import cc.mewcraft.wakame.item.SlotDisplayLoreData
 import cc.mewcraft.wakame.util.adventure.legacy
 import net.kyori.adventure.text.Component
 

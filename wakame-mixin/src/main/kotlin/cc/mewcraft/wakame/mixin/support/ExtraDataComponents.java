@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.support;
 
-import cc.mewcraft.wakame.item2.data.ItemDataContainer;
+import cc.mewcraft.wakame.item.data.ItemDataContainer;
 import cc.mewcraft.wakame.mixin.core.InvokerDataComponents;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentType;

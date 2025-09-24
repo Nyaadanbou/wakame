@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.breweryx
 
-import cc.mewcraft.wakame.item2.ItemRefHandler
+import cc.mewcraft.wakame.item.ItemRefHandler
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import com.dre.brewery.api.BreweryApi

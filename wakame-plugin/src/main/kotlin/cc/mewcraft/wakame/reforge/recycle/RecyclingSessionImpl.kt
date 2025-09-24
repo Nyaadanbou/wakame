@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.reforge.recycle
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.integration.economy.EconomyManager
-import cc.mewcraft.wakame.item2.koishTypeId
+import cc.mewcraft.wakame.item.koishTypeId
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.util.decorate

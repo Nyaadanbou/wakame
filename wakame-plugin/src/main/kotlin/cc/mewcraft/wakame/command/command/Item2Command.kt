@@ -4,9 +4,9 @@ import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
 import cc.mewcraft.wakame.command.parser.Item2Parser
-import cc.mewcraft.wakame.item2.KoishItem
-import cc.mewcraft.wakame.item2.KoishStackGenerator
-import cc.mewcraft.wakame.item2.context.ItemGenerationContext
+import cc.mewcraft.wakame.item.KoishItem
+import cc.mewcraft.wakame.item.KoishStackGenerator
+import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.item2.data.impl.ReforgeHistory
-import cc.mewcraft.wakame.item2.getData
-import cc.mewcraft.wakame.item2.getDataOrDefault
-import cc.mewcraft.wakame.item2.setData
+import cc.mewcraft.wakame.item.data.ItemDataTypes
+import cc.mewcraft.wakame.item.data.impl.ReforgeHistory
+import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.getDataOrDefault
+import cc.mewcraft.wakame.item.setData
 import org.bukkit.entity.Player
 
 /**

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.serialization.json
 
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.serialization.json.serializer.*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder

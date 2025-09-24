@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.entity.attribute.bundle
 
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
-import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.registry.entry.RegistryEntry
 
 /**
  * 代表 [AttributeBundle] 的一部分特性, 故命名为 "...Trait".

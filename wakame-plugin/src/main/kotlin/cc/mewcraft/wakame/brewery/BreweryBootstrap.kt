@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.brewery
 
 import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.registerSerializer
-import cc.mewcraft.wakame.item2.display.SlotDisplayLoreData
+import cc.mewcraft.wakame.item.SlotDisplayLoreData
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage

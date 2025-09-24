@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.element.system
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.ability2.AbilityCastUtils
-import cc.mewcraft.wakame.ability2.component.CastBy
-import cc.mewcraft.wakame.ability2.component.TargetTo
+import cc.mewcraft.wakame.ability.AbilityCastUtils
+import cc.mewcraft.wakame.ability.component.CastBy
+import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ecs.CommonFamilies
 import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.bridge.koishify
@@ -16,7 +16,7 @@ import cc.mewcraft.wakame.element.component.ElementStack
 import cc.mewcraft.wakame.element.component.ElementStackContainer
 import cc.mewcraft.wakame.element.component.Elemental
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
-import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import com.github.quillraven.fleks.Entity
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import org.bukkit.entity.Player

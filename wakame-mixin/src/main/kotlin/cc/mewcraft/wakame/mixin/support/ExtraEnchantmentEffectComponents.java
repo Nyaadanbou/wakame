@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.support;
 
-import cc.mewcraft.wakame.enchantment2.effect.*;
+import cc.mewcraft.wakame.enchantment.effect.*;
 import cc.mewcraft.wakame.mixin.core.InvokerEnchantmentEffectComponents;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.enchantment.Enchantment;

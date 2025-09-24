@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
-import cc.mewcraft.wakame.ability2.meta.AbilityMeta
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.ability.meta.AbilityMeta
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent

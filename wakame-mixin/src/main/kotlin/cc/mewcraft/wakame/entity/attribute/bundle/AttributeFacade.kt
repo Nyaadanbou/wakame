@@ -51,7 +51,7 @@ interface AttributeFacade<T : ConstantAttributeBundle, S : VariableAttributeBund
     val convertNodeToVariable: (ConfigurationNode) -> S
 
     /**
-     * A creator for [cc.mewcraft.wakame.item2.data.impl.AttributeCore].
+     * A creator for [cc.mewcraft.wakame.item.data.impl.AttributeCore].
      */
     val convertNodeToConstant: (ConfigurationNode) -> T
 

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.item2.ItemRef
+import cc.mewcraft.wakame.item.ItemRef
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 

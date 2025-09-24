@@ -5,8 +5,8 @@ import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.entity.attribute.AttributeModifierSource
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
-import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.registry.BuiltInRegistries
+import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.util.registerExact
 import net.kyori.adventure.key.Key

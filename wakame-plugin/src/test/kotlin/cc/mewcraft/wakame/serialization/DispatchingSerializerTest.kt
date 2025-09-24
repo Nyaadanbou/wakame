@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.serialization
 
-import cc.mewcraft.wakame.registry2.Registry
-import cc.mewcraft.wakame.registry2.SimpleRegistry
+import cc.mewcraft.wakame.registry.Registry
+import cc.mewcraft.wakame.registry.SimpleRegistry
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer

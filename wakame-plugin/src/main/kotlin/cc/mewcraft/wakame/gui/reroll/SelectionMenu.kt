@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.gui.reroll
 
-import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.item2.display.resolveToItemWrapper
-import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item.data.ItemDataTypes
+import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.resolveToItemWrapper
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType

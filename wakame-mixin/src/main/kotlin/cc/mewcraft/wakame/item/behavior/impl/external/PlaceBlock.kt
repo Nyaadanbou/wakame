@@ -1,0 +1,23 @@
+package cc.mewcraft.wakame.item.behavior.impl.external
+
+import cc.mewcraft.wakame.item.behavior.InteractionResult
+import cc.mewcraft.wakame.item.behavior.ItemBehavior
+import cc.mewcraft.wakame.item.behavior.UseOnContext
+
+object PlaceBlock : ItemBehavior {
+
+    @get:JvmName("getInstance")
+    var INSTANCE: ItemBehavior = ItemBehavior.NO_OP
+        private set
+
+    override fun handleUseOn(context: UseOnContext): InteractionResult {
+        return INSTANCE.handleUseOn(context)
+    }
+
+    /**
+     * 替换 [PlaceBlock] 物品行为的实现.
+     */
+    fun register(itemBehavior: ItemBehavior) {
+        INSTANCE = itemBehavior
+    }
+}
