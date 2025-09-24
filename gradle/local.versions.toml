@@ -56,7 +56,7 @@ nightcore = "2.7.8"
 economybridge = "1.2.1" # 同上
 breweryx = "3.4.10"
 chestshop = "3.12.3-SNAPSHOT"
-craftengine = "0.0.61"
+craftengine = "0.0.63"
 
 [libraries]
 
