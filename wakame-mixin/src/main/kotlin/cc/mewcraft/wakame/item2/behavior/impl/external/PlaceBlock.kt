@@ -1,10 +1,10 @@
-package cc.mewcraft.wakame.item2.behavior.impl.hook.craftengine
+package cc.mewcraft.wakame.item2.behavior.impl.external
 
 import cc.mewcraft.wakame.item2.behavior.InteractionResult
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
 import cc.mewcraft.wakame.item2.behavior.UseOnContext
 
-object PlaceDoubleHighBlock : ItemBehavior {
+object PlaceBlock : ItemBehavior {
 
     @get:JvmName("getInstance")
     var INSTANCE: ItemBehavior = ItemBehavior.NO_OP
@@ -15,7 +15,7 @@ object PlaceDoubleHighBlock : ItemBehavior {
     }
 
     /**
-     * 替换 [PlaceDoubleHighBlock] 物品行为的实现.
+     * 替换 [PlaceBlock] 物品行为的实现.
      */
     fun register(itemBehavior: ItemBehavior) {
         INSTANCE = itemBehavior
