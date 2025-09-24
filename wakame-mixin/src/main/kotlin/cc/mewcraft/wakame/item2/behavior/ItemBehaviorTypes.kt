@@ -9,13 +9,7 @@ import cc.mewcraft.wakame.item2.behavior.impl.hook.craftengine.PlaceBlock
 import cc.mewcraft.wakame.item2.behavior.impl.hook.craftengine.PlaceDoubleHighBlock
 import cc.mewcraft.wakame.item2.behavior.impl.hook.craftengine.PlaceLiquidCollisionBlock
 import cc.mewcraft.wakame.item2.behavior.impl.test.TestInteract
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.Bow
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.Crossbow
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.DualSword
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.Katana
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.Mace
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.Melee
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.Trident
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.*
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 
 /**
@@ -103,29 +97,34 @@ object ItemBehaviorTypes {
     @JvmField
     val ENTITY_BUCKET = typeOf("entity_bucket", EntityBucket)
 
-    // 需要安装对应插件才能正常运行
-    // 需要 BreweryX
     /**
      * 物品具有该行为时, 可以使用以揭示酒酿配方.
+     *
+     * 需要安装对应插件才能正常使用.
      */
     @JvmField
     val BREW_RECIPE = typeOf("brew_recipe", BrewRecipe) // ID 故意和 ItemBrewRecipe(ItemData) 保持一致
 
-    // 需要 CraftEngine
     /**
      * 物品具有该行为时, 可以使用以放置普通自定义方块(类似石头、台阶等原版方块).
+     *
+     * 需要安装对应插件才能正常使用.
      */
     @JvmField
     val PLACE_BLOCK = typeOf("place_block", PlaceBlock)
 
     /**
      * 物品具有该行为时, 可以使用以放置流体碰撞方块(类似睡莲等原版方块).
+     *
+     * 需要安装对应插件才能正常使用.
      */
     @JvmField
     val PLACE_LIQUID_COLLISION_BLOCK = typeOf("place_liquid_collision_block", PlaceLiquidCollisionBlock)
 
     /**
      * 物品具有该行为时, 可以使用以放置两格高方块(类似门等原版方块).
+     *
+     * 需要安装对应插件才能正常使用.
      */
     @JvmField
     val PLACE_DOUBLE_HIGH_BLOCK = typeOf("place_double_high_block", PlaceDoubleHighBlock)

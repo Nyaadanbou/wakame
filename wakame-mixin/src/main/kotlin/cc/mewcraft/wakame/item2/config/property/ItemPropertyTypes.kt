@@ -2,16 +2,7 @@ package cc.mewcraft.wakame.item2.config.property
 
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.entity.player.AttackSpeed
-import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
-import cc.mewcraft.wakame.item2.config.property.impl.Arrow
-import cc.mewcraft.wakame.item2.config.property.impl.EnchantSlotCapacity
-import cc.mewcraft.wakame.item2.config.property.impl.EntityBucket
-import cc.mewcraft.wakame.item2.config.property.impl.ExtraLore
-import cc.mewcraft.wakame.item2.config.property.impl.Fuel
-import cc.mewcraft.wakame.item2.config.property.impl.HoldLastDamageSettings
-import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
-import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
-import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotGroup
+import cc.mewcraft.wakame.item2.config.property.impl.*
 import cc.mewcraft.wakame.item2.config.property.impl.hook.craftengine.LiquidCollisionBlockSettings
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.DualSword
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.Katana
@@ -175,14 +166,27 @@ data object ItemPropTypes {
     @JvmField
     val FUEL: ItemPropertyType<Fuel> = typeOf("fuel")
 
-    // 需要安装对应插件才能正常运行
-    // 需要 CraftEngine
+    /**
+     * 物品放置出来的方块.
+     *
+     * 需要安装对应插件才能正常使用.
+     */
     @JvmField
     val PLACE_BLOCK = typeOf<Identifier>("place_block")
 
+    /**
+     * 物品放置出来的方块.
+     *
+     * 需要安装对应插件才能正常使用.
+     */
     @JvmField
     val PLACE_LIQUID_COLLISION_BLOCK = typeOf<LiquidCollisionBlockSettings>("place_liquid_collision_block")
 
+    /**
+     * 物品放置出来的两格高方块.
+     *
+     * 需要安装对应插件才能正常使用.
+     */
     @JvmField
     val PLACE_DOUBLE_HIGH_BLOCK = typeOf<Identifier>("place_double_high_block")
 
