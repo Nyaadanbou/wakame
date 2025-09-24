@@ -11,6 +11,7 @@ import cc.mewcraft.wakame.item2.getProp
 import net.momirealms.craftengine.bukkit.item.behavior.LiquidCollisionBlockItemBehavior
 
 object CraftEnginePlaceLiquidCollisionBlock : ItemBehavior {
+
     override fun handleUseOn(context: UseOnContext): InteractionResult {
         // 未指定方块 ID 和放置高度 - 交互失败
         val settings = context.itemstack.getProp(ItemPropTypes.PLACE_LIQUID_COLLISION_BLOCK) ?: return InteractionResult.FAIL
