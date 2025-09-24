@@ -2,16 +2,7 @@ package cc.mewcraft.wakame.item2.config.property
 
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.entity.player.AttackSpeed
-import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
-import cc.mewcraft.wakame.item2.config.property.impl.Arrow
-import cc.mewcraft.wakame.item2.config.property.impl.EnchantSlotCapacity
-import cc.mewcraft.wakame.item2.config.property.impl.EntityBucket
-import cc.mewcraft.wakame.item2.config.property.impl.ExtraLore
-import cc.mewcraft.wakame.item2.config.property.impl.Fuel
-import cc.mewcraft.wakame.item2.config.property.impl.HoldLastDamageSettings
-import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
-import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
-import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotGroup
+import cc.mewcraft.wakame.item2.config.property.impl.*
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.DualSword
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.Katana
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.Melee
@@ -73,7 +64,7 @@ data object ItemPropTypes {
     val ARROW: ItemPropertyType<Arrow> = typeOf("arrow")
 
     @JvmField
-    val HOLD_LAST_DAMAGE_SETTINGS: ItemPropertyType<HoldLastDamageSettings> = typeOf("hold_last_damage")
+    val HOLD_LAST_DAMAGE: ItemPropertyType<HoldLastDamage> = typeOf("hold_last_damage")
 
     @JvmField
     val GLOWABLE: ItemPropertyType<Unit> = typeOf("glowable")
@@ -173,6 +164,36 @@ data object ItemPropTypes {
      */
     @JvmField
     val FUEL: ItemPropertyType<Fuel> = typeOf("fuel")
+
+    /**
+     * 物品放置出来的普通方块.
+     *
+     * 需要安装对应插件才能正常使用.
+     *
+     * @see cc.mewcraft.wakame.item2.behavior.ItemBehaviorTypes.PLACE_BLOCK
+     */
+    @JvmField
+    val PLACE_BLOCK = typeOf<Identifier>("place_block")
+
+    /**
+     * 物品放置出来的流体碰撞方块.
+     *
+     * 需要安装对应插件才能正常使用.
+     *
+     * @see cc.mewcraft.wakame.item2.behavior.ItemBehaviorTypes.PLACE_LIQUID_COLLISION_BLOCK
+     */
+    @JvmField
+    val PLACE_LIQUID_COLLISION_BLOCK = typeOf<LiquidCollisionBlockSettings>("place_liquid_collision_block")
+
+    /**
+     * 物品放置出来的两格高方块.
+     *
+     * 需要安装对应插件才能正常使用.
+     *
+     * @see cc.mewcraft.wakame.item2.behavior.ItemBehaviorTypes.PLACE_DOUBLE_HIGH_BLOCK
+     */
+    @JvmField
+    val PLACE_DOUBLE_HIGH_BLOCK = typeOf<Identifier>("place_double_high_block")
 
     // ------------
     // 方便函数

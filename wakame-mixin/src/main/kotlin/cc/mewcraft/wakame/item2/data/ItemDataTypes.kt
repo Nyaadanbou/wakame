@@ -87,9 +87,6 @@ data object ItemDataTypes {
     }
 
     @JvmField
-    val BREW_RECIPE: ItemDataType<ItemBrewRecipe> = typeOf("brew_recipe")
-
-    @JvmField
     val CRATE: ItemDataType<ItemCrate> = typeOf("crate")
 
     @JvmField
@@ -126,6 +123,14 @@ data object ItemDataTypes {
      */
     @JvmField
     val EXTRA_ENCHANT_SLOTS: ItemDataType<Int> = typeOf("extra_enchant_slots")
+
+    /**
+     * 记录了一个酒酿配方.
+     *
+     * 需要安装对应插件才能正常使用.
+     */
+    @JvmField
+    val BREW_RECIPE: ItemDataType<ItemBrewRecipe> = typeOf("brew_recipe")
 
     // ------------
     // 方便函数

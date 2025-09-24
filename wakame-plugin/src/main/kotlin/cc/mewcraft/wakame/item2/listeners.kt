@@ -41,6 +41,7 @@ import org.bukkit.entity.AbstractArrow
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
 import org.bukkit.entity.ThrowableProjectile
+import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -80,8 +81,22 @@ internal object ItemBehaviorListener : Listener {
         alreadyCallInteractEntityWithOffHandPlayers.clear()
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    // Koish 的交互应该在最后的最后触发
+    // 事件的取消只是为了移除原版交互的影响, 而不是通知其他插件
+    // 故使用 EventPriority.MONITOR, 下同
+    @EventHandler(priority = EventPriority.MONITOR)
     fun onRightClickInteract(event: PlayerInteractEvent) {
+        // 2025/9/22 芙兰
+        // 吗的Bukkit这交互事件是人啊
+
+        // 事件被取消 - 不处理
+        // 不能用 isCancelled 或者 ignoreCancelled = true 判定
+        // 原因是 PlayerInteractEvent 的 isCancelled 仅仅判断了 useInteractedBlock()
+        // 玩家交互空气时该函数返回值必然为 Event.Result.DENY, 也就是事件必然是取消状态
+        if (event.useInteractedBlock() == Event.Result.DENY && event.useItemInHand() == Event.Result.DENY) {
+            return
+        }
+
         val action = event.action
         val player = event.player
         // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
@@ -173,7 +188,7 @@ internal object ItemBehaviorListener : Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onInteractEntity(event: PlayerInteractEntityEvent) {
         val player = event.player
         // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
@@ -221,8 +236,14 @@ internal object ItemBehaviorListener : Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.MONITOR)
     fun onLeftClickInteract(event: PlayerInteractEvent) {
+        // 事件被取消 - 不处理
+        // 这样写的原因同上文的 onRightClickInteract(...)
+        if (event.useInteractedBlock() == Event.Result.DENY && event.useItemInHand() == Event.Result.DENY) {
+            return
+        }
+
         val action = event.action
         val player = event.player
         // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理

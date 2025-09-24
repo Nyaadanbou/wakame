@@ -25,6 +25,16 @@ package cc.mewcraft.wakame.item2.behavior
  * 也就是说, 玩家登录时对于背包里的每个非空气物品都会触发一次该事件.
  */
 interface ItemBehavior {
+
+    companion object {
+
+        /**
+         * 一个不执行任何操作的 [ItemBehavior] 实现.
+         */
+        @JvmField
+        val NO_OP: ItemBehavior = object : ItemBehavior {}
+    }
+
     /**
      * 玩家手持该物品对方块按下使用键(默认为鼠标右键)进行交互时, 执行的行为.
      */
@@ -92,8 +102,8 @@ interface ItemBehavior {
     fun handleConsume(context: ConsumeContext) = BehaviorResult.PASS
 
     // 2025/9/17 芙兰
-    // 当确实需要用到上述handle未囊括的事件时, 再进行添加, 不建议写一堆无用的handle.
-    // 添加新handle时, 注意考虑 HoldLastDamage 行为是否需要处理它.
-    // 例如StopUse就不被 HoldLastDamage 行为处理, 毕竟StopUse只可能由交互产生.
+    // 当确实需要用到上述 handle未囊括的事件时, 再进行添加, 不建议写一堆无用的 handle.
+    // 添加新 handle 时, 注意考虑 HoldLastDamage 行为是否需要处理它.
+    // 例如 StopUse 就不被 HoldLastDamage 行为处理, 毕竟 StopUse 只可能由交互产生.
     // 而交互已然被 HoldLastDamage 行为考虑在内, 因此无需冗余代码.
 }

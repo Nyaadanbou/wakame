@@ -2,15 +2,7 @@
 
 package cc.mewcraft.wakame.item2.behavior.impl
 
-import cc.mewcraft.wakame.item2.behavior.AttackContext
-import cc.mewcraft.wakame.item2.behavior.BehaviorResult
-import cc.mewcraft.wakame.item2.behavior.CauseDamageContext
-import cc.mewcraft.wakame.item2.behavior.ConsumeContext
-import cc.mewcraft.wakame.item2.behavior.DurabilityDecreaseContext
-import cc.mewcraft.wakame.item2.behavior.InteractionResult
-import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContext
-import cc.mewcraft.wakame.item2.behavior.ReceiveDamageContext
-import cc.mewcraft.wakame.item2.behavior.UseContext
+import cc.mewcraft.wakame.item2.behavior.*
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.config.property.impl.HoldLastDamageAction
 import cc.mewcraft.wakame.item2.config.property.impl.ItemBehaviorHandlerType
@@ -68,7 +60,7 @@ object HoldLastDamage : SimpleInteract {
         val player = context.player
         if (!itemstack.isBroken()) return InteractionResult.PASS
 
-        val settings = itemstack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_SETTINGS)
+        val settings = itemstack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE)
         val action = settings?.getAction(type) ?: type.defaultAction
         val message = settings?.getMessage(type) ?: type.defaultMessage
 
@@ -92,7 +84,7 @@ object HoldLastDamage : SimpleInteract {
         val player = context.player
         if (!itemstack.isBroken()) return BehaviorResult.PASS
 
-        val settings = itemstack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE_SETTINGS)
+        val settings = itemstack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE)
         val action = settings?.getAction(type) ?: type.defaultAction
         val message = settings?.getMessage(type) ?: type.defaultMessage
 
