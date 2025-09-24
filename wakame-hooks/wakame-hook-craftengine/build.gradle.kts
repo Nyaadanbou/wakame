@@ -22,6 +22,6 @@ dependencies {
     compileOnly(project(":wakame-plugin"))
 
     // libraries
-     compileOnly(local.craftengine.core)
-     compileOnly(local.craftengine.bukkit)
+    compileOnly(local.craftengine.core)
+    compileOnly(local.craftengine.bukkit)
 }
