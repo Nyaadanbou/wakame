@@ -1,14 +1,20 @@
 package cc.mewcraft.wakame.item.property
 
 import cc.mewcraft.wakame.ability.trigger.AbilityTriggerVariant
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item.SlotDisplayDictData
 import cc.mewcraft.wakame.item.SlotDisplayLoreData
 import cc.mewcraft.wakame.item.SlotDisplayNameData
+import cc.mewcraft.wakame.item.data.impl.Core
+import cc.mewcraft.wakame.item.data.impl.CoreContainer
+import cc.mewcraft.wakame.item.data.impl.ItemLevel
 import cc.mewcraft.wakame.item.property.impl.*
 import cc.mewcraft.wakame.item.property.impl.weapon.DualSword
 import cc.mewcraft.wakame.item.property.impl.weapon.Katana
 import cc.mewcraft.wakame.item.property.impl.weapon.Melee
+import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
@@ -194,6 +200,75 @@ data object ItemPropTypes {
      */
     @JvmField
     val PLACE_DOUBLE_HIGH_BLOCK = typeOf<Identifier>("place_double_high_block")
+
+    /**
+     * 与物品类型绑定的物品等级.
+     *
+     * @see cc.mewcraft.wakame.item.data.ItemDataTypes.LEVEL
+     */
+    @JvmField
+    val LEVEL = typeOf<ItemLevel>("idem_level")
+
+    /**
+     * 与物品类型绑定的稀有度.
+     *
+     * @see cc.mewcraft.wakame.item.data.ItemDataTypes.RARITY
+     */
+    @JvmField
+    val RARITY = typeOf<RegistryEntry<Rarity>>("idem_rarity") {
+        serializers {
+            register(BuiltInRegistries.RARITY.holderByNameTypeSerializer())
+        }
+    }
+
+    /**
+     * 与物品类型绑定的元素.
+     *
+     * @see cc.mewcraft.wakame.item.data.ItemDataTypes.ELEMENT
+     */
+    @JvmField
+    val ELEMENT = typeOf<RegistryEntry<Element>>("idem_element") {
+        serializers {
+            register(BuiltInRegistries.ELEMENT.holderByNameTypeSerializer())
+        }
+    }
+
+    /**
+     * 与物品类型绑定的铭刻.
+     *
+     * @see cc.mewcraft.wakame.item.data.ItemDataTypes.KIZAMI
+     */
+    @JvmField
+    val KIZAMI = typeOf<RegistryEntry<Kizami>>("idem_kizami") {
+        serializers {
+            register(BuiltInRegistries.KIZAMI.holderByNameTypeSerializer())
+        }
+    }
+
+    /**
+     * 物品的核心.
+     *
+     * @see cc.mewcraft.wakame.item.data.ItemDataTypes.CORE
+     */
+    @JvmField
+    val CORE = typeOf<Core>("idem_core") {
+        serializers {
+            registerAll(Core.serializers())
+        }
+    }
+
+    /**
+     * 物品的核心容器.
+     *
+     * @see cc.mewcraft.wakame.item.data.ItemDataTypes.CORE_CONTAINER
+     */
+    @JvmField
+    val CORE_CONTAINER = typeOf<Map<String, Core>>("idem_core_container") {
+        serializers {
+            registerAll(Core.serializers())
+            register(CoreContainer.SERIALIZER)
+        }
+    }
 
     // ------------
     // 方便函数
