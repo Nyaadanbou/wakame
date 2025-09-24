@@ -1,3 +1,4 @@
+@file:JvmName("CraftEngineUtils")
 package cc.mewcraft.wakame.hook.impl.craftengine
 
 import cc.mewcraft.wakame.item2.behavior.InteractionHand
