@@ -23,7 +23,7 @@ import cc.mewcraft.wakame.item.data.ItemDataType
 import cc.mewcraft.wakame.item.data.impl.CoreType
 import cc.mewcraft.wakame.item.data.impl.EntityBucketInfoType
 import cc.mewcraft.wakame.item.datagen.ItemMetaType
-import cc.mewcraft.wakame.item.property.ItemPropertyType
+import cc.mewcraft.wakame.item.property.ItemPropType
 import cc.mewcraft.wakame.item.property.impl.EnchantSlotCapacityType
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.loot.LootTable
@@ -58,7 +58,7 @@ object BuiltInRegistryKeys {
     val ITEM_META_TYPE = createRegistryKey<ItemMetaType<*, *>>("item_meta_type")
 
     @JvmField
-    val ITEM_PROPERTY_TYPE = createRegistryKey<ItemPropertyType<*>>("item_property_type")
+    val ITEM_PROPERTY_TYPE = createRegistryKey<ItemPropType<*>>("item_property_type")
 
     @JvmField
     val ITEM_BEHAVIOR = createRegistryKey<ItemBehavior>("item_behavior")

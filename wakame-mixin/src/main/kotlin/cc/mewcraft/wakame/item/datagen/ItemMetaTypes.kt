@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.item.data.impl.CoreContainer
 import cc.mewcraft.wakame.item.data.impl.ItemLevel
 import cc.mewcraft.wakame.item.datagen.impl.*
-import cc.mewcraft.wakame.item.property.ItemPropertyContainer
+import cc.mewcraft.wakame.item.property.ItemPropContainer
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.BuiltInRegistries
@@ -133,7 +133,7 @@ data object ItemMetaTypes {
     // -–----------
 
     /**
-     * 获取一个 [TypeSerializerCollection] 实例, 可用来序列化 [ItemPropertyContainer] 中的数据类型.
+     * 获取一个 [TypeSerializerCollection] 实例, 可用来序列化 [ItemPropContainer] 中的数据类型.
      *
      * 返回的 [TypeSerializerCollection] 仅包含在这里显式声明的序列化操作, 不包含隐式声明的例如 [Int].
      *

@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorContainer
 import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
 import cc.mewcraft.wakame.item.datagen.ItemMetaContainer
-import cc.mewcraft.wakame.item.property.ItemPropertyContainer
+import cc.mewcraft.wakame.item.property.ItemPropContainer
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -31,7 +31,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 private val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
     .register<ItemBehaviorContainer>(ItemBehaviorContainer.makeDirectSerializer())
-    .registerAll(ItemPropertyContainer.makeDirectSerializers())
+    .registerAll(ItemPropContainer.makeDirectSerializers())
     .registerAll(ItemMetaContainer.makeDirectSerializers())
     .build()
 
@@ -94,7 +94,7 @@ internal object CustomItemRegistryLoader : RegistryLoader {
 
     private fun loadValue(id: Identifier, node: ConfigurationNode): KoishItem {
         val dataConfig = node.require<ItemMetaContainer>()
-        val properties = node.require<ItemPropertyContainer>()
+        val properties = node.require<ItemPropContainer>()
         val behaviors = node.require<ItemBehaviorContainer>()
         return KoishItem(id, dataConfig, properties, behaviors)
     }
@@ -151,7 +151,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
 
     private fun loadValue(id: Identifier, node: ConfigurationNode): KoishItemProxy {
         val dataConfig = node.require<ItemMetaContainer>()
-        val properties = node.require<ItemPropertyContainer>()
+        val properties = node.require<ItemPropContainer>()
         val behaviors = node.require<ItemBehaviorContainer>()
         val koishItem = KoishItem(id, dataConfig, properties, behaviors)
 

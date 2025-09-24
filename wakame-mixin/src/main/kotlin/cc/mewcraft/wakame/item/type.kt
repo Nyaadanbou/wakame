@@ -5,8 +5,8 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorContainer
 import cc.mewcraft.wakame.item.data.ItemDataContainer
 import cc.mewcraft.wakame.item.datagen.ItemMetaContainer
-import cc.mewcraft.wakame.item.property.ItemPropertyContainer
-import cc.mewcraft.wakame.item.property.ItemPropertyType
+import cc.mewcraft.wakame.item.property.ItemPropContainer
+import cc.mewcraft.wakame.item.property.ItemPropType
 import cc.mewcraft.wakame.item.property.ItemPropertyTypes
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.adventure.toSimpleString
@@ -40,7 +40,7 @@ import java.util.stream.Stream
 open class KoishItem(
     val id: Identifier,
     val dataConfig: ItemMetaContainer,
-    val properties: ItemPropertyContainer,
+    val properties: ItemPropContainer,
     val behaviors: ItemBehaviorContainer,
 ) : Examinable {
 
@@ -75,9 +75,9 @@ open class KoishItem(
  */
 val KoishItem.name: Component get() = properties.getOrDefault(ItemPropertyTypes.NAME, Component.text(id.asString()))
 //val KoishItem.isEmpty: Boolean get() = this === KoishItem.EMPTY
-fun <T> KoishItem.hasProperty(type: ItemPropertyType<T>): Boolean = properties.has(type)
-fun <T> KoishItem.getProperty(type: ItemPropertyType<out T>): T? = properties[type]
-fun <T> KoishItem.getPropertyOrDefault(type: ItemPropertyType<T>, default: T): T = properties.getOrDefault(type, default)
+fun <T> KoishItem.hasProperty(type: ItemPropType<T>): Boolean = properties.has(type)
+fun <T> KoishItem.getProperty(type: ItemPropType<out T>): T? = properties[type]
+fun <T> KoishItem.getPropertyOrDefault(type: ItemPropType<T>, default: T): T = properties.getOrDefault(type, default)
 
 /**
  * 表示一个套皮物品(由配置文件创建).
@@ -90,7 +90,7 @@ fun <T> KoishItem.getPropertyOrDefault(type: ItemPropertyType<T>, default: T): T
 class KoishItemProxy(
     id: Identifier,
     dataConfig: ItemMetaContainer,
-    properties: ItemPropertyContainer,
+    properties: ItemPropContainer,
     behaviors: ItemBehaviorContainer,
     val data: ItemDataContainer,
 ) : KoishItem(id, dataConfig, properties, behaviors) {

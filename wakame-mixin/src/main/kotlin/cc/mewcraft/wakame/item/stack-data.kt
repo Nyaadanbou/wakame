@@ -8,8 +8,8 @@ import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.datagen.ItemMetaContainer
 import cc.mewcraft.wakame.item.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item.datagen.ItemMetaType
-import cc.mewcraft.wakame.item.property.ItemPropertyContainer
-import cc.mewcraft.wakame.item.property.ItemPropertyType
+import cc.mewcraft.wakame.item.property.ItemPropContainer
+import cc.mewcraft.wakame.item.property.ItemPropType
 import cc.mewcraft.wakame.mixin.support.ExtraDataComponents
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifier
@@ -35,21 +35,21 @@ val ItemStack.isExactKoish: Boolean get() = toNMS().isExactKoish
 val ItemStack.koishItem: KoishItem? get() = toNMS().koishItem
 fun ItemStack.dataContainer(includeProxy: Boolean): ItemDataContainer? = toNMS().dataContainer(includeProxy)
 fun ItemStack.dataConfig(): ItemMetaContainer? = toNMS().dataConfig()
-fun ItemStack.propertyContainer(): ItemPropertyContainer? = toNMS().propertyContainer()
+fun ItemStack.propertyContainer(): ItemPropContainer? = toNMS().propertyContainer()
 val Material.koishProxy: KoishItemProxy? get() = BuiltInRegistries.ITEM_PROXY[key()]
 
 /* Property */
 
-fun <T> ItemStack.getProp(type: ItemPropertyType<out T>): T? = toNMS().getProp(type)
-fun <T> ItemStack.hasProp(type: ItemPropertyType<T>): Boolean = toNMS().hasProp(type)
-fun <T> ItemStack.getPropOrDefault(type: ItemPropertyType<out T>, fallback: T): T? = toNMS().getPropOrDefault(type, fallback)
+fun <T> ItemStack.getProp(type: ItemPropType<out T>): T? = toNMS().getProp(type)
+fun <T> ItemStack.hasProp(type: ItemPropType<T>): Boolean = toNMS().hasProp(type)
+fun <T> ItemStack.getPropOrDefault(type: ItemPropType<out T>, fallback: T): T? = toNMS().getPropOrDefault(type, fallback)
 
 @Deprecated("Use getProp instead", ReplaceWith("hasProp(type)"))
-fun <T> ItemStack.hasProperty(type: ItemPropertyType<T>): Boolean = hasProp(type)
+fun <T> ItemStack.hasProperty(type: ItemPropType<T>): Boolean = hasProp(type)
 @Deprecated("Use hasProp instead", ReplaceWith("getProp(type)"))
-fun <T> ItemStack.getProperty(type: ItemPropertyType<out T>): T? = getProp(type)
+fun <T> ItemStack.getProperty(type: ItemPropType<out T>): T? = getProp(type)
 @Deprecated("Use getPropOrDefault instead", ReplaceWith("getPropOrDefault(type, fallback)"))
-fun <T> ItemStack.getPropertyOrDefault(type: ItemPropertyType<out T>, fallback: T): T? = toNMS().getPropOrDefault(type, fallback)
+fun <T> ItemStack.getPropertyOrDefault(type: ItemPropType<out T>, fallback: T): T? = toNMS().getPropOrDefault(type, fallback)
 
 /* ItemData */
 
@@ -164,7 +164,7 @@ fun MojangStack.dataConfig(): ItemMetaContainer? =
     koishItem?.dataConfig
 
 /**
- * 获取该物品堆叠的属性数据容器 [ItemPropertyContainer].
+ * 获取该物品堆叠的属性数据容器 [ItemPropContainer].
  *
  * *绝大多数情况下无需使用该函数.*
  *
@@ -174,7 +174,7 @@ fun MojangStack.dataConfig(): ItemMetaContainer? =
  * @see getProperty
  * @see getPropertyOrDefault
  */
-fun MojangStack.propertyContainer(): ItemPropertyContainer? =
+fun MojangStack.propertyContainer(): ItemPropContainer? =
     koishItem?.properties
 
 /**
@@ -187,25 +187,25 @@ val Item.koishProxy: KoishItemProxy?
 
 /* Property */
 
-fun <T> MojangStack.getProp(type: ItemPropertyType<out T>): T? =
+fun <T> MojangStack.getProp(type: ItemPropType<out T>): T? =
     propertyContainer()?.get(type)
 
-fun <T> MojangStack.hasProp(type: ItemPropertyType<T>): Boolean =
+fun <T> MojangStack.hasProp(type: ItemPropType<T>): Boolean =
     propertyContainer()?.has(type) == true
 
-fun <T> MojangStack.getPropOrDefault(type: ItemPropertyType<out T>, fallback: T): T? =
+fun <T> MojangStack.getPropOrDefault(type: ItemPropType<out T>, fallback: T): T? =
     propertyContainer()?.getOrDefault(type, fallback)
 
 @Deprecated("Use getProp instead", ReplaceWith("getProp(type)"))
-fun <T> MojangStack.getProperty(type: ItemPropertyType<out T>): T? =
+fun <T> MojangStack.getProperty(type: ItemPropType<out T>): T? =
     getProp(type)
 
 @Deprecated("Use hasProp instead", ReplaceWith("hasProp(type)"))
-fun <T> MojangStack.hasProperty(type: ItemPropertyType<T>): Boolean =
+fun <T> MojangStack.hasProperty(type: ItemPropType<T>): Boolean =
     hasProp(type)
 
 @Deprecated("Use getPropOrDefault instead", ReplaceWith("getPropOrDefault(type, fallback)"))
-fun <T> MojangStack.getPropertyOrDefault(type: ItemPropertyType<out T>, fallback: T): T? =
+fun <T> MojangStack.getPropertyOrDefault(type: ItemPropType<out T>, fallback: T): T? =
     getPropOrDefault(type, fallback)
 
 /* ItemData */

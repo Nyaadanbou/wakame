@@ -9,7 +9,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
  *
  * @param T 数据类型
  */
-sealed interface ItemPropertyType<T> {
+sealed interface ItemPropType<T> {
 
     companion object {
 
@@ -42,14 +42,14 @@ sealed interface ItemPropertyType<T> {
             return this
         }
 
-        fun build(): ItemPropertyType<T> {
+        fun build(): ItemPropType<T> {
             return Simple(typeToken, serializers)
         }
 
         private class Simple<T>(
             override val typeToken: TypeToken<T>,
             override val serializers: TypeSerializerCollection?,
-        ) : ItemPropertyType<T> {
+        ) : ItemPropType<T> {
             override fun toString(): String = "ItemPropertyType(type=${typeToken.type}, serializers=$serializers)"
         }
     }
