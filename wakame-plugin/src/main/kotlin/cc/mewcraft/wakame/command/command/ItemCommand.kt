@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.command.command
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
-import cc.mewcraft.wakame.command.parser.Item2Parser
+import cc.mewcraft.wakame.command.parser.ItemParser
 import cc.mewcraft.wakame.item.KoishItem
 import cc.mewcraft.wakame.item.KoishStackGenerator
 import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
@@ -19,19 +19,19 @@ import org.incendo.cloud.kotlin.extension.getOrNull
 import org.incendo.cloud.paper.util.sender.Source
 import org.incendo.cloud.parser.standard.IntegerParser
 
-internal object Item2Command : KoishCommandFactory<Source> {
+internal object ItemCommand : KoishCommandFactory<Source> {
 
     override fun KoishCommandFactory.Builder<Source>.createCommands() {
         val commonBuilder = build {
             permission(CommandPermissions.ITEM)
-            literal("item2")
+            literal("item")
         }
 
-        // <root> item2 give <item> <amount> <player>
+        // <root> item give <item> <amount> <player>
         // Give the player(s) certain amount of specific item(s)
         buildAndAdd(commonBuilder) {
             literal("give")
-            required("item", Item2Parser.itemParser())
+            required("item", ItemParser.itemParser())
             optional("amount", IntegerParser.integerParser(1, 4 * 9 * 64))
             optional("player", MultiplePlayerSelectorParser.multiplePlayerSelectorParser())
             koishHandler(handler = ::handleGiveItem)

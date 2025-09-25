@@ -19,10 +19,10 @@ import org.incendo.cloud.suggestion.BlockingSuggestionProvider
  *
  * @param C the sender type
  */
-class Item2Parser<C : Any> : ArgumentParser<C, KoishItem>, BlockingSuggestionProvider.Strings<C> {
+class ItemParser<C : Any> : ArgumentParser<C, KoishItem>, BlockingSuggestionProvider.Strings<C> {
     companion object Factory {
         fun <C : Any> itemParser(): ParserDescriptor<C, KoishItem> {
-            return ParserDescriptor.of(Item2Parser(), typeTokenOf())
+            return ParserDescriptor.of(ItemParser(), typeTokenOf())
         }
 
         fun <C : Any> itemComponent(): CommandComponent.Builder<C, KoishItem> {
@@ -32,7 +32,7 @@ class Item2Parser<C : Any> : ArgumentParser<C, KoishItem>, BlockingSuggestionPro
 
     override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<KoishItem> {
         val peekString = commandInput.peekString()
-        val itemType = BuiltInRegistries.ITEM[peekString] ?: return ArgumentParseResult.failure(Item2ParseException(commandContext))
+        val itemType = BuiltInRegistries.ITEM[peekString] ?: return ArgumentParseResult.failure(ItemParseException(commandContext))
         commandInput.readString() // consume token
         return ArgumentParseResult.success(itemType)
     }
@@ -42,10 +42,10 @@ class Item2Parser<C : Any> : ArgumentParser<C, KoishItem>, BlockingSuggestionPro
     }
 }
 
-class Item2ParseException(
+class ItemParseException(
     context: CommandContext<*>,
 ) : ParserException(
-    Item2Parser::class.java,
+    ItemParser::class.java,
     context,
     StandardCaptionKeys.EXCEPTION_INVALID_ARGUMENT
 )
