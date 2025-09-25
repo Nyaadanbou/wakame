@@ -77,7 +77,7 @@ internal object CustomItemRegistryLoader : RegistryLoader {
         }
 
         // 获取存放所有物品配置的文件夹
-        val dataDir = getFileInConfigDirectory("item2/")
+        val dataDir = getFileInConfigDirectory("item/")
 
         dataDir.walk().drop(1).filter { it.isFile && it.extension == "yml" }.forEach { f ->
             try {
