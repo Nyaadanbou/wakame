@@ -65,7 +65,7 @@ data class MetaItemLevel(
         }
 
         return raw
-            .coerceIn(ItemLevel.minimumLevel, max)
+            .coerceIn(ItemLevel.MINIMUM_LEVEL, max)
             .also { lvl -> context.level = lvl } // populate the context with generated level
             .let { lvl -> ItemMetaResult.of(ItemLevel(lvl)) }
     }

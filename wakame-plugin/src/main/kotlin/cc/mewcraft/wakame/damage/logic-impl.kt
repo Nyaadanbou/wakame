@@ -23,8 +23,7 @@ import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
 import cc.mewcraft.wakame.item.behavior.getBehavior
 import cc.mewcraft.wakame.item.behavior.hasBehaviorExact
 import cc.mewcraft.wakame.item.behavior.impl.weapon.Weapon
-import cc.mewcraft.wakame.item.data.ItemDataTypes
-import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.extension.coreContainer
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
@@ -767,7 +766,7 @@ internal object DamageManager : DamageManagerApi {
     private fun createNoCausingAttributedArrowDamageMetadata(arrow: AbstractArrow): DamageMetadata? {
         val itemstack = arrow.itemStack
         if (!itemstack.hasBehaviorExact(ItemBehaviorTypes.ARROW)) return null
-        val itemcores = itemstack.getData(ItemDataTypes.CORE_CONTAINER) ?: return null
+        val itemcores = itemstack.coreContainer ?: return null
         val modifiersOnArrow = itemcores.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
 
         val arrowAttributes = getImaginaryArrowAttributes() ?: return null
@@ -795,7 +794,7 @@ internal object DamageManager : DamageManagerApi {
         val damageBundle = run {
             val itemstack = abstractArrow.itemStack
             if (!itemstack.hasBehaviorExact(ItemBehaviorTypes.ARROW)) return null
-            val itemcores = itemstack.getData(ItemDataTypes.CORE_CONTAINER) ?: return null
+            val itemcores = itemstack.coreContainer ?: return null
             val modifiersOnArrow = itemcores.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
 
             attributes.addTransientModifiers(modifiersOnArrow)

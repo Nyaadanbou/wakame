@@ -2,8 +2,7 @@ package cc.mewcraft.wakame.item.behavior
 
 import cc.mewcraft.wakame.damage.FinalDamageContext
 import cc.mewcraft.wakame.entity.player.koishLevel
-import cc.mewcraft.wakame.item.data.ItemDataTypes
-import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.extension.level
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.koishItem
 import cc.mewcraft.wakame.item.property.ItemPropertyTypes
@@ -192,10 +191,8 @@ object ItemStackActivationChecker {
     fun ItemStack.isPlayerLevelEnough(player: Player): Boolean {
         // 如果不是萌芽物品, 那么认为玩家的等级足够
         if (koishItem == null) return true
-        val itemLevel = getData(ItemDataTypes.LEVEL)?.level
-
         // 如果物品没有等级, 那么认为玩家的等级足够
-        if (itemLevel == null) return true
+        val itemLevel = this.level?.level ?: return true
 
         val playerLevel = player.koishLevel
         return itemLevel <= playerLevel

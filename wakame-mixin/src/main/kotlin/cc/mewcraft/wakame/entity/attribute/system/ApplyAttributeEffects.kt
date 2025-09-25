@@ -6,8 +6,7 @@ import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.item.ItemSlotChanges
-import cc.mewcraft.wakame.item.data.ItemDataTypes
-import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.extension.coreContainer
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 
@@ -25,7 +24,7 @@ object ApplyAttributeEffects : IteratingSystem(
         // 更新属性的状态
         slotChanges.forEachChangingEntry { slot, curr, prev ->
             if (prev != null && ItemSlotChanges.testSlot(slot, prev)) {
-                val coreContainer = prev.getData(ItemDataTypes.CORE_CONTAINER)
+                val coreContainer = prev.coreContainer
                 if (coreContainer != null) {
                     LOGGER.info("Removing attribute modifier from ${slot.id}")
                     val attrModifiers = coreContainer.collectAttributeModifiers(prev, slot)
@@ -37,7 +36,7 @@ object ApplyAttributeEffects : IteratingSystem(
                 ItemSlotChanges.testLevel(player, curr) &&
                 ItemSlotChanges.testDurability(curr)
             ) {
-                val coreContainer = curr.getData(ItemDataTypes.CORE_CONTAINER)
+                val coreContainer = curr.coreContainer
                 if (coreContainer != null) {
                     LOGGER.info("Adding attribute modifier from ${slot.id}")
                     val attrModifiers = coreContainer.collectAttributeModifiers(curr, slot)

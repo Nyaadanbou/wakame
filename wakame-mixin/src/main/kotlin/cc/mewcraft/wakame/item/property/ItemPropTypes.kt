@@ -227,7 +227,7 @@ data object ItemPropTypes {
      * @see cc.mewcraft.wakame.item.data.ItemDataTypes.ELEMENT
      */
     @JvmField
-    val ELEMENT = typeOf<RegistryEntry<Element>>("idem_element") {
+    val ELEMENT = typeOf<Set<RegistryEntry<Element>>>("idem_element") {
         serializers {
             register(BuiltInRegistries.ELEMENT.holderByNameTypeSerializer())
         }
@@ -239,7 +239,7 @@ data object ItemPropTypes {
      * @see cc.mewcraft.wakame.item.data.ItemDataTypes.KIZAMI
      */
     @JvmField
-    val KIZAMI = typeOf<RegistryEntry<Kizami>>("idem_kizami") {
+    val KIZAMI = typeOf<Set<RegistryEntry<Kizami>>>("idem_kizami") {
         serializers {
             register(BuiltInRegistries.KIZAMI.holderByNameTypeSerializer())
         }
@@ -263,7 +263,7 @@ data object ItemPropTypes {
      * @see cc.mewcraft.wakame.item.data.ItemDataTypes.CORE_CONTAINER
      */
     @JvmField
-    val CORE_CONTAINER = typeOf<Map<String, Core>>("idem_core_container") {
+    val CORE_CONTAINER = typeOf<CoreContainer>("idem_core_container") {
         serializers {
             registerAll(Core.serializers())
             register(CoreContainer.SERIALIZER)

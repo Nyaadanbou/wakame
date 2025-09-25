@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entryOrElse
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.data.ItemDataTypes
+import cc.mewcraft.wakame.item.extension.rarity2
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.ItemPropertyTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -100,7 +101,7 @@ object EnchantSlotFeature : Listener {
         val amount = when (ENCHANT_SLOT_BASE_PROVIDER) {
             SlotBaseProviderType.NONE -> Int.MIN_VALUE
             SlotBaseProviderType.PROP -> item.getProp(ItemPropertyTypes.ENCHANT_SLOT_BASE) ?: 0
-            SlotBaseProviderType.RARITY -> item.getData(ItemDataTypes.RARITY)?.unwrap()?.enchantSlotBase ?: 0
+            SlotBaseProviderType.RARITY -> item.rarity2?.unwrap()?.enchantSlotBase ?: 0
         }
         return amount
     }
@@ -116,7 +117,7 @@ object EnchantSlotFeature : Listener {
      * 返回物品的魔咒槽位最大容量.
      */
     fun getSlotLimit(item: ItemStack): Int {
-        return item.getData(ItemDataTypes.RARITY)?.unwrap()?.enchantSlotLimit ?: 0
+        return item.rarity2?.unwrap()?.enchantSlotLimit ?: 0
     }
 
     /**

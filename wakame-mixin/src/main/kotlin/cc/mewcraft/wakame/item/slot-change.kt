@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.entity.player.component.InventoryListenable
 import cc.mewcraft.wakame.entity.player.koishLevel
 import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
-import cc.mewcraft.wakame.item.data.ItemDataTypes
+import cc.mewcraft.wakame.item.extension.level
 import cc.mewcraft.wakame.item.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import cc.mewcraft.wakame.item.property.impl.ItemSlotGroup
@@ -88,14 +88,10 @@ data class ItemSlotChanges(
          * 检查物品的等级小于等于玩家的冒险等级.
          */
         fun testLevel(player: Player, itemstack: ItemStack?): Boolean {
-            if (itemstack == null) {
-                return true // 如果不是萌芽物品, 那么玩家的等级一定高于该物品 (0)
-            }
-
-            val itemLevel = itemstack.getData(ItemDataTypes.LEVEL)?.level
-            if (itemLevel == null) {
-                return true // 如果物品没有等级, 那么玩家的等级一定高于该物品 (0)
-            }
+            // 如果不是萌芽物品, 那么玩家的等级一定高于该物品 (0)
+            if (itemstack == null) return true
+            // 如果物品没有等级, 那么玩家的等级一定高于该物品 (0)
+            val itemLevel = itemstack.level?.level ?: return true
 
             val playerLevel = player.koishLevel
             return itemLevel <= playerLevel

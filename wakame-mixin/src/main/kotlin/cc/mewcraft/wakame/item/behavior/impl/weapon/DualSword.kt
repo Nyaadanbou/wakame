@@ -8,11 +8,10 @@ import cc.mewcraft.wakame.item.behavior.AttackContext
 import cc.mewcraft.wakame.item.behavior.InteractionHand
 import cc.mewcraft.wakame.item.behavior.InteractionResult
 import cc.mewcraft.wakame.item.behavior.UseContext
-import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.extension.addCooldown
+import cc.mewcraft.wakame.item.extension.coreContainer
 import cc.mewcraft.wakame.item.extension.damageItem
 import cc.mewcraft.wakame.item.extension.isOnCooldown
-import cc.mewcraft.wakame.item.getData
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
@@ -70,7 +69,7 @@ object DualSword : Weapon {
 
         val attributeContainerSnapshot = player.attributeContainer.getSnapshot()
         // 如果主手剑位于主手时提供属性修饰符, 才需要移除
-        val coresOnMainSword = itemstack.getData(ItemDataTypes.CORE_CONTAINER)
+        val coresOnMainSword = itemstack.coreContainer
         val slotGroup = itemstack.getProp(ItemPropTypes.SLOT) ?: ItemSlotGroup.empty()
         if (slotGroup.contains(MinecraftItemSlot.MAINHAND)) {
             // 移除主手剑上的属性修饰符
@@ -81,7 +80,7 @@ object DualSword : Weapon {
         }
 
         // 副手剑上没有核心容器 - 不处理
-        val coresOnOffSword = itemInOffHand.getData(ItemDataTypes.CORE_CONTAINER) ?: return InteractionResult.FAIL
+        val coresOnOffSword = itemInOffHand.coreContainer ?: return InteractionResult.FAIL
         val modifiersOnOffSword = coresOnOffSword.collectAttributeModifiers(itemInOffHand, ItemSlot.imaginary())
         // 加上副手剑上的属性修饰符
         attributeContainerSnapshot.addTransientModifiers(modifiersOnOffSword)

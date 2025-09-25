@@ -40,6 +40,42 @@ world_weather_control_use_interval_ticks: 12000
 #   rarity: 根据物品的稀有度 (rarity) 计算
 enchant_slot_base_provider: rarity
 
+# Koish 如何获取物品的等级
+# 可用选项:
+#   data: 从物品堆叠上读取等级
+#   type: 从物品类型上读取等级
+item_level_provider: data
+
+# Koish 如何获取物品的稀有度
+# 可用选项:
+#   data: 从物品堆叠上读取稀有度
+#   type: 从物品类型上读取稀有度
+item_rarity_provider: data
+
+# Koish 如何获取物品的元素
+# 可用选项:
+#   data: 从物品堆叠上读取元素
+#   type: 从物品类型上读取元素
+item_element_provider: data
+
+# Koish 如何获取物品的铭刻
+# 可用选项:
+#   data: 从物品堆叠上读取铭刻
+#   type: 从物品类型上读取铭刻
+item_kizami_provider: data
+
+# Koish 如何获取物品的核心
+# 可用选项:
+#   data: 从物品堆叠上读取核心
+#   type: 从物品类型上读取核心
+item_core_provider: data
+
+# Koish 如何获取物品的核心容器
+# 可用选项:
+#   data: 从物品堆叠上读取核心容器
+#   type: 从物品类型上读取核心容器
+item_core_container_provider: data
+
 # 禁止玩家在以下世界中与村民进行交易
 disable_villager_trade_in_worlds:
   - koish:eden

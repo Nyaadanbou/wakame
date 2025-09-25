@@ -11,7 +11,9 @@ import cc.mewcraft.wakame.item.display.IndexedText
 import cc.mewcraft.wakame.item.display.TextAssembler
 import cc.mewcraft.wakame.item.display.implementation.*
 import cc.mewcraft.wakame.item.display.implementation.common.*
+import cc.mewcraft.wakame.item.extension.*
 import cc.mewcraft.wakame.item.feature.EnchantSlotFeature
+import cc.mewcraft.wakame.item.getData
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.Arrow
 import cc.mewcraft.wakame.item.property.impl.EntityBucket
@@ -82,17 +84,18 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         item.process(ItemMetaTypes.ITEM_NAME) { data -> StandardRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
         item.process(ItemMetaTypes.CUSTOM_NAME) { data -> StandardRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
 
-        item.process(ItemDataTypes.CORE_CONTAINER) { data -> for ((_, core) in data) renderCore(collector, core) }
         item.process(ItemDataTypes.CRATE) { data -> StandardRenderingHandlerRegistry.CRATE.process(collector, data) }
-        item.process(ItemDataTypes.ELEMENT) { data -> StandardRenderingHandlerRegistry.ELEMENT.process(collector, data) }
-        item.process(ItemDataTypes.KIZAMI) { data -> StandardRenderingHandlerRegistry.KIZAMI.process(collector, data) }
-        item.process(ItemDataTypes.LEVEL) { data -> StandardRenderingHandlerRegistry.LEVEL.process(collector, data) }
-        item.process(ItemDataTypes.CORE) { data -> StandardRenderingHandlerRegistry.CORE.process(collector, data) }
-        item.process(ItemDataTypes.RARITY, ItemDataTypes.REFORGE_HISTORY) { data1, data2 ->
-            val data1 = data1 ?: return@process
-            val data2 = data2 ?: ReforgeHistory.ZERO
+        StandardRenderingHandlerRegistry.ELEMENT.process(collector, item.elements)
+        StandardRenderingHandlerRegistry.KIZAMI.process(collector, item.kizamiz)
+        item.level?.let { StandardRenderingHandlerRegistry.LEVEL.process(collector, it) }
+        item.core?.let { StandardRenderingHandlerRegistry.CORE.process(collector, it) }
+        item.coreContainer?.let { data -> for ((_, core) in data) renderCore(collector, core) }
+        item.rarity2?.let { rarityEntry ->
+            val data1 = rarityEntry
+            val data2 = item.getData(ItemDataTypes.REFORGE_HISTORY) ?: ReforgeHistory.ZERO
             StandardRenderingHandlerRegistry.RARITY.process(collector, data1, data2)
         }
+
         item.process(ItemDataTypes.ENTITY_BUCKET_INFO) { data -> StandardRenderingHandlerRegistry.ENTITY_BUCKET_INFO.process(collector, data) }
 
         item.process(DataComponentTypes.ENCHANTMENTS) { data -> StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }

@@ -10,8 +10,7 @@ data class ItemLevel(
 ) {
 
     companion object {
-        // FIXME #350: 读取全局配置文件
-        val minimumLevel: Int = 1
+        const val MINIMUM_LEVEL: Int = 1 // FIXME #350: 读取全局配置文件
     }
 
 }

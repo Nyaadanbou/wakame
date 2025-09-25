@@ -5,8 +5,7 @@ import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.item.ItemSlotChanges
-import cc.mewcraft.wakame.item.data.ItemDataTypes
-import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.extension.kizamiz
 import cc.mewcraft.wakame.kizami.KizamiMap
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
@@ -29,8 +28,8 @@ object ApplyKizamiEffects : IteratingSystem(
         var changed = false
         slotChanges.forEachChangingEntry { slot, curr, prev ->
             if (prev != null && ItemSlotChanges.testSlot(slot, prev)) {
-                val kizami = prev.getData(ItemDataTypes.KIZAMI)
-                if (kizami != null) {
+                val kizami = prev.kizamiz
+                if (kizami.isNotEmpty()) {
                     LOGGER.info("Decrementing kizami count from ${slot.id}")
                     liveKizamiContainer.subtractOneEach(kizami)
                     changed = true
@@ -41,8 +40,8 @@ object ApplyKizamiEffects : IteratingSystem(
                 ItemSlotChanges.testLevel(player, curr) &&
                 ItemSlotChanges.testDurability(curr)
             ) {
-                val kizami = curr.getData(ItemDataTypes.KIZAMI)
-                if (kizami != null) {
+                val kizami = curr.kizamiz
+                if (kizami.isNotEmpty()) {
                     LOGGER.info("Incrementing kizami count from ${slot.id}")
                     liveKizamiContainer.addOneEach(kizami)
                     changed = true

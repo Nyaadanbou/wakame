@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.network
 
-import cc.mewcraft.wakame.item.data.ItemDataTypes
-import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.extension.rarity2
 import cc.mewcraft.wakame.item.hasProperty
 import cc.mewcraft.wakame.item.property.ItemPropertyTypes
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
@@ -93,7 +92,7 @@ internal object ItemEntityRender : PacketListener {
     }
 
     private fun sendGlowColorPacket(player: Player, item: Item) {
-        val rarityColor = item.itemStack.getData(ItemDataTypes.RARITY)?.unwrap()?.color ?: return
+        val rarityColor = item.itemStack.rarity2?.unwrap()?.color ?: return
         val teamPacket = buildCreateTeamPacket(item, rarityColor)
         entityId2EntityUniqueId[item.entityId] = item.uniqueId
         player.send(teamPacket)
