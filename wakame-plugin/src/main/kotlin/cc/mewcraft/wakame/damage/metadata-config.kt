@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.damage
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.molang.Expression
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
-import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.registry.BuiltInRegistries
+import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
@@ -139,7 +139,7 @@ internal data class VanillaDamageMetadataBuilder(
  * 依赖攻击实体的 [cc.mewcraft.wakame.entity.attribute.AttributeMap] 的 [DamageMetadata] 序列化器.
  */
 @ConfigSerializable
-internal object AttributeDamageMetadataBuilder: DamageMetadataBuilder<Double> {
+internal object AttributeDamageMetadataBuilder : DamageMetadataBuilder<Double> {
 
     override fun build(context: RawDamageContext): DamageMetadata {
         val damager = context.damageSource.causingEntity ?: throw IllegalStateException(

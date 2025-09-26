@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.loot
 
 import cc.mewcraft.wakame.loot.context.LootContext
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import io.leangen.geantyref.TypeFactory
@@ -16,7 +16,7 @@ import java.lang.reflect.WildcardType
 import java.util.stream.Stream
 
 inline fun <reified S> LootTable(
-    pools: List<LootPool<S>>
+    pools: List<LootPool<S>>,
 ): LootTable<S> = SimpleLootTable(pools)
 
 /**

@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.api
 
 import cc.mewcraft.wakame.api.item.KoishItem
 import cc.mewcraft.wakame.api.item.KoishItemRegistry
-import cc.mewcraft.wakame.item2.koishItem
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.item.koishItem
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifiers
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack

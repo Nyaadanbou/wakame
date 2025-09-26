@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.gui.catalog.item
 
 import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
-import cc.mewcraft.wakame.item2.ItemRef
-import cc.mewcraft.wakame.item2.display.resolveToItemWrapper
+import cc.mewcraft.wakame.item.ItemRef
+import cc.mewcraft.wakame.item.resolveToItemWrapper
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType

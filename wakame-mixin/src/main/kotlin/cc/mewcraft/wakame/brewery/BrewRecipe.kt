@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.brewery
 
-import cc.mewcraft.wakame.registry2.Registry
-import cc.mewcraft.wakame.registry2.WritableRegistry
+import cc.mewcraft.wakame.registry.Registry
+import cc.mewcraft.wakame.registry.WritableRegistry
 import cc.mewcraft.wakame.util.Identifiers
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed

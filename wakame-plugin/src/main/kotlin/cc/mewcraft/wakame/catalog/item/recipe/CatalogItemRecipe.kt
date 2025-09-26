@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.catalog.item.recipe
 
-import cc.mewcraft.wakame.item2.ItemRef
+import cc.mewcraft.wakame.item.ItemRef
 import xyz.xenondevs.invui.gui.Gui
 
 /**

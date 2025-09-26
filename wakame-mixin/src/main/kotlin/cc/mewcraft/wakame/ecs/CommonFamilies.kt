@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.ecs
 
-import cc.mewcraft.wakame.ability2.component.Ability
-import cc.mewcraft.wakame.ability2.component.CastBy
-import cc.mewcraft.wakame.ability2.component.ManaCost
-import cc.mewcraft.wakame.ability2.component.TargetTo
+import cc.mewcraft.wakame.ability.component.Ability
+import cc.mewcraft.wakame.ability.component.CastBy
+import cc.mewcraft.wakame.ability.component.ManaCost
+import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.*
 import cc.mewcraft.wakame.element.component.ElementStack

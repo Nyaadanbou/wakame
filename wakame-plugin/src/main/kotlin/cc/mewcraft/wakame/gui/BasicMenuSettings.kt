@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.gui
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.item2.display.SlotDisplay
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.item.SlotDisplay
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.adventure.plain
 import net.kyori.adventure.text.Component

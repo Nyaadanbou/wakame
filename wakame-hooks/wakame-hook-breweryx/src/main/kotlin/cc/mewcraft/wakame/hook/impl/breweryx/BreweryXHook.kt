@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.hook.impl.breweryx
 import cc.mewcraft.wakame.brewery.BrewRecipeManager
 import cc.mewcraft.wakame.brewery.BrewRecipeRenderer
 import cc.mewcraft.wakame.integration.Hook
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifiers
 import com.dre.brewery.BarrelWoodType
 import com.dre.brewery.recipe.PluginItem

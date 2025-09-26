@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.bundle.element
-import cc.mewcraft.wakame.item2.data.impl.AttributeCore
-import cc.mewcraft.wakame.item2.data.impl.Core
-import cc.mewcraft.wakame.item2.data.impl.EmptyCore
-import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.item.data.impl.AttributeCore
+import cc.mewcraft.wakame.item.data.impl.Core
+import cc.mewcraft.wakame.item.data.impl.EmptyCore
+import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.javaTypeOf
@@ -65,7 +65,7 @@ interface CoreMatchRule : Examinable {
  * [CoreMatchRule] 的序列化器.
  *
  * 依赖的序列化器:
- * - [cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariantSerializer]
+ * - [cc.mewcraft.wakame.ability.trigger.AbilityTriggerVariantSerializer]
  */
 internal object CoreMatchRuleSerializer : TypeSerializer2<CoreMatchRule> {
     override fun deserialize(type: Type, node: ConfigurationNode): CoreMatchRule {

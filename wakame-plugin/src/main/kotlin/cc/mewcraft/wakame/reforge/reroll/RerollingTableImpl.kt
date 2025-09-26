@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item.data.ItemDataTypes
+import cc.mewcraft.wakame.item.getData
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.adventure.toSimpleString

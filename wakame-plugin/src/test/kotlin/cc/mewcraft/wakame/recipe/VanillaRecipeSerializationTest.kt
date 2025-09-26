@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.recipe
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.core.ItemRefMock
-import cc.mewcraft.wakame.item2.ItemRef
-import cc.mewcraft.wakame.item2.ItemRefBootstrap
+import cc.mewcraft.wakame.item.ItemRef
+import cc.mewcraft.wakame.item.ItemRefBootstrap
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.test.TestOnly
 import cc.mewcraft.wakame.util.test.TestPath
@@ -14,13 +14,7 @@ import io.mockk.unmockkObject
 import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
-import kotlin.test.AfterTest
-import kotlin.test.Test
-import kotlin.test.assertContains
-import kotlin.test.assertContentEquals
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
-import kotlin.test.assertNotNull
+import kotlin.test.*
 
 class VanillaRecipeSerializationTest {
     companion object {

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.event.bukkit
 
-import cc.mewcraft.wakame.ability2.meta.AbilityMeta
+import cc.mewcraft.wakame.ability.meta.AbilityMeta
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.player.PlayerEvent

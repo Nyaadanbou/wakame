@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.reforge.mod
 
-import cc.mewcraft.wakame.item2.data.impl.Core
+import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.reforge.common.VariableByPlayer
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable

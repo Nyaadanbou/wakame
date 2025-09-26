@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.support;
 
-import cc.mewcraft.wakame.item2.KoishStackData;
+import cc.mewcraft.wakame.item.KoishStackData;
 import it.unimi.dsi.fastutil.Hash;
 import net.kyori.adventure.key.Key;
 import net.minecraft.world.item.ItemStack;

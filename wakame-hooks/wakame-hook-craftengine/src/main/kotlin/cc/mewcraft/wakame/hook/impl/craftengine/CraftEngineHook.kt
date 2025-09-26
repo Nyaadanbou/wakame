@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.hook.impl.craftengine.item.behavior.CraftEnginePlaceBl
 import cc.mewcraft.wakame.hook.impl.craftengine.item.behavior.CraftEnginePlaceDoubleHighBlock
 import cc.mewcraft.wakame.hook.impl.craftengine.item.behavior.CraftEnginePlaceLiquidCollisionBlock
 import cc.mewcraft.wakame.integration.Hook
-import cc.mewcraft.wakame.item2.behavior.CustomBlockChecker
-import cc.mewcraft.wakame.item2.behavior.impl.external.PlaceBlock
-import cc.mewcraft.wakame.item2.behavior.impl.external.PlaceDoubleHighBlock
-import cc.mewcraft.wakame.item2.behavior.impl.external.PlaceLiquidCollisionBlock
+import cc.mewcraft.wakame.item.behavior.CustomBlockChecker
+import cc.mewcraft.wakame.item.behavior.impl.external.PlaceBlock
+import cc.mewcraft.wakame.item.behavior.impl.external.PlaceDoubleHighBlock
+import cc.mewcraft.wakame.item.behavior.impl.external.PlaceLiquidCollisionBlock
 import net.momirealms.craftengine.bukkit.api.CraftEngineBlocks
 import org.bukkit.block.Block
 

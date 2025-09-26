@@ -1,17 +1,7 @@
 package cc.mewcraft.wakame.catalog.item.recipe
 
-import cc.mewcraft.wakame.item2.ItemRef
-import org.bukkit.inventory.BlastingRecipe
-import org.bukkit.inventory.CampfireRecipe
-import org.bukkit.inventory.CookingRecipe
-import org.bukkit.inventory.FurnaceRecipe
-import org.bukkit.inventory.RecipeChoice
-import org.bukkit.inventory.ShapedRecipe
-import org.bukkit.inventory.ShapelessRecipe
-import org.bukkit.inventory.SmithingTransformRecipe
-import org.bukkit.inventory.SmithingTrimRecipe
-import org.bukkit.inventory.SmokingRecipe
-import org.bukkit.inventory.StonecuttingRecipe
+import cc.mewcraft.wakame.item.ItemRef
+import org.bukkit.inventory.*
 import org.bukkit.inventory.Recipe as BukkitRecipe
 
 /**

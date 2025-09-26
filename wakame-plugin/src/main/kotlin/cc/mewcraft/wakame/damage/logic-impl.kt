@@ -19,15 +19,14 @@ import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.entity.attribute.AttributeMapSnapshot
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
-import cc.mewcraft.wakame.item2.behavior.ItemBehaviorTypes
-import cc.mewcraft.wakame.item2.behavior.getBehavior
-import cc.mewcraft.wakame.item2.behavior.hasBehaviorExact
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.Weapon
-import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
-import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.item2.getData
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
-import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
+import cc.mewcraft.wakame.item.behavior.getBehavior
+import cc.mewcraft.wakame.item.behavior.hasBehaviorExact
+import cc.mewcraft.wakame.item.behavior.impl.weapon.Weapon
+import cc.mewcraft.wakame.item.extension.coreContainer
+import cc.mewcraft.wakame.item.property.impl.ItemSlot
+import cc.mewcraft.wakame.registry.BuiltInRegistries
+import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.handle
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.serverLevel
@@ -36,35 +35,16 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import net.kyori.adventure.extra.kotlin.join
-import net.kyori.adventure.text.Component.empty
-import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.Component.translatable
+import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.LinearComponents
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.damage.DamageSource
-import org.bukkit.entity.AbstractArrow
-import org.bukkit.entity.Arrow
-import org.bukkit.entity.Entity
-import org.bukkit.entity.EntityType
-import org.bukkit.entity.FallingBlock
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
-import org.bukkit.entity.SpectralArrow
-import org.bukkit.entity.Trident
+import org.bukkit.entity.*
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ABSORPTION
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ARMOR
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BASE
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BLOCKING
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.FREEZING
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.HARD_HAT
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.INVULNERABILITY_REDUCTION
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.MAGIC
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.RESISTANCE
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.*
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.potion.PotionEffectType
@@ -384,7 +364,7 @@ internal object DamageManager : DamageManagerApi {
      */
     private fun calculateBaseModifierValueMap(
         damageMetadata: DamageMetadata,
-        defenseMetadata: DefenseMetadata
+        defenseMetadata: DefenseMetadata,
     ): Reference2DoubleMap<RegistryEntry<Element>> {
         val map = Reference2DoubleOpenHashMap<RegistryEntry<Element>>()
         val damagePackets = damageMetadata.damageBundle.packets()
@@ -409,7 +389,7 @@ internal object DamageManager : DamageManagerApi {
     private fun calculateElementDamage(
         damageMetadata: DamageMetadata,
         defenseMetadata: DefenseMetadata,
-        damagePacket: DamagePacket
+        damagePacket: DamagePacket,
     ): Double {
         // 伤害包的元素类型
         val elementType = damagePacket.element
@@ -463,7 +443,7 @@ internal object DamageManager : DamageManagerApi {
     private fun calculateBlockingModifierValueMap(
         damageMetadata: DamageMetadata,
         defenseMetadata: DefenseMetadata,
-        baseDamageMap: Reference2DoubleMap<RegistryEntry<Element>>
+        baseDamageMap: Reference2DoubleMap<RegistryEntry<Element>>,
     ): Reference2DoubleMap<RegistryEntry<Element>> {
         val map = Reference2DoubleOpenHashMap<RegistryEntry<Element>>()
         val elements = baseDamageMap.keys
@@ -510,7 +490,7 @@ internal object DamageManager : DamageManagerApi {
      */
     private fun calculateFinalDamageMap(
         baseDamageMap: Reference2DoubleMap<RegistryEntry<Element>>,
-        blockingDamageMap: Reference2DoubleMap<RegistryEntry<Element>>
+        blockingDamageMap: Reference2DoubleMap<RegistryEntry<Element>>,
     ): Reference2DoubleMap<RegistryEntry<Element>> {
         val finalDamageMap = Reference2DoubleOpenHashMap<RegistryEntry<Element>>()
 
@@ -552,7 +532,7 @@ internal object DamageManager : DamageManagerApi {
      * - [ABSORPTION] - 伤害吸收
      */
     private fun EntityDamageEvent.modifyUsedDamageModifiers(
-        finalDamageContext: FinalDamageContext
+        finalDamageContext: FinalDamageContext,
     ) {
         finalDamageContext.blockingModifierValue?.let { modifyDamageModifier(BLOCKING, it) }
         finalDamageContext.resistanceModifierValue?.let { modifyDamageModifier(RESISTANCE, it) }
@@ -786,7 +766,7 @@ internal object DamageManager : DamageManagerApi {
     private fun createNoCausingAttributedArrowDamageMetadata(arrow: AbstractArrow): DamageMetadata? {
         val itemstack = arrow.itemStack
         if (!itemstack.hasBehaviorExact(ItemBehaviorTypes.ARROW)) return null
-        val itemcores = itemstack.getData(ItemDataTypes.CORE_CONTAINER) ?: return null
+        val itemcores = itemstack.coreContainer ?: return null
         val modifiersOnArrow = itemcores.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
 
         val arrowAttributes = getImaginaryArrowAttributes() ?: return null
@@ -814,7 +794,7 @@ internal object DamageManager : DamageManagerApi {
         val damageBundle = run {
             val itemstack = abstractArrow.itemStack
             if (!itemstack.hasBehaviorExact(ItemBehaviorTypes.ARROW)) return null
-            val itemcores = itemstack.getData(ItemDataTypes.CORE_CONTAINER) ?: return null
+            val itemcores = itemstack.coreContainer ?: return null
             val modifiersOnArrow = itemcores.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
 
             attributes.addTransientModifiers(modifiersOnArrow)

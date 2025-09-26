@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.DefenseMetadata
 import cc.mewcraft.wakame.damage.FinalDamageContext
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Entity
 import org.bukkit.event.Cancellable

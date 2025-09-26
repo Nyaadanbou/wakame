@@ -2,11 +2,11 @@ package cc.mewcraft.wakame.gui.merge
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
-import cc.mewcraft.wakame.item2.display.resolveToItemWrapper
-import cc.mewcraft.wakame.item2.isKoish
+import cc.mewcraft.wakame.item.display.ItemRenderers
+import cc.mewcraft.wakame.item.display.implementation.merging_table.MergingTableContext
+import cc.mewcraft.wakame.item.isKoish
+import cc.mewcraft.wakame.item.resolveToItemWrapper
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.reforge.merge.MergingSession
 import cc.mewcraft.wakame.reforge.merge.MergingTable

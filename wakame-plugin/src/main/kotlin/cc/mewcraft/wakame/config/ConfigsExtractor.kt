@@ -3,15 +3,7 @@ package cc.mewcraft.wakame.config
 import cc.mewcraft.wakame.BootstrapContexts
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.util.data.useZip
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.copyTo
-import kotlin.io.path.copyToRecursively
-import kotlin.io.path.createDirectories
-import kotlin.io.path.createParentDirectories
-import kotlin.io.path.exists
-import kotlin.io.path.isDirectory
-import kotlin.io.path.isRegularFile
-import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.*
 
 /**
  * 本单例负责提取默认的配置文件.
@@ -45,7 +37,7 @@ internal object ConfigsExtractor {
         "catalog/",
         "crafting_station/",
         "element/",
-        "item2/",
+        "item/",
         "item_proxied/",
         "loot_table/",
         "kizami/",

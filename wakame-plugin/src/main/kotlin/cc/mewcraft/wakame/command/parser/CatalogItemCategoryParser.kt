@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
-import cc.mewcraft.wakame.registry2.DynamicRegistries
+import cc.mewcraft.wakame.registry.DynamicRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys

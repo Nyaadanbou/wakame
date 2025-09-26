@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.gui.mod
 
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
-import cc.mewcraft.wakame.item2.display.resolveToItemWrapper
+import cc.mewcraft.wakame.item.display.ItemRenderers
+import cc.mewcraft.wakame.item.display.implementation.modding_table.ModdingTableContext
+import cc.mewcraft.wakame.item.resolveToItemWrapper
 import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.item.fastLoreOrEmpty

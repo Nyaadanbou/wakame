@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.gui.reroll
 
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
-import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.item2.display.resolveToItemWrapper
-import cc.mewcraft.wakame.item2.getData
-import cc.mewcraft.wakame.item2.setData
+import cc.mewcraft.wakame.item.data.ItemDataTypes
+import cc.mewcraft.wakame.item.display.ItemRenderers
+import cc.mewcraft.wakame.item.display.implementation.rerolling_table.RerollingTableContext
+import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.resolveToItemWrapper
+import cc.mewcraft.wakame.item.setData
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import cc.mewcraft.wakame.reforge.reroll.RerollingTable
 import cc.mewcraft.wakame.reforge.reroll.SimpleRerollingSession

@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.player.component.InventoryListenable
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
-import cc.mewcraft.wakame.kizami2.KizamiMap
+import cc.mewcraft.wakame.kizami.KizamiMap
 import org.bukkit.entity.Player
 
 // ------------

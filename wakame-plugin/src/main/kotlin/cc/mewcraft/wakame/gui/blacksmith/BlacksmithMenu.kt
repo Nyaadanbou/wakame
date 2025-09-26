@@ -2,11 +2,10 @@ package cc.mewcraft.wakame.gui.blacksmith
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.display2.implementation.repairing_table.RepairingTableItemRendererContext
-import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.item2.display.resolveToItemWrapper
-import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item.display.ItemRenderers
+import cc.mewcraft.wakame.item.display.implementation.repairing_table.RepairingTableItemRendererContext
+import cc.mewcraft.wakame.item.extension.level
+import cc.mewcraft.wakame.item.resolveToItemWrapper
 import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.reforge.blacksmith.BlacksmithStation
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
@@ -381,7 +380,7 @@ internal class BlacksmithMenu(
                         folded("item_list") {
                             for (item in recyclingSession.getAllClaims().map { claim -> claim.originalItem }) {
                                 val itemName = item.itemNameOrType
-                                val itemLevel = item.getData(ItemDataTypes.LEVEL)?.level?.let(::text)
+                                val itemLevel = item.level?.level?.let(::text)
                                 if (itemLevel != null) {
                                     resolve("with_level") {
                                         component("item_name", itemName)

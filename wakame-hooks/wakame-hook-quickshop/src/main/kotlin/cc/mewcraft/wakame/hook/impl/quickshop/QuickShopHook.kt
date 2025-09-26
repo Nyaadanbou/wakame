@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.Hook
-import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
-import cc.mewcraft.wakame.item2.hasProperty
-import cc.mewcraft.wakame.item2.isExactKoish
-import cc.mewcraft.wakame.item2.koishTypeId
+import cc.mewcraft.wakame.item.hasProperty
+import cc.mewcraft.wakame.item.isExactKoish
+import cc.mewcraft.wakame.item.koishTypeId
+import cc.mewcraft.wakame.item.property.ItemPropertyTypes
 import cc.mewcraft.wakame.util.registerEvents
 import com.ghostchu.quickshop.api.event.QSCancellable
 import com.ghostchu.quickshop.api.event.display.ItemPreviewComponentPrePopulateEvent

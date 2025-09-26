@@ -3,15 +3,12 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ABSORPTION
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BASE
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BLOCKING
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.RESISTANCE
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.*
 import org.jetbrains.annotations.ApiStatus
 
 
@@ -82,7 +79,7 @@ fun RawDamageContext(event: EntityDamageEvent): RawDamageContext {
 class RawDamageContext(
     val damage: Double,
     val damagee: LivingEntity,
-    val damageSource: DamageSource
+    val damageSource: DamageSource,
 ) {
     override fun toString(): String {
         return "DamageContext(damage=$damage, damagee=$damagee, damageType=${damageSource.damageType}, causingEntity=${damageSource.causingEntity}, directEntity=${damageSource.directEntity}, damageLocation=${damageSource.damageLocation})"
@@ -131,5 +128,5 @@ class FinalDamageContext(
      * 各元素的最终伤害值.
      * 真正意义上的"最终", 可直接显示给玩家.
      */
-    val finalDamageMap: Reference2DoubleMap<RegistryEntry<Element>>
+    val finalDamageMap: Reference2DoubleMap<RegistryEntry<Element>>,
 )

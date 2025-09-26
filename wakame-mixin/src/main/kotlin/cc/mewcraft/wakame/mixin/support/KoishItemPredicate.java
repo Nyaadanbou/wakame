@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.support;
 
-import cc.mewcraft.wakame.item2.KoishStackData;
+import cc.mewcraft.wakame.item.KoishStackData;
 import cc.mewcraft.wakame.util.IdentifierTools;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

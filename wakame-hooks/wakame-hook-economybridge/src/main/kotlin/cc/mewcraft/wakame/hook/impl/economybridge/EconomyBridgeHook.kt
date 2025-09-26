@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.hook.impl.economybridge
 
 import cc.mewcraft.economy.api.EconomyProvider
 import cc.mewcraft.wakame.integration.Hook
-import cc.mewcraft.wakame.item2.ItemRefHandler
-import cc.mewcraft.wakame.item2.KoishItemRefHandler
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.item.ItemRefHandler
+import cc.mewcraft.wakame.item.KoishItemRefHandler
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import net.kyori.adventure.text.Component

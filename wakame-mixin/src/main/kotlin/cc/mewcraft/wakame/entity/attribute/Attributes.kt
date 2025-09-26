@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
-import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.registry.BuiltInRegistries
+import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import com.google.common.collect.MultimapBuilder
 import com.google.common.collect.SetMultimap
 import org.jetbrains.annotations.ApiStatus

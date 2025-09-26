@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.core
 
-import cc.mewcraft.wakame.item2.ItemRef
+import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import net.kyori.adventure.text.Component
@@ -8,7 +8,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 class ItemRefMock(
-    override val id: Identifier
+    override val id: Identifier,
 ) : ItemRef {
     constructor(uid: String) : this(
         Identifiers.of(uid)

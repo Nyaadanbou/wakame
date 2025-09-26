@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import cc.mewcraft.wakame.item2.KoishStackData;
+import cc.mewcraft.wakame.item.KoishStackData;
 import cc.mewcraft.wakame.mixin.support.CustomItemStack;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenCustomHashSet;
 import net.minecraft.world.entity.player.StackedContents;
@@ -35,6 +35,7 @@ public abstract class MixinIngredient implements StackedContents.IngredientInfo<
     }
 
     // FIXME 这只是临时解决方案, 后续工作请到 #396 跟进
+
     /// 在第二个 return (即非 isExact 的情况) 之前注入代码, 再判断是否为 Koish 物品堆叠, 如果是的话就返回 false.
     ///
     /// @param stack 传入进来的物品堆叠

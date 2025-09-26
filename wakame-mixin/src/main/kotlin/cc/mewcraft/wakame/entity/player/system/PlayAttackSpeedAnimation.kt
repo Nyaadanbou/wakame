@@ -5,10 +5,10 @@ import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.entity.player.AttackSpeed
-import cc.mewcraft.wakame.item2.ItemSlotChanges
-import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
-import cc.mewcraft.wakame.item2.getProperty
-import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.item.ItemSlotChanges
+import cc.mewcraft.wakame.item.getProperty
+import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import org.bukkit.NamespacedKey

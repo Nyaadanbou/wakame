@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.reforge.common
 
-import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item.data.ItemDataTypes
+import cc.mewcraft.wakame.item.extension.level
+import cc.mewcraft.wakame.item.extension.rarity2
+import cc.mewcraft.wakame.item.getData
 import cc.mewcraft.wakame.util.bindInstance
 import cc.mewcraft.wakame.util.item.damage
 import org.bukkit.inventory.ItemStack
@@ -78,7 +80,7 @@ data class LevelPriceModifier(
     }
 
     override fun evaluate(item: ItemStack): Double {
-        val level = item.getData(ItemDataTypes.LEVEL)?.level ?: return .0
+        val level = item.level?.level ?: return .0
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(LevelBinding(level), "query")
         return mocha.eval(expression)
@@ -107,7 +109,7 @@ data class RarityPriceModifier(
     }
 
     override fun evaluate(item: ItemStack): Double {
-        val rarity = item.getData(ItemDataTypes.RARITY) ?: return .0
+        val rarity = item.rarity2 ?: return .0
         val mapped = mapping[rarity.getIdAsString()] ?: return .0
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(RarityBinding(mapped), "query")

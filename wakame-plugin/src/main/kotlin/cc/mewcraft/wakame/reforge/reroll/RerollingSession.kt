@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.reforge.reroll
 
-import cc.mewcraft.wakame.item2.data.impl.Core
+import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.loot.LootTable
 import cc.mewcraft.wakame.reforge.common.VariableByPlayer
 import net.kyori.adventure.text.Component

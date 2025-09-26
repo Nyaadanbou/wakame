@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.command.command
 
-import cc.mewcraft.wakame.ability2.AbilityCastUtils
-import cc.mewcraft.wakame.ability2.meta.AbilityMeta
+import cc.mewcraft.wakame.ability.AbilityCastUtils
+import cc.mewcraft.wakame.ability.meta.AbilityMeta
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler

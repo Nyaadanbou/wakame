@@ -1,9 +1,10 @@
 @file:JvmName("CraftEngineUtils")
+
 package cc.mewcraft.wakame.hook.impl.craftengine
 
-import cc.mewcraft.wakame.item2.behavior.InteractionHand
-import cc.mewcraft.wakame.item2.behavior.InteractionResult
-import cc.mewcraft.wakame.item2.behavior.UseOnContext
+import cc.mewcraft.wakame.item.behavior.InteractionHand
+import cc.mewcraft.wakame.item.behavior.InteractionResult
+import cc.mewcraft.wakame.item.behavior.UseOnContext
 import cc.mewcraft.wakame.util.Identifier
 import net.momirealms.craftengine.bukkit.api.BukkitAdaptors
 import net.momirealms.craftengine.bukkit.util.DirectionUtils
@@ -45,7 +46,8 @@ fun CEInteractionResult.toKoish(): InteractionResult {
         // 取消事件是为了不触发后续ce对交互的判定
         CEInteractionResult.FAIL -> InteractionResult.FAIL_AND_CANCEL
         CEInteractionResult.SUCCESS,
-        CEInteractionResult.SUCCESS_AND_CANCEL -> InteractionResult.SUCCESS_AND_CANCEL
+        CEInteractionResult.SUCCESS_AND_CANCEL,
+            -> InteractionResult.SUCCESS_AND_CANCEL
 
         // 在 Koish 的物品行为系统中不可能发生, 因为 Koish 物品行为触发时必定有物品
         CEInteractionResult.TRY_EMPTY_HAND -> InteractionResult.FAIL_AND_CANCEL

@@ -1,14 +1,14 @@
 package cc.mewcraft.wakame.reforge.common
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.item2.KoishItem
-import cc.mewcraft.wakame.item2.KoishStackGenerator
-import cc.mewcraft.wakame.item2.context.ItemGenerationContext
-import cc.mewcraft.wakame.item2.data.impl.AttributeCore
-import cc.mewcraft.wakame.item2.data.impl.Core
-import cc.mewcraft.wakame.item2.data.impl.EmptyCore
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.item.KoishItem
+import cc.mewcraft.wakame.item.KoishStackGenerator
+import cc.mewcraft.wakame.item.data.impl.AttributeCore
+import cc.mewcraft.wakame.item.data.impl.Core
+import cc.mewcraft.wakame.item.data.impl.EmptyCore
+import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
+import cc.mewcraft.wakame.item.display.ItemRenderers
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import org.bukkit.inventory.ItemStack
 
 /**

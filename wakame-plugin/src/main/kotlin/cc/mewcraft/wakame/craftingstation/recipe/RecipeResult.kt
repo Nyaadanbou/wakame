@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.craftingstation.recipe
 
-import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
-import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.item2.ItemRef
+import cc.mewcraft.wakame.item.ItemRef
+import cc.mewcraft.wakame.item.display.ItemRenderers
+import cc.mewcraft.wakame.item.display.implementation.crafting_station.CraftingStationContext
+import cc.mewcraft.wakame.item.display.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.giveItemStack

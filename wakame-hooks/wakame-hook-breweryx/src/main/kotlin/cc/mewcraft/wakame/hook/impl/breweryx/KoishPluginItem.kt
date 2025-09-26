@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.breweryx
 
-import cc.mewcraft.wakame.item2.KoishItemRefHandler
+import cc.mewcraft.wakame.item.KoishItemRefHandler
 import com.dre.brewery.recipe.PluginItem
 import org.bukkit.inventory.ItemStack
 

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.transformation
 
-import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.item.data.ItemDataTypes
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.transformation.transforms.KoishTransformation
 import cc.mewcraft.wakame.transformation.transforms.Transform1
 import cc.mewcraft.wakame.util.test.TestOnly

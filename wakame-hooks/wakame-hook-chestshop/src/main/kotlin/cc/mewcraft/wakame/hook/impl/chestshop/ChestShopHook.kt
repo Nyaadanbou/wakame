@@ -2,10 +2,10 @@ package cc.mewcraft.wakame.hook.impl.chestshop
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.integration.Hook
-import cc.mewcraft.wakame.item2.ItemRef
-import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
-import cc.mewcraft.wakame.item2.hasProperty
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.item.ItemRef
+import cc.mewcraft.wakame.item.hasProperty
+import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import cc.mewcraft.wakame.util.registerEvents
 import com.Acrobot.Breeze.Utils.StringUtil

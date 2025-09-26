@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.entity.typeref
 
 import cc.mewcraft.wakame.entity.typeref.MinecraftEntityRefLookupDictionary.get
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import net.kyori.adventure.key.Key
 import org.bukkit.Registry
 import org.bukkit.entity.Entity

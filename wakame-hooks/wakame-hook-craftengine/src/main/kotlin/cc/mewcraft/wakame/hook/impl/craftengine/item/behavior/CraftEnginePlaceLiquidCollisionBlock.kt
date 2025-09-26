@@ -2,12 +2,12 @@ package cc.mewcraft.wakame.hook.impl.craftengine.item.behavior
 
 import cc.mewcraft.wakame.hook.impl.craftengine.toCraftEngine
 import cc.mewcraft.wakame.hook.impl.craftengine.toKoish
-import cc.mewcraft.wakame.item2.behavior.InteractionResult
-import cc.mewcraft.wakame.item2.behavior.ItemBehavior
-import cc.mewcraft.wakame.item2.behavior.UseContext
-import cc.mewcraft.wakame.item2.behavior.UseOnContext
-import cc.mewcraft.wakame.item2.config.property.ItemPropTypes
-import cc.mewcraft.wakame.item2.getProp
+import cc.mewcraft.wakame.item.behavior.InteractionResult
+import cc.mewcraft.wakame.item.behavior.ItemBehavior
+import cc.mewcraft.wakame.item.behavior.UseContext
+import cc.mewcraft.wakame.item.behavior.UseOnContext
+import cc.mewcraft.wakame.item.getProp
+import cc.mewcraft.wakame.item.property.ItemPropTypes
 import net.momirealms.craftengine.bukkit.item.behavior.LiquidCollisionBlockItemBehavior
 
 object CraftEnginePlaceLiquidCollisionBlock : ItemBehavior {

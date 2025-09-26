@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.chestsort
 
 import cc.mewcraft.wakame.integration.Hook
-import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotRegistry
+import cc.mewcraft.wakame.item.property.impl.ItemSlotRegistry
 import cc.mewcraft.wakame.util.registerEvents
 import de.jeff_media.chestsort.api.ChestSortEvent
 import org.bukkit.entity.Player

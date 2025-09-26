@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.element
 
-import cc.mewcraft.wakame.ability2.meta.AbilityMeta
-import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.ability.meta.AbilityMeta
+import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Required
 
@@ -12,7 +12,7 @@ data class StackEffect(
     @Required
     val disappearTime: Int,
     @Required
-    val stages: List<StackEffectStage>
+    val stages: List<StackEffectStage>,
 )
 
 @ConfigSerializable
@@ -20,5 +20,5 @@ data class StackEffectStage(
     @Required
     val amount: Int,
     @Required
-    val abilities: List<RegistryEntry<AbilityMeta>>
+    val abilities: List<RegistryEntry<AbilityMeta>>,
 )

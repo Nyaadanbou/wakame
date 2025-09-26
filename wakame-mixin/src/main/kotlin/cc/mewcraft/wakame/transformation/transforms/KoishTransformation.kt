@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.transformation.transforms
 
-import cc.mewcraft.wakame.item2.data.ItemDataType
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.item.data.ItemDataType
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.transformation.ConfigurationTransformation
 
 abstract class KoishTransformation(
-    val version: Int
+    val version: Int,
 ) : ConfigurationTransformation {
     protected fun ConfigurationNode.dataNode(dataType: ItemDataType<*>): ConfigurationNode {
         val nodeKey = BuiltInRegistries.ITEM_DATA_TYPE.getId(dataType)?.value()

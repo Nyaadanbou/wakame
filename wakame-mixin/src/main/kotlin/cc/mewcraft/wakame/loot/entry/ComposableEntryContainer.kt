@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.loot.entry
 
 import cc.mewcraft.wakame.loot.context.LootContext
-import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
 import io.leangen.geantyref.GenericTypeReflector
