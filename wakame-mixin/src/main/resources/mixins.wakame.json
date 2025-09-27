@@ -19,7 +19,7 @@
     "MixinEnchantmentEntityEffect",
     "MixinEnchantmentLocationBasedEffect",
     "MixinEntityType",
-    "MixinHashedPatchMap",
+    "MixinHashedStack",
     "MixinHoverEvent$ShowItem",
     "MixinIngredient",
     "MixinItemOrExact$Exact",
