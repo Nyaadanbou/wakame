@@ -38,6 +38,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Registry
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import java.nio.file.Path
 
 internal class StandardRendererFormatRegistry(renderer: StandardItemRenderer) : AbstractRendererFormatRegistry(renderer)
@@ -85,15 +86,15 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         item.process(ItemMetaTypes.CUSTOM_NAME) { data -> StandardRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
 
         item.process(ItemDataTypes.CRATE) { data -> StandardRenderingHandlerRegistry.CRATE.process(collector, data) }
-        StandardRenderingHandlerRegistry.ELEMENT.process(collector, item.elements)
-        StandardRenderingHandlerRegistry.KIZAMI.process(collector, item.kizamiz)
+
+        item.elements.takeUnlessEmpty()?.let { StandardRenderingHandlerRegistry.ELEMENT.process(collector, it) }
+        item.kizamiz.takeUnlessEmpty()?.let { StandardRenderingHandlerRegistry.KIZAMI.process(collector, it) }
         item.level?.let { StandardRenderingHandlerRegistry.LEVEL.process(collector, it) }
         item.core?.let { StandardRenderingHandlerRegistry.CORE.process(collector, it) }
         item.coreContainer?.let { data -> for ((_, core) in data) renderCore(collector, core) }
         item.rarity2?.let { rarityEntry ->
-            val data1 = rarityEntry
             val data2 = item.getData(ItemDataTypes.REFORGE_HISTORY) ?: ReforgeHistory.ZERO
-            StandardRenderingHandlerRegistry.RARITY.process(collector, data1, data2)
+            StandardRenderingHandlerRegistry.RARITY.process(collector, rarityEntry, data2)
         }
 
         item.process(ItemDataTypes.ENTITY_BUCKET_INFO) { data -> StandardRenderingHandlerRegistry.ENTITY_BUCKET_INFO.process(collector, data) }
