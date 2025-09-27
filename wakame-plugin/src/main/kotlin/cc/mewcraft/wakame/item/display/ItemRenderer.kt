@@ -1,12 +1,18 @@
 package cc.mewcraft.wakame.item.display
 
+import cc.mewcraft.wakame.item.display.implementation.crafting_station.CraftingStationContext
 import cc.mewcraft.wakame.item.display.implementation.crafting_station.CraftingStationItemRenderer
+import cc.mewcraft.wakame.item.display.implementation.merging_table.MergingTableContext
 import cc.mewcraft.wakame.item.display.implementation.merging_table.MergingTableItemRenderer
+import cc.mewcraft.wakame.item.display.implementation.modding_table.ModdingTableContext
 import cc.mewcraft.wakame.item.display.implementation.modding_table.ModdingTableItemRenderer
 import cc.mewcraft.wakame.item.display.implementation.repairing_table.RepairingTableItemRenderer
+import cc.mewcraft.wakame.item.display.implementation.repairing_table.RepairingTableItemRendererContext
+import cc.mewcraft.wakame.item.display.implementation.rerolling_table.RerollingTableContext
 import cc.mewcraft.wakame.item.display.implementation.rerolling_table.RerollingTableItemRenderer
 import cc.mewcraft.wakame.item.display.implementation.simple.SimpleItemRenderer
 import cc.mewcraft.wakame.item.display.implementation.standard.StandardItemRenderer
+import org.bukkit.inventory.ItemStack
 import java.nio.file.Path
 
 /**
@@ -14,25 +20,25 @@ import java.nio.file.Path
  */
 internal object ItemRenderers {
     @JvmField
-    val SIMPLE = SimpleItemRenderer
+    val SIMPLE: ItemRenderer<ItemStack, Nothing> = SimpleItemRenderer
 
     @JvmField // 省去无用的函数调用
-    val STANDARD = StandardItemRenderer
+    val STANDARD: ItemRenderer<ItemStack, Nothing> = StandardItemRenderer
 
     @JvmField
-    val CRAFTING_STATION = CraftingStationItemRenderer
+    val CRAFTING_STATION: ItemRenderer<ItemStack, CraftingStationContext> = CraftingStationItemRenderer
 
     @JvmField
-    val MERGING_TABLE = MergingTableItemRenderer
+    val MERGING_TABLE: ItemRenderer<ItemStack, MergingTableContext> = MergingTableItemRenderer
 
     @JvmField
-    val MODDING_TABLE = ModdingTableItemRenderer
+    val MODDING_TABLE: ItemRenderer<ItemStack, ModdingTableContext> = ModdingTableItemRenderer
 
     @JvmField
-    val REROLLING_TABLE = RerollingTableItemRenderer
+    val REROLLING_TABLE: ItemRenderer<ItemStack, RerollingTableContext> = RerollingTableItemRenderer
 
     @JvmField
-    val REPAIRING_TABLE = RepairingTableItemRenderer
+    val REPAIRING_TABLE: ItemRenderer<ItemStack, RepairingTableItemRendererContext> = RepairingTableItemRenderer
 }
 
 /**
@@ -63,10 +69,7 @@ internal interface ItemRenderer<in T, in C> {
      * @param formatPath *渲染格式* 的配置文件路径, 相对于插件数据文件夹
      * @param layoutPath *渲染布局* 的配置文件路径, 相对于插件数据文件夹
      */
-    fun initialize(
-        formatPath: Path,
-        layoutPath: Path,
-    )
+    fun initialize(formatPath: Path, layoutPath: Path)
 
     /**
      * 原地渲染物品 [item].
@@ -78,12 +81,3 @@ internal interface ItemRenderer<in T, in C> {
      */
     fun render(item: T, context: C? = null)
 }
-
-// 开发日记 2024/9/22
-// ItemRenderer 是一个顶级接口, 实现之间会存在较大的区别.
-// 例如对于 Standard, 它是基于 ItemComponent, 也就是每个 ItemComponentMap 产生若干个 IndexedText.
-// 但对于 CraftingStation, 它是基于 ItemTemplate, 并且可能存在多个 Template 结合产生若干个 IndexedText.
-// 而有些 ItemRenderer 可能是基于 ItemComponent 和 ItemTemplate 两者的结合产生若干个 IndexedText.
-//
-// 作为 ItemRenderer 的用户, 99% 的情况下只需要 render 函数.
-// 当然, 用户必须传入正确的 context, 否则渲染不会生效 (NoOp+Log).
