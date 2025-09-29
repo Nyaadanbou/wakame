@@ -33,6 +33,7 @@ sealed interface MetaElement : ItemMetaEntry<Set<RegistryEntry<Element>>> {
     ) : MetaElement {
 
         override fun make(context: ItemGenerationContext): ItemMetaResult<Set<RegistryEntry<Element>>> {
+            context.elements.addAll(entries)
             return ItemMetaResult.of(entries)
         }
 
@@ -44,7 +45,9 @@ sealed interface MetaElement : ItemMetaEntry<Set<RegistryEntry<Element>>> {
     ) : MetaElement {
 
         override fun make(context: ItemGenerationContext): ItemMetaResult<Set<RegistryEntry<Element>>> {
-            return ItemMetaResult.of(entries.select(context).toSet())
+            val result = entries.select(context).toSet()
+            context.elements.addAll(result)
+            return ItemMetaResult.of(result)
         }
 
     }

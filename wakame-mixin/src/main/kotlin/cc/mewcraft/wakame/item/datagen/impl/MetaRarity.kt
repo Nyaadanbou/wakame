@@ -39,6 +39,7 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
     ) : MetaRarity {
 
         override fun make(context: ItemGenerationContext): ItemMetaResult<RegistryEntry<Rarity>> {
+            context.rarity = entry
             return ItemMetaResult.of(entry)
         }
 
@@ -54,7 +55,9 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
             val mapper = entry.unwrap()
             val level = context.level
             if (mapper.contains(level)) {
-                return ItemMetaResult.of(mapper.pick(level, context.random))
+                val result = mapper.pick(level, context.random)
+                context.rarity = result
+                return ItemMetaResult.of(result)
             } else {
                 LOGGER.warn("Generating no rarity from context: $context. This is possibly a configuration error! ")
                 return ItemMetaResult.empty()

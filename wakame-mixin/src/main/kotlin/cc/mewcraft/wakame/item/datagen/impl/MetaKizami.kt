@@ -42,6 +42,7 @@ sealed interface MetaKizami : ItemMetaEntry<Set<RegistryEntry<Kizami>>> {
     ) : MetaKizami {
 
         override fun make(context: ItemGenerationContext): ItemMetaResult<Set<RegistryEntry<Kizami>>> {
+            context.kizami.addAll(entries)
             return ItemMetaResult.of(entries)
         }
 
@@ -54,7 +55,9 @@ sealed interface MetaKizami : ItemMetaEntry<Set<RegistryEntry<Kizami>>> {
     ) : MetaKizami {
 
         override fun make(context: ItemGenerationContext): ItemMetaResult<Set<RegistryEntry<Kizami>>> {
-            return ItemMetaResult.of(selector.select(context).toSet())
+            val result = selector.select(context).toSet()
+            context.kizami.addAll(result)
+            return ItemMetaResult.of(result)
         }
 
     }

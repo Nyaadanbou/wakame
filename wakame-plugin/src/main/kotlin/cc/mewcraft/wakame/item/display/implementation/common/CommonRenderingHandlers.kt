@@ -22,7 +22,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 internal object CommonRenderingHandlers {
     @JvmField
     val CUSTOM_NAME: RenderingHandlerRegistry.() -> RenderingHandler<MetaCustomName, SingleValueRendererFormat> = xconfigure("custom_name") { data, format ->
-        format.render(Placeholder.component("value", data.customName))
+        format.render(Placeholder.parsed("value", data.customName))
     }
 
     @JvmField
