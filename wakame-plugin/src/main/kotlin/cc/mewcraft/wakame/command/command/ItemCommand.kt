@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
 import cc.mewcraft.wakame.command.parser.ItemParser
+import cc.mewcraft.wakame.gui.explorer.item.ExplorerItemMenu
 import cc.mewcraft.wakame.item.KoishItem
 import cc.mewcraft.wakame.item.KoishStackGenerator
 import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
@@ -27,7 +28,7 @@ internal object ItemCommand : KoishCommandFactory<Source> {
             literal("item")
         }
 
-        // <root> item give <item> <amount> <player>
+        // <root> item give <item> [amount] [player]
         // Give the player(s) certain amount of specific item(s)
         buildAndAdd(commonBuilder) {
             literal("give")
@@ -35,6 +36,14 @@ internal object ItemCommand : KoishCommandFactory<Source> {
             optional("amount", IntegerParser.integerParser(1, 4 * 9 * 64))
             optional("player", MultiplePlayerSelectorParser.multiplePlayerSelectorParser())
             koishHandler(handler = ::handleGiveItem)
+        }
+
+        // <root> item explore [player]
+        // 给特定玩家打开物品库浏览器
+        buildAndAdd(commonBuilder) {
+            literal("explore")
+            optional("player", MultiplePlayerSelectorParser.multiplePlayerSelectorParser())
+            koishHandler(handler = ::handleExploreItem)
         }
     }
 
@@ -62,6 +71,18 @@ internal object ItemCommand : KoishCommandFactory<Source> {
                 player.inventory.addItem(*items)
                 player.sendPlainMessage("You received $amount item(s): ${item.id}")
             }
+        }
+    }
+
+    private suspend fun handleExploreItem(context: CommandContext<Source>) {
+        val sender = context.sender().source()
+        val viewers = context.getOrNull<MultiplePlayerSelector>("player")?.values()
+            ?: (sender as? Player)?.let(::listOf)
+            ?: emptyList()
+        val menus = viewers.map(::ExplorerItemMenu)
+
+        withContext(Dispatchers.minecraft) {
+            menus.forEach(ExplorerItemMenu::open)
         }
     }
 
