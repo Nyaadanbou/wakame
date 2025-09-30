@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.data.ItemDataContainer
 import cc.mewcraft.wakame.item.datagen.ItemMetaContainer
 import cc.mewcraft.wakame.item.property.ItemPropContainer
 import cc.mewcraft.wakame.item.property.ItemPropType
-import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.text.Component
@@ -44,27 +44,21 @@ open class KoishItem(
     val behaviors: ItemBehaviorContainer,
 ) : Examinable {
 
-    companion object {
-
-        ///**
-        // * 代表一个不存在的 [KoishItem].
-        // */
-        //@JvmField
-        //internal val EMPTY: KoishItem = KoishItem(Identifiers.of("__empty__"), ItemMetaContainer.EMPTY, ItemPropertyContainer.EMPTY, ItemBehaviorContainer.EMPTY)
-        //
-        ///**
-        // * 代表一个不存在的 [KoishItem].
-        // */
-        //@JvmField
-        //internal val EMPTY_ENTRY: RegistryEntry<KoishItem> = KoishRegistries2.ITEM.add("__empty__", EMPTY)
-
-    }
-
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
         ExaminableProperty.of("id", id),
     )
 
     override fun toString(): String = toSimpleString()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is KoishItem) return false
+        return id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
 
 }
 
@@ -73,8 +67,7 @@ open class KoishItem(
  *
  * 该物品类型的配置文件必须指定了 [ItemPropertyTypes.NAME], 否则将使用物品 ID 作为返回值.
  */
-val KoishItem.name: Component get() = properties.getOrDefault(ItemPropertyTypes.NAME, Component.text(id.asString()))
-//val KoishItem.isEmpty: Boolean get() = this === KoishItem.EMPTY
+val KoishItem.name: Component get() = properties.getOrDefault(ItemPropTypes.NAME, Component.text(id.asString()))
 fun <T> KoishItem.hasProperty(type: ItemPropType<T>): Boolean = properties.has(type)
 fun <T> KoishItem.getProperty(type: ItemPropType<out T>): T? = properties[type]
 fun <T> KoishItem.getPropertyOrDefault(type: ItemPropType<T>, default: T): T = properties.getOrDefault(type, default)
@@ -100,5 +93,15 @@ class KoishItemProxy(
     )
 
     override fun toString(): String = toSimpleString()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is KoishItemProxy) return false
+        return id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
 
 }
