@@ -47,8 +47,8 @@ internal class ExplorerItemMenu(
             "x x x x x x x x x",
             "< . . . . . . . >",
         )
-        builder.addIngredient('<', PREV_PAGE)
-        builder.addIngredient('>', NEXT_PAGE)
+        builder.addIngredient('<', ::PrevItem)
+        builder.addIngredient('>', ::NextItem)
         builder.addIngredient('.', BACKGROUND)
         builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         builder.setContent(getGuiContents())
