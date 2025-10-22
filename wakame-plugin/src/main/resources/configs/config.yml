@@ -82,6 +82,13 @@ disable_villager_trade_in_worlds:
   - koish:dune
   - koish:hollow
 
+# 映射: 维度技术名字 -> 维度友好名字
+# 目前用于配置 %koish_current_world% 占位符的输出
+dimension_key_mappings:
+  minecraft:overworld: 主世界
+  minecraft:nether: 下界
+  minecraft:end: 末地
+
 # 关于调试模式
 debug:
   # 调试模式信息记录控制

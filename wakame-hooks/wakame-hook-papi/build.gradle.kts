@@ -5,6 +5,11 @@ plugins {
 
 version = "0.0.1"
 
+repositories {
+    nyaadanbouReleases()
+    nyaadanbouPrivate()
+}
+
 dependencies {
     // internal
     compileOnly(project(":wakame-mixin"))
@@ -17,4 +22,6 @@ dependencies {
     // libraries
     compileOnly(local.paper)
     compileOnly(local.papi) { isTransitive = false }
+    compileOnly(platform(libs.bom.configurate.yaml))
+    compileOnly(local.commons.provider)
 }
