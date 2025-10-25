@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import net.kyori.adventure.key.InvalidKeyException
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.NamespacedKey
 import org.spongepowered.configurate.serialize.ScalarSerializer
 import org.spongepowered.configurate.serialize.SerializationException
@@ -34,6 +35,17 @@ import java.util.function.Predicate
     }
 
     override fun serialize(item: NamespacedKey, typeSupported: Predicate<Class<*>>): Any {
+        return item.toString()
+    }
+}
+
+object ResourceLocationSerializer : ScalarSerializer<ResourceLocation>(ResourceLocation::class.java) {
+    override fun deserialize(type: Type, obj: Any): ResourceLocation {
+        val string = obj.toString()
+        return ResourceLocation.parse(string)
+    }
+
+    override fun serialize(item: ResourceLocation, typeSupported: Predicate<Class<*>>): Any {
         return item.toString()
     }
 }

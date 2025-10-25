@@ -32,6 +32,7 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     // Namespaced
     .register(IdentifierSerializer)
     .register(NamespacedKeySerializer)
+    .register(ResourceLocationSerializer)
     // Math
     .register(Vector3fSerializer)
     // Bukkit Object
