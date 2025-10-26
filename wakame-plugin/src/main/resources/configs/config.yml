@@ -89,6 +89,18 @@ dimension_key_mappings:
   minecraft:nether: 下界
   minecraft:end: 末地
 
+# 在发送 ClientboundUpdateAttributesPacket 封包时移除掉以下属性
+# 目前仅用于配合伤害系统来“移除” ARMOR 和 ARMOR_TOUGHNESS 这两属性
+# 此功能可以带来几个好处:
+# - 不再需要手动移除掉物品自带的 minecraft:attribute_modifiers 组件
+# - 不再需要使用特制的资源包隐藏掉护甲 HUD
+remove_attributes_on_clientbound_update_attributes_packet:
+  - minecraft:armor
+  - minecraft:armor_toughness
+
+# 在发送 ClientboundSetEntityDataPacket 封包时移除掉 ABSORPTION 数据
+remove_absorption_on_clientbound_set_entity_data_packet: true
+
 # 关于调试模式
 debug:
   # 调试模式信息记录控制
