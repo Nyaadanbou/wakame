@@ -23,7 +23,7 @@ import java.util.*
 @Hook(plugins = ["AdventureLevel"])
 object AdventureLevelHook : PlayerLevelIntegration, ResourceLoadingFixHandler {
 
-    override val type: PlayerLevelType = PlayerLevelType.ADVENTURE
+    override val levelType: PlayerLevelType = PlayerLevelType.ADVENTURE
 
     override fun get(uuid: UUID): Int? {
         val api = AdventureLevelProvider.get()

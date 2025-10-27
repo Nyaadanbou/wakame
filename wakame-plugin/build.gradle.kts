@@ -21,6 +21,7 @@ dependencies {
     compileOnly(project(":wakame-common")) // 运行时由 koish-mod 提供
     compileOnly(project(":wakame-mixin")) // 运行时由 koish-mod 提供
     runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-auraskills"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-betterhud"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-breweryx"))
      runtimeOnly(project(":wakame-hooks:wakame-hook-chestshop"))
@@ -28,6 +29,7 @@ dependencies {
      runtimeOnly(project(":wakame-hooks:wakame-hook-craftengine"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-economy"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-economybridge"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-husksync"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-luckperms"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-mythicmobs"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-papi"))

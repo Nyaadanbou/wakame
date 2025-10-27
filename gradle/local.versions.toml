@@ -57,6 +57,8 @@ economybridge = "1.2.1" # 同上
 breweryx = "3.4.10"
 chestshop = "3.12.3-SNAPSHOT"
 craftengine = "0.0.63"
+auraskills = "2.2.4"
+husksync = "3.8.7+1.21.8"
 
 [libraries]
 
@@ -140,6 +142,8 @@ breweryx = { group = "com.dre.brewery", name = "BreweryX", version.ref = "brewer
 chestshop = { group = "com.acrobot.chestshop", name = "chestshop", version.ref = "chestshop" }
 craftengine-core = { group = "net.momirealms", name = "craft-engine-core", version.ref = "craftengine" }
 craftengine-bukkit = { group = "net.momirealms", name = "craft-engine-bukkit", version.ref = "craftengine" }
+auraskills = { group = "dev.aurelium", name = "auraskills-api-bukkit", version.ref = "auraskills" }
+husksync = { group = "net.william278.husksync", name = "husksync-bukkit", version.ref = "husksync" }
 
 [plugins]
 

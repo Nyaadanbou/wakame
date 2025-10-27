@@ -11,7 +11,7 @@ interface PlayerLevelIntegration {
      * 当前钩子的类型.
      * 允许在多个钩子存在的情况下, 让用户选择指定的等级系统.
      */
-    val type: PlayerLevelType
+    val levelType: PlayerLevelType
 
     /**
      * Gets the player's level from the player's UUID.
