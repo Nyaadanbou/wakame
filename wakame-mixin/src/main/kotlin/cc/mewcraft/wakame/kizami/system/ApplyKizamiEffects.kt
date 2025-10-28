@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.kizami.system
 
-import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
@@ -30,7 +29,7 @@ object ApplyKizamiEffects : IteratingSystem(
             if (prev != null && ItemSlotChanges.testSlot(slot, prev)) {
                 val kizami = prev.kizamiz
                 if (kizami.isNotEmpty()) {
-                    LOGGER.info("Decrementing kizami count from ${slot.id}")
+                    //LOGGER.info("Decrementing kizami count from ${slot.id}")
                     liveKizamiContainer.subtractOneEach(kizami)
                     changed = true
                 }
@@ -42,7 +41,7 @@ object ApplyKizamiEffects : IteratingSystem(
             ) {
                 val kizami = curr.kizamiz
                 if (kizami.isNotEmpty()) {
-                    LOGGER.info("Incrementing kizami count from ${slot.id}")
+                    //LOGGER.info("Incrementing kizami count from ${slot.id}")
                     liveKizamiContainer.addOneEach(kizami)
                     changed = true
                 }
@@ -51,7 +50,7 @@ object ApplyKizamiEffects : IteratingSystem(
 
         // 更新铭刻的效果
         if (changed) {
-            LOGGER.info("Updating kizami effects for ${player.name}")
+            //LOGGER.info("Updating kizami effects for ${player.name}")
             prevKizamiContainer.removeAllEffects(player)
             liveKizamiContainer.applyAllEffects(player)
         }

@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.entity.attribute.system
 
-import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
@@ -26,7 +25,7 @@ object ApplyAttributeEffects : IteratingSystem(
             if (prev != null && ItemSlotChanges.testSlot(slot, prev)) {
                 val coreContainer = prev.coreContainer
                 if (coreContainer != null) {
-                    LOGGER.info("Removing attribute modifier from ${slot.id}")
+                    //LOGGER.info("Removing attribute modifier from ${slot.id}")
                     val attrModifiers = coreContainer.collectAttributeModifiers(prev, slot)
                     attributeContainer.removeModifiers(attrModifiers)
                 }
@@ -38,7 +37,7 @@ object ApplyAttributeEffects : IteratingSystem(
             ) {
                 val coreContainer = curr.coreContainer
                 if (coreContainer != null) {
-                    LOGGER.info("Adding attribute modifier from ${slot.id}")
+                    //LOGGER.info("Adding attribute modifier from ${slot.id}")
                     val attrModifiers = coreContainer.collectAttributeModifiers(curr, slot)
                     attributeContainer.addTransientModifiers(attrModifiers)
                 }
