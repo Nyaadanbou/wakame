@@ -11,6 +11,9 @@ dependencies:
     AdventureLevel:
       required: false
       load: BEFORE # Koish 需要访问其事件
+    AuraSkills:
+      required: false
+      load: OMIT
     BetterHud:
       required: false
       load: OMIT
@@ -40,6 +43,9 @@ dependencies:
       required: false
       join-classpath: false
       load: AFTER # ExcellentCrates 需要访问 Koish 注册的 ItemHandler
+    HuskSync:
+      required: false
+      load: OMIT
     LuckPerms:
       required: false
       load: OMIT
