@@ -1,16 +1,13 @@
 package cc.mewcraft.wakame.hook.impl.auraskills
 
+import cc.mewcraft.wakame.entity.player.PlayerDataLoadingCoordinator
 import cc.mewcraft.wakame.entity.player.ResourceLoadingFixHandler
-import cc.mewcraft.wakame.entity.player.ResourceSynchronizer
-import cc.mewcraft.wakame.entity.player.isInventoryListenable
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.integration.playermana.PlayerManaIntegration
 import cc.mewcraft.wakame.integration.playermana.PlayerManaType
 import cc.mewcraft.wakame.util.event
-import cc.mewcraft.wakame.util.runTask
-import cc.mewcraft.wakame.util.runTaskLater
 import dev.aurelium.auraskills.api.AuraSkillsApi
 import dev.aurelium.auraskills.api.event.user.UserLoadEvent
 import dev.aurelium.auraskills.api.skill.Skills
@@ -22,29 +19,20 @@ import java.util.*
 object AuraSkillsHook :
     ResourceLoadingFixHandler by AuraResourceLoadingFixHandler,
     PlayerLevelIntegration by AuraPlayerLevelIntegration,
-    PlayerManaIntegration by AuraPlayerManaIntegration
+    PlayerManaIntegration by AuraPlayerManaIntegration {
+
+    init {
+        PlayerDataLoadingCoordinator.registerExternalStage2Handler("AuraSkills")
+    }
+}
 
 private object AuraResourceLoadingFixHandler : ResourceLoadingFixHandler {
 
-    override fun invoke() {
-        // AuraSkills 的数据是异步加载
+    override fun fix() {
+
         event<UserLoadEvent> { event ->
             val player = event.player
-
-            runTask {
-                // TODO 这里似乎要等 HuskSync 同步完数据后再安排这个任务?
-                if (player.isConnected) {
-                    player.isInventoryListenable = true
-                }
-
-                runTaskLater(1) {
-                    // TODO 除了延迟 1t 外还有更好维护的解决方式吗?
-
-                    if (player.isConnected) {
-                        ResourceSynchronizer.load(player)
-                    }
-                }
-            }
+            PlayerDataLoadingCoordinator.getOrCreateSession(player).completeStage2()
         }
     }
 }

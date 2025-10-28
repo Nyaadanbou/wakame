@@ -18,12 +18,15 @@ import org.bukkit.event.player.PlayerQuitEvent
 fun interface ResourceLoadingFixHandler {
 
     /** 实现该函数来执行必要的逻辑, 例如注册 Event Handler. */
-    operator fun invoke()
+    fun fix()
 
-    companion object {
-        // 当前所使用的实例
+    companion object : ResourceLoadingFixHandler {
         internal var CURRENT_HANDLER: ResourceLoadingFixHandler = ResourceLoadingFixHandler {
             LOGGER.error("The current PlayerResourceFixHandler is a no-op but it's being called. This is a bug!", Error())
+        }
+
+        override fun fix() {
+            CURRENT_HANDLER.fix()
         }
     }
 
@@ -31,9 +34,8 @@ fun interface ResourceLoadingFixHandler {
 
 /** 该 object 用于解决玩家资源(当前血量/魔法值)在进出服务器时无法正确加载的问题. */
 @Init(
-    stage = InitStage.POST_WORLD, runAfter = [
-        HooksLoader::class, // 依赖于 PlayerLevelManager
-    ]
+    stage = InitStage.POST_WORLD,
+    runAfter = [HooksLoader::class /* 依赖于 PlayerLevelManager */]
 )
 internal object ResourceLoadingFixBootstrap {
 
@@ -60,7 +62,7 @@ internal object ResourceLoadingFixBootstrap {
             }
 
             // 其余的情况则使用 Hook 的具体实现.
-            else -> ResourceLoadingFixHandler.CURRENT_HANDLER.invoke()
+            else -> ResourceLoadingFixHandler.fix()
         }
     }
 
@@ -72,5 +74,4 @@ internal object ResourceLoadingFixBootstrap {
         // 否则 PDC 无法保存到 HuskSync 的数据库, 导致玩家资源数据丢失.
         ResourceSynchronizer.saveAll()
     }
-
 }
