@@ -39,7 +39,7 @@ private object AuraResourceLoadingFixHandler : ResourceLoadingFixHandler {
 
 private object AuraPlayerLevelIntegration : PlayerLevelIntegration {
 
-    private val auraApi: AuraSkillsApi = AuraSkillsApi.get()
+    private val auraApi: AuraSkillsApi by lazy { AuraSkillsApi.get() }
 
     override val levelType: PlayerLevelType = PlayerLevelType.AURA_SKILLS
 
@@ -57,7 +57,7 @@ private object AuraPlayerLevelIntegration : PlayerLevelIntegration {
 
 private object AuraPlayerManaIntegration : PlayerManaIntegration {
 
-    private val auraApi: AuraSkillsApi = AuraSkillsApi.get()
+    private val auraApi: AuraSkillsApi by lazy { AuraSkillsApi.get() }
 
     override val manaType: PlayerManaType = PlayerManaType.AURA_SKILLS
 
