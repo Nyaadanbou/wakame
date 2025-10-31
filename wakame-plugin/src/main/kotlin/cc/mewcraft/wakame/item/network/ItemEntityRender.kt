@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.network
 
 import cc.mewcraft.wakame.item.extension.rarity2
-import cc.mewcraft.wakame.item.hasProperty
-import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item.hasProp
+import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap
 @Init(stage = InitStage.POST_WORLD)
 internal object ItemEntityRender : PacketListener {
 
-    private val shadowEntity: ShadowEntity = BukkitShadowFactory.global().staticShadow<ShadowEntity>()
+    private val SHADOW_ENTITY: ShadowEntity = BukkitShadowFactory.global().staticShadow<ShadowEntity>()
 
     // 目前用于彩色物品发光的实现
     private val entityId2EntityUniqueId = ConcurrentHashMap<Int, UUID>()
@@ -55,12 +55,13 @@ internal object ItemEntityRender : PacketListener {
 
     @PacketHandler
     private fun handleSetEntityData(event: ClientboundSetEntityDataPacketEvent) {
-        val oldData = event.packedItems
         val item = NMSUtils.getEntity(event.id) as? Item ?: return
-        val newData = oldData.toMutableList()
-        tryAddCustomNameEntityData(item, newData)
-        tryAddGlowEffectEntityData(item, newData)
-        event.packedItems = newData
+        val old = event.packedItems
+        val new = old.toMutableList().apply {
+            tryAddCustomNameEntityData(item, this)
+            tryAddGlowEffectEntityData(item, this)
+        }
+        event.packedItems = new
         sendGlowColorPacket(event.player, item)
     }
 
@@ -69,26 +70,21 @@ internal object ItemEntityRender : PacketListener {
         for (entityId in event.entityIds.intIterator()) {
             entityId2EntityUniqueId.remove(entityId)
                 ?.let { entityUniqueId -> buildRemoveTeamPacket(entityUniqueId) }
-                ?.let { serverTeamPacket -> event.player.send(serverTeamPacket) }
+                ?.also { serverTeamPacket -> event.player.send(serverTeamPacket) }
         }
     }
 
     private fun tryAddGlowEffectEntityData(item: Item, entityData: MutableList<SynchedEntityData.DataValue<*>>) {
-        if (!item.itemStack.hasProperty(ItemPropertyTypes.GLOWABLE))
-            return
-
+        if (!item.itemStack.hasProp(ItemPropTypes.GLOWABLE)) return
         // Glow effect flag
-        entityData.add(SynchedEntityData.DataValue.create(shadowEntity.DATA_SHARED_FLAGS_ID, 0x40))
+        entityData.add(SynchedEntityData.DataValue.create(SHADOW_ENTITY.DATA_SHARED_FLAGS_ID, 0x40))
     }
 
     private fun tryAddCustomNameEntityData(item: Item, entityData: MutableList<SynchedEntityData.DataValue<*>>) {
-        val itemStack = item.itemStack
-
-        // CustomName
-        entityData.add(SynchedEntityData.DataValue.create(shadowEntity.DATA_CUSTOM_NAME, Optional.ofNullable(itemStack.itemName?.toNMSComponent())))
-
-        // CustomNameVisible
-        entityData.add(SynchedEntityData.DataValue.create(shadowEntity.DATA_CUSTOM_NAME_VISIBLE, true))
+        // add CustomName
+        entityData.add(SynchedEntityData.DataValue.create(SHADOW_ENTITY.DATA_CUSTOM_NAME, Optional.ofNullable(item.itemStack.itemName?.toNMSComponent())))
+        // add CustomNameVisible
+        entityData.add(SynchedEntityData.DataValue.create(SHADOW_ENTITY.DATA_CUSTOM_NAME_VISIBLE, true))
     }
 
     private fun sendGlowColorPacket(player: Player, item: Item) {
@@ -98,25 +94,23 @@ internal object ItemEntityRender : PacketListener {
         player.send(teamPacket)
     }
 
-    private fun buildCreateTeamPacket(itemEntity: Item, color: NamedTextColor): ClientboundSetPlayerTeamPacket {
-        val entityUniqueId = itemEntity.uniqueId
-        return ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(
-            /* team = */ PlayerTeam(Scoreboard(), "glow_item_$entityUniqueId").apply {
-                this.color = PaperAdventure.asVanilla(color) ?: ChatFormatting.RESET
-                this.players += entityUniqueId.toString()
-            },
-            /* useAdd = */ true
-        )
+    private fun buildCreateTeamPacket(item: Item, color: NamedTextColor): ClientboundSetPlayerTeamPacket {
+        val entityUuid = item.uniqueId
+        val playerTeam = PlayerTeam(Scoreboard(), "glow_item_$entityUuid").apply {
+            this.color = PaperAdventure.asVanilla(color) ?: ChatFormatting.RESET
+            this.players += entityUuid.toString()
+        }
+        val useAdd = true
+        return ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(playerTeam, useAdd)
     }
 
     private fun buildRemoveTeamPacket(entityUniqueId: UUID): ClientboundSetPlayerTeamPacket {
-        return ClientboundSetPlayerTeamPacket.createRemovePacket(
-            /* team = */ PlayerTeam(
-                Scoreboard(),
-                "glow_item_$entityUniqueId"
-            ).also {
-                it.players += entityUniqueId.toString()
-            }
-        )
+        val playerTeam = PlayerTeam(
+            Scoreboard(),
+            "glow_item_$entityUniqueId"
+        ).apply {
+            this.players += entityUniqueId.toString()
+        }
+        return ClientboundSetPlayerTeamPacket.createRemovePacket(playerTeam)
     }
 }

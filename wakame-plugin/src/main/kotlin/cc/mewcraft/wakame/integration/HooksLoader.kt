@@ -14,6 +14,8 @@ import cc.mewcraft.wakame.integration.permission.PermissionManager
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
+import cc.mewcraft.wakame.integration.playermana.PlayerManaIntegration
+import cc.mewcraft.wakame.integration.playermana.PlayerManaType
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.integration.townflight.TownFlightIntegration
 import cc.mewcraft.wakame.integration.townflight.TownFlightManager
@@ -30,11 +32,20 @@ import kotlin.reflect.KClass
 @Init(stage = InitStage.PRE_FLEKS)
 internal object HooksLoader {
 
-    /** 用户指定的玩家等级系统. */
-    private val selectedPlayerLevelProvider by MAIN_CONFIG.entry<PlayerLevelType>("player_level_provider")
+    /**
+     * 用户指定的经济账户系统.
+     */
+    private val ECONOMY_PROVIDER by MAIN_CONFIG.entry<EconomyType>("economy_provider")
 
-    /** 用户指定的经济账户系统. */
-    private val selectedEconomyProvider by MAIN_CONFIG.entry<EconomyType>("economy_provider")
+    /**
+     * 用户指定的玩家等级系统.
+     */
+    private val PLAYER_LEVEL_PROVIDER by MAIN_CONFIG.entry<PlayerLevelType>("player_level_provider")
+
+    /**
+     * 用户指定的玩家魔法值系统.
+     */
+    private val PLAYER_MANA_PROVIDER by MAIN_CONFIG.entry<PlayerManaType>("player_mana_provider")
 
     @InitFun
     fun init() {
@@ -102,7 +113,7 @@ internal object HooksLoader {
     }
 
     private fun useHook(hook: Any) {
-        if (hook is EconomyIntegration && selectedEconomyProvider == hook.type) {
+        if (hook is EconomyIntegration && ECONOMY_PROVIDER == hook.type) {
             EconomyManager.integration = hook // overwrite
         }
         if (hook is PermissionIntegration) {
@@ -111,8 +122,11 @@ internal object HooksLoader {
         if (hook is ResourceLoadingFixHandler) {
             ResourceLoadingFixHandler.CURRENT_HANDLER = hook
         }
-        if (hook is PlayerLevelIntegration && selectedPlayerLevelProvider == hook.type) {
+        if (hook is PlayerLevelIntegration && PLAYER_LEVEL_PROVIDER == hook.levelType) {
             PlayerLevelManager.integration = hook // overwrite
+        }
+        if (hook is PlayerManaIntegration && PLAYER_MANA_PROVIDER == hook.manaType) {
+            PlayerManaIntegration.setImplementation(hook)
         }
         if (hook is ProtectionIntegration) {
             ProtectionManager.integrations += hook

@@ -6,14 +6,22 @@ version: 1
 #   economy: Economy 插件的账户余额
 #   vanilla: Minecraft 的原版经验等级
 #   zero: 无经济系统 (永远为 0)
-economy_provider: vanilla
+economy_provider: zero
 
 # Koish 如何计算玩家的等级
 # 可用选项:
+#   aura_skills: AuraSkills 插件的技能等级
 #   adventure: AdventureLevel 插件的冒险等级
 #   vanilla: Minecraft 的原版经验等级
 #   zero: 无等级 (永远为 0)
-player_level_provider: vanilla
+player_level_provider: zero
+
+# Koish 如何计算玩家的魔法值
+# 可用选项:
+#   aura_skills: AuraSkills 插件的魔法值
+#   koish: Koish 内置的魔法值系统
+#   zero: 无魔法值 (永远为 0)
+player_mana_provider: zero
 
 # Koish 如何显示玩家的魔法值
 # 可用选项:
@@ -88,6 +96,18 @@ dimension_key_mappings:
   minecraft:overworld: 主世界
   minecraft:nether: 下界
   minecraft:end: 末地
+
+# 在发送 ClientboundUpdateAttributesPacket 封包时移除掉以下属性
+# 目前仅用于配合伤害系统来“移除” ARMOR 和 ARMOR_TOUGHNESS 这两属性
+# 此功能可以带来几个好处:
+# - 不再需要手动移除掉物品自带的 minecraft:attribute_modifiers 组件
+# - 不再需要使用特制的资源包隐藏掉护甲 HUD
+remove_attributes_on_clientbound_update_attributes_packet:
+  - minecraft:armor
+  - minecraft:armor_toughness
+
+# 在发送 ClientboundSetEntityDataPacket 封包时移除掉 ABSORPTION 数据
+remove_absorption_on_clientbound_set_entity_data_packet: true
 
 # 关于调试模式
 debug:

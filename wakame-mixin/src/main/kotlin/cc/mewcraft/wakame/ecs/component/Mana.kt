@@ -11,7 +11,10 @@ data class Mana(
     override fun type(): EComponentType<Mana> = Mana
 
     var current: Int = maximum
-        private set
+        set(value) {
+            require(value >= 0) { "value must be non-negative" }
+            field = value
+        }
 
     operator fun plusAssign(value: Int) = addMana(value)
 

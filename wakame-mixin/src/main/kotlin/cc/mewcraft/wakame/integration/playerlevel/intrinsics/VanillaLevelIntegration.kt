@@ -11,7 +11,7 @@ import java.util.*
  */
 object VanillaLevelIntegration : PlayerLevelIntegration {
 
-    override val type: PlayerLevelType = PlayerLevelType.VANILLA
+    override val levelType: PlayerLevelType = PlayerLevelType.VANILLA
     override fun get(uuid: UUID): Int? = SERVER.getPlayer(uuid)?.level
 
 }

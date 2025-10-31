@@ -10,7 +10,7 @@ import java.util.*
  */
 internal object ZeroLevelIntegration : PlayerLevelIntegration {
 
-    override val type: PlayerLevelType = PlayerLevelType.ZERO
+    override val levelType: PlayerLevelType = PlayerLevelType.ZERO
     override fun get(uuid: UUID): Int = 0
 
 }

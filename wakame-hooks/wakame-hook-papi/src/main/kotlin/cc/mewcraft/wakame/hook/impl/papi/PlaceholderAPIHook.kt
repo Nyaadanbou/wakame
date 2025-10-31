@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.ecs.component.Mana
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.integration.Hook
+import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
 import me.clip.placeholderapi.expansion.PlaceholderExpansion
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
@@ -41,6 +42,8 @@ object PlaceholderAPIHook : PlaceholderExpansion() {
         } else if (params == "current_dimension") {
             val worldKey = player.world.key
             return dimensionKeyMappings[worldKey] ?: worldKey.asString()
+        } else if (params == "player_level") {
+            return PlayerLevelManager.getOrDefault(player.uniqueId, 0).toString()
         } else if (params.startsWith("attribute_")) {
             val param0 = params.substringAfter("attribute_")
             val attributeMap = player.attributeContainer
