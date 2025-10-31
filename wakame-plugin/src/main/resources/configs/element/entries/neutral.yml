@@ -8,7 +8,7 @@ version: 1
 name: "<color:#faff69>中立"
 styles: "<color:#faff69>"
 
-# 元素叠层效果
+# 元素叠层效果 (暂时失效, 请等待新实现完成)
 stack_effects:
   # 最大叠层数量
   max_amount: 10

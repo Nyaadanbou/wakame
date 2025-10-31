@@ -34,6 +34,7 @@ object MythicMobsDamageApplier : DamageApplier {
 
         val shitDamageMetadata = DamageMetadata(
             /* damager = */ shitDamager,
+            /* metadata = */ null,
             /* damagerItem = */ ItemComponentBukkitItemStack(ItemStack.empty()),
             /* amount = */ MAGIC_DAMAGE_AMOUNT,
             /* bonusDamage = */ Maps.newTreeMap<String, Double>(),

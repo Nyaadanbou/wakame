@@ -2,12 +2,9 @@ package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.ability.component.Ability
 import cc.mewcraft.wakame.ability.component.CastBy
-import cc.mewcraft.wakame.ability.component.ManaCost
 import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.*
-import cc.mewcraft.wakame.element.component.ElementStack
-import cc.mewcraft.wakame.element.component.Elemental
 import com.github.quillraven.fleks.Family
 
 /**
@@ -38,11 +35,5 @@ object CommonFamilies : Families {
 
     @JvmField
     val ABILITY: Family = EWorld.family { all(Ability, CastBy, TargetTo, TickCount) }
-
-    @JvmField
-    val MANA_COSTING_ABILITY: Family = EWorld.family { all(Ability, CastBy, TargetTo, TickCount, ManaCost) }
-
-    @JvmField
-    val ELEMENT_STACK: Family = EWorld.family { all(Elemental, ElementStack, TargetTo) }
 
 }
