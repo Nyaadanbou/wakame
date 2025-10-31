@@ -19,15 +19,8 @@ player_level_provider: zero
 # Koish 如何计算玩家的魔法值
 # 可用选项:
 #   aura_skills: AuraSkills 插件的魔法值
-#   koish: Koish 内置的魔法值系统
 #   zero: 无魔法值 (永远为 0)
 player_mana_provider: zero
-
-# Koish 如何显示玩家的魔法值
-# 可用选项:
-#   none: Koish 不负责魔法值显示
-#   koish: Koish 内置的魔法值显示 (BossBar)
-display_mana_provider: koish
 
 # 只有物品的所有者可以拾起死亡掉落的物品
 only_owner_can_pickup_death_drops: false

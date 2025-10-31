@@ -3,12 +3,11 @@ package cc.mewcraft.wakame.hook.impl.papi
 import cc.mewcraft.wakame.BootstrapContexts
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.ecs.bridge.koishify
-import cc.mewcraft.wakame.ecs.component.Mana
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
+import cc.mewcraft.wakame.integration.playermana.PlayerManaIntegration
 import me.clip.placeholderapi.expansion.PlaceholderExpansion
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
@@ -30,15 +29,15 @@ object PlaceholderAPIHook : PlaceholderExpansion() {
 
     override fun onPlaceholderRequest(player: Player, params: String): String? {
         if (params == "mana") {
-            val current = player.koishify()[Mana].current
+            val current = PlayerManaIntegration.getMana(player)
             return current.toString()
         } else if (params == "max_mana") {
-            val maximum = player.koishify()[Mana].maximum
+            val maximum = PlayerManaIntegration.getMaxMana(player)
             return maximum.toString()
         } else if (params == "mana_percentage") {
-            val current = player.koishify()[Mana].current
-            val maximum = player.koishify()[Mana].maximum
-            return if (maximum > 0) (current.toDouble() / maximum * 100).toString() else "0"
+            val current = PlayerManaIntegration.getMana(player)
+            val maximum = PlayerManaIntegration.getMaxMana(player)
+            return if (maximum > 0) (current / maximum * 100).toString() else "0"
         } else if (params == "current_dimension") {
             val worldKey = player.world.key
             return dimensionKeyMappings[worldKey] ?: worldKey.asString()
