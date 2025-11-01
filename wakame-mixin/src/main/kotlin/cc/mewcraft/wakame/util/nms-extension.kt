@@ -23,6 +23,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.item.crafting.RecipeManager
 import net.minecraft.world.level.chunk.LevelChunk
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
@@ -44,6 +45,7 @@ import kotlin.jvm.optionals.getOrNull
 
 val MINECRAFT_SERVER: DedicatedServer by lazy { (Bukkit.getServer() as CraftServer).server }
 val REGISTRY_ACCESS: RegistryAccess by lazy { MINECRAFT_SERVER.registryAccess() }
+val RECIPE_MANAGER: RecipeManager by lazy { MINECRAFT_SERVER.recipeManager }
 val DATA_VERSION: Int by lazy { CraftMagicNumbers.INSTANCE.dataVersion }
 
 val MojangUnit.toKotlin: Unit

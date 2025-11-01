@@ -1,6 +1,10 @@
 # 有序配方, 参考: https://minecraft.wiki/w/Recipe#crafting_shaped
 type: shaped
 
+# 解锁该配方时, 是否弹出提示
+# 仅有序合成配方有这个选项
+show_notification: true
+
 # 合成方格中物品要摆放成的合成图案
 # 其中的每个字符串代表合成方格中的一横行
 pattern:

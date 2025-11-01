@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.item.ItemRef
+import cc.mewcraft.wakame.mixin.support.recipe.KoishIngredient
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
+import cc.mewcraft.wakame.util.MojangIngredient
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -18,14 +20,20 @@ import org.bukkit.inventory.RecipeChoice as BukkitRecipeChoice
  */
 sealed interface RecipeChoice : Examinable {
     fun toBukkitRecipeChoice(): BukkitRecipeChoice
+    fun toMojangIngredient() : MojangIngredient
 }
 
 /**
  * 空输入.
+ * 在某些配方中起占位作用, 如允许部分输入为空的锻造台转化配方.
  */
 data object EmptyRecipeChoice : RecipeChoice {
     override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
         return BukkitRecipeChoice.empty()
+    }
+
+    override fun toMojangIngredient(): MojangIngredient {
+        throw UnsupportedOperationException("Unable to create empty ingredient")
     }
 }
 
@@ -38,6 +46,10 @@ data class SingleRecipeChoice(
     override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
         val itemstack = item.createItemStack()
         return BukkitRecipeChoice.ExactChoice(itemstack)
+    }
+
+    override fun toMojangIngredient(): MojangIngredient {
+        return KoishIngredient.ofIdentifiers(setOf(item.id))
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -58,6 +70,10 @@ data class MultiRecipeChoice(
         return BukkitRecipeChoice.ExactChoice(itemstacks)
     }
 
+    override fun toMojangIngredient(): MojangIngredient {
+        return KoishIngredient.ofIdentifiers(items.map { it.id }.toSet())
+    }
+
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("items", items),
     )
@@ -70,6 +86,7 @@ data class MultiRecipeChoice(
  */
 internal object RecipeChoiceSerializer : TypeSerializer2<RecipeChoice> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeChoice {
+        // RecipeChoice 中的 ItemRef 必然是合法有效的, 因为无效的会在这里产生序列化异常
         val itemList = node.getList<ItemRef>(emptyList())
         return when (itemList.size) {
             0 -> throw SerializationException(node, type, "Recipe choice must have at least 1 element")

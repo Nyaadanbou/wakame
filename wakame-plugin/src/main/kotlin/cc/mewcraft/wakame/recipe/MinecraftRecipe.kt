@@ -1,29 +1,59 @@
 package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.adventure.key.Identified
+import cc.mewcraft.wakame.mixin.support.recipe.KoishRecipe
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.MojangResourceKey
+import cc.mewcraft.wakame.util.RECIPE_MANAGER
 import cc.mewcraft.wakame.util.adventure.toNamespacedKey
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.toResourceLocation
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
+import io.papermc.paper.registry.RegistryAccess
+import io.papermc.paper.registry.RegistryKey
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import net.minecraft.core.Holder
+import net.minecraft.core.registries.Registries
+import net.minecraft.world.item.crafting.Recipe
+import net.minecraft.world.item.crafting.RecipeHolder
+import net.minecraft.world.item.crafting.ShapedRecipePattern
+import net.minecraft.world.item.crafting.TransmuteResult
 import org.bukkit.Bukkit
+import org.bukkit.craftbukkit.inventory.CraftRecipe
+import org.bukkit.craftbukkit.inventory.trim.CraftTrimPattern
+import org.bukkit.inventory.meta.trim.TrimPattern
+import org.bukkit.inventory.recipe.CookingBookCategory
+import org.bukkit.inventory.recipe.CraftingBookCategory
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
+import java.util.*
 import java.util.Collections.emptyList
 import java.util.stream.Stream
+import net.minecraft.world.item.crafting.BlastingRecipe as MojangBlastingRecipe
+import net.minecraft.world.item.crafting.CampfireCookingRecipe as MojangCampfireRecipe
+import net.minecraft.world.item.crafting.CookingBookCategory as MojangCookingBookCategory
+import net.minecraft.world.item.crafting.CraftingBookCategory as MojangCraftingBookCategory
+import net.minecraft.world.item.crafting.ShapedRecipe as MojangShapedRecipe
+import net.minecraft.world.item.crafting.ShapelessRecipe as MojangShapelessRecipe
+import net.minecraft.world.item.crafting.SmeltingRecipe as MojangFurnaceRecipe
+import net.minecraft.world.item.crafting.SmithingTransformRecipe as MojangSmithingTransformRecipe
+import net.minecraft.world.item.crafting.SmithingTrimRecipe as MojangSmithingTrimRecipe
+import net.minecraft.world.item.crafting.SmokingRecipe as MojangSmokingRecipe
+import net.minecraft.world.item.crafting.StonecutterRecipe as MojangStonecuttingRecipe
+import net.minecraft.world.item.equipment.trim.TrimPattern as MojangTrimPattern
 import org.bukkit.inventory.BlastingRecipe as BukkitBlastingRecipe
 import org.bukkit.inventory.CampfireRecipe as BukkitCampfireRecipe
 import org.bukkit.inventory.FurnaceRecipe as BukkitFurnaceRecipe
-import org.bukkit.inventory.ShapedRecipe as BukkitShapredRecipe
+import org.bukkit.inventory.ShapedRecipe as BukkitShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe as BukkitShapelessRecipe
 import org.bukkit.inventory.SmithingTransformRecipe as BukkitSmithingTransformRecipe
 import org.bukkit.inventory.SmithingTrimRecipe as BukkitSmithingTrimRecipe
@@ -31,7 +61,7 @@ import org.bukkit.inventory.SmokingRecipe as BukkitSmokingRecipe
 import org.bukkit.inventory.StonecuttingRecipe as BukkitStonecuttingRecipe
 
 /**
- * 合成配方 (对 Bukkit 的合成配方的包装).
+ * 配方 (对 nms 配方的包装).
  */
 sealed interface MinecraftRecipe : Identified, Examinable {
     val result: RecipeResult
@@ -40,6 +70,20 @@ sealed interface MinecraftRecipe : Identified, Examinable {
 
     fun unregisterBukkitRecipe() {
         Bukkit.removeRecipe(identifier.toNamespacedKey, false)
+    }
+
+    /**
+     * 将该配方添加到服务端的 RecipeManager 中.
+     * 注意: 仅调用该方法并不会向玩家客户端重新发包.
+     */
+    fun addToManager()
+
+    /**
+     * 将该配方从服务端的 RecipeManager 中移除.
+     * 注意: 仅调用该方法并不会向玩家客户端重新发包.
+     */
+    fun removeFromManager(): Boolean {
+        return RECIPE_MANAGER.removeRecipe(identifier.createResourceKey())
     }
 
     /**
@@ -67,6 +111,8 @@ sealed interface MinecraftRecipe : Identified, Examinable {
 class BlastingRecipe(
     override val identifier: Identifier,
     override val result: RecipeResult,
+    val group: String,
+    val category: CookingBookCategory,
     val input: RecipeChoice,
     val cookingTime: Int,
     val exp: Float,
@@ -80,6 +126,19 @@ class BlastingRecipe(
             cookingTime
         )
         return Bukkit.addRecipe(blastingRecipe)
+    }
+
+    override fun addToManager() {
+        val mojangRecipe = MojangBlastingRecipe(
+            group,
+            category.toMojang(),
+            input.toMojangIngredient(),
+            result.toMojangStack(),
+            exp,
+            cookingTime
+        )
+        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -99,6 +158,8 @@ class BlastingRecipe(
 class CampfireRecipe(
     override val identifier: Identifier,
     override val result: RecipeResult,
+    val group: String,
+    val category: CookingBookCategory,
     val input: RecipeChoice,
     val cookingTime: Int,
     val exp: Float,
@@ -112,6 +173,19 @@ class CampfireRecipe(
             cookingTime
         )
         return Bukkit.addRecipe(campfireRecipe)
+    }
+
+    override fun addToManager() {
+        val mojangRecipe = MojangCampfireRecipe(
+            group,
+            category.toMojang(),
+            input.toMojangIngredient(),
+            result.toMojangStack(),
+            exp,
+            cookingTime
+        )
+        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -131,6 +205,8 @@ class CampfireRecipe(
 class FurnaceRecipe(
     override val identifier: Identifier,
     override val result: RecipeResult,
+    val group: String,
+    val category: CookingBookCategory,
     val input: RecipeChoice,
     val cookingTime: Int,
     val exp: Float,
@@ -144,6 +220,19 @@ class FurnaceRecipe(
             cookingTime
         )
         return Bukkit.addRecipe(furnaceRecipe)
+    }
+
+    override fun addToManager() {
+        val mojangRecipe = MojangFurnaceRecipe(
+            group,
+            category.toMojang(),
+            input.toMojangIngredient(),
+            result.toMojangStack(),
+            exp,
+            cookingTime
+        )
+        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -164,6 +253,9 @@ class FurnaceRecipe(
 class ShapedRecipe(
     override val identifier: Identifier,
     override val result: RecipeResult,
+    val group: String,
+    val category: CraftingBookCategory,
+    val showNotification: Boolean,
     val pattern: Array<String>,
     val ingredients: Map<Char, RecipeChoice>,
 ) : MinecraftRecipe {
@@ -172,13 +264,27 @@ class ShapedRecipe(
     }
 
     override fun registerBukkitRecipe(): Boolean {
-        val shapedRecipe = BukkitShapredRecipe(identifier.toNamespacedKey, result.toBukkitItemStack())
+        val shapedRecipe = BukkitShapedRecipe(identifier.toNamespacedKey, result.toBukkitItemStack())
         pattern.forEachIndexed { i, s -> pattern[i] = s.replace(EMPTY_INGREDIENT_CHAR, ' ') }
         shapedRecipe.shape(*pattern)
         ingredients.forEach {
             shapedRecipe.setIngredient(it.key, it.value.toBukkitRecipeChoice())
         }
         return Bukkit.addRecipe(shapedRecipe, false)
+    }
+
+    override fun addToManager() {
+        pattern.forEachIndexed { i, s -> pattern[i] = s.replace(EMPTY_INGREDIENT_CHAR, ' ') }
+        val mojangIngredients = ingredients.mapValues { it.value.toMojangIngredient() }
+        val mojangRecipe = MojangShapedRecipe(
+            group,
+            category.toMojang(),
+            ShapedRecipePattern.of(mojangIngredients, *pattern),
+            result.toMojangStack(),
+            showNotification
+        )
+        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -197,6 +303,8 @@ class ShapedRecipe(
 class ShapelessRecipe(
     override val identifier: Identifier,
     override val result: RecipeResult,
+    val group: String,
+    val category: CraftingBookCategory,
     val ingredients: List<RecipeChoice>,
 ) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
@@ -205,6 +313,19 @@ class ShapelessRecipe(
             shapelessRecipe.addIngredient(it.toBukkitRecipeChoice())
         }
         return Bukkit.addRecipe(shapelessRecipe, false)
+    }
+
+    override fun addToManager() {
+        val mojangRecipe = MojangShapelessRecipe(
+            group,
+            category.toMojang(),
+            result.toMojangStack(),
+            ingredients.map { it.toMojangIngredient() }
+        )
+        // 无序合成配方需要注入特殊标记
+        KoishRecipe.minecraftToKoish(mojangRecipe).setCreatedByKoish()
+        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -239,6 +360,29 @@ class SmithingTransformRecipe(
         return Bukkit.addRecipe(smithingTransformRecipe)
     }
 
+    override fun addToManager() {
+        val optionalTemplateIngredient = if (template is EmptyRecipeChoice) {
+            Optional.empty()
+        } else {
+            Optional.of(template.toMojangIngredient())
+        }
+        val optionalAdditionIngredient = if (addition is EmptyRecipeChoice) {
+            Optional.empty()
+        } else {
+            Optional.of(addition.toMojangIngredient())
+        }
+        val resultMojangStack = result.toMojangStack()
+        val mojangRecipe = MojangSmithingTransformRecipe(
+            optionalTemplateIngredient,
+            base.toMojangIngredient(),
+            optionalAdditionIngredient,
+            TransmuteResult(resultMojangStack.itemHolder, resultMojangStack.count, resultMojangStack.componentsPatch),
+            copyDataComponents
+        )
+        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        RECIPE_MANAGER.addRecipe(recipeHolder)
+    }
+
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("identifier", identifier),
         ExaminableProperty.of("recipe_result", result),
@@ -259,6 +403,7 @@ class SmithingTrimRecipe(
     val base: RecipeChoice,
     val addition: RecipeChoice,
     val template: RecipeChoice,
+    val trimPattern: Identifier,
     val copyDataComponents: Boolean,
 ) : MinecraftRecipe {
     // 锻造台纹饰配方的结果是原版生成的
@@ -272,6 +417,18 @@ class SmithingTrimRecipe(
             copyDataComponents
         )
         return Bukkit.addRecipe(smithingTrimRecipe)
+    }
+
+    override fun addToManager() {
+        val mojangRecipe = MojangSmithingTrimRecipe(
+            template.toMojangIngredient(),
+            base.toMojangIngredient(),
+            addition.toMojangIngredient(),
+            identifier.getTrimPattern().toMojangHolder(),
+            copyDataComponents
+        )
+        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -291,6 +448,8 @@ class SmithingTrimRecipe(
 class SmokingRecipe(
     override val identifier: Identifier,
     override val result: RecipeResult,
+    val group: String,
+    val category: CookingBookCategory,
     val input: RecipeChoice,
     val cookingTime: Int,
     val exp: Float,
@@ -304,6 +463,19 @@ class SmokingRecipe(
             cookingTime
         )
         return Bukkit.addRecipe(smokingRecipe)
+    }
+
+    override fun addToManager() {
+        val mojangRecipe = MojangSmokingRecipe(
+            group,
+            category.toMojang(),
+            input.toMojangIngredient(),
+            result.toMojangStack(),
+            exp,
+            cookingTime
+        )
+        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -323,6 +495,7 @@ class SmokingRecipe(
 class StonecuttingRecipe(
     override val identifier: Identifier,
     override val result: RecipeResult,
+    val group: String,
     val input: RecipeChoice,
 ) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
@@ -332,6 +505,16 @@ class StonecuttingRecipe(
             input.toBukkitRecipeChoice(),
         )
         return Bukkit.addRecipe(stonecuttingRecipe)
+    }
+
+    override fun addToManager() {
+        val mojangRecipe = MojangStonecuttingRecipe(
+            group,
+            input.toMojangIngredient(),
+            result.toMojangStack()
+        )
+        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -352,11 +535,15 @@ enum class RecipeType(
         val exp = node.node("exp").getFloat(0F)
 
         val result = node.node("result").require<RecipeResult>()
+        val group = node.node("group").getString("")
+        val category = node.node("category").get<CookingBookCategory>(CookingBookCategory.MISC)
         val key = node.getRecipeKey()
 
         BlastingRecipe(
             identifier = key,
             result = result,
+            group = group,
+            category = category,
             input = input,
             cookingTime = cookingTime,
             exp = exp
@@ -368,11 +555,15 @@ enum class RecipeType(
         val exp = node.node("exp").getFloat(0F)
 
         val result = node.node("result").require<RecipeResult>()
+        val group = node.node("group").getString("")
+        val category = node.node("category").get<CookingBookCategory>(CookingBookCategory.MISC)
         val key = node.getRecipeKey()
 
         CampfireRecipe(
             identifier = key,
             result = result,
+            group = group,
+            category = category,
             input = input,
             cookingTime = cookingTime,
             exp = exp
@@ -384,11 +575,15 @@ enum class RecipeType(
         val exp = node.node("exp").getFloat(0F)
 
         val result = node.node("result").require<RecipeResult>()
+        val group = node.node("group").getString("")
+        val category = node.node("category").get<CookingBookCategory>(CookingBookCategory.MISC)
         val key = node.getRecipeKey()
 
         FurnaceRecipe(
             identifier = key,
             result = result,
+            group = group,
+            category = category,
             input = input,
             cookingTime = cookingTime,
             exp = exp
@@ -414,10 +609,10 @@ enum class RecipeType(
                 mapChild.require<RecipeChoice>()
             }
 
-        //判断特殊字符是否被误用
+        // 判断特殊字符是否被误用
         require(!ingredients.keys.contains(ShapedRecipe.EMPTY_INGREDIENT_CHAR)) { "${ShapedRecipe.EMPTY_INGREDIENT_CHAR} means an empty slot in pattern, should not be used as an ingredient char" }
 
-        //判断 pattern 中的 key 是否都在 ingredients 中
+        // 判断 pattern 中的 key 是否都在 ingredients 中
         val missingIngredientKeys = pattern
             .map { it.toCharArray() }
             .reduce { acc, chars -> acc + chars }
@@ -428,11 +623,17 @@ enum class RecipeType(
         }
 
         val result = node.node("result").require<RecipeResult>()
+        val group = node.node("group").getString("")
+        val category = node.node("category").get<CraftingBookCategory>(CraftingBookCategory.MISC)
+        val showNotification = node.node("show_notification").getBoolean(true)
         val key = node.getRecipeKey()
 
         ShapedRecipe(
             identifier = key,
             result = result,
+            group = group,
+            category = category,
+            showNotification = showNotification,
             pattern = pattern.toTypedArray(),
             ingredients = ingredients,
         )
@@ -452,11 +653,15 @@ enum class RecipeType(
 
 
         val result = node.node("result").require<RecipeResult>()
+        val group = node.node("group").getString("")
+        val category = node.node("category").get<CraftingBookCategory>(CraftingBookCategory.MISC)
         val key = node.getRecipeKey()
 
         ShapelessRecipe(
             identifier = key,
             result = result,
+            group = group,
+            category = category,
             ingredients = ingredients
         )
     }),
@@ -487,6 +692,7 @@ enum class RecipeType(
         val base = node.node("base").require<RecipeChoice>()
         val addition = node.node("addition").get<RecipeChoice>(EmptyRecipeChoice)
         val template = node.node("template").get<RecipeChoice>(EmptyRecipeChoice)
+        val trimPattern = node.node("pattern").require<Identifier>()
         val copyDataComponents = node.node("copy_data_components").getBoolean(true)
 
         // addition和template不能同时是EmptyRecipeChoice
@@ -501,6 +707,7 @@ enum class RecipeType(
             base = base,
             addition = addition,
             template = template,
+            trimPattern = trimPattern,
             copyDataComponents = copyDataComponents
         )
     }),
@@ -510,11 +717,15 @@ enum class RecipeType(
         val exp = node.node("exp").getFloat(0F)
 
         val result = node.node("result").require<RecipeResult>()
+        val group = node.node("group").getString("")
+        val category = node.node("category").get<CookingBookCategory>(CookingBookCategory.MISC)
         val key = node.getRecipeKey()
 
         SmokingRecipe(
             identifier = key,
             result = result,
+            group = group,
+            category = category,
             input = input,
             cookingTime = cookingTime,
             exp = exp
@@ -524,11 +735,13 @@ enum class RecipeType(
         val input = node.node("input").require<RecipeChoice>()
 
         val result = node.node("result").require<RecipeResult>()
+        val group = node.node("group").getString("")
         val key = node.getRecipeKey()
 
         StonecuttingRecipe(
             identifier = key,
             result = result,
+            group = group,
             input = input,
         )
     });
@@ -560,4 +773,44 @@ internal class RecipeTypeBridge<T : MinecraftRecipe>(
         typeToken,
         TypeSerializer2<T> { type, node -> serializer(type, node) }
     )
+}
+
+/**
+ * 方便函数.
+ */
+private fun Identifier.createResourceKey(): MojangResourceKey<Recipe<*>> {
+    return MojangResourceKey.create(Registries.RECIPE, this.toResourceLocation())
+}
+
+/**
+ * 方便函数.
+ */
+private fun Identifier.getTrimPattern(): TrimPattern {
+    val trimPattern = RegistryAccess.registryAccess().getRegistry(RegistryKey.TRIM_PATTERN).get(this)
+    if (trimPattern == null) {
+        throw NoSuchElementException("Trim pattern does not exist: $trimPattern")
+    } else {
+        return trimPattern
+    }
+}
+
+/**
+ * 方便函数.
+ */
+private fun CraftingBookCategory.toMojang(): MojangCraftingBookCategory {
+    return CraftRecipe.getCategory(this)
+}
+
+/**
+ * 方便函数.
+ */
+private fun CookingBookCategory.toMojang(): MojangCookingBookCategory {
+    return CraftRecipe.getCategory(this)
+}
+
+/**
+ * 方便函数.
+ */
+private fun TrimPattern.toMojangHolder(): Holder<MojangTrimPattern> {
+    return CraftTrimPattern.bukkitToMinecraftHolder(this)
 }

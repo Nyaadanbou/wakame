@@ -11,8 +11,12 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.eventbus.MapEventBus
+import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.runTask
+import cc.mewcraft.wakame.util.yamlLoader
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.VisibleForTesting
@@ -39,7 +43,7 @@ internal object MinecraftRecipeRegistryLoader {
 
     private fun postLoad() {
         // 将从 Koish 读取到的配方注册到 Minecraft
-        registerForBukkitRecipes()
+        registerRecipes()
         // 向所有客户端发送新的配方数据包
         Bukkit.updateRecipes()
         // 通知其他系统
@@ -77,6 +81,22 @@ internal object MinecraftRecipeRegistryLoader {
                 Util.pauseInIde(IllegalStateException("Can't load vanilla recipe: '${file.relativeTo(recipeDir)}'", e))
             }
         }
+    }
+
+    private fun registerRecipes() {
+        checkedRecipes.values.forEach(MinecraftRecipe::removeFromManager)
+        checkedRecipes.clear()
+        uncheckedRecipes.forEach { (key, recipe) ->
+            try {
+                recipe.addToManager()
+                checkedRecipes[key] = recipe
+            } catch (e: Throwable) {
+                Util.pauseInIde(IllegalStateException("Can't register vanilla recipe: '$key'", e))
+            }
+        }
+
+        LOGGER.info("Registered vanilla recipes: {}", checkedRecipes.keys.joinToString(transform = Key::asString))
+        LOGGER.info("Registered ${checkedRecipes.size} vanilla recipes")
     }
 
     private fun registerForBukkitRecipes() {

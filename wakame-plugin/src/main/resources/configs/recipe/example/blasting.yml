@@ -1,6 +1,9 @@
 # 高炉配方, 参考: https://minecraft.wiki/w/Recipe#blasting
 type: blasting
 
+# 在配方书中的分类
+category: blocks
+
 # 输入
 input:
   - minecraft:glass

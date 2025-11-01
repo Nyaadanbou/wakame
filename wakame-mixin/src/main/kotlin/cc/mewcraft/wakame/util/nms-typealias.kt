@@ -12,3 +12,4 @@ typealias MojangEnchantment = net.minecraft.world.item.enchantment.Enchantment
 typealias MojangStack = net.minecraft.world.item.ItemStack
 typealias MojangEntity = net.minecraft.world.entity.Entity
 typealias MojangDamageSource = net.minecraft.world.damagesource.DamageSource
+typealias MojangIngredient = net.minecraft.world.item.crafting.Ingredient

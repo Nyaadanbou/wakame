@@ -29,6 +29,7 @@
     "MixinRegistryDataLoader",
     "MixinRepairItemRecipe",
     "MixinServerPlayer",
+    "MixinShapelessRecipe",
     "MixinSpawnerData",
     "MixinStackedContentsExtrasMap",
     "MixinTippedArrowRecipe",
