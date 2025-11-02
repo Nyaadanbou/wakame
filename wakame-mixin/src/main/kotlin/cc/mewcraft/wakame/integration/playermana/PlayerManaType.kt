@@ -5,6 +5,5 @@ package cc.mewcraft.wakame.integration.playermana
 
 enum class PlayerManaType {
     ZERO,
-    KOISH,
     AURA_SKILLS,
 }
