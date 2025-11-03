@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
+import cc.mewcraft.wakame.item.KoishStackData;
 import cc.mewcraft.wakame.mixin.support.recipe.KoishRecipe;
 import io.papermc.paper.inventory.recipe.ItemOrExact;
 import io.papermc.paper.inventory.recipe.StackedContentsExtrasMap;
@@ -32,7 +33,7 @@ public abstract class MixinStackedContentsExtrasMap {
 
     /**
      * @author Flandreqwq
-     * @reason 为了让无序合成能够支持 Koish 物品
+     * @reason 让无序合成能够支持 Koish 物品
      */
     @Inject(method = "initialize", at = @At("HEAD"), cancellable = true)
     private void onInitialize(Recipe<?> recipe, CallbackInfo ci) {
@@ -44,10 +45,9 @@ public abstract class MixinStackedContentsExtrasMap {
         }
     }
 
-
     /**
      * @author Flandreqwq
-     * @reason 为了让无序合成能够支持 Koish 物品
+     * @reason 让无序合成能够支持 Koish 物品
      */
     @Inject(method = "resetExtras", at = @At("HEAD"))
     private void onResetExtras(CallbackInfo ci) {
@@ -57,23 +57,22 @@ public abstract class MixinStackedContentsExtrasMap {
 
     /**
      * @author Flandreqwq
-     * @reason 为了让无序合成能够支持 Koish 物品
+     * @reason
+     * 让无序合成能够支持 Koish 物品.
+     * 防止 Koish 物品被视为原版物品而参与原版无序合成配方.
      */
     @Overwrite
     public boolean accountStack(ItemStack stack, int count) {
         // 若有 accountAllItemStackToExact 标记, 则将输入物品都识别成 Exact
         // 因为只有这样才能在匹配配方原料时, 拿到物品的唯一标识
-        if (accountAllItemStackToExact || this.exactIngredients.contains(stack)) {
+        // 若输入物品是 Koish 物品, 则也将输入物品识别成 Exact
+        // 因为原版无序合成配方均为 Item 原料, Item 原料是无法被 Exact 输入匹配成功的
+        // 以此防止 Koish 物品参与原版无序合成配方
+        if (accountAllItemStackToExact || KoishStackData.isExactKoish(stack) || this.exactIngredients.contains(stack)) {
             this.contents.account(new ItemOrExact.Exact(stack), count);
             return true;
         }
         return false;
     }
 
-    // /**
-    //  * 让 Koish 物品在 Shapeless 配方中只考虑 Koish 的唯一物品标识而忽略其他物品数据
-    //  */
-    // @Final
-    // @Shadow
-    // public final ObjectSet<ItemStack> exactIngredients = new ObjectOpenCustomHashSet<>(CustomItemStack.EXACT_MATCH_STRATEGY);
 }

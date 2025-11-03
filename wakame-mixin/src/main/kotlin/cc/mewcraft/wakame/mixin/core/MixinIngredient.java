@@ -72,7 +72,10 @@ public abstract class MixinIngredient implements StackedContents.IngredientInfo<
 
     /**
      * @author Flandreqwq
-     * @reason 插入 Koish 原料判定逻辑, 影响所有配方类型的匹配逻辑
+     * @reason
+     * 插入 Koish 原料判定逻辑, 影响所有配方类型的匹配逻辑.
+     * (请注意: 由 Koish 添加的配方, 其中只会有 Koish 原料).
+     * 防止 Koish 物品被视为原版物品而参与原版配方.
      */
     @Overwrite
     public boolean test(ItemStack stack) {
@@ -86,19 +89,24 @@ public abstract class MixinIngredient implements StackedContents.IngredientInfo<
         if (this.isExact()) {
             return this.itemStacks.contains(stack);
         } else {
-            return stack.is(this.values);
+            return stack.is(this.values) && !KoishStackData.isExactKoish(stack);
         }
     }
 
     /**
      * @author Flandreqwq
-     * @reason 插入 Koish 原料判定逻辑, 影响无序合成配方的匹配逻辑
+     * @reason
+     * 插入 Koish 原料判定逻辑, 影响无序合成配方的匹配逻辑.
+     * (请注意: 由 Koish 添加的配方, 其中只会有 Koish 原料).
+     * 借助服务端原生代码防止 Koish 物品被视为原版物品而参与原版配方.
+     * 原理是我们让 Koish 物品在进入这个方法前被识别成 Exact.
+     * 原版无序合成配方均为 Item 原料, Item 原料是无法被 Exact 输入匹配成功的.
      */
     @Overwrite
     public boolean acceptsItem(ItemOrExact itemOrExact) {
         boolean var13;
         switch (itemOrExact) {
-            case ItemOrExact.Item(Holder item):
+            case ItemOrExact.Item(Holder<Item> item):
                 var13 = !this.isExact() && this.values.contains(item);
                 break;
             case ItemOrExact.Exact(ItemStack exact):
@@ -117,39 +125,4 @@ public abstract class MixinIngredient implements StackedContents.IngredientInfo<
         return var13;
     }
 
-    // /**
-    //  * @return a set of item stacks that are used to check for equality
-    //  * @author Nailm, Flandre
-    //  * @reason make Koish items invariant to their data components
-    //  */
-    // @Redirect(
-    //         method = "ofStacks(Ljava/util/List;)Lnet/minecraft/world/item/crafting/Ingredient;",
-    //         at = @At(
-    //                 value = "INVOKE",
-    //                 target = "Lnet/minecraft/world/item/ItemStackLinkedSet;createTypeAndComponentsSet()Ljava/util/Set;"
-    //         )
-    // )
-    // private static Set<ItemStack> koish$createTypeAndComponentSet() {
-    //     return new ObjectLinkedOpenCustomHashSet<>(CustomItemStack.EXACT_MATCH_STRATEGY);
-    // }
-
-    // FIXME 这只是临时解决方案, 后续工作请到 #396 跟进
-
-    // /// 在第二个 return (即非 isExact 的情况) 之前注入代码, 再判断是否为 Koish 物品堆叠, 如果是的话就返回 false.
-    // ///
-    // /// @param stack 传入进来的物品堆叠
-    // /// @param cir   回调信息
-    // @Inject(
-    //         method = "test(Lnet/minecraft/world/item/ItemStack;)Z",
-    //         at = @At(
-    //                 value = "RETURN",
-    //                 ordinal = 1
-    //         ),
-    //         cancellable = true
-    // )
-    // private void injected0(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-    //     if (KoishStackData.isExactKoish(stack)) {
-    //         cir.setReturnValue(false);
-    //     }
-    // }
 }
