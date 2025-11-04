@@ -47,7 +47,7 @@ private object AuraPlayerLevelIntegration : PlayerLevelIntegration {
         val user = auraApi.getUser(uuid)
         if (!user.isLoaded) return null
 
-        // 将所有 Skill 等级取平均值作为玩家等级返回
+        // 将所有 Skill 等级之和作为玩家等级返回
         val skills = Skills.entries
         val result = skills.sumOf { user.getSkillLevel(it) }
 
