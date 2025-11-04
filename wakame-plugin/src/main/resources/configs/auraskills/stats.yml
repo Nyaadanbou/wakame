@@ -1,0 +1,58 @@
+stats:
+traits:
+  koish/attribute/attack_knockback:
+    enabled: true
+  koish/attribute/block_interaction_range:
+    enabled: true
+  koish/attribute/entity_interaction_range:
+    enabled: true
+  koish/attribute/knockback_resistance:
+    enabled: true
+  koish/attribute/max_absorption:
+    enabled: true
+  koish/attribute/max_health:
+    enabled: true
+  koish/attribute/mining_efficiency:
+    enabled: true
+  koish/attribute/movement_speed:
+    enabled: true
+  koish/attribute/safe_fall_distance:
+    enabled: true
+  koish/attribute/scale:
+    enabled: true
+  koish/attribute/step_height:
+    enabled: true
+  koish/attribute/sweeping_damage_ratio:
+    enabled: true
+  koish/attribute/water_movement_efficiency:
+    enabled: true
+  koish/attribute/attack_effect_chance:
+    enabled: true
+  koish/attribute/critical_strike_chance:
+    enabled: true
+  koish/attribute/critical_strike_power:
+    enabled: true
+  koish/attribute/damage_rate_by_untargeted:
+    enabled: true
+  koish/attribute/hammer_damage_range:
+    enabled: true
+  koish/attribute/hammer_damage_ratio:
+    enabled: true
+  koish/attribute/health_regeneration:
+    enabled: true
+  koish/attribute/lifesteal:
+    enabled: true
+  koish/attribute/negative_critical_strike_power:
+    enabled: true
+  koish/attribute/none_critical_strike_power:
+    enabled: true
+  koish/attribute/universal_defense:
+    enabled: true
+  koish/attribute/universal_defense_penetration:
+    enabled: true
+  koish/attribute/universal_defense_penetration_rate:
+    enabled: true
+  koish/attribute/universal_max_attack_damage:
+    enabled: true
+  koish/attribute/universal_min_attack_damage:
+    enabled: true
