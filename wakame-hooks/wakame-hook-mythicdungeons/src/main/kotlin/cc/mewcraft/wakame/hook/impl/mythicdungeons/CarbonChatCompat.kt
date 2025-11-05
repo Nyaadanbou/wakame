@@ -10,6 +10,6 @@ import cc.mewcraft.wakame.integration.Hook
  * 1. 当 MythicDungeons 和 CarbonChat 同时存在时, 注册基于 CarbonChat 实现的 Party 系统
  */
 @Hook(plugins = ["MythicDungeons", "CarbonChat"])
-object MythicDungeonsWithCarbonChatHook {
+object CarbonChatCompat {
 
 }

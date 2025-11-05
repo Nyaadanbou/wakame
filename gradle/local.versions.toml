@@ -61,6 +61,7 @@ auraskills = "2.2.4"
 husksync = "3.8.7+1.21.8"
 carbonchat = "3.0.0-beta.26"
 mythicdungeons = "1.3.0-SNAPSHOT"
+betonquest = "3.0.0-SNAPSHOT"
 
 [libraries]
 
@@ -148,6 +149,7 @@ auraskills = { group = "dev.aurelium", name = "auraskills-api-bukkit", version.r
 husksync = { group = "net.william278.husksync", name = "husksync-bukkit", version.ref = "husksync" }
 carbonchat = { group = "de.hexaoxi", name = "carbonchat-api", version.ref = "carbonchat" }
 mythicdungeons = { group = "net.playavalon", name = "MythicDungeons", version.ref = "mythicdungeons" }
+betonquest = { group = "org.betonquest", name = "betonquest", version.ref = "betonquest" }
 
 [plugins]
 

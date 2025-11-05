@@ -14,6 +14,9 @@ dependencies:
     AuraSkills:
       required: false
       load: BEFORE
+    BetonQuest:
+      required: false
+      load: BEFORE
     BetterHud:
       required: false
       load: OMIT
@@ -49,6 +52,9 @@ dependencies:
     LuckPerms:
       required: false
       load: OMIT
+    MythicDungeons:
+      required: false
+      load: OMIT # 游戏中才需要用到其 API
     MythicMobs:
       required: false
       load: OMIT

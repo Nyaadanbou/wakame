@@ -22,6 +22,7 @@ dependencies {
     compileOnly(project(":wakame-mixin")) // 运行时由 koish-mod 提供
     runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-auraskills"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-betonquest"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-betterhud"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-breweryx"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-carbonchat"))
