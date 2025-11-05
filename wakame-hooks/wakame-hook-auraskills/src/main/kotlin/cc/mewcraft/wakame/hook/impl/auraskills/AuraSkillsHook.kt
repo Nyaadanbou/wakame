@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.auraskills
 
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.entity.player.PlayerDataLoadingCoordinator
 import cc.mewcraft.wakame.entity.player.ResourceLoadingFixHandler
 import cc.mewcraft.wakame.integration.Hook
@@ -10,7 +11,6 @@ import cc.mewcraft.wakame.integration.playermana.PlayerManaType
 import cc.mewcraft.wakame.util.event
 import dev.aurelium.auraskills.api.AuraSkillsApi
 import dev.aurelium.auraskills.api.event.user.UserLoadEvent
-import dev.aurelium.auraskills.api.skill.Skills
 import dev.aurelium.auraskills.api.user.SkillsUser
 import org.bukkit.entity.Player
 import java.util.*
@@ -23,6 +23,49 @@ object AuraSkillsHook :
 
     init {
         PlayerDataLoadingCoordinator.registerExternalStage2Handler("AuraSkills")
+
+        registerTraits()
+        registerTraitHandlers()
+    }
+
+    private fun registerTraits() {
+        val contentDirectory = KoishDataPaths.CONFIGS.resolve("auraskills").toFile()
+        val koishRegistry = AuraSkillsApi.get().useRegistry("koish", contentDirectory)
+
+        koishRegistry.registerTrait(KoishTraits.ATTACK_KNOCKBACK)
+        koishRegistry.registerTrait(KoishTraits.BLOCK_INTERACTION_RANGE)
+        koishRegistry.registerTrait(KoishTraits.ENTITY_INTERACTION_RANGE)
+        koishRegistry.registerTrait(KoishTraits.KNOCKBACK_RESISTANCE)
+        koishRegistry.registerTrait(KoishTraits.MAX_ABSORPTION)
+        koishRegistry.registerTrait(KoishTraits.MAX_HEALTH)
+        koishRegistry.registerTrait(KoishTraits.MINING_EFFICIENCY)
+        koishRegistry.registerTrait(KoishTraits.MOVEMENT_SPEED)
+        koishRegistry.registerTrait(KoishTraits.SAFE_FALL_DISTANCE)
+        koishRegistry.registerTrait(KoishTraits.SCALE)
+        koishRegistry.registerTrait(KoishTraits.STEP_HEIGHT)
+        koishRegistry.registerTrait(KoishTraits.SWEEPING_DAMAGE_RATIO)
+        koishRegistry.registerTrait(KoishTraits.WATER_MOVEMENT_EFFICIENCY)
+        koishRegistry.registerTrait(KoishTraits.ATTACK_EFFECT_CHANCE)
+        koishRegistry.registerTrait(KoishTraits.CRITICAL_STRIKE_CHANCE)
+        koishRegistry.registerTrait(KoishTraits.CRITICAL_STRIKE_POWER)
+        koishRegistry.registerTrait(KoishTraits.DAMAGE_RATE_BY_UNTARGETED)
+        koishRegistry.registerTrait(KoishTraits.HAMMER_DAMAGE_RANGE)
+        koishRegistry.registerTrait(KoishTraits.HAMMER_DAMAGE_RATIO)
+        koishRegistry.registerTrait(KoishTraits.HEALTH_REGENERATION)
+        koishRegistry.registerTrait(KoishTraits.LIFESTEAL)
+        koishRegistry.registerTrait(KoishTraits.NEGATIVE_CRITICAL_STRIKE_POWER)
+        koishRegistry.registerTrait(KoishTraits.NONE_CRITICAL_STRIKE_POWER)
+        koishRegistry.registerTrait(KoishTraits.UNIVERSAL_DEFENSE)
+        koishRegistry.registerTrait(KoishTraits.UNIVERSAL_DEFENSE_PENETRATION)
+        koishRegistry.registerTrait(KoishTraits.UNIVERSAL_DEFENSE_PENETRATION_RATE)
+        koishRegistry.registerTrait(KoishTraits.UNIVERSAL_MAX_ATTACK_DAMAGE)
+        koishRegistry.registerTrait(KoishTraits.UNIVERSAL_MIN_ATTACK_DAMAGE)
+    }
+
+    private fun registerTraitHandlers() {
+        val auraApi = AuraSkillsApi.get()
+
+        auraApi.handlers.registerTraitHandler(KoishAttributeTrait())
     }
 }
 
@@ -47,9 +90,8 @@ private object AuraPlayerLevelIntegration : PlayerLevelIntegration {
         val user = auraApi.getUser(uuid)
         if (!user.isLoaded) return null
 
-        // 将所有 Skill 等级取平均值作为玩家等级返回
-        val skills = Skills.entries
-        val result = skills.sumOf { user.getSkillLevel(it) }
+        // 将所有 Skill 等级之和作为玩家等级返回
+        val result = user.powerLevel
 
         return result
     }
