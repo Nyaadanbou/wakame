@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.adventure.key.Identified
-import cc.mewcraft.wakame.mixin.support.recipe.KoishRecipe
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
@@ -322,8 +321,6 @@ class ShapelessRecipe(
             result.toMojangStack(),
             ingredients.map { it.toMojangIngredient() }
         )
-        // 无序合成配方需要注入特殊标记
-        KoishRecipe.minecraftToKoish(mojangRecipe).setCreatedByKoish()
         val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
         RECIPE_MANAGER.addRecipe(recipeHolder)
     }
@@ -424,7 +421,7 @@ class SmithingTrimRecipe(
             template.toMojangIngredient(),
             base.toMojangIngredient(),
             addition.toMojangIngredient(),
-            identifier.getTrimPattern().toMojangHolder(),
+            trimPattern.getTrimPattern().toMojangHolder(),
             copyDataComponents
         )
         val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)

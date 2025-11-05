@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.mixin.support.recipe;
+package cc.mewcraft.wakame.mixin.support;
 
 import cc.mewcraft.wakame.api.Koish;
 import cc.mewcraft.wakame.api.item.KoishItem;

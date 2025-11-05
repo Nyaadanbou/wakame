@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.mixin.core;
 
 import cc.mewcraft.wakame.item.KoishStackData;
-import cc.mewcraft.wakame.mixin.support.recipe.KoishIngredient;
+import cc.mewcraft.wakame.mixin.support.KoishIngredient;
 import io.papermc.paper.inventory.recipe.ItemOrExact;
 import net.kyori.adventure.key.Key;
 import net.minecraft.core.Holder;

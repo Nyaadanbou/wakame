@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.item.ItemRef
-import cc.mewcraft.wakame.mixin.support.recipe.KoishIngredient
+import cc.mewcraft.wakame.mixin.support.KoishIngredient
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.MojangIngredient
 import cc.mewcraft.wakame.util.adventure.toSimpleString
