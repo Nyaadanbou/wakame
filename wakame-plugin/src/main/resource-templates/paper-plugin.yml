@@ -13,7 +13,7 @@ dependencies:
       load: BEFORE # Koish 需要访问其事件
     AuraSkills:
       required: false
-      load: OMIT
+      load: BEFORE
     BetterHud:
       required: false
       load: OMIT
