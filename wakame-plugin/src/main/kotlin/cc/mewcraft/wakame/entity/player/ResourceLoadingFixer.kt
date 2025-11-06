@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.entity.player
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.integration.HooksLoader
-import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
+import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -51,7 +51,7 @@ internal object ResourceLoadingFixBootstrap {
         }
 
         // 在玩家的冒险等级加载完毕后, 加载玩家的资源数据 (这里根据运行时的冒险等级系统加载对应的监听器)
-        when (PlayerLevelManager.integration.levelType) {
+        when (PlayerLevelIntegration.levelType) {
 
             // 这两冒险等级系统完全依赖原版游戏自身, 没有额外的数据储存,
             // 所以可以直接在进入游戏时读取玩家的等级信息并且加载资源数据.

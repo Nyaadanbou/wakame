@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.condition
 
-import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
+import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.adapters.AbstractLocation
 import io.lumine.mythic.api.config.MythicLineConfig
@@ -40,7 +40,7 @@ class LevelCondition(
     }
 
     private fun checkLevel(player: Player): Boolean {
-        val level = PlayerLevelManager.get(player.uniqueId)
+        val level = PlayerLevelIntegration.get(player.uniqueId)
             ?: return false
         return this.level.equals(level)
     }

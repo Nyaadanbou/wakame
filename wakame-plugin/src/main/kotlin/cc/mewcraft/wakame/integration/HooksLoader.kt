@@ -12,7 +12,6 @@ import cc.mewcraft.wakame.integration.economy.EconomyType
 import cc.mewcraft.wakame.integration.permission.PermissionIntegration
 import cc.mewcraft.wakame.integration.permission.PermissionManager
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
-import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.integration.playermana.PlayerManaIntegration
 import cc.mewcraft.wakame.integration.playermana.PlayerManaType
@@ -123,7 +122,7 @@ internal object HooksLoader {
             ResourceLoadingFixHandler.CURRENT_HANDLER = hook
         }
         if (hook is PlayerLevelIntegration && PLAYER_LEVEL_PROVIDER == hook.levelType) {
-            PlayerLevelManager.integration = hook // overwrite
+            PlayerLevelIntegration.setImplementation(hook) // overwrite
         }
         if (hook is PlayerManaIntegration && PLAYER_MANA_PROVIDER == hook.manaType) {
             PlayerManaIntegration.setImplementation(hook)

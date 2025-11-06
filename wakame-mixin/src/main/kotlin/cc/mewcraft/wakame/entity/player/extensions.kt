@@ -5,7 +5,7 @@ package cc.mewcraft.wakame.entity.player
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.player.component.InventoryListenable
-import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
+import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.kizami.KizamiMap
 import org.bukkit.entity.Player
 
@@ -17,7 +17,7 @@ import org.bukkit.entity.Player
  * 玩家的冒险等级.
  */
 val Player.koishLevel: Int
-    get() = PlayerLevelManager.getOrDefault(uniqueId, 1)
+    get() = PlayerLevelIntegration.getOrDefault(uniqueId, 1)
 
 /**
  * 玩家的物品冷却.
