@@ -1,7 +1,14 @@
 package cc.mewcraft.wakame.item.data
 
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.data.impl.*
+import cc.mewcraft.wakame.item.data.impl.Core
+import cc.mewcraft.wakame.item.data.impl.CoreContainer
+import cc.mewcraft.wakame.item.data.impl.EntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.ItemBrewRecipe
+import cc.mewcraft.wakame.item.data.impl.ItemCrate
+import cc.mewcraft.wakame.item.data.impl.ItemId
+import cc.mewcraft.wakame.item.data.impl.ItemLevel
+import cc.mewcraft.wakame.item.data.impl.ReforgeHistory
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.BuiltInRegistries
@@ -43,6 +50,9 @@ data object ItemDataTypes {
 
     @JvmField
     val BYPASS_NETWORK_REWRITE: ItemDataType<Unit> = typeOf("bypass_network_rewrite")
+
+    @JvmField
+    val ONLY_COMPARE_ID_IN_RECIPE_BOOK: ItemDataType<Unit> = typeOf("only_compare_id_in_recipe")
 
     @JvmField
     val PROCESSED: ItemDataType<Unit> = typeOf("processed")

@@ -111,7 +111,7 @@ public abstract class MixinStackedContentsExtrasMap {
         } else if (KoishStackData.isExactKoish(stack)) {
             // 进入这个分支说明没有标记, 那此时处理的配方应该是非 Koish 添加的配方
             // 对于非 Koish 添加的配方(可能是原版配方或其他插件配方), 我们约定 Koish 物品均不匹配
-            // 因此这里直接返回 true, 但实际上并不把物品置入匹配器中
+            // 因此这里直接返回 true, 但实际上并不把物品置入待匹配Map的容器中
             cir.setReturnValue(true);
         }
 

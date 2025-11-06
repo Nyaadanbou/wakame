@@ -98,9 +98,7 @@ public abstract class MixinIngredient implements StackedContents.IngredientInfo<
      * @reason
      * 插入 Koish 原料判定逻辑, 影响无序合成配方的匹配逻辑.
      * (请注意: 由 Koish 添加的配方, 其中只会有 Koish 原料).
-     * 借助服务端原生代码防止 Koish 物品被视为原版物品而参与原版配方.
-     * 原理是我们让 Koish 物品在进入这个方法前被识别成 Exact.
-     * 原版无序合成配方均为 Item 原料, Item 原料是无法被 Exact 输入匹配成功的.
+     * 防止 Koish 物品被视为原版物品而参与原版配方的代码见 [MixinStackedContentsExtrasMap].
      */
     @Overwrite
     public boolean acceptsItem(ItemOrExact itemOrExact) {

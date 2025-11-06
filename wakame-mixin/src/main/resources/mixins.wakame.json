@@ -22,6 +22,7 @@
     "MixinHashedStack",
     "MixinHoverEvent$ShowItem",
     "MixinIngredient",
+    "MixinInventory",
     "MixinItemStack$2",
     "MixinLivingEntity",
     "MixinLootPoolEntries",
