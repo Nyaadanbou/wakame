@@ -18,8 +18,13 @@ class EnterDungeonEventFactory(
     override fun parsePlayer(instruction: Instruction): PlayerEvent {
         val logger = loggerFactory.create(EnterDungeonEvent::class.java)
         val dungeon = instruction.get(Argument.STRING)
+
+        // 使用 Instruction#getValue 可以使该事件支持按玩家独立计算的变量
+        val useParty = instruction.getValue("party", Argument.BOOLEAN, false)
+            ?: error("Failed to get 'party' argument")
+
         val enterDungeonEvent = OnlineEventAdapter(
-            EnterDungeonEvent(dungeon, logger),
+            EnterDungeonEvent(dungeon, useParty, logger),
             logger,
             instruction.getPackage(),
         )
