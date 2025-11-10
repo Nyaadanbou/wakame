@@ -12,6 +12,7 @@
     "InvokerLootPoolEntries",
     "InvokerRegistryData",
     "MixinCraftEntityType",
+    "MixinCraftingRecipe",
     "MixinCriteriaTriggers",
     "MixinDataComponentPatch$3",
     "MixinDataComponents",

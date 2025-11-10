@@ -38,6 +38,9 @@ public abstract class MixinInventory {
                 // 服务端原逻辑
                 return itemStack.is(item);
             case ItemOrExact.Exact(ItemStack exact):
+                // Exact 中存储的物品堆叠上有特殊标记
+                // 由 Koish 创建的原料产生的 Exact 中的物品堆叠均会带有此特殊标记
+                // 虽然有些曲线, 但不失为一种高性价比的方案
                 if (KoishStackData.isOnlyCompareIdInRecipeBook(exact)) {
                     Key Id1 = KoishStackData.getTypeId(exact);
                     Key Id2 = KoishStackData.getTypeId(itemStack);

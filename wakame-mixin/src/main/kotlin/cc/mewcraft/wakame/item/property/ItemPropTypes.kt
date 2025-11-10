@@ -9,7 +9,18 @@ import cc.mewcraft.wakame.item.SlotDisplayNameData
 import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.item.data.impl.CoreContainer
 import cc.mewcraft.wakame.item.data.impl.ItemLevel
-import cc.mewcraft.wakame.item.property.impl.*
+import cc.mewcraft.wakame.item.property.impl.AbilityOnItem
+import cc.mewcraft.wakame.item.property.impl.Arrow
+import cc.mewcraft.wakame.item.property.impl.CraftingReminder
+import cc.mewcraft.wakame.item.property.impl.EnchantSlotCapacity
+import cc.mewcraft.wakame.item.property.impl.EntityBucket
+import cc.mewcraft.wakame.item.property.impl.ExtraLore
+import cc.mewcraft.wakame.item.property.impl.Fuel
+import cc.mewcraft.wakame.item.property.impl.HoldLastDamage
+import cc.mewcraft.wakame.item.property.impl.ItemBase
+import cc.mewcraft.wakame.item.property.impl.ItemSlot
+import cc.mewcraft.wakame.item.property.impl.ItemSlotGroup
+import cc.mewcraft.wakame.item.property.impl.LiquidCollisionBlockSettings
 import cc.mewcraft.wakame.item.property.impl.weapon.DualSword
 import cc.mewcraft.wakame.item.property.impl.weapon.Katana
 import cc.mewcraft.wakame.item.property.impl.weapon.Melee
@@ -170,6 +181,16 @@ data object ItemPropTypes {
      */
     @JvmField
     val FUEL: ItemPropType<Fuel> = typeOf("fuel")
+
+    /**
+     * 物品在工作台中合成后返还的物品.
+     */
+    @JvmField
+    val CRAFTING_REMINDER: ItemPropType<CraftingReminder> = typeOf("crafting_reminder"){
+        serializers {
+            registerAll(CraftingReminder.serializers())
+        }
+    }
 
     /**
      * 物品放置出来的普通方块.

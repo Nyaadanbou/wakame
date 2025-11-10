@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.mixin.support;
 import cc.mewcraft.wakame.api.Koish;
 import cc.mewcraft.wakame.api.item.KoishItem;
 import cc.mewcraft.wakame.item.KoishStackData;
+import cc.mewcraft.wakame.util.item.ExtensionsKt;
 import com.mojang.logging.LogUtils;
 import net.kyori.adventure.key.Key;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -11,7 +12,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -59,7 +59,7 @@ public interface KoishIngredient {
     private static @Nonnull ItemStack getMojangStackById(Key identifier) {
         KoishItem koishItem = Koish.get().getItemRegistry().getOrNull(identifier);
         if (koishItem != null) {
-            return CraftItemStack.unwrap(koishItem.createItemStack());
+            return ExtensionsKt.toNMS(koishItem.createItemStack());
         } else {
             if (identifier.namespace().equals(Key.MINECRAFT_NAMESPACE)) {
                 ResourceLocation resourceLocation = ResourceLocation.withDefaultNamespace(identifier.value());
