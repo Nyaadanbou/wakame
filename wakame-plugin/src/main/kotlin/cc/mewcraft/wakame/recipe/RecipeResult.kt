@@ -8,8 +8,6 @@ import cc.mewcraft.wakame.util.item.toNMS
 import cc.mewcraft.wakame.util.require
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import org.bukkit.Material
-import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 import java.util.stream.Stream
@@ -19,7 +17,6 @@ import java.util.stream.Stream
  * 表现为合成输出gui中一格的物品.
  */
 sealed interface RecipeResult : Examinable {
-    fun toBukkitItemStack(): ItemStack
     fun toMojangStack(): MojangStack
 }
 
@@ -29,10 +26,6 @@ sealed interface RecipeResult : Examinable {
  * 此单例仅作特殊用途.
  */
 data object EmptyRecipeResult : RecipeResult {
-    override fun toBukkitItemStack(): ItemStack {
-        return ItemStack(Material.AIR)
-    }
-
     override fun toMojangStack(): MojangStack {
         return MojangStack.EMPTY
     }
@@ -45,12 +38,6 @@ data class SingleRecipeResult(
     val item: ItemRef,
     val amount: Int,
 ) : RecipeResult {
-    override fun toBukkitItemStack(): ItemStack {
-        val itemStack = item.createItemStack()
-        itemStack.amount = amount
-        return itemStack
-    }
-
     override fun toMojangStack(): MojangStack {
         val itemStack = item.createItemStack()
         itemStack.amount = amount

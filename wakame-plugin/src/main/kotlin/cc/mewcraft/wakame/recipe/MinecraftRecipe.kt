@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.MojangResourceKey
 import cc.mewcraft.wakame.util.RECIPE_MANAGER
-import cc.mewcraft.wakame.util.adventure.toNamespacedKey
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.toResourceLocation
@@ -23,7 +22,6 @@ import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.crafting.RecipeHolder
 import net.minecraft.world.item.crafting.ShapedRecipePattern
 import net.minecraft.world.item.crafting.TransmuteResult
-import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.inventory.CraftRecipe
 import org.bukkit.craftbukkit.inventory.trim.CraftTrimPattern
 import org.bukkit.inventory.meta.trim.TrimPattern
@@ -49,27 +47,12 @@ import net.minecraft.world.item.crafting.SmithingTrimRecipe as MojangSmithingTri
 import net.minecraft.world.item.crafting.SmokingRecipe as MojangSmokingRecipe
 import net.minecraft.world.item.crafting.StonecutterRecipe as MojangStonecuttingRecipe
 import net.minecraft.world.item.equipment.trim.TrimPattern as MojangTrimPattern
-import org.bukkit.inventory.BlastingRecipe as BukkitBlastingRecipe
-import org.bukkit.inventory.CampfireRecipe as BukkitCampfireRecipe
-import org.bukkit.inventory.FurnaceRecipe as BukkitFurnaceRecipe
-import org.bukkit.inventory.ShapedRecipe as BukkitShapedRecipe
-import org.bukkit.inventory.ShapelessRecipe as BukkitShapelessRecipe
-import org.bukkit.inventory.SmithingTransformRecipe as BukkitSmithingTransformRecipe
-import org.bukkit.inventory.SmithingTrimRecipe as BukkitSmithingTrimRecipe
-import org.bukkit.inventory.SmokingRecipe as BukkitSmokingRecipe
-import org.bukkit.inventory.StonecuttingRecipe as BukkitStonecuttingRecipe
 
 /**
  * 配方 (对 nms 配方的包装).
  */
 sealed interface MinecraftRecipe : Identified, Examinable {
     val result: RecipeResult
-
-    fun registerBukkitRecipe(): Boolean
-
-    fun unregisterBukkitRecipe() {
-        Bukkit.removeRecipe(identifier.toNamespacedKey, false)
-    }
 
     /**
      * 将该配方添加到服务端的 RecipeManager 中.
@@ -116,17 +99,6 @@ class BlastingRecipe(
     val cookingTime: Int,
     val exp: Float,
 ) : MinecraftRecipe {
-    override fun registerBukkitRecipe(): Boolean {
-        val blastingRecipe = BukkitBlastingRecipe(
-            identifier.toNamespacedKey,
-            result.toBukkitItemStack(),
-            input.toBukkitRecipeChoice(),
-            exp,
-            cookingTime
-        )
-        return Bukkit.addRecipe(blastingRecipe)
-    }
-
     override fun addToManager() {
         val mojangRecipe = MojangBlastingRecipe(
             group,
@@ -163,17 +135,6 @@ class CampfireRecipe(
     val cookingTime: Int,
     val exp: Float,
 ) : MinecraftRecipe {
-    override fun registerBukkitRecipe(): Boolean {
-        val campfireRecipe = BukkitCampfireRecipe(
-            identifier.toNamespacedKey,
-            result.toBukkitItemStack(),
-            input.toBukkitRecipeChoice(),
-            exp,
-            cookingTime
-        )
-        return Bukkit.addRecipe(campfireRecipe)
-    }
-
     override fun addToManager() {
         val mojangRecipe = MojangCampfireRecipe(
             group,
@@ -210,17 +171,6 @@ class FurnaceRecipe(
     val cookingTime: Int,
     val exp: Float,
 ) : MinecraftRecipe {
-    override fun registerBukkitRecipe(): Boolean {
-        val furnaceRecipe = BukkitFurnaceRecipe(
-            identifier.toNamespacedKey,
-            result.toBukkitItemStack(),
-            input.toBukkitRecipeChoice(),
-            exp,
-            cookingTime
-        )
-        return Bukkit.addRecipe(furnaceRecipe)
-    }
-
     override fun addToManager() {
         val mojangRecipe = MojangFurnaceRecipe(
             group,
@@ -262,16 +212,6 @@ class ShapedRecipe(
         const val EMPTY_INGREDIENT_CHAR = 'X'
     }
 
-    override fun registerBukkitRecipe(): Boolean {
-        val shapedRecipe = BukkitShapedRecipe(identifier.toNamespacedKey, result.toBukkitItemStack())
-        pattern.forEachIndexed { i, s -> pattern[i] = s.replace(EMPTY_INGREDIENT_CHAR, ' ') }
-        shapedRecipe.shape(*pattern)
-        ingredients.forEach {
-            shapedRecipe.setIngredient(it.key, it.value.toBukkitRecipeChoice())
-        }
-        return Bukkit.addRecipe(shapedRecipe, false)
-    }
-
     override fun addToManager() {
         pattern.forEachIndexed { i, s -> pattern[i] = s.replace(EMPTY_INGREDIENT_CHAR, ' ') }
         val mojangIngredients = ingredients.mapValues { it.value.toMojangIngredient() }
@@ -306,13 +246,6 @@ class ShapelessRecipe(
     val category: CraftingBookCategory,
     val ingredients: List<RecipeChoice>,
 ) : MinecraftRecipe {
-    override fun registerBukkitRecipe(): Boolean {
-        val shapelessRecipe = BukkitShapelessRecipe(identifier.toNamespacedKey, result.toBukkitItemStack())
-        ingredients.forEach {
-            shapelessRecipe.addIngredient(it.toBukkitRecipeChoice())
-        }
-        return Bukkit.addRecipe(shapelessRecipe, false)
-    }
 
     override fun addToManager() {
         val mojangRecipe = MojangShapelessRecipe(
@@ -345,17 +278,6 @@ class SmithingTransformRecipe(
     val template: RecipeChoice,
     val copyDataComponents: Boolean,
 ) : MinecraftRecipe {
-    override fun registerBukkitRecipe(): Boolean {
-        val smithingTransformRecipe = BukkitSmithingTransformRecipe(
-            identifier.toNamespacedKey,
-            result.toBukkitItemStack(),
-            template.toBukkitRecipeChoice(),
-            base.toBukkitRecipeChoice(),
-            addition.toBukkitRecipeChoice(),
-            copyDataComponents
-        )
-        return Bukkit.addRecipe(smithingTransformRecipe)
-    }
 
     override fun addToManager() {
         val optionalTemplateIngredient = if (template is EmptyRecipeChoice) {
@@ -405,16 +327,6 @@ class SmithingTrimRecipe(
 ) : MinecraftRecipe {
     // 锻造台纹饰配方的结果是原版生成的
     override val result: RecipeResult = EmptyRecipeResult
-    override fun registerBukkitRecipe(): Boolean {
-        val smithingTrimRecipe = BukkitSmithingTrimRecipe(
-            identifier.toNamespacedKey,
-            template.toBukkitRecipeChoice(),
-            base.toBukkitRecipeChoice(),
-            addition.toBukkitRecipeChoice(),
-            copyDataComponents
-        )
-        return Bukkit.addRecipe(smithingTrimRecipe)
-    }
 
     override fun addToManager() {
         val mojangRecipe = MojangSmithingTrimRecipe(
@@ -451,17 +363,6 @@ class SmokingRecipe(
     val cookingTime: Int,
     val exp: Float,
 ) : MinecraftRecipe {
-    override fun registerBukkitRecipe(): Boolean {
-        val smokingRecipe = BukkitSmokingRecipe(
-            identifier.toNamespacedKey,
-            result.toBukkitItemStack(),
-            input.toBukkitRecipeChoice(),
-            exp,
-            cookingTime
-        )
-        return Bukkit.addRecipe(smokingRecipe)
-    }
-
     override fun addToManager() {
         val mojangRecipe = MojangSmokingRecipe(
             group,
@@ -495,15 +396,6 @@ class StonecuttingRecipe(
     val group: String,
     val input: RecipeChoice,
 ) : MinecraftRecipe {
-    override fun registerBukkitRecipe(): Boolean {
-        val stonecuttingRecipe = BukkitStonecuttingRecipe(
-            identifier.toNamespacedKey,
-            result.toBukkitItemStack(),
-            input.toBukkitRecipeChoice(),
-        )
-        return Bukkit.addRecipe(stonecuttingRecipe)
-    }
-
     override fun addToManager() {
         val mojangRecipe = MojangStonecuttingRecipe(
             group,

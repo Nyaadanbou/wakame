@@ -98,29 +98,4 @@ internal object MinecraftRecipeRegistryLoader {
         LOGGER.info("Registered vanilla recipes: {}", checkedRecipes.keys.joinToString(transform = Key::asString))
         LOGGER.info("Registered ${checkedRecipes.size} vanilla recipes")
     }
-
-    private fun registerForBukkitRecipes() {
-        checkedRecipes.values.forEach(MinecraftRecipe::unregisterBukkitRecipe)
-        checkedRecipes.clear()
-        uncheckedRecipes.forEach {
-            try {
-                registerForBukkitRecipe0(it.key, it.value)
-            } catch (e: Throwable) {
-                Util.pauseInIde(IllegalStateException("Can't register vanilla recipe: '${it.key}'", e))
-            }
-        }
-
-        LOGGER.info("Registered vanilla recipes: {}", checkedRecipes.keys.joinToString(transform = Key::asString))
-        LOGGER.info("Registered ${checkedRecipes.size} vanilla recipes")
-    }
-
-    private fun registerForBukkitRecipe0(key: Key, minecraftRecipe: MinecraftRecipe) {
-        val success = minecraftRecipe.registerBukkitRecipe()
-        if (!success) {
-            LOGGER.warn("Can't register vanilla recipe: '$key'")
-            return
-        }
-
-        checkedRecipes[key] = minecraftRecipe
-    }
 }
