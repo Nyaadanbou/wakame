@@ -13,13 +13,19 @@ dependencies:
       load: BEFORE # Koish 需要访问其事件
     AuraSkills:
       required: false
-      load: OMIT
+      load: BEFORE
+    BetonQuest:
+      required: false
+      load: BEFORE
     BetterHud:
       required: false
       load: OMIT
     BreweryX:
       required: false
       load: BEFORE # Koish 需要访问其 PluginItem 并注册实例
+    CarbonChat:
+      required: false
+      load: OMIT
     ChestShop:
       required: false
       load: OMIT # 只监听其事件, 所以顺序无关紧要
@@ -49,6 +55,9 @@ dependencies:
     LuckPerms:
       required: false
       load: OMIT
+    MythicDungeons:
+      required: false
+      load: OMIT # 游戏中才需要用到其 API
     MythicMobs:
       required: false
       load: OMIT

@@ -17,7 +17,16 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 @Hook(plugins = ["WorldGuard"])
-object WorldGuardHook : ProtectionIntegration {
+object WorldGuardHook : ProtectionIntegration by WorldGuardProtectionIntegration {
+
+    // Java default methods are not overridden automatically in Kotlin delegation
+    override fun getExecutionMode(): ExecutionMode {
+        return WorldGuardProtectionIntegration.executionMode
+    }
+
+}
+
+private object WorldGuardProtectionIntegration : ProtectionIntegration {
 
     private val PLUGIN get() = WorldGuardPlugin.inst()
 
@@ -79,5 +88,4 @@ object WorldGuardHook : ProtectionIntegration {
     private fun hasBypass(world: World, player: LocalPlayer): Boolean {
         return PLATFORM.sessionManager.hasBypass(player, world)
     }
-
 }

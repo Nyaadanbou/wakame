@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.hook.impl.betterhud
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.integration.Hook
-import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
+import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.integration.playermana.PlayerManaIntegration
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudAPI
@@ -57,7 +57,7 @@ object BetterHudHook {
             "koish_player_level", HudPlaceholder.of(
                 HudPlaceholder.PlaceholderFunction.of { playerx ->
                     val player = playerx.toBukkitPlayer()
-                    PlayerLevelManager.getOrDefault(player.uniqueId, 0)
+                    PlayerLevelIntegration.getOrDefault(player.uniqueId, 0)
                 }
             )
         )

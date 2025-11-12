@@ -22,8 +22,10 @@ dependencies {
     compileOnly(project(":wakame-mixin")) // 运行时由 koish-mod 提供
     runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-auraskills"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-betonquest"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-betterhud"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-breweryx"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-carbonchat"))
      runtimeOnly(project(":wakame-hooks:wakame-hook-chestshop"))
     // runtimeOnly(project(":wakame-hooks:wakame-hook-chestsort")) // FIXME 仓库已经挂掉并且作者似乎没有修复的打算
      runtimeOnly(project(":wakame-hooks:wakame-hook-craftengine"))
@@ -31,6 +33,7 @@ dependencies {
     runtimeOnly(project(":wakame-hooks:wakame-hook-economybridge"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-husksync"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-luckperms"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-mythicdungeons"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-mythicmobs"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-papi"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-quickshop"))
