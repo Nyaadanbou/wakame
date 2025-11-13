@@ -59,6 +59,7 @@ chestshop = "3.12.3-SNAPSHOT"
 craftengine = "0.0.63"
 auraskills = "2.2.4"
 husksync = "3.8.7+1.21.8"
+huskhomes = "4.9.9"
 carbonchat = "3.0.0-beta.26"
 mythicdungeons = "1.3.0-SNAPSHOT"
 betonquest = "3.0.0-SNAPSHOT"
@@ -147,6 +148,8 @@ craftengine-core = { group = "net.momirealms", name = "craft-engine-core", versi
 craftengine-bukkit = { group = "net.momirealms", name = "craft-engine-bukkit", version.ref = "craftengine" }
 auraskills = { group = "dev.aurelium", name = "auraskills-api-bukkit", version.ref = "auraskills" }
 husksync = { group = "net.william278.husksync", name = "husksync-bukkit", version.ref = "husksync" }
+huskhomes-common = { group = "net.william278.huskhomes", name = "huskhomes-common", version.ref = "huskhomes" }
+huskhomes-bukkit = { group = "net.william278.huskhomes", name = "huskhomes-bukkit", version.ref = "huskhomes" }
 carbonchat = { group = "de.hexaoxi", name = "carbonchat-api", version.ref = "carbonchat" }
 mythicdungeons = { group = "net.playavalon", name = "MythicDungeons", version.ref = "mythicdungeons" }
 betonquest = { group = "org.betonquest", name = "betonquest", version.ref = "betonquest" }
