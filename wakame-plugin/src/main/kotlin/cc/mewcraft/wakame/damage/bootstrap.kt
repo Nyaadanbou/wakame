@@ -13,7 +13,6 @@ import io.papermc.paper.registry.keys.tags.DamageTypeTagKeys
 import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys
 import io.papermc.paper.tag.TagEntry
 import net.kyori.adventure.key.Key
-import org.bukkit.entity.LivingEntity
 
 /**
  * 负责初始化伤害系统的一些内部状态, 如 API 实例.
@@ -23,9 +22,6 @@ internal object DamageApiBootstrap {
 
     @InitFun
     fun init() {
-        // 注册 DamageApplier
-        DamageApplier.register(BukkitDamageApplier)
-
         // 注册 DamageBundleFactory
         DamageBundleFactory.register(DefaultDamageBundleFactory)
 
@@ -89,14 +85,6 @@ internal object DamageApiBootstrap {
 // ------------
 // 内部实现
 // ------------
-
-internal object BukkitDamageApplier : DamageApplier {
-    override fun damage(victim: LivingEntity, source: LivingEntity?, amount: Double) {
-        // 这里仅仅用于触发一下 Bukkit 的 EntityDamageEvent.
-        // 伤害数值填多少都无所谓, 最后都会被事件监听逻辑重新计算.
-        victim.damage(amount, source)
-    }
-}
 
 internal object DefaultDamageBundleFactory : DamageBundleFactory {
     override fun create(data: Map<RegistryEntry<Element>, DamagePacket>): DamageBundle {
