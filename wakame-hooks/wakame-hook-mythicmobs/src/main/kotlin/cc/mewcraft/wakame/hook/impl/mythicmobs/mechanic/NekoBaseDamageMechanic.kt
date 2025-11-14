@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.damage.DamageManagerApi
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.DamagePacket
 import cc.mewcraft.wakame.damage.KoishDamageSources
-import cc.mewcraft.wakame.util.RecursionGuard
+import cc.mewcraft.wakame.hook.impl.mythicmobs.MythicMobsUtils
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.ITargetedEntitySkill
@@ -109,14 +109,14 @@ class NekoBaseDamageMechanic(
             KoishDamageSources.mobAttack(casterEntity)
         }
 
-        // 对目标生物造成自定义的萌芽伤害.
-        // 由于愚蠢的mm是监听伤害事件来判断生物进行了攻击, 在某些技能触发器下会产生堆栈溢出.
-        // 在不使用mm的勾丝api的情况下, 可通过直接阻断循环调用来解决问题.
-        RecursionGuard.with(
-            functionName = "hurt", silenceLogs = true
-        ) {
-            DamageManagerApi.INSTANCE.hurt(entity, damageMetadata, damageSource, knockback)
-        }
+        val mythicDamageMetadata = MythicMobsUtils.createMythicDamageMetadata(data)
+        // 添加标记使本次伤害被视为技能伤害, 而不再触发 ~onAttack 触发器, 避免堆栈溢出
+        target.setMetadata("skill-damage", mythicDamageMetadata)
+        // 对目标生物造成自定义的萌芽伤害
+        DamageManagerApi.INSTANCE.hurt(entity, damageMetadata, damageSource, knockback)
+        // 移除标记
+        // 是的, MythicMobs 并不会自动移除伤害元数据, 但它却以此来区分伤害是否为技能伤害
+        target.removeMetadata("skill-damage")
 
         return SkillResult.SUCCESS
     }
