@@ -1,6 +1,10 @@
 # 不要修改!
 version: 1
 
+# 玩家空手攻击(手持非 Weapon 物品时左键)的冷却.
+# 单位 tick.
+player_intrinsic_attack_cooldown: 5
+
 # 伤害规则相关.
 rules:
 

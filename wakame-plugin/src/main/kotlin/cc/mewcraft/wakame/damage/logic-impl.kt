@@ -4,6 +4,7 @@ package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
+import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.damage.DamageManager.registerExactArrow
@@ -35,16 +36,35 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import net.kyori.adventure.extra.kotlin.join
-import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.Component.empty
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.Component.translatable
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.LinearComponents
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.damage.DamageSource
-import org.bukkit.entity.*
+import org.bukkit.entity.AbstractArrow
+import org.bukkit.entity.Arrow
+import org.bukkit.entity.Entity
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.FallingBlock
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+import org.bukkit.entity.Projectile
+import org.bukkit.entity.SpectralArrow
+import org.bukkit.entity.Trident
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.*
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ABSORPTION
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ARMOR
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BASE
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BLOCKING
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.FREEZING
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.HARD_HAT
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.INVULNERABILITY_REDUCTION
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.MAGIC
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.RESISTANCE
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.potion.PotionEffectType
@@ -61,14 +81,16 @@ import kotlin.math.round
 
 private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "damage").orElse(false)
 
+private val DAMAGE_CONFIG = ConfigAccess.INSTANCE["damage/config"]
+private val PLAYER_INTRINSIC_ATTACK_COOLDOWN by DAMAGE_CONFIG.optionalEntry<Long>("player_intrinsic_attack_cooldown").orElse(5L)
+
 /**
  * 包含伤害系统的计算逻辑和状态.
  */
 internal object DamageManager : DamageManagerApi {
 
     // 特殊值, 方便识别. 仅用于触发事件, 以被事件系统监听&修改.
-    private const val PLACEHOLDER_DAMAGE_VALUE: Double = 4.95
-    private const val PLACEHOLDER_DAMAGE_VALUE_FLOAT: Float = 4.95f
+    private const val PLACEHOLDER_DAMAGE_VALUE: Float = 4.95f
 
     /**
      * 作为 direct_entity 时能够造成伤害的 entity(projectile) 类型.
@@ -157,7 +179,7 @@ internal object DamageManager : DamageManagerApi {
 
         // 直接调用nms方法造成伤害.
         // 原因是只有nms的方法会返回布尔值, bukkit方法直接吃掉了布尔值.
-        return victim.handle.hurtServer(victim.world.serverLevel, source.handle, PLACEHOLDER_DAMAGE_VALUE_FLOAT)
+        return victim.handle.hurtServer(victim.world.serverLevel, source.handle, PLACEHOLDER_DAMAGE_VALUE)
     }
 
     /**
@@ -265,7 +287,7 @@ internal object DamageManager : DamageManagerApi {
                 if (directEntity.type in ENTITY_TYPES_5) {
                     // 特殊处理属于 attributed_arrow_types 的 direct_entity, 考虑箭矢本身给予的额外伤害.
                     // 例如: 无源箭矢(发射器)
-                    return createNoCausingAttributedArrowDamageMetadata(directEntity as AbstractArrow) ?: context.toDamageMetadata(Mapping.NULL_CAUSING_ENTITY)
+                    return createNoCausingAttributedArrowDamage(directEntity as AbstractArrow) ?: context.toDamageMetadata(Mapping.NULL_CAUSING_ENTITY)
                 } else if (directEntity.type in ENTITY_TYPES_2) {
                     // 使用映射来计算 direct_entity 造成的伤害.
                     // attributed_arrow_types 中的直接实体类型不会进入此分支
@@ -689,9 +711,19 @@ internal object DamageManager : DamageManagerApi {
     // 可以返回 null, 意为取消本次伤害
     private fun createPlayerAttackDamage(context: RawDamageContext): DamageMetadata? {
         val player = context.damageSource.causingEntity as? Player ?: error("The causing entity must be a player.")
-        val itemstack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
-        val weapon = itemstack.getBehavior<Weapon>() ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
+        val itemstack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return createPlayerIntrinsicAttackDamage(player)
+        val weapon = itemstack.getBehavior<Weapon>() ?: return createPlayerIntrinsicAttackDamage(player)
         return weapon.generateDamageMetadata(player, itemstack)
+    }
+
+    // 玩家空手攻击处于冷却时返回 null, 使伤害事件取消
+    private fun createPlayerIntrinsicAttackDamage(player: Player): DamageMetadata? {
+        if (player.canIntrinsicAttack()) {
+            player.markIntrinsicAttack()
+            return PlayerDamageMetadata.INTRINSIC_ATTACK
+        } else {
+            return null
+        }
     }
 
     private fun createDefaultDamage(context: RawDamageContext): DamageMetadata {
@@ -763,7 +795,7 @@ internal object DamageManager : DamageManagerApi {
      *
      * 返回 `null` 表示不由该函数负责.
      */
-    private fun createNoCausingAttributedArrowDamageMetadata(arrow: AbstractArrow): DamageMetadata? {
+    private fun createNoCausingAttributedArrowDamage(arrow: AbstractArrow): DamageMetadata? {
         val itemstack = arrow.itemStack
         if (!itemstack.hasBehaviorExact(ItemBehaviorTypes.ARROW)) return null
         val itemcores = itemstack.coreContainer ?: return null
@@ -882,4 +914,24 @@ internal object DamageManager : DamageManagerApi {
     fun unregisterCancelKnockback(entity: Entity): Boolean {
         return entitiesCancellingKnockback.remove(entity.uniqueId)
     }
+
+    /**
+     * 包含玩家上一次空手攻击(手持非 Weapon 物品时左键)的时间戳.
+     */
+    private val playerIntrinsicAttackTimestampMap: HashMap<UUID, Long> = HashMap()
+
+    /**
+     * 记录玩家空手攻击的时间戳.
+     */
+    private fun Player.markIntrinsicAttack() {
+        playerIntrinsicAttackTimestampMap.put(uniqueId, System.currentTimeMillis())
+    }
+
+    /**
+     * 玩家此时是否可以进行空手攻击.
+     */
+    private fun Player.canIntrinsicAttack(): Boolean {
+        return System.currentTimeMillis() - playerIntrinsicAttackTimestampMap.getOrDefault(uniqueId, 0L) >= PLAYER_INTRINSIC_ATTACK_COOLDOWN * 50L
+    }
+
 }
