@@ -34,7 +34,7 @@ internal object DamageApiBootstrap {
 
     /**
      * 修改部分 [RegistryKey.ITEM] 标签和 [RegistryKey.DAMAGE_TYPE] 标签.
-     * 以实现伤害相同的特定功能.
+     * 以实现伤害系统的特定功能.
      */
     private fun modifyTags() {
         BootstrapContexts.LIFECYCLE_MANAGER_OWNED_BY_BOOTSTRAP.registerEventHandler(
@@ -45,23 +45,6 @@ internal object DamageApiBootstrap {
             // 清空 minecraft:swords 标签的内容
             // 目的是移除原版的横扫机制
             registrar.setTag(ItemTypeTagKeys.SWORDS, emptySet())
-        }
-
-        BootstrapContexts.LIFECYCLE_MANAGER_OWNED_BY_BOOTSTRAP.registerEventHandler(
-            LifecycleEvents.TAGS.postFlatten(RegistryKey.DAMAGE_TYPE)
-        ) { event ->
-            val registrar = event.registrar()
-
-            // 清空 minecraft:damages_helmet 标签的内容
-            // 目的是移除原版下落的方块会对头盔造成大量耐久度损耗的机制
-            // 双重保险
-            // 现有伤害系统在不清空该标签的情况下, 也不会计算头盔对下落的方块伤害的减免, 即不计算 HARD_HAT 伤害修饰器
-            registrar.setTag(DamageTypeTagKeys.DAMAGES_HELMET, emptySet())
-            // 清空 minecraft:witch_resistant_to 标签的内容
-            // 目的是移除原版女巫对魔法伤害的减免
-            // 双重保险
-            // 现有伤害系统在不清空该标签的情况下, 也同样不考虑女巫的对魔法伤害的减免, 即不计算 MAGIC 伤害修饰器
-            registrar.setTag(DamageTypeTagKeys.WITCH_RESISTANT_TO, emptySet())
         }
 
         BootstrapContexts.LIFECYCLE_MANAGER_OWNED_BY_BOOTSTRAP.registerEventHandler(

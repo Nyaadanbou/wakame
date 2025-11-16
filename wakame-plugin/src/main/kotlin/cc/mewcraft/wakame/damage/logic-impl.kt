@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.MAIN_CONFIG
+import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.damage.DamageManager.registerExactArrow
 import cc.mewcraft.wakame.damage.DamageManager.registerTrident
@@ -45,6 +46,7 @@ import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.damage.DamageSource
+import org.bukkit.damage.DamageType
 import org.bukkit.entity.AbstractArrow
 import org.bukkit.entity.Arrow
 import org.bukkit.entity.Entity
@@ -69,6 +71,7 @@ import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.commons.collections.enumSetOf
+import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.orElse
 import java.time.Duration
 import java.util.*
@@ -82,7 +85,12 @@ import kotlin.math.round
 private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "damage").orElse(false)
 
 private val DAMAGE_CONFIG = ConfigAccess.INSTANCE["damage/config"]
-private val PLAYER_INTRINSIC_ATTACK_COOLDOWN by DAMAGE_CONFIG.optionalEntry<Long>("player_intrinsic_attack_cooldown").orElse(5L)
+private val PLAYER_INTRINSIC_ATTACK_COOLDOWN by DAMAGE_CONFIG.optionalEntry<Long>("player_intrinsic_attack_cooldown").orElse(5L).map { it * 50L }
+private val HURT_EQUIPMENT_CONFIG = DAMAGE_CONFIG.node("hurt_equipment")
+private val BYPASSES_HURT_EQUIPMENT_DAMAGE_TYPES by HURT_EQUIPMENT_CONFIG.optionalEntry<List<DamageType>>("bypasses_damage_types").orElse(emptyList())
+private val AMOUNT_PER_DAMAGE by HURT_EQUIPMENT_CONFIG.optionalEntry<Float>("amount_per_damage").orElse(0.25f)
+private val MIN_AMOUNT by HURT_EQUIPMENT_CONFIG.optionalEntry<Int>("min_amount").orElse(1)
+private val MAX_AMOUNT by HURT_EQUIPMENT_CONFIG.optionalEntry<Int>("max_amount").orElse(Int.MAX_VALUE)
 
 /**
  * 包含伤害系统的计算逻辑和状态.
@@ -183,16 +191,29 @@ internal object DamageManager : DamageManagerApi {
     }
 
     /**
+     * 判定某次伤害是否会使盔甲损失耐久度.
+     */
+    override fun bypassesHurtEquipment(damageType: DamageType): Boolean {
+        return BYPASSES_HURT_EQUIPMENT_DAMAGE_TYPES.contains(damageType)
+    }
+
+    /**
+     * 计算单次伤害下盔甲的耐久损失.
+     */
+    override fun computeEquipmentHurtAmount(damageAmount: Float): Int {
+        return (damageAmount * AMOUNT_PER_DAMAGE).toInt().coerceIn(MIN_AMOUNT, MAX_AMOUNT).coerceAtLeast(0)
+    }
+
+    /**
      * 包含所有与 Bukkit 伤害事件交互的逻辑.
      */
-    override fun injectDamageLogic(event: EntityDamageEvent, isDuringInvulnerable: Boolean): Float {
+    override fun injectDamageLogic(event: EntityDamageEvent, originLastHurt: Float, isDuringInvulnerable: Boolean): Float {
         val finalDamageContext = handleKoishDamageCalculationLogic(event)
         if (finalDamageContext == null) {
             // Bukkit 伤害事件被取消, 后续服务端中的 actuallyHurt 方法会返回false
-            // LivingEntity#lastHurt 变量其实不会被设置
-            // 无需深究返回 0f 可能造成的问题
+            // LivingEntity#lastHurt 变量其实不会被设置, 保险起见返回 originLastHurt
             event.isCancelled = true
-            return 0f
+            return originLastHurt
         } else {
             val finalDamage = finalDamageContext.finalDamageMap.values.sum().toFloat()
             val damagee = event.entity
@@ -200,8 +221,8 @@ internal object DamageManager : DamageManagerApi {
             if (isDuringInvulnerable && damagee is LivingEntity) {
                 if (finalDamage <= damagee.lastDamage) {
                     event.isCancelled = true
-                    // 同上无需深究返回 0f 可能造成的问题
-                    return 0f
+                    // 同上保险起见返回 originLastHurt
+                    return originLastHurt
                 }
             }
 
@@ -210,8 +231,8 @@ internal object DamageManager : DamageManagerApi {
             if (!postprocessEvent.callEvent()) {
                 // Koish 伤害事件被取消, 则直接返回
                 // Koish 伤害事件被取消时, 其内部的 Bukkit 伤害事件必然是取消的状态
-                // 同上无需深究返回 0f 可能造成的问题
-                return 0f
+                // 同上保险起见返回 originLastHurt
+                return originLastHurt
             }
 
             // 修改 BASE 伤害
@@ -931,7 +952,7 @@ internal object DamageManager : DamageManagerApi {
      * 玩家此时是否可以进行空手攻击.
      */
     private fun Player.canIntrinsicAttack(): Boolean {
-        return System.currentTimeMillis() - playerIntrinsicAttackTimestampMap.getOrDefault(uniqueId, 0L) >= PLAYER_INTRINSIC_ATTACK_COOLDOWN * 50L
+        return System.currentTimeMillis() - playerIntrinsicAttackTimestampMap.getOrDefault(uniqueId, 0L) >= PLAYER_INTRINSIC_ATTACK_COOLDOWN
     }
 
 }
