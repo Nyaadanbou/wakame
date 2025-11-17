@@ -48,7 +48,7 @@ public abstract class MixinLivingEntity {
             )
     )
     private float redirectComputeAmountDuringInvulnerable(LivingEntity instance, EntityDamageEvent event) {
-        return DamageManagerApi.injectDamageLogic(event, instance.lastHurt, true);
+        return DamageManagerApi.Companion.injectDamageLogic(event, instance.lastHurt, true);
     }
 
 
@@ -64,7 +64,7 @@ public abstract class MixinLivingEntity {
             )
     )
     private float redirectComputeAmountDuringNotInvulnerable(LivingEntity instance, EntityDamageEvent event) {
-        return DamageManagerApi.injectDamageLogic(event, instance.lastHurt, false);
+        return DamageManagerApi.Companion.injectDamageLogic(event, instance.lastHurt, false);
     }
 
     /**
@@ -95,7 +95,7 @@ public abstract class MixinLivingEntity {
             )
     )
     private boolean redirectIsBypassesArmor(DamageSource instance, TagKey<DamageType> damageTypeKey) {
-        return DamageManagerApi.bypassesHurtEquipment(CraftDamageType.minecraftHolderToBukkit(instance.typeHolder()));
+        return DamageManagerApi.Companion.bypassesHurtEquipment(CraftDamageType.minecraftHolderToBukkit(instance.typeHolder()));
     }
 
     /**
@@ -111,7 +111,7 @@ public abstract class MixinLivingEntity {
     private float redirectEquipmentDamageCompute(float a, float b) {
         // a = 1.0f
         // b = damageAmount / 4.0f
-        return DamageManagerApi.computeEquipmentHurtAmount(b * 4f);
+        return DamageManagerApi.Companion.computeEquipmentHurtAmount(b * 4f);
     }
 
 }

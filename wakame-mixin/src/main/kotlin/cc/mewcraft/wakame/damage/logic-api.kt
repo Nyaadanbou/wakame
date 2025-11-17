@@ -60,31 +60,30 @@ interface DamageManagerApi {
      */
     companion object : DamageManagerApi {
 
-        @get:JvmName("getInstance")
-        lateinit var implementation: DamageManagerApi
-            private set
+        private var implementation: DamageManagerApi = object : DamageManagerApi {
+            override fun hurt(victim: LivingEntity, metadata: DamageMetadata, source: DamageSource, knockback: Boolean): Boolean = false
+            override fun injectDamageLogic(event: EntityDamageEvent, originLastHurt: Float, isDuringInvulnerable: Boolean): Float = 4.94f
+            override fun bypassesHurtEquipment(damageType: DamageType): Boolean = false
+            override fun computeEquipmentHurtAmount(damageAmount: Float): Int = 0
+        }
 
         @ApiStatus.Internal
         fun setImplementation(instance: DamageManagerApi) {
             this.implementation = instance
         }
 
-        @JvmStatic
         override fun hurt(victim: LivingEntity, metadata: DamageMetadata, source: DamageSource, knockback: Boolean): Boolean {
             return implementation.hurt(victim, metadata, source, knockback)
         }
 
-        @JvmStatic
         override fun injectDamageLogic(event: EntityDamageEvent, originLastHurt: Float, isDuringInvulnerable: Boolean): Float {
             return implementation.injectDamageLogic(event, originLastHurt, isDuringInvulnerable)
         }
 
-        @JvmStatic
         override fun bypassesHurtEquipment(damageType: DamageType): Boolean {
             return implementation.bypassesHurtEquipment(damageType)
         }
 
-        @JvmStatic
         override fun computeEquipmentHurtAmount(damageAmount: Float): Int {
             return implementation.computeEquipmentHurtAmount(damageAmount)
         }
