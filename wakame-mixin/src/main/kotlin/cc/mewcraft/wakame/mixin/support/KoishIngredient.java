@@ -19,9 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/**
- * 桥接接口, 让其他代码可以调用通过 Mixin 新增的方法.
- */
+/// 桥接接口, 让其他代码可以调用通过 Mixin 新增的方法.
 public interface KoishIngredient {
 
     boolean isKoish();
@@ -35,19 +33,17 @@ public interface KoishIngredient {
         return (KoishIngredient) (Object) ingredient;
     }
 
-    /**
-     * 创建 Koish 原料的静态方法.
-     *
-     * @param identifiers 原料中的物品唯一标识符, 务必保证物品存在. 若物品不存在, 则在配方中以**屏障**占位作为兜底
-     * @return Koish 原料.
-     */
+    /// 创建 Koish 原料的静态方法.
+    ///
+    /// @param identifiers 原料中的物品唯一标识符, 务必保证物品存在. 若物品不存在, 则在配方中以**屏障**占位作为兜底
+    /// @return Koish 原料
     static Ingredient ofIdentifiers(Set<Key> identifiers) {
         List<ItemStack> mojangStacks = new ArrayList<>();
         for (Key identifier : identifiers) {
             ItemStack mojangStack = getMojangStackById(identifier);
             // 加入特殊标记, 使配方书移动物品时只匹配 id
             // 参与配方的原料的匹配逻辑不受此标记影响, 具体逻辑见 [MixinIngredient]
-            KoishStackData.setOnlyCompareIdInRecipeBook(mojangStack,true);
+            KoishStackData.setOnlyCompareIdInRecipeBook(mojangStack, true);
             mojangStacks.add(mojangStack);
         }
         // 要正确写入 Exact 所需的物品堆叠, 不然客户端配方书以及JEI类mod无法正确看到配方物品

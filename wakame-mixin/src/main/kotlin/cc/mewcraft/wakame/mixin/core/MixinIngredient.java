@@ -10,11 +10,7 @@ import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.*;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -22,7 +18,6 @@ import java.util.function.Predicate;
 
 @Mixin(value = Ingredient.class)
 public abstract class MixinIngredient implements StackedContents.IngredientInfo<io.papermc.paper.inventory.recipe.ItemOrExact>, Predicate<ItemStack>, KoishIngredient {
-
 
     @Shadow
     @Final
@@ -35,24 +30,18 @@ public abstract class MixinIngredient implements StackedContents.IngredientInfo<
     @Shadow
     public abstract boolean isExact();
 
-    /**
-     * 类似服务端 Exact 原料在 Ingredient 类里面维护一个 itemStacks 的思路.
-     * 我们也维护一个我们所需的字段.
-     * 显式设置默认值 null 是为了代码稳定性与可读性.
-     */
+    /// 类似服务端 Exact 原料在 Ingredient 类里面维护一个 itemStacks 的思路, 我们也维护一个我们所需的字段.
     @Nullable
     @Unique
-    private Set<Key> identifiers = null;
+    private Set<Key> identifiers = null; // 显式设置默认值 `null` 是为了代码稳定性与可读性.
 
-    /**
-     * 该原料是否为 Koish 原料, 若是则会采取 Koish 的逻辑去匹配物品.
-     * 即只考虑物品的 id, 无论是原版物品还是 Koish 物品.
-     * 注意事项:
-     * 1.要将玩家输入物品判定成 Exact.
-     * 然后在进行输入物品与配方所需原料之间的匹配时, 额外插入 Koish 原料的判定.
-     * 原因是 ItemOrExact 接口是密封的, 纵使 Mixin 也无法新增实现.
-     * 2.原料中用于 Exact 的 itemStacks 字段需要填充物品.
-     */
+    /// 该原料是否为 Koish 原料, 若是则会采取 Koish 的逻辑去匹配物品.
+    /// 即只考虑物品的 id, 无论是原版物品还是 Koish 物品.
+    /// 注意事项:
+    /// - 要将玩家输入物品判定成 Exact.
+    /// 然后在进行输入物品与配方所需原料之间的匹配时, 额外插入 Koish 原料的判定.
+    /// 原因是 ItemOrExact 接口是密封的, 纵使 Mixin 也无法新增实现.
+    /// - 原料中用于 Exact 的 itemStacks 字段需要填充物品.
     @Unique
     public boolean isKoish() {
         return this.identifiers != null;
@@ -69,14 +58,9 @@ public abstract class MixinIngredient implements StackedContents.IngredientInfo<
         this.identifiers = identifiers;
     }
 
-
-    /**
-     * @author Flandreqwq
-     * @reason
-     * 插入 Koish 原料判定逻辑, 影响所有配方类型的匹配逻辑.
-     * (请注意: 由 Koish 添加的配方, 其中只会有 Koish 原料).
-     * 防止 Koish 物品被视为原版物品而参与原版配方.
-     */
+    /// @author Flandreqwq
+    /// @reason 插入 Koish 原料判定逻辑, 影响所有配方类型的匹配逻辑. 防止 Koish 物品被视为原版物品而参与原版配方.
+    /// (请注意: 由 Koish 添加的配方, 其中只会有 Koish 原料).
     @Overwrite
     public boolean test(ItemStack stack) {
         // 插入对 Koish 原料的判定
@@ -93,13 +77,9 @@ public abstract class MixinIngredient implements StackedContents.IngredientInfo<
         }
     }
 
-    /**
-     * @author Flandreqwq
-     * @reason
-     * 插入 Koish 原料判定逻辑, 影响无序合成配方的匹配逻辑.
-     * (请注意: 由 Koish 添加的配方, 其中只会有 Koish 原料).
-     * 防止 Koish 物品被视为原版物品而参与原版配方的代码见 [MixinStackedContentsExtrasMap].
-     */
+    /// @author Flandreqwq
+    /// @reason 插入 Koish 原料判定逻辑, 影响无序合成配方的匹配逻辑, 防止 Koish 物品被视为原版物品而参与原版配方的代码见 [MixinStackedContentsExtrasMap].
+    /// (请注意: 由 Koish 添加的配方, 其中只会有 Koish 原料).
     @Overwrite
     public boolean acceptsItem(ItemOrExact itemOrExact) {
         boolean var13;

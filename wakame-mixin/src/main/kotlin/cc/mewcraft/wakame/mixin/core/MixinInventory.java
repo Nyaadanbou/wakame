@@ -14,10 +14,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(Inventory.class)
 public abstract class MixinInventory {
 
-    /**
-     * @author Flandreqwq
-     * @reason 实现支持 Koish 物品通过配方书转移物品, 并防止 Koish 物品被视为原版物品而转移.
-     */
+    /// @author Flandreqwq
+    /// @reason 实现支持 Koish 物品通过配方书转移物品, 并防止 Koish 物品被视为原版物品而转移.
     @Redirect(
             method = "findSlotMatchingCraftingIngredient",
             at = @At(

@@ -80,9 +80,11 @@ data class ItemReminder(
 }
 
 /**
- * 返还原物品扣除耐久后的新物品.
- * 耐久归零则返还空气.
- * 无法扣除耐久则返还原物品的复制.
+ * 返还原物品在扣除耐久后产生的新物品.
+ *
+ * 注意事项:
+ * - 如耐久归零, 则返还空气.
+ * - 如扣除耐久失败, 则返还原物品的克隆.
  */
 @ConfigSerializable
 data class HurtAndBreakReminder(

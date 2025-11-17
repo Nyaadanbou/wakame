@@ -10,11 +10,7 @@ import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -38,10 +34,8 @@ public abstract class MixinStackedContentsExtrasMap {
     @Final
     private StackedContents<ItemOrExact> contents;
 
-    /**
-     * @author Flandreqwq
-     * @reason 让无序合成能够支持 Koish 物品
-     */
+    /// @author Flandreqwq
+    /// @reason 让无序合成能够支持 Koish 物品
     @Overwrite
     public void initialize(Recipe<?> recipe) {
         // 若配方是 Koish 添加的, 则添加把输入物品统一识别为 Exact 的标记
@@ -74,10 +68,8 @@ public abstract class MixinStackedContentsExtrasMap {
         }
     }
 
-    /**
-     * @author Flandreqwq
-     * @reason 让无序合成能够支持 Koish 物品
-     */
+    /// @author Flandreqwq
+    /// @reason 让无序合成能够支持 Koish 物品
     @Inject(method = "resetExtras", at = @At("HEAD"))
     private void onResetExtras(CallbackInfo ci) {
         if (accountAllItemStackToExact) {
@@ -96,11 +88,8 @@ public abstract class MixinStackedContentsExtrasMap {
         // 后续是服务端原逻辑
     }
 
-    /**
-     * @author Flandreqwq
-     * @reason 让无序合成能够支持 Koish 物品.
-     * 防止 Koish 物品被视为原版物品而参与原版无序合成配方.
-     */
+    /// @author Flandreqwq
+    /// @reason 让无序合成能够支持 Koish 物品, 防止 Koish 物品被视为原版物品而参与原版无序合成配方
     @Inject(method = "accountStack", at = @At("HEAD"), cancellable = true)
     public void accountStack(ItemStack stack, int count, CallbackInfoReturnable<Boolean> cir) {
         // 若有 accountAllItemStackToExact 标记, 则将输入物品都识别成 Exact
