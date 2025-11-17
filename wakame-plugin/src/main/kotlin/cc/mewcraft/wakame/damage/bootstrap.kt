@@ -55,7 +55,7 @@ internal object DamageApiBootstrap {
             // 将玩家伤害添加至忽略无懈可击时间的标签中
             // 目的是让玩家伤害忽略无懈可击时间
             // 或许是因为原版 minecraft:bypasses_cooldown 默认为空
-            // 所以paper的 DamageTypeTagKeys 中没有该标签, 因此手动创建
+            // 所以 Paper 的 DamageTypeTagKeys 中没有该标签, 因此手动创建
             registrar.setTag(
                 DamageTypeTagKeys.create(Key.key("minecraft:bypasses_cooldown")),
                 setOf(TagEntry.tagEntry(DamageTypeTagKeys.IS_PLAYER_ATTACK))

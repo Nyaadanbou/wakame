@@ -30,10 +30,10 @@ object MythicMobsHook {
 
 private object MythicApiImpl : MythicApi {
 
-    private val MYTHIC_API: MythicBukkit = MythicBukkit.inst()
+    private val mythic: MythicBukkit = MythicBukkit.inst()
 
     override fun getEntityType(id: Key): EntityType? {
-        val mythicMob: MythicMob? = MYTHIC_API.apiHelper.getMythicMob(id.value())
+        val mythicMob: MythicMob? = mythic.apiHelper.getMythicMob(id.value())
         val mythicEntityType = mythicMob?.entityType ?: return null
         return EntityType.fromName(mythicEntityType.name)
     }

@@ -7,8 +7,7 @@ import io.lumine.mythic.api.skills.damage.DamageMetadata as MythicDamageMetadata
 
 /**
  * 请务必注意:
- * MythicMobs 可能随时修改其 api.
- * 包括但不限于构造器, 方法参数列表, 元数据使用的字符串.
+ * MythicMobs 可能随时修改其 API. 包括但不限于构造器, 方法参数列表, 元数据使用的字符串.
  */
 object MythicMobsUtils {
     private const val MAGIC_DAMAGE_AMOUNT = 4.95

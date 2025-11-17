@@ -1,8 +1,7 @@
 # 不要修改!
 version: 1
 
-# 玩家空手攻击(手持非 Weapon 物品时左键)的冷却.
-# 单位 tick.
+# 玩家空手攻击 (手持非 `koish:weapon` 物品时左键) 的冷却时间 (tick).
 player_intrinsic_attack_cooldown: 5
 
 # 盔甲耐久度损失相关
@@ -43,8 +42,6 @@ hurt_equipment:
     - stalagmite
     - starve
     - wither
-
-
 
 # 伤害规则相关.
 rules:

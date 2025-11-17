@@ -9,10 +9,7 @@ import org.bukkit.damage.DamageSource
 import org.bukkit.damage.DamageType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ABSORPTION
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BASE
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BLOCKING
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.RESISTANCE
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.*
 import org.jetbrains.annotations.ApiStatus
 
 
@@ -85,9 +82,9 @@ fun RawDamageContext(event: EntityDamageEvent): RawDamageContext {
 }
 
 /**
- * 对 Bukkit 伤害事件所含伤害信息的封装.
+ * 对 Bukkit 伤害事件所含伤害信息的封装, 其中不含 Koish 自定义伤害的信息.
+ *
  * 用于兼容原版的各种伤害场景.
- * 其中不含 Koish 自定义伤害的信息.
  */
 @ApiStatus.Internal
 class RawDamageContext(
