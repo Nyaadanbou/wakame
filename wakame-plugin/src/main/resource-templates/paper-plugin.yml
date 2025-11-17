@@ -49,6 +49,9 @@ dependencies:
       required: false
       join-classpath: false
       load: AFTER # ExcellentCrates 需要访问 Koish 注册的 ItemHandler
+    HuskHomes:
+      required: false
+      load: OMIT
     HuskSync:
       required: false
       load: OMIT

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.hook.impl
 
+import cc.mewcraft.wakame.LOGGER
 import net.william278.huskhomes.event.ReceiveTeleportRequestEvent
 import net.william278.huskhomes.event.SendTeleportRequestEvent
 import net.william278.huskhomes.event.TeleportEvent
@@ -18,6 +19,8 @@ class TpaBlockListener : Listener {
     //
     @EventHandler
     private fun on(event: ReceiveTeleportRequestEvent) {
+        LOGGER.warn("Firing receive teleport request event")
+
         if (event.isIgnored) {
             return
         }
@@ -57,6 +60,8 @@ class TpaBlockListener : Listener {
     //
     @EventHandler
     private fun on(event: SendTeleportRequestEvent) {
+        LOGGER.warn("Firing send teleport request event")
+
         val request = event.request
         val requestType = request.type
 
