@@ -1,14 +1,24 @@
 package cc.mewcraft.wakame.mixin.core;
 
 import cc.mewcraft.wakame.damage.DamageManagerApi;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import org.bukkit.craftbukkit.damage.CraftDamageType;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(LivingEntity.class)
 public abstract class MixinLivingEntity {
+
+    @Shadow
+    public abstract ItemStack getItemBySlot(EquipmentSlot slot);
 
     /**
      * 让此处if表达式的条件恒为false.
@@ -38,8 +48,9 @@ public abstract class MixinLivingEntity {
             )
     )
     private float redirectComputeAmountDuringInvulnerable(LivingEntity instance, EntityDamageEvent event) {
-        return DamageManagerApi.Companion.getInstance().injectDamageLogic(event, true);
+        return DamageManagerApi.injectDamageLogic(event, instance.lastHurt, true);
     }
+
 
     /**
      * 插入非无懈可击期间自定义的伤害逻辑.
@@ -53,7 +64,54 @@ public abstract class MixinLivingEntity {
             )
     )
     private float redirectComputeAmountDuringNotInvulnerable(LivingEntity instance, EntityDamageEvent event) {
-        return DamageManagerApi.Companion.getInstance().injectDamageLogic(event, false);
+        return DamageManagerApi.injectDamageLogic(event, instance.lastHurt, false);
+    }
+
+    /**
+     * 移除原版“下落方块对头盔造成大量耐久度消耗”的机制.
+     * 头盔对下落方块的减伤机制也被移除了, 见拓展函数 [EntityDamageEvent.removeUnusedDamageModifiers]
+     */
+    @Redirect(
+            method = "actuallyHurt",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/damagesource/DamageSource;is(Lnet/minecraft/tags/TagKey;)Z",
+                    ordinal = 0
+            )
+    )
+    private boolean redirectIsDamagesHelmet(DamageSource instance, TagKey<DamageType> damageTypeKey) {
+        return false;
+    }
+
+    /**
+     * 修改盔甲是否损失耐久度的判定.
+     */
+    @Redirect(
+            method = "actuallyHurt",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/damagesource/DamageSource;is(Lnet/minecraft/tags/TagKey;)Z",
+                    ordinal = 1
+            )
+    )
+    private boolean redirectIsBypassesArmor(DamageSource instance, TagKey<DamageType> damageTypeKey) {
+        return DamageManagerApi.bypassesHurtEquipment(CraftDamageType.minecraftHolderToBukkit(instance.typeHolder()));
+    }
+
+    /**
+     * 使盔甲耐久度损失可配置.
+     */
+    @Redirect(
+            method = "doHurtEquipment",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Ljava/lang/Math;max(FF)F"
+            )
+    )
+    private float redirectEquipmentDamageCompute(float a, float b) {
+        // a = 1.0f
+        // b = damageAmount / 4.0f
+        return DamageManagerApi.computeEquipmentHurtAmount(b * 4f);
     }
 
 }

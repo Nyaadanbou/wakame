@@ -86,14 +86,13 @@ dry_out:
     defense_penetration_rate: 1.0
     critical_strike_metadata:
       chance: 0.0
-# ender_pearl:
-#   damage_metadata:
-#     type: vanilla
-#     damage_tags: [ ]
-#     element: neutral
-#     defense_penetration_rate: 1.0
-#     critical_strike_metadata:
-#       chance: 0.0
+ender_pearl:
+  damage_metadata:
+    type: vanilla
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
 explosion:
   damage_metadata:
     type: vanilla
@@ -144,6 +143,7 @@ fly_into_wall:
   damage_metadata:
     type: vanilla
     element: neutral
+    defense_penetration_rate: 1.0
     critical_strike_metadata:
       chance: 0.0
 freeze:
@@ -216,13 +216,12 @@ magic:
     defense_penetration_rate: 1.0
     critical_strike_metadata:
       chance: 0.0
-# mace_smash:
-#   damage_metadata:
-#     type: vanilla
-#     damage_tags: [ ]
-#     element: neutral
-#     critical_strike_metadata:
-#       chance: 0.0
+mace_smash:
+  damage_metadata:
+    type: vanilla
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
 mob_attack:
   damage_metadata:
     type: vanilla
@@ -346,6 +345,7 @@ wither:
   damage_metadata:
     type: vanilla
     element: neutral
+    defense_penetration_rate: 1.0
     critical_strike_metadata:
       chance: 0.0
 wither_skull:

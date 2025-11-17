@@ -30,25 +30,25 @@ internal object DamageListener : Listener {
 
     @EventHandler
     fun on(event: ProjectileLaunchEvent) {
-        DamageManager.registerTrident(event)
+        DamageManagerImpl.registerTrident(event)
     }
 
     @EventHandler
     fun on(event: EntityShootBowEvent) {
-        DamageManager.registerExactArrow(event)
+        DamageManagerImpl.registerExactArrow(event)
     }
 
     // 在弹射物击中方块时移除记录的 DamageMetadata.
     @EventHandler
     fun on(event: ProjectileHitEvent) {
         if (event.hitBlock == null) return
-        DamageManager.unregisterProjectile(event.entity)
+        DamageManagerImpl.unregisterProjectile(event.entity)
     }
 
     // 用于取消自定义伤害的击退.
     @EventHandler
     fun on(event: EntityKnockbackEvent) {
-        if (DamageManager.unregisterCancelKnockback(event.entity)) {
+        if (DamageManagerImpl.unregisterCancelKnockback(event.entity)) {
             event.isCancelled = true
         }
     }

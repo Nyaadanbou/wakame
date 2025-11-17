@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalContracts::class)
+@file:JvmName("BundleDsl")
 
 package cc.mewcraft.wakame.damage
 
@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.*
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import kotlin.contracts.ExperimentalContracts
 
 /**
  * 开始构建一个 [DamageBundle].
