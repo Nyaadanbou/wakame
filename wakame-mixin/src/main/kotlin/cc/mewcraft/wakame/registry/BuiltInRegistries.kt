@@ -31,6 +31,8 @@ import cc.mewcraft.wakame.item.datagen.ItemMetaType
 import cc.mewcraft.wakame.item.datagen.ItemMetaTypes
 import cc.mewcraft.wakame.item.property.ItemPropType
 import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item.property.impl.CraftingReminderType
+import cc.mewcraft.wakame.item.property.impl.CraftingReminderTypes
 import cc.mewcraft.wakame.item.property.impl.EnchantSlotCapacityType
 import cc.mewcraft.wakame.item.property.impl.EnchantSlotCapacityTypes
 import cc.mewcraft.wakame.kizami.Kizami
@@ -209,6 +211,12 @@ object BuiltInRegistries {
      */
     @JvmField
     val ENCHANT_SLOT_CAPACITY_TYPE: WritableRegistry<EnchantSlotCapacityType> = registerSimple(BuiltInRegistryKeys.ENCHANT_SLOT_CAPACITY_TYPE) { EnchantSlotCapacityTypes }
+
+    /**
+     * CraftingReminder 的类型.
+     */
+    @JvmField
+    val CRAFTING_REMINDER_TYPE: WritableRegistry<CraftingReminderType> = registerSimple(BuiltInRegistryKeys.CRAFTING_REMINDER_TYPE) { CraftingReminderTypes }
 
     /**
      * 攻击速度.

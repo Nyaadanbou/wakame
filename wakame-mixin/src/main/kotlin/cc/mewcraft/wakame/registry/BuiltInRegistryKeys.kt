@@ -24,6 +24,7 @@ import cc.mewcraft.wakame.item.data.impl.CoreType
 import cc.mewcraft.wakame.item.data.impl.EntityBucketInfoType
 import cc.mewcraft.wakame.item.datagen.ItemMetaType
 import cc.mewcraft.wakame.item.property.ItemPropType
+import cc.mewcraft.wakame.item.property.impl.CraftingReminderType
 import cc.mewcraft.wakame.item.property.impl.EnchantSlotCapacityType
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.loot.LootTable
@@ -110,6 +111,9 @@ object BuiltInRegistryKeys {
 
     @JvmField
     val ENCHANT_SLOT_CAPACITY_TYPE = createRegistryKey<EnchantSlotCapacityType>("enchant_slot_capacity_type")
+
+    @JvmField
+    val CRAFTING_REMINDER_TYPE = createRegistryKey<CraftingReminderType>("crafting_reminder_type")
 
     @JvmField
     val ATTACK_SPEED = createRegistryKey<AttackSpeed>("attack_speed")
