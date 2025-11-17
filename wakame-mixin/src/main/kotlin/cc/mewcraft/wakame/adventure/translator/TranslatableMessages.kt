@@ -85,6 +85,8 @@ object TranslatableMessages {
     val MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_RECEIVE_DAMAGE = create("msg_hold_last_damage_default_when_receive_damage")
     val MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_CONSUME = create("msg_hold_last_damage_default_when_consume")
     val MSG_VILLAGER_TRADE_DISABLED_IN_THIS_WORLD = create("msg_villager_trade_disabled_in_this_world")
+    val MSG_RECV_TELEPORT_REQUEST_BLOCKED = create("msg_recv_teleport_request_blocked")
+    val MSG_SEND_TELEPORT_REQUEST_BLOCKED = create("msg_send_teleport_request_blocked")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

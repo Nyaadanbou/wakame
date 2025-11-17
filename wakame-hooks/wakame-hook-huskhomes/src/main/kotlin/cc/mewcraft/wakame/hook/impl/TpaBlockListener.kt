@@ -1,9 +1,10 @@
 package cc.mewcraft.wakame.hook.impl
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
+import net.kyori.adventure.text.Component
 import net.william278.huskhomes.event.ReceiveTeleportRequestEvent
 import net.william278.huskhomes.event.SendTeleportRequestEvent
-import net.william278.huskhomes.event.TeleportEvent
 import net.william278.huskhomes.teleport.TeleportRequest
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -39,6 +40,7 @@ class TpaBlockListener : Listener {
             TeleportRequest.Type.TPA -> {
                 if (!recipient.hasPermission("huskhomes.extra.recv.tpa.at.$recipientServer")) {
                     event.isCancelled = true
+                    recipient.audience.sendMessage(TranslatableMessages.MSG_RECV_TELEPORT_REQUEST_BLOCKED.arguments(Component.text(request.requesterName)))
                 }
             }
 
@@ -46,6 +48,7 @@ class TpaBlockListener : Listener {
             TeleportRequest.Type.TPA_HERE -> {
                 if (!recipient.hasPermission("huskhomes.extra.recv.tpahere.at.$recipientServer")) {
                     event.isCancelled = true
+                    recipient.audience.sendMessage(TranslatableMessages.MSG_RECV_TELEPORT_REQUEST_BLOCKED.arguments(Component.text(request.requesterName)))
                 }
             }
         }
@@ -74,6 +77,7 @@ class TpaBlockListener : Listener {
             TeleportRequest.Type.TPA -> {
                 if (!sender.hasPermission("huskhomes.extra.send.tpa.at.$senderServer")) {
                     event.isCancelled = true
+                    sender.audience.sendMessage(TranslatableMessages.MSG_SEND_TELEPORT_REQUEST_BLOCKED.arguments(Component.text(request.recipientName ?: "???")))
                 }
             }
 
@@ -81,16 +85,10 @@ class TpaBlockListener : Listener {
             TeleportRequest.Type.TPA_HERE -> {
                 if (!sender.hasPermission("huskhomes.extra.send.tpahere.at.$senderServer")) {
                     event.isCancelled = true
+                    sender.audience.sendMessage(TranslatableMessages.MSG_SEND_TELEPORT_REQUEST_BLOCKED.arguments(Component.text(request.recipientName ?: "???")))
                 }
             }
         }
     }
 
-    @EventHandler
-    private fun on(event: TeleportEvent) {
-        val teleport = event.teleport
-        teleport.type
-        teleport.teleporter
-        teleport.target
-    }
 }
