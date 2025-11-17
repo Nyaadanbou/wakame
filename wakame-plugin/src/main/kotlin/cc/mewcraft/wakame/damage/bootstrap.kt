@@ -26,7 +26,7 @@ internal object DamageApiBootstrap {
         DamageBundleFactory.register(DefaultDamageBundleFactory)
 
         // 注册 DamageManagerApi
-        DamageManagerApi.register(DamageManager)
+        DamageManagerApi.setImplementation(DamageManagerImpl)
 
         // 修改原版和伤害有关的部分标签
         modifyTags()

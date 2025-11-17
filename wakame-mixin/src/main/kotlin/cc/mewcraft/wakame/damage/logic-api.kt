@@ -14,7 +14,7 @@ import org.jetbrains.annotations.ApiStatus
 
 
 fun LivingEntity.hurt(metadata: DamageMetadata, source: DamageSource, knockback: Boolean): Boolean {
-    return DamageManagerApi.INSTANCE.hurt(this, metadata, source, knockback)
+    return DamageManagerApi.hurt(this, metadata, source, knockback)
 }
 
 interface DamageManagerApi {
@@ -36,10 +36,14 @@ interface DamageManagerApi {
     ): Boolean
 
     /**
-     * 将插入到原版伤害系统触发 [EntityDamageEvent] 之后、造成实际伤害效果(扣血, 装备损失耐久等, 即服务端 actuallyHurt 方法)之前的位置.
+     * 将插入到原版伤害系统触发 [EntityDamageEvent] 之后、造成实际伤害效果 (扣血, 装备损失耐久等, 即服务端 actuallyHurt 方法) 之前的位置.
      * @return 最终要被记录到 LivingEntity#lastHurt 变量中的值
      */
-    fun injectDamageLogic(event: EntityDamageEvent, originLastHurt: Float, isDuringInvulnerable: Boolean): Float
+    fun injectDamageLogic(
+        event: EntityDamageEvent,
+        originLastHurt: Float,
+        isDuringInvulnerable: Boolean,
+    ): Float
 
     /**
      * 将插入到原版盔甲损失耐久度判定处.
@@ -54,19 +58,37 @@ interface DamageManagerApi {
     /**
      * 伴生对象, 提供 [DamageManagerApi] 的实例.
      */
-    companion object {
+    companion object : DamageManagerApi {
 
         @get:JvmName("getInstance")
-        lateinit var INSTANCE: DamageManagerApi
+        lateinit var implementation: DamageManagerApi
             private set
 
         @ApiStatus.Internal
-        fun register(instance: DamageManagerApi) {
-            this.INSTANCE = instance
+        fun setImplementation(instance: DamageManagerApi) {
+            this.implementation = instance
         }
 
-    }
+        @JvmStatic
+        override fun hurt(victim: LivingEntity, metadata: DamageMetadata, source: DamageSource, knockback: Boolean): Boolean {
+            return implementation.hurt(victim, metadata, source, knockback)
+        }
 
+        @JvmStatic
+        override fun injectDamageLogic(event: EntityDamageEvent, originLastHurt: Float, isDuringInvulnerable: Boolean): Float {
+            return implementation.injectDamageLogic(event, originLastHurt, isDuringInvulnerable)
+        }
+
+        @JvmStatic
+        override fun bypassesHurtEquipment(damageType: DamageType): Boolean {
+            return implementation.bypassesHurtEquipment(damageType)
+        }
+
+        @JvmStatic
+        override fun computeEquipmentHurtAmount(damageAmount: Float): Int {
+            return implementation.computeEquipmentHurtAmount(damageAmount)
+        }
+    }
 }
 
 // ------------

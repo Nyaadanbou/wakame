@@ -1,3 +1,5 @@
+@file:JvmName("Bundle")
+
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.LOGGER

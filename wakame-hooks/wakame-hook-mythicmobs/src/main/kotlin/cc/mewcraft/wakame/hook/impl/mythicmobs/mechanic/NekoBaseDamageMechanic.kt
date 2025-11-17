@@ -1,13 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.mechanic
 
-import cc.mewcraft.wakame.damage.CriticalStrikeMetadata
-import cc.mewcraft.wakame.damage.CriticalStrikeState
-import cc.mewcraft.wakame.damage.DamageBundle
-import cc.mewcraft.wakame.damage.DamageBundleFactory
-import cc.mewcraft.wakame.damage.DamageManagerApi
-import cc.mewcraft.wakame.damage.DamageMetadata
-import cc.mewcraft.wakame.damage.DamagePacket
-import cc.mewcraft.wakame.damage.KoishDamageSources
+import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.hook.impl.mythicmobs.MythicMobsUtils
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
@@ -113,7 +106,7 @@ class NekoBaseDamageMechanic(
         // 添加标记使本次伤害被视为技能伤害, 而不再触发 ~onAttack 触发器, 避免堆栈溢出
         target.setMetadata("skill-damage", mythicDamageMetadata)
         // 对目标生物造成自定义的萌芽伤害
-        DamageManagerApi.INSTANCE.hurt(entity, damageMetadata, damageSource, knockback)
+        DamageManagerApi.hurt(entity, damageMetadata, damageSource, knockback)
         // 移除标记
         // 是的, MythicMobs 并不会自动移除伤害元数据, 但它却以此来区分伤害是否为技能伤害
         target.removeMetadata("skill-damage")
