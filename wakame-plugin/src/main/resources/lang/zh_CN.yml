@@ -79,6 +79,8 @@ msg_hold_last_damage_default_when_cause_damage: "<red>无法使用损坏的物�
 msg_hold_last_damage_default_when_receive_damage: "<red>无法使用损坏的物品."
 msg_hold_last_damage_default_when_consume: "<red>无法使用损坏的物品."
 msg_villager_trade_disabled_in_this_world: "<red>这个世界无法与村民交易."
+msg_recv_teleport_request_blocked: "<red><arg:0> 尝试向你发送传送请求但被一股神秘力量拦截了."
+msg_send_teleport_request_blocked: "<red>你尝试向 <arg:0> 发送传送请求但被一股神秘力量拦截了."
 
 # 像这样制定一个数字的格式, '#' 是 Java 的 DecimalFormat 的语法
 msg_number_format: "This is a decimal number: <arg:0:'zh-CN':'#'>."

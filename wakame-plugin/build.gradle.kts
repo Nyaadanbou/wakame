@@ -32,6 +32,7 @@ dependencies {
     runtimeOnly(project(":wakame-hooks:wakame-hook-economy"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-economybridge"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-husksync"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-huskhomes"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-luckperms"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-mythicdungeons"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-mythicmobs"))
