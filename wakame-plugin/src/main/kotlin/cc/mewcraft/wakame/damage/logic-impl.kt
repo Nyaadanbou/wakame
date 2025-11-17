@@ -68,10 +68,10 @@ private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "d
 private val DAMAGE_CONFIG = ConfigAccess.INSTANCE["damage/config"]
 private val PLAYER_INTRINSIC_ATTACK_COOLDOWN by DAMAGE_CONFIG.optionalEntry<Long>("player_intrinsic_attack_cooldown").orElse(5L).map { it * 50L }
 private val EQUIPMENT_CONFIG = DAMAGE_CONFIG.node("equipment")
-private val BYPASSES_EQUIPMENT_DAMAGE_TYPES by EQUIPMENT_CONFIG.optionalEntry<List<DamageType>>("bypasses_damage_types").orElse(emptyList())
-private val AMOUNT_PER_DAMAGE by EQUIPMENT_CONFIG.optionalEntry<Float>("amount_per_damage").orElse(0.25f)
-private val MIN_AMOUNT by EQUIPMENT_CONFIG.optionalEntry<Int>("min_amount").orElse(1)
-private val MAX_AMOUNT by EQUIPMENT_CONFIG.optionalEntry<Int>("max_amount").orElse(Int.MAX_VALUE)
+private val EQUIPMENT_NO_DURABILITY_LOSS_DAMAGE_TYPES by EQUIPMENT_CONFIG.optionalEntry<List<DamageType>>("no_durability_loss_damage_types").orElse(emptyList())
+private val EQUIPMENT_AMOUNT_PER_DAMAGE by EQUIPMENT_CONFIG.optionalEntry<Float>("amount_per_damage").orElse(0.25f)
+private val EQUIPMENT_MIN_AMOUNT by EQUIPMENT_CONFIG.optionalEntry<Int>("min_amount").orElse(1)
+private val EQUIPMENT_MAX_AMOUNT by EQUIPMENT_CONFIG.optionalEntry<Int>("max_amount").orElse(Int.MAX_VALUE)
 
 /**
  * 包含伤害系统的计算逻辑和状态.
@@ -175,14 +175,14 @@ internal object DamageManagerImpl : DamageManagerApi {
      * 判定某次伤害是否会使盔甲损失耐久度.
      */
     override fun bypassesHurtEquipment(damageType: DamageType): Boolean {
-        return BYPASSES_EQUIPMENT_DAMAGE_TYPES.contains(damageType)
+        return EQUIPMENT_NO_DURABILITY_LOSS_DAMAGE_TYPES.contains(damageType)
     }
 
     /**
      * 计算单次伤害下盔甲的耐久损失.
      */
     override fun computeEquipmentHurtAmount(damageAmount: Float): Int {
-        return (damageAmount * AMOUNT_PER_DAMAGE).toInt().coerceIn(MIN_AMOUNT, MAX_AMOUNT).coerceAtLeast(0)
+        return (damageAmount * EQUIPMENT_AMOUNT_PER_DAMAGE).toInt().coerceIn(EQUIPMENT_MIN_AMOUNT, EQUIPMENT_MAX_AMOUNT).coerceAtLeast(0)
     }
 
     /**

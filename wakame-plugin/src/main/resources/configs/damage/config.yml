@@ -51,7 +51,7 @@ equipment:
   max_amount: 2147483647
   # 不会使盔甲损失耐久的伤害类型
   # 默认列表为默认 damage_type_mappings.yml 文件中防御穿透率为 1.0 的伤害类型
-  bypasses_damage_types:
+  no_durability_loss_damage_types:
     - cactus
     - campfire
     - cramming
