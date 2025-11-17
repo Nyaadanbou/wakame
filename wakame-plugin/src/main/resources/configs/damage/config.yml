@@ -4,45 +4,6 @@ version: 1
 # 玩家空手攻击 (手持非 `koish:weapon` 物品时左键) 的冷却时间 (tick).
 player_intrinsic_attack_cooldown: 5
 
-# 盔甲耐久度损失相关
-hurt_equipment:
-  # 每点伤害损失耐久度
-  amount_per_damage: 0.25
-  # 单次伤害损失耐久度最小值
-  min_amount: 1
-  # 单次伤害损失耐久度最大值
-  max_amount: 2147483647
-  # 不会使盔甲损失耐久的伤害类型
-  # 默认列表为默认 damage_type_mappings.yml 文件中防御穿透率为 1.0 的伤害类型
-  bypasses_damage_types:
-    - cactus
-    - campfire
-    - cramming
-    - drown
-    - dry_out
-    - ender_pearl
-    - fall
-    - falling_anvil
-    - falling_block
-    - falling_stalactite
-    - fly_into_wall
-    - freeze
-    - generic
-    - generic_kill
-    - hot_floor
-    - in_fire
-    - in_wall
-    - indirect_magic
-    - lava
-    - lightning_bolt
-    - magic
-    - on_fire
-    - out_of_world
-    - outside_border
-    - stalagmite
-    - starve
-    - wither
-
 # 伤害规则相关.
 rules:
 
@@ -79,6 +40,45 @@ rules:
   # q.use_ticks
   #   玩家拉弓释放时, 累计长按使用的时间, 单位 tick
   bow_force_formula: "math.clamp((q.use_ticks * q.use_ticks / 400.0 + q.use_ticks / 10.0) / 3.0, 0.0, 1.0)"
+
+# 盔甲耐久度损失相关
+equipment:
+  # 每点伤害损失耐久度
+  amount_per_damage: 0.25
+  # 单次伤害损失耐久度最小值
+  min_amount: 1
+  # 单次伤害损失耐久度最大值
+  max_amount: 2147483647
+  # 不会使盔甲损失耐久的伤害类型
+  # 默认列表为默认 damage_type_mappings.yml 文件中防御穿透率为 1.0 的伤害类型
+  bypasses_damage_types:
+    - cactus
+    - campfire
+    - cramming
+    - drown
+    - dry_out
+    - ender_pearl
+    - fall
+    - falling_anvil
+    - falling_block
+    - falling_stalactite
+    - fly_into_wall
+    - freeze
+    - generic
+    - generic_kill
+    - hot_floor
+    - in_fire
+    - in_wall
+    - indirect_magic
+    - lava
+    - lightning_bolt
+    - magic
+    - on_fire
+    - out_of_world
+    - outside_border
+    - stalagmite
+    - starve
+    - wither
 
 # 伤害显示相关.
 display:

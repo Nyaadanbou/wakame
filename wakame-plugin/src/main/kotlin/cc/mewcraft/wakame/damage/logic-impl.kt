@@ -67,11 +67,11 @@ private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "d
 
 private val DAMAGE_CONFIG = ConfigAccess.INSTANCE["damage/config"]
 private val PLAYER_INTRINSIC_ATTACK_COOLDOWN by DAMAGE_CONFIG.optionalEntry<Long>("player_intrinsic_attack_cooldown").orElse(5L).map { it * 50L }
-private val HURT_EQUIPMENT_CONFIG = DAMAGE_CONFIG.node("hurt_equipment")
-private val BYPASSES_HURT_EQUIPMENT_DAMAGE_TYPES by HURT_EQUIPMENT_CONFIG.optionalEntry<List<DamageType>>("bypasses_damage_types").orElse(emptyList())
-private val AMOUNT_PER_DAMAGE by HURT_EQUIPMENT_CONFIG.optionalEntry<Float>("amount_per_damage").orElse(0.25f)
-private val MIN_AMOUNT by HURT_EQUIPMENT_CONFIG.optionalEntry<Int>("min_amount").orElse(1)
-private val MAX_AMOUNT by HURT_EQUIPMENT_CONFIG.optionalEntry<Int>("max_amount").orElse(Int.MAX_VALUE)
+private val EQUIPMENT_CONFIG = DAMAGE_CONFIG.node("equipment")
+private val BYPASSES_EQUIPMENT_DAMAGE_TYPES by EQUIPMENT_CONFIG.optionalEntry<List<DamageType>>("bypasses_damage_types").orElse(emptyList())
+private val AMOUNT_PER_DAMAGE by EQUIPMENT_CONFIG.optionalEntry<Float>("amount_per_damage").orElse(0.25f)
+private val MIN_AMOUNT by EQUIPMENT_CONFIG.optionalEntry<Int>("min_amount").orElse(1)
+private val MAX_AMOUNT by EQUIPMENT_CONFIG.optionalEntry<Int>("max_amount").orElse(Int.MAX_VALUE)
 
 /**
  * 包含伤害系统的计算逻辑和状态.
@@ -175,7 +175,7 @@ internal object DamageManagerImpl : DamageManagerApi {
      * 判定某次伤害是否会使盔甲损失耐久度.
      */
     override fun bypassesHurtEquipment(damageType: DamageType): Boolean {
-        return BYPASSES_HURT_EQUIPMENT_DAMAGE_TYPES.contains(damageType)
+        return BYPASSES_EQUIPMENT_DAMAGE_TYPES.contains(damageType)
     }
 
     /**
