@@ -36,6 +36,14 @@ interface ItemRenderer<in T, in C> {
     fun initialize(formatPath: Path, layoutPath: Path)
 
     /**
+     * 原地渲染物品 [item], 不使用任何上下文.
+     *
+     * @param item 服务端上的物品堆叠, 也是需要被渲染的物品
+     */
+    // 该函数仅仅用于简化 Java 侧的调用 (不然总得带个 null)
+    fun render(item: T) = render(item, null)
+
+    /**
      * 原地渲染物品 [item].
      *
      * 实现上, 如果有需要, 可以根据 [context] 产生不同的渲染结果.
