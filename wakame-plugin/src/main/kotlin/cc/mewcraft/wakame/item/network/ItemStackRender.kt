@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.item.display.ItemRenderers
+import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.item.koishTypeId
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -13,8 +14,6 @@ import cc.mewcraft.wakame.network.event.*
 import cc.mewcraft.wakame.network.event.clientbound.*
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.getOrThrow
-import cc.mewcraft.wakame.util.item.editNbt
-import cc.mewcraft.wakame.util.item.isNetworkRewrite
 import cc.mewcraft.wakame.util.item.toNMS
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
@@ -298,26 +297,18 @@ internal object ItemStackRender : PacketListener, Listener {
         return event.player.gameMode == GameMode.CREATIVE
     }
 
-    private const val PDC_FIELD = "PublicBukkitValues"
-
     private fun MojangStack.modify(): MojangStack {
-        val itemStack = asBukkitCopy()
+        if (!isNetworkRewrite)
+            return this
 
-        // 移除任意物品的 PDC
-        itemStack.editNbt { nbt ->
-            nbt.remove(PDC_FIELD)
-        }
-
-        if (itemStack != null && isNetworkRewrite) {
-            try {
-                ItemRenderers.STANDARD.render(itemStack)
-            } catch (e: Throwable) {
-                if (LOGGING) {
-                    LOGGER.error("An error occurred while rewrite network item: ${itemStack.koishTypeId}", e)
-                }
+        val bukkitCopy = asBukkitCopy()
+        try {
+            ItemRenderers.STANDARD.render(bukkitCopy)
+        } catch (e: Throwable) {
+            if (LOGGING) {
+                LOGGER.error("An error occurred while rewrite network item: ${bukkitCopy.koishTypeId}", e)
             }
         }
-
-        return itemStack.toNMS()
+        return bukkitCopy.toNMS()
     }
 }
