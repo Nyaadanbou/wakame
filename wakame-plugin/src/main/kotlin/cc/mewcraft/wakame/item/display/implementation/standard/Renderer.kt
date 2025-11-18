@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.display.implementation.standard
 
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item.data.ItemDataTypes
@@ -8,6 +9,8 @@ import cc.mewcraft.wakame.item.datagen.ItemMetaTypes
 import cc.mewcraft.wakame.item.datagen.impl.MetaCustomName
 import cc.mewcraft.wakame.item.datagen.impl.MetaItemName
 import cc.mewcraft.wakame.item.display.IndexedText
+import cc.mewcraft.wakame.item.display.ItemRendererConstants
+import cc.mewcraft.wakame.item.display.NetworkRenderer
 import cc.mewcraft.wakame.item.display.TextAssembler
 import cc.mewcraft.wakame.item.display.implementation.*
 import cc.mewcraft.wakame.item.display.implementation.common.*
@@ -31,6 +34,8 @@ import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.item.fastLore
 import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
+import cc.mewcraft.wakame.util.yamlLoader
+import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.FoodProperties
 import io.papermc.paper.datacomponent.item.ItemEnchantments
@@ -40,8 +45,10 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Registry
 import org.bukkit.inventory.ItemStack
+import org.spongepowered.configurate.kotlin.extensions.getList
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import java.nio.file.Path
+import kotlin.io.path.readText
 
 internal class StandardRendererFormatRegistry(renderer: StandardItemRenderer) : AbstractRendererFormatRegistry(renderer)
 
@@ -54,15 +61,28 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
     override val formats = StandardRendererFormatRegistry(this)
     override val layout = StandardRendererLayout(this)
     private val textAssembler = TextAssembler(layout)
+    private val removeComponents: ArrayList<DataComponentType> = ArrayList()
 
     @InitFun
     fun init() {
         loadDataFromConfigs()
+        loadExtraDataFromConfigs()
     }
 
     @ReloadFun
     fun reload() {
         loadDataFromConfigs()
+        loadExtraDataFromConfigs()
+    }
+
+    fun loadExtraDataFromConfigs() {
+        removeComponents.clear()
+
+        val renderersDirectory = KoishDataPaths.CONFIGS.resolve(ItemRendererConstants.DATA_DIR)
+        val layoutPath = renderersDirectory.resolve(name).resolve(ItemRendererConstants.LAYOUT_FILE_NAME)
+        val yaml = yamlLoader { withDefaults() }.buildAndLoadString(layoutPath.readText())
+
+        removeComponents += yaml.node("remove_components").getList<DataComponentType>(emptyList())
     }
 
     override fun initialize(
@@ -75,6 +95,10 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
     }
 
     override fun render(item: ItemStack, context: Nothing?) {
+        if (!(NetworkRenderer.responsible(item))) {
+            return
+        }
+
         val collector = ReferenceOpenHashSet<IndexedText>()
 
         StandardRenderingHandlerRegistry.ARROW.process(collector, item.getProp(ItemPropTypes.ARROW))
@@ -122,8 +146,14 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
             }
         }
 
-        // 应用修改到物品上
+        // 应用 lore 到物品上
         item.fastLore(resultantLore)
+
+        // 移除不需要的物品组件
+        // 注意: 仅在存在需要移除的物品组件时, 才进行移除, 这样可以避免不必要的数据传输
+        for (componentType in removeComponents) {
+            item.unsetData(componentType)
+        }
     }
 
     private fun renderCoreContainer(collector: ReferenceOpenHashSet<IndexedText>, coreContainer: CoreContainer?) {

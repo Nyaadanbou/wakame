@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import cc.mewcraft.wakame.item.KoishStackData;
 import cc.mewcraft.wakame.item.display.NetworkRenderer;
 import cc.mewcraft.wakame.mixin.support.ExtraDataComponents;
 import net.minecraft.core.Holder;
@@ -30,7 +29,8 @@ public abstract class MixinHashedStack {
     private HashedPatchMap components; // 客户端那边发过来的物品组件哈希
 
     /**
-     * @param stack 服务端侧的物品堆叠
+     * @param stack         服务端侧的物品堆叠
+     * @param hashGenerator 服务端侧的哈希生成器
      * @author Nailm
      * @reason 使服务端上计算出来的物品哈希与客户端发送过来的一致
      */
@@ -45,21 +45,13 @@ public abstract class MixinHashedStack {
         // 这里就是解决物品不同步问题的核心逻辑了!!!
         // 算法: 在服务端也渲染一个完整的物品堆叠 x, 然后生成 x 的哈希 h_s. 最终将 h_s 与客户端那边发来的 h_c 进行比较.
         // 注意: stack 是服务端侧的直接物品堆叠实例, 如果要对其修改务必在其克隆上进行 (ItemStack#copy)
-        if (KoishStackData.isExactKoish(stack)) {
-            // 如果是 Koish 物品则只比较 components, 忽略 item
+        if (NetworkRenderer.responsible(stack)) {
             stack = stack.copy();
             NetworkRenderer.getInstance().render(stack.asBukkitMirror());
             stack.remove(ExtraDataComponents.DATA_CONTAINER);
-            return this.components.matches(stack.getComponentsPatch(), hashGenerator);
-        } else if (KoishStackData.hasItemProxy(stack.getItem())) {
-            // 如果是套皮物品则先渲染再比较 item 和 components
-            stack = stack.copy();
-            NetworkRenderer.getInstance().render(stack.asBukkitMirror());
-            return this.item.equals(stack.getItemHolder()) && this.components.matches(stack.getComponentsPatch(), hashGenerator);
-        } else {
-            // 都不是则直接执行 NMS 原本的逻辑
-            return this.item.equals(stack.getItemHolder()) && this.components.matches(stack.getComponentsPatch(), hashGenerator);
         }
+
+        return this.item.equals(stack.getItemHolder()) && this.components.matches(stack.getComponentsPatch(), hashGenerator);
     }
 
     /// 尝试移除掉 minecraft:bundle_contents 中的所有 koish:data_container 物品组件.

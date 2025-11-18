@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.display
 
+import cc.mewcraft.wakame.item.isKoish
+import cc.mewcraft.wakame.util.MojangStack
 import org.bukkit.inventory.ItemStack
 import java.nio.file.Path
 
@@ -67,4 +69,18 @@ object NetworkRenderer {
     fun register(renderer: ItemRenderer<ItemStack, Nothing>) {
         INSTANCE = renderer
     }
+
+    ///
+
+    /**
+     * 检查指定的物品堆叠是否应该由网络渲染处理.
+     */
+    @JvmStatic
+    fun responsible(item: ItemStack): Boolean = item.isKoish
+
+    /**
+     * 检查指定的物品堆叠是否应该由网络渲染处理.
+     */
+    @JvmStatic
+    fun responsible(item: MojangStack): Boolean = item.isKoish
 }

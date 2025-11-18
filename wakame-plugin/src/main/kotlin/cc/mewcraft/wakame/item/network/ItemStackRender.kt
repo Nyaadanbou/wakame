@@ -155,17 +155,17 @@ internal object ItemStackRender : PacketListener, Listener {
     @EventHandler
     private fun handlePlayerChat(event: AsyncChatEvent) {
         val originMessage = event.message()
-        event.message(modifyTextComponent(originMessage))
+        event.message(modifyComponent(originMessage))
     }
 
     @PacketHandler
     private fun handleSystemChat(event: ClientboundSystemChatPacketEvent) {
-        event.message = modifyTextComponent(event.message)
+        event.message = modifyComponent(event.message)
     }
 
     @PacketHandler
     private fun handleCombatKill(event: ClientboundPlayerCombatKillPacketEvent) {
-        event.message = modifyTextComponent(event.message)
+        event.message = modifyComponent(event.message)
     }
 
     private fun modifyIngredientList(optList: Optional<List<Ingredient>>): Optional<List<Ingredient>> =
@@ -259,19 +259,19 @@ internal object ItemStackRender : PacketListener, Listener {
      * @param component Adventure Component
      * @return 修改后的 Adventure Component
      */
-    private fun modifyTextComponent(component: Component): Component {
+    private fun modifyComponent(component: Component): Component {
         if (component !is TranslatableComponent)
             return component
 
-        val modified = modifyTranslatableComponent(component)
+        val modified = modifyComponent0(component)
 
-        val modifiedChildren = modified.children().map { modifyTextComponent(it) }
-        val modifiedArguments = modified.arguments().map { modifyTextComponent(it.asComponent()) }
+        val modifiedChildren = modified.children().map { modifyComponent(it) }
+        val modifiedArguments = modified.arguments().map { modifyComponent(it.asComponent()) }
 
         return modified.children(modifiedChildren).arguments(modifiedArguments)
     }
 
-    private fun modifyTranslatableComponent(component: TranslatableComponent): TranslatableComponent {
+    private fun modifyComponent0(component: TranslatableComponent): TranslatableComponent {
         val hoverEvent = component.hoverEvent() ?: return component
         if (hoverEvent.action() == HoverEvent.Action.SHOW_ITEM) {
             val itemStackInfo = hoverEvent.value() as HoverEvent.ShowItem
