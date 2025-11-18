@@ -9,6 +9,8 @@ import cc.mewcraft.wakame.item.display.implementation.*
 import cc.mewcraft.wakame.item.display.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.item.display.implementation.common.ExtraLoreRendererFormat
 import cc.mewcraft.wakame.item.display.implementation.common.SingleValueRendererFormat
+import cc.mewcraft.wakame.item.getMeta
+import cc.mewcraft.wakame.item.getProperty
 import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.item.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item.property.impl.ExtraLore
@@ -53,20 +55,25 @@ internal object SimpleItemRenderer : AbstractItemRenderer<Nothing>() {
     }
 
     override fun render(item: ItemStack, context: Nothing?) {
+        // 这里的物品不应该被网络重写
         item.isNetworkRewrite = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 
-        item.process(ItemMetaTypes.CUSTOM_NAME) { data -> SimpleRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
-        item.process(ItemMetaTypes.ITEM_NAME) { data -> SimpleRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
-        item.process(ItemPropertyTypes.EXTRA_LORE) { data -> SimpleRenderingHandlerRegistry.LORE.process(collector, data) }
+        // ItemMetaTypes
+        SimpleRenderingHandlerRegistry.CUSTOM_NAME.process(collector, item.getMeta(ItemMetaTypes.CUSTOM_NAME))
+        SimpleRenderingHandlerRegistry.ITEM_NAME.process(collector, item.getMeta(ItemMetaTypes.ITEM_NAME))
+        SimpleRenderingHandlerRegistry.LORE.process(collector, item.getProperty(ItemPropertyTypes.EXTRA_LORE))
 
-        val lore = textAssembler.assemble(collector)
-        item.fastLore(lore)
+        val koishLore = textAssembler.assemble(collector)
+
+        // 应用修改到物品上
+        item.fastLore(koishLore)
     }
 }
 
 internal object SimpleRenderingHandlerRegistry : RenderingHandlerRegistry(SimpleItemRenderer) {
+
     @JvmField
     val CUSTOM_NAME: RenderingHandler<MetaCustomName, SingleValueRendererFormat> = CommonRenderingHandlers.CUSTOM_NAME(this)
 

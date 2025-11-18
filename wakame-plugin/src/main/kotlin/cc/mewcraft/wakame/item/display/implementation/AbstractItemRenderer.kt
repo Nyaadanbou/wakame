@@ -159,7 +159,7 @@ internal abstract class RenderingHandlerRegistry(
     }
 
     // subclasses should not use it
-    protected data class HandlerParams<F : RendererFormat>(
+    data class HandlerParams<F : RendererFormat>(
         val format: Provider<F>,
     )
 }
@@ -176,67 +176,61 @@ internal abstract class RenderingHandlerRegistry(
  * @param renderer 渲染逻辑
  */
 internal class RenderingHandler<T, F : RendererFormat>(
-    format: Provider<F>,
-    renderer: IndexedDataRenderer<T, F>,
+    val format: Provider<F>,
+    val renderer: IndexedDataRenderer<T, F>,
 ) {
-    private val format by format
-    private val renderer = renderer
-    fun process(collector: ReferenceOpenHashSet<IndexedText>, data: T) {
-        collector += renderer.render(data, format)
+    fun process(collector: ReferenceOpenHashSet<IndexedText>, data: T?) {
+        if (data == null) return
+        collector += renderer.render(data, format.get())
     }
 }
 
 internal class RenderingHandler2<T1, T2, F : RendererFormat>(
-    format: Provider<F>,
-    renderer: IndexedDataRenderer2<T1, T2, F>,
+    val format: Provider<F>,
+    val renderer: IndexedDataRenderer2<T1, T2, F>,
 ) {
-    private val format by format
-    private val renderer = renderer
-    fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1, data2: T2) {
-        collector += renderer.render(data1, data2, format)
+    fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1?, data2: T2?) {
+        if (data1 == null || data2 == null) return
+        collector += renderer.render(data1, data2, format.get())
     }
 }
 
 internal class RenderingHandler3<T1, T2, T3, F : RendererFormat>(
-    format: Provider<F>,
-    renderer: IndexedDataRenderer3<T1, T2, T3, F>,
+    val format: Provider<F>,
+    val renderer: IndexedDataRenderer3<T1, T2, T3, F>,
 ) {
-    private val format by format
-    private val renderer = renderer
-    fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1, data2: T2, data3: T3) {
-        collector += renderer.render(data1, data2, data3, format)
+    fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1?, data2: T2?, data3: T3?) {
+        if (data1 == null || data2 == null || data3 == null) return
+        collector += renderer.render(data1, data2, data3, format.get())
     }
 }
 
 internal class RenderingHandler4<T1, T2, T3, T4, F : RendererFormat>(
-    format: Provider<F>,
-    renderer: IndexedDataRenderer4<T1, T2, T3, T4, F>,
+    val format: Provider<F>,
+    val renderer: IndexedDataRenderer4<T1, T2, T3, T4, F>,
 ) {
-    private val format by format
-    private val renderer = renderer
-    fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1, data2: T2, data3: T3, data4: T4) {
-        collector += renderer.render(data1, data2, data3, data4, format)
+    fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1?, data2: T2?, data3: T3?, data4: T4?) {
+        if (data1 == null || data2 == null || data3 == null || data4 == null) return
+        collector += renderer.render(data1, data2, data3, data4, format.get())
     }
 }
 
 internal class RenderingHandler5<T1, T2, T3, T4, T5, F : RendererFormat>(
-    format: Provider<F>,
-    renderer: IndexedDataRenderer5<T1, T2, T3, T4, T5, F>,
+    val format: Provider<F>,
+    val renderer: IndexedDataRenderer5<T1, T2, T3, T4, T5, F>,
 ) {
-    private val format by format
-    private val renderer = renderer
-    fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1, data2: T2, data3: T3, data4: T4, data5: T5) {
-        collector += renderer.render(data1, data2, data3, data4, data5, format)
+    fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1?, data2: T2?, data3: T3?, data4: T4?, data5: T5?) {
+        if (data1 == null || data2 == null || data3 == null || data4 == null || data5 == null) return
+        collector += renderer.render(data1, data2, data3, data4, data5, format.get())
     }
 }
 
 internal class RenderingHandler6<T1, T2, T3, T4, T5, T6, F : RendererFormat>(
-    format: Provider<F>,
-    renderer: IndexedDataRenderer6<T1, T2, T3, T4, T5, T6, F>,
+    val format: Provider<F>,
+    val renderer: IndexedDataRenderer6<T1, T2, T3, T4, T5, T6, F>,
 ) {
-    private val format by format
-    private val renderer = renderer
-    fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1, data2: T2, data3: T3, data4: T4, data5: T5, data6: T6) {
-        collector += renderer.render(data1, data2, data3, data4, data5, data6, format)
+    fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1?, data2: T2?, data3: T3?, data4: T4?, data5: T5?, data6: T6?) {
+        if (data1 == null || data2 == null || data3 == null || data4 == null || data5 == null || data6 == null) return
+        collector += renderer.render(data1, data2, data3, data4, data5, data6, format.get())
     }
 }

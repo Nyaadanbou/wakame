@@ -54,15 +54,20 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<RepairingTable
     override fun render(item: ItemStack, context: RepairingTableItemRendererContext?) {
         requireNotNull(context) { "context" }
 
+        // 这里的物品不应该被网络重写
         item.isNetworkRewrite = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()
+
+        // Context
         RepairingTableRenderingHandlerRegistry.DURABILITY.process(collector, context)
         RepairingTableRenderingHandlerRegistry.REPAIR_COST.process(collector, context)
         RepairingTableRenderingHandlerRegistry.REPAIR_USAGE.process(collector, context)
 
-        val lore = textAssembler.assemble(collector)
-        item.fastLore(lore)
+        val koishLore = textAssembler.assemble(collector)
+
+        // 应用修改到物品上
+        item.fastLore(koishLore)
     }
 }
 

@@ -14,6 +14,8 @@ import cc.mewcraft.wakame.item.display.implementation.common.*
 import cc.mewcraft.wakame.item.extension.*
 import cc.mewcraft.wakame.item.feature.EnchantSlotFeature
 import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.getMeta
+import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.Arrow
 import cc.mewcraft.wakame.item.property.impl.EntityBucket
@@ -75,34 +77,24 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
     override fun render(item: ItemStack, context: Nothing?) {
         val collector = ReferenceOpenHashSet<IndexedText>()
 
-        item.process(ItemPropTypes.ARROW) { data -> StandardRenderingHandlerRegistry.ARROW.process(collector, data) }
-        item.process(ItemPropTypes.ATTACK_SPEED) { data -> StandardRenderingHandlerRegistry.ATTACK_SPEED.process(collector, data) }
-        item.process(ItemPropTypes.EXTRA_LORE) { data -> StandardRenderingHandlerRegistry.LORE.process(collector, data) }
-        item.process(ItemPropTypes.ENTITY_BUCKET) { data -> StandardRenderingHandlerRegistry.ENTITY_BUCKET_PROP.process(collector, data) }
-        item.process(ItemPropTypes.FUEL) { data -> StandardRenderingHandlerRegistry.FUEL.process(collector, data) }
-
-        // 对于最可能被频繁修改的 `item_name`, `custom_name` 直接读取配置模板里的内容
-        item.process(ItemMetaTypes.ITEM_NAME) { data -> StandardRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
-        item.process(ItemMetaTypes.CUSTOM_NAME) { data -> StandardRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
-
-        item.process(ItemDataTypes.CRATE) { data -> StandardRenderingHandlerRegistry.CRATE.process(collector, data) }
-
-        item.elements.takeUnlessEmpty()?.let { StandardRenderingHandlerRegistry.ELEMENT.process(collector, it) }
-        item.kizamiz.takeUnlessEmpty()?.let { StandardRenderingHandlerRegistry.KIZAMI.process(collector, it) }
-        item.level?.let { StandardRenderingHandlerRegistry.LEVEL.process(collector, it) }
-        item.core?.let { StandardRenderingHandlerRegistry.CORE.process(collector, it) }
-        item.coreContainer?.let { data -> for ((_, core) in data) renderCore(collector, core) }
-        item.rarity2?.let { rarityEntry ->
-            val data2 = item.getData(ItemDataTypes.REFORGE_HISTORY) ?: ReforgeHistory.ZERO
-            StandardRenderingHandlerRegistry.RARITY.process(collector, rarityEntry, data2)
-        }
-
-        item.process(ItemDataTypes.ENTITY_BUCKET_INFO) { data -> StandardRenderingHandlerRegistry.ENTITY_BUCKET_INFO.process(collector, data) }
-
-        item.process(DataComponentTypes.ENCHANTMENTS) { data -> StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
-        item.process(DataComponentTypes.DAMAGE_RESISTANT) { data -> StandardRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, Unit) }
-        item.process(DataComponentTypes.FOOD) { data -> StandardRenderingHandlerRegistry.FOOD.process(collector, data) }
-
+        StandardRenderingHandlerRegistry.ARROW.process(collector, item.getProp(ItemPropTypes.ARROW))
+        StandardRenderingHandlerRegistry.ATTACK_SPEED.process(collector, item.getProp(ItemPropTypes.ATTACK_SPEED))
+        StandardRenderingHandlerRegistry.LORE.process(collector, item.getProp(ItemPropTypes.EXTRA_LORE))
+        StandardRenderingHandlerRegistry.ENTITY_BUCKET_PROP.process(collector, item.getProp(ItemPropTypes.ENTITY_BUCKET))
+        StandardRenderingHandlerRegistry.FUEL.process(collector, item.getProp(ItemPropTypes.FUEL))
+        StandardRenderingHandlerRegistry.ITEM_NAME.process(collector, item.getMeta(ItemMetaTypes.ITEM_NAME)) // 对于最可能被频繁修改的 `item_name`, `custom_name`
+        StandardRenderingHandlerRegistry.CUSTOM_NAME.process(collector, item.getMeta(ItemMetaTypes.CUSTOM_NAME))
+        StandardRenderingHandlerRegistry.CRATE.process(collector, item.getData(ItemDataTypes.CRATE))
+        StandardRenderingHandlerRegistry.ELEMENT.process(collector, item.elements.takeUnlessEmpty())
+        StandardRenderingHandlerRegistry.KIZAMI.process(collector, item.kizamiz.takeUnlessEmpty())
+        StandardRenderingHandlerRegistry.LEVEL.process(collector, item.level)
+        StandardRenderingHandlerRegistry.CORE.process(collector, item.core)
+        renderCoreContainer(collector, item.coreContainer)
+        StandardRenderingHandlerRegistry.RARITY.process(collector, item.rarity2, item.getData(ItemDataTypes.REFORGE_HISTORY) ?: ReforgeHistory.ZERO)
+        StandardRenderingHandlerRegistry.ENTITY_BUCKET_INFO.process(collector, item.getData(ItemDataTypes.ENTITY_BUCKET_INFO))
+        StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, item.getData(DataComponentTypes.ENCHANTMENTS))
+        StandardRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, if (item.hasData(DataComponentTypes.DAMAGE_RESISTANT)) Unit else null)
+        StandardRenderingHandlerRegistry.FOOD.process(collector, item.getData(DataComponentTypes.FOOD))
         StandardRenderingHandlerRegistry.ENCHANT_SLOTS.process(collector, item)
 
         // 生成 koish lore
@@ -134,16 +126,20 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         item.fastLore(resultantLore)
     }
 
-    private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, core: Core) {
-        when (core) {
-            is AttributeCore -> StandardRenderingHandlerRegistry.CORE_ATTRIBUTE.process(collector, core)
-            is EmptyCore -> StandardRenderingHandlerRegistry.CORE_EMPTY.process(collector, core)
-            is VirtualCore -> IndexedText.NOP
+    private fun renderCoreContainer(collector: ReferenceOpenHashSet<IndexedText>, coreContainer: CoreContainer?) {
+        if (coreContainer == null) return
+        for ((_, core) in coreContainer) {
+            when (core) {
+                is AttributeCore -> StandardRenderingHandlerRegistry.CORE_ATTRIBUTE.process(collector, core)
+                is EmptyCore -> StandardRenderingHandlerRegistry.CORE_EMPTY.process(collector, core)
+                is VirtualCore -> IndexedText.NOP
+            }
         }
     }
 }
 
 internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(StandardItemRenderer) {
+
     @JvmField
     val ARROW: RenderingHandler<Arrow, ListValueRendererFormat> = configure("arrow") { data, format ->
         format.render(
