@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
+import cc.mewcraft.wakame.item.KoishStackData;
 import cc.mewcraft.wakame.item.display.NetworkRenderer;
 import cc.mewcraft.wakame.mixin.support.ExtraDataComponents;
 import com.google.common.collect.Lists;
@@ -69,7 +70,7 @@ public abstract class MixinHashedStack {
         //   先渲染服务端侧的 stack (注意要 copy)
         //   然后再移除掉 koish:data_container
         //   最后再与 this.components 进行比较
-        if (stack.has(ExtraDataComponents.DATA_CONTAINER)) {
+        if (KoishStackData.isKoish(stack)) {
             // 如果是 Koish 物品堆叠则只比较 components, 忽略 item
             // 这里需要 copy 一份并在 copy 上操作, 因为我们需要移除组件
             if (!itemstackArgCopied) stack = stack.copy();
