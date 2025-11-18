@@ -4,18 +4,9 @@
 package cc.mewcraft.wakame.item.display.implementation
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.item.data.ItemDataType
-import cc.mewcraft.wakame.item.datagen.ItemMetaEntry
-import cc.mewcraft.wakame.item.datagen.ItemMetaType
 import cc.mewcraft.wakame.item.display.*
-import cc.mewcraft.wakame.item.getData
-import cc.mewcraft.wakame.item.getMeta
-import cc.mewcraft.wakame.item.getProperty
-import cc.mewcraft.wakame.item.property.ItemPropType
-import io.papermc.paper.datacomponent.DataComponentType
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import org.bukkit.inventory.ItemStack
-import org.jetbrains.annotations.VisibleForTesting
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.requireNotNull
 
@@ -37,64 +28,10 @@ internal abstract class AbstractItemRenderer<in C> : ItemRenderer<ItemStack, C> 
      */
     abstract val layout: AbstractRendererLayout
 
-    // 方便函数
-
-    protected inline fun <T : Any> ItemStack.process(type: DataComponentType.Valued<T>, block: (T) -> Unit) {
-        getData(type)?.apply(block)
-    }
-
-    protected inline fun <T1 : Any, T2 : Any> ItemStack.process(type1: DataComponentType.Valued<T1>, type2: DataComponentType.Valued<T2>, block: (T1?, T2?) -> Unit) {
-        block(getData(type1), getData(type2))
-    }
-
-    protected inline fun <T1 : Any, T2 : Any, T3 : Any> ItemStack.process(type1: DataComponentType.Valued<T1>, type2: DataComponentType.Valued<T2>, type3: DataComponentType.Valued<T3>, block: (T1?, T2?, T3?) -> Unit) {
-        block(getData(type1), getData(type2), getData(type3))
-    }
-
-    // 方便函数
-
-    protected inline fun <T> ItemStack.process(type: ItemPropType<T>, block: (T) -> Unit) {
-        getProperty(type)?.apply(block)
-    }
-
-    protected inline fun <T1, T2> ItemStack.process(type1: ItemPropType<T1>, type2: ItemPropType<T2>, block: (T1?, T2?) -> Unit) {
-        block(getProperty(type1), getProperty(type2))
-    }
-
-    protected inline fun <T1, T2, T3> ItemStack.process(type1: ItemPropType<T1>, type2: ItemPropType<T2>, type3: ItemPropType<T3>, block: (T1?, T2?, T3?) -> Unit) {
-        block(getProperty(type1), getProperty(type2), getProperty(type3))
-    }
-
-    // 方便函数
-
-    protected inline fun <T> ItemStack.process(type: ItemDataType<T>, block: (T) -> Unit) {
-        getData(type)?.apply(block)
-    }
-
-    protected inline fun <T1, T2> ItemStack.process(type1: ItemDataType<T1>, type2: ItemDataType<T2>, block: (T1?, T2?) -> Unit) {
-        block(getData(type1), getData(type2))
-    }
-
-    protected inline fun <T1, T2, T3> ItemStack.process(type1: ItemDataType<T1>, type2: ItemDataType<T2>, type3: ItemDataType<T3>, block: (T1?, T2?, T3?) -> Unit) {
-        block(getData(type1), getData(type2), getData(type3))
-    }
-
-    // 方便函数
-
-    protected inline fun <U : ItemMetaEntry<V>, V> ItemStack.process(type: ItemMetaType<U, V>, block: (U) -> Unit) {
-        getMeta(type)?.apply(block)
-    }
-
-    protected inline fun <U1 : ItemMetaEntry<V1>, U2 : ItemMetaEntry<V2>, V1, V2> ItemStack.process(type1: ItemMetaType<U1, V1>, type2: ItemMetaType<U2, V2>, block: (U1?, U2?) -> Unit) {
-        block(getMeta(type1), getMeta(type2))
-    }
-
-    protected inline fun <U1 : ItemMetaEntry<V1>, U2 : ItemMetaEntry<V2>, U3 : ItemMetaEntry<V3>, V1, V2, V3> ItemStack.process(type1: ItemMetaType<U1, V1>, type2: ItemMetaType<U2, V2>, type3: ItemMetaType<U3, V3>, block: (U1?, U2?, U3?) -> Unit) {
-        block(getMeta(type1), getMeta(type2), getMeta(type3))
-    }
-
-    @VisibleForTesting
-    fun loadDataFromConfigs() {
+    /**
+     * 初始化该渲染器.
+     */
+    protected fun loadDataFromConfigs() {
         val renderersDirectory = KoishDataPaths.CONFIGS.resolve(ItemRendererConstants.DATA_DIR)
         val formatPath = renderersDirectory.resolve(name).resolve(ItemRendererConstants.FORMAT_FILE_NAME)
         val layoutPath = renderersDirectory.resolve(name).resolve(ItemRendererConstants.LAYOUT_FILE_NAME)
