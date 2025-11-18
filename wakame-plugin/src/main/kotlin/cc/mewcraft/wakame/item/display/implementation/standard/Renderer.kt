@@ -105,23 +105,33 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
 
         StandardRenderingHandlerRegistry.ENCHANT_SLOTS.process(collector, item)
 
-        val lore = textAssembler.assemble(collector)
-        item.fastLore(run {
-            // 尝试在物品原本的 lore 的第一行插入我们渲染的 lore.
-            // 如果原本的 lore 为空, 则直接使用我们渲染的 lore.
-            // 如果原本的 lore 不为空, 则在渲染的 lore 和原本的 lore 之间插入一个空行.
+        // 生成 koish lore
+        val koishLore = textAssembler.assemble(collector)
 
-            val existingLore = item.fastLoreOrEmpty
-            if (existingLore.isEmpty()) {
-                lore
-            } else {
-                buildList {
-                    addAll(existingLore)
-                    add(Component.empty())
-                    addAll(lore)
-                }
+        // 尝试在物品原本的 lore 的最后一行插入我们渲染的 lore:
+        // - 如果原本的 lore 为空, 则直接使用我们渲染的 lore
+        // - 如果原本的 lore 不为空, 则在 koish lore 和 existing lore 之间插入一个空行
+        val existingLore = item.fastLoreOrEmpty
+        val resultantLore = if (existingLore.isEmpty() && koishLore.isNotEmpty()) {
+            // existingLore 为空 && koishLore 不为空
+            koishLore
+        } else if (existingLore.isEmpty()) {
+            // existingLore 为空 && koishLore 为空
+            return
+        } else if (koishLore.isEmpty()) {
+            // existingLore 不为空 && koishLore 为空
+            existingLore
+        } else {
+            // existingLore 不为空 && koishLore 不为空
+            buildList {
+                addAll(existingLore)
+                add(Component.empty()) // 加入空行分隔开
+                addAll(koishLore)
             }
-        })
+        }
+
+        // 应用修改到物品上
+        item.fastLore(resultantLore)
     }
 
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, core: Core) {
