@@ -48,6 +48,7 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     .register(ComposableEntryContainer.SERIALIZER)
     // Paper Registry
     .register(RegistryKey.DAMAGE_TYPE.valueByNameTypeSerializer())
+    .register(RegistryKey.DATA_COMPONENT_TYPE.valueByNameTypeSerializer())
     .register(RegistryKey.ENCHANTMENT.valueByNameTypeSerializer())
     .register(RegistryKey.ENTITY_TYPE.valueByNameTypeSerializer())
     .register(RegistryKey.ITEM.valueByNameTypeSerializer())

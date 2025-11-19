@@ -11,8 +11,11 @@ import cc.mewcraft.wakame.item.display.TextAssembler
 import cc.mewcraft.wakame.item.display.implementation.*
 import cc.mewcraft.wakame.item.display.implementation.common.*
 import cc.mewcraft.wakame.item.display.implementation.standard.AttackSpeedRendererFormat
+import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.getMeta
+import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.isNetworkRewrite
-import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.ExtraLore
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -77,28 +80,35 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<CraftingStati
     override fun render(item: ItemStack, context: CraftingStationContext?) {
         requireNotNull(context) { "context" }
 
+        // 这里的物品不应该被网络重写
         item.isNetworkRewrite = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 
-        item.process(ItemMetaTypes.CORE_CONTAINER) { data -> CraftingStationRenderingHandlerRegistry.CORE_CONTAINER.process(collector, data) }
-        item.process(ItemMetaTypes.CUSTOM_NAME) { data -> CraftingStationRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
-        item.process(ItemMetaTypes.ITEM_NAME) { data -> CraftingStationRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
-        item.process(ItemMetaTypes.KIZAMI) { data -> CraftingStationRenderingHandlerRegistry.KIZAMI.process(collector, data) }
-        item.process(ItemMetaTypes.ELEMENT) { data -> CraftingStationRenderingHandlerRegistry.ELEMENT.process(collector, data) }
+        // ItemMetaTypes
+        CraftingStationRenderingHandlerRegistry.CORE_CONTAINER.process(collector, item.getMeta(ItemMetaTypes.CORE_CONTAINER))
+        CraftingStationRenderingHandlerRegistry.CUSTOM_NAME.process(collector, item.getMeta(ItemMetaTypes.CUSTOM_NAME))
+        CraftingStationRenderingHandlerRegistry.ITEM_NAME.process(collector, item.getMeta(ItemMetaTypes.ITEM_NAME))
+        CraftingStationRenderingHandlerRegistry.KIZAMI.process(collector, item.getMeta(ItemMetaTypes.KIZAMI))
+        CraftingStationRenderingHandlerRegistry.ELEMENT.process(collector, item.getMeta(ItemMetaTypes.ELEMENT))
 
-        item.process(ItemPropertyTypes.ATTACK_SPEED) { data -> CraftingStationRenderingHandlerRegistry.ATTACK_SPEED.process(collector, data) }
-        item.process(ItemPropertyTypes.EXTRA_LORE) { data -> CraftingStationRenderingHandlerRegistry.LORE.process(collector, data) }
+        // ItemPropTypes
+        CraftingStationRenderingHandlerRegistry.ATTACK_SPEED.process(collector, item.getProp(ItemPropTypes.ATTACK_SPEED))
+        CraftingStationRenderingHandlerRegistry.LORE.process(collector, item.getProp(ItemPropTypes.EXTRA_LORE))
 
-        item.process(ItemDataTypes.CRATE) { data -> CraftingStationRenderingHandlerRegistry.CRATE.process(collector, data) }
-        item.process(ItemDataTypes.CORE) { data -> CraftingStationRenderingHandlerRegistry.CORE.process(collector, data) }
+        // ItemDataTypes
+        CraftingStationRenderingHandlerRegistry.CRATE.process(collector, item.getData(ItemDataTypes.CRATE))
+        CraftingStationRenderingHandlerRegistry.CORE.process(collector, item.getData(ItemDataTypes.CORE))
 
-        item.process(DataComponentTypes.DAMAGE_RESISTANT) { data -> CraftingStationRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, data) }
-        item.process(DataComponentTypes.ENCHANTMENTS) { data -> CraftingStationRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
-        item.process(DataComponentTypes.FOOD) { data -> CraftingStationRenderingHandlerRegistry.FOOD.process(collector, data) }
+        // DataComponentTypes
+        CraftingStationRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, item.getData(DataComponentTypes.DAMAGE_RESISTANT))
+        CraftingStationRenderingHandlerRegistry.ENCHANTMENTS.process(collector, item.getData(DataComponentTypes.ENCHANTMENTS))
+        CraftingStationRenderingHandlerRegistry.FOOD.process(collector, item.getData(DataComponentTypes.FOOD))
 
-        val lore = textAssembler.assemble(collector)
-        item.fastLore(lore)
+        val koishLore = textAssembler.assemble(collector)
+
+        // 将修改应用到物品上
+        item.fastLore(koishLore)
     }
 }
 

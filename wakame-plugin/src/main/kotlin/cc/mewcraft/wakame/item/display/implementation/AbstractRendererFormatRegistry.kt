@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item.display.RendererFormat
 import cc.mewcraft.wakame.item.display.RendererFormatRegistry
+import cc.mewcraft.wakame.item.display.TextMetaFactory
 import cc.mewcraft.wakame.item.display.TextMetaFactoryRegistry
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.yamlLoader

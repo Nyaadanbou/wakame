@@ -11,6 +11,9 @@ import cc.mewcraft.wakame.item.display.SimpleIndexedText
 import cc.mewcraft.wakame.item.display.TextAssembler
 import cc.mewcraft.wakame.item.display.implementation.*
 import cc.mewcraft.wakame.item.display.implementation.common.*
+import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.getDataOrDefault
+import cc.mewcraft.wakame.item.getMeta
 import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -78,37 +81,42 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<ModdingTableCont
     override fun render(item: ItemStack, context: ModdingTableContext?) {
         requireNotNull(context) { "context" }
 
+        // 这里的物品不应该被网络重写
         item.isNetworkRewrite = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 
-        item.process(ItemMetaTypes.ITEM_NAME) { data -> ModdingTableRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
-        item.process(ItemMetaTypes.CUSTOM_NAME) { data -> ModdingTableRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
+        // ItemMetaTypes
+        ModdingTableRenderingHandlerRegistry.ITEM_NAME.process(collector, item.getMeta(ItemMetaTypes.ITEM_NAME))
+        ModdingTableRenderingHandlerRegistry.CUSTOM_NAME.process(collector, item.getMeta(ItemMetaTypes.CUSTOM_NAME))
 
-        item.process(ItemDataTypes.ELEMENT) { data -> ModdingTableRenderingHandlerRegistry.ELEMENT.process(collector, data) }
-        item.process(ItemDataTypes.LEVEL) { data -> ModdingTableRenderingHandlerRegistry.LEVEL.process(collector, data) }
-        item.process(ItemDataTypes.RARITY, ItemDataTypes.REFORGE_HISTORY) { data1, data2 ->
-            val data1 = data1 ?: return@process
-            val data2 = data2 ?: ReforgeHistory.ZERO
-            ModdingTableRenderingHandlerRegistry.RARITY.process(collector, data1, data2)
-        }
+        // ItemDataTypes
+        ModdingTableRenderingHandlerRegistry.ELEMENT.process(collector, item.getData(ItemDataTypes.ELEMENT))
+        ModdingTableRenderingHandlerRegistry.LEVEL.process(collector, item.getData(ItemDataTypes.LEVEL))
+        ModdingTableRenderingHandlerRegistry.RARITY.process(collector, item.getData(ItemDataTypes.RARITY), item.getDataOrDefault(ItemDataTypes.REFORGE_HISTORY, ReforgeHistory.ZERO))
 
         if (context is ModdingTableContext.Input) {
-            item.process(ItemDataTypes.CORE_CONTAINER) { data ->
-                for ((id, core) in data) when (core) {
-                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CORE_ATTRIBUTE_MAIN_IN.process(collector, id, core, context)
-                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CORE_EMPTY_IN.process(collector, id, context)
-                    is VirtualCore -> IndexedText.NOP
+            val coreContainer = item.getData(ItemDataTypes.CORE_CONTAINER)
+            if (coreContainer != null) {
+                for ((id, core) in coreContainer) {
+                    when (core) {
+                        is AttributeCore -> ModdingTableRenderingHandlerRegistry.CORE_ATTRIBUTE_MAIN_IN.process(collector, id, core, context)
+                        is EmptyCore -> ModdingTableRenderingHandlerRegistry.CORE_EMPTY_IN.process(collector, id, context)
+                        is VirtualCore -> IndexedText.NOP
+                    }
                 }
             }
         }
 
         if (context is ModdingTableContext.Output) {
-            item.process(ItemDataTypes.CORE_CONTAINER) { data ->
-                for ((id, core) in data) when (core) {
-                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CORE_ATTRIBUTE_MAIN_OUT.process(collector, id, core, context)
-                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CORE_EMPTY_OUT.process(collector, id, context)
-                    is VirtualCore -> IndexedText.NOP
+            val coreContainer = item.getData(ItemDataTypes.CORE_CONTAINER)
+            if (coreContainer != null) {
+                for ((id, core) in coreContainer) {
+                    when (core) {
+                        is AttributeCore -> ModdingTableRenderingHandlerRegistry.CORE_ATTRIBUTE_MAIN_OUT.process(collector, id, core, context)
+                        is EmptyCore -> ModdingTableRenderingHandlerRegistry.CORE_EMPTY_OUT.process(collector, id, context)
+                        is VirtualCore -> IndexedText.NOP
+                    }
                 }
             }
 
@@ -123,8 +131,10 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<ModdingTableCont
             }
         }
 
-        val lore = textAssembler.assemble(collector)
-        item.fastLore(lore)
+        val koishLore = textAssembler.assemble(collector)
+
+        // 将修改应用到物品上
+        item.fastLore(koishLore)
     }
 }
 

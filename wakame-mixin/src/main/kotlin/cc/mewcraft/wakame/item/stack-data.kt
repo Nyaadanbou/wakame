@@ -28,15 +28,17 @@ import org.bukkit.inventory.ItemStack
 
 /* Type */
 
+val Material.itemProxy: KoishItemProxy? get() = BuiltInRegistries.ITEM_PROXY[key()]
+fun Material.hasItemProxy(): Boolean = itemProxy != null
 val ItemStack.typeId: Identifier get() = toNMS().typeId
 val ItemStack.koishTypeId: Identifier? get() = toNMS().koishTypeId
 val ItemStack.isKoish: Boolean get() = toNMS().isKoish
 val ItemStack.isExactKoish: Boolean get() = toNMS().isExactKoish
+val ItemStack.isProxyKoish: Boolean get() = toNMS().isProxyKoish
 val ItemStack.koishItem: KoishItem? get() = toNMS().koishItem
 fun ItemStack.dataContainer(includeProxy: Boolean): ItemDataContainer? = toNMS().dataContainer(includeProxy)
-fun ItemStack.dataConfig(): ItemMetaContainer? = toNMS().dataConfig()
-fun ItemStack.propertyContainer(): ItemPropContainer? = toNMS().propertyContainer()
-val Material.koishProxy: KoishItemProxy? get() = BuiltInRegistries.ITEM_PROXY[key()]
+fun ItemStack.metaContainer(): ItemMetaContainer? = toNMS().metaContainer()
+fun ItemStack.propContainer(): ItemPropContainer? = toNMS().propContainer()
 
 /* Property */
 
@@ -65,6 +67,8 @@ fun <U : ItemMetaEntry<V>, V> ItemStack.getMeta(type: ItemMetaType<U, V>): U? = 
 fun <U : ItemMetaEntry<V>, V> ItemStack.hasMeta(type: ItemMetaType<U, V>): Boolean = toNMS().hasMeta(type)
 fun <U : ItemMetaEntry<V>, V> ItemStack.getMetaOrDefault(type: ItemMetaType<U, V>, fallback: U): U = toNMS().getMetaOrDefault(type, fallback)
 
+@get:JvmName("isNetworkRewrite")
+@set:JvmName("setNetworkRewrite")
 var ItemStack.isNetworkRewrite: Boolean
     get() = toNMS().isNetworkRewrite
     set(value) {
@@ -78,11 +82,23 @@ var ItemStack.isNetworkRewrite: Boolean
 /* Type */
 
 /**
+ * 获取该物品类型的套皮物品的实例.
+ */
+val Item.itemProxy: KoishItemProxy?
+    get() = CraftItemType.minecraftToBukkit(this).itemProxy
+
+/**
+ * 判断该物品类型是否存在套皮物品的实例.
+ */
+fun Item.hasItemProxy(): Boolean =
+    CraftItemType.minecraftToBukkit(this).hasItemProxy()
+
+/**
  * 获取该物品堆叠的物品类型的 [Identifier].
  *
- * - 如果该物品堆叠是一个 *Koish 物品* , 则命名空间为 [cc.mewcraft.wakame.util.KOISH_NAMESPACE]
- * - 如果该物品堆叠是一个 *原版(或 Koish 套皮)物品*, 则命名空间为 [cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE]
- * - 如果该物品堆叠来自其他物品系统, 将被当作是一个 *原版物品*, 命名空间为 [cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE] // TODO 支持 ItemRef
+ * - 如果该物品堆叠是一个 *Koish 物品* , 则命名空间为 `koish`
+ * - 如果该物品堆叠是一个 *原版(或 Koish 套皮)物品*, 则命名空间为 `minecraft`
+ * - 如果该物品堆叠来自其他物品系统, 将被当作是一个 *原版物品*, 命名空间为 `minecraft` // TODO 支持 ItemRef
  */
 val MojangStack.typeId: Identifier
     get() = dataContainer(false)?.get(ItemDataTypes.ID)?.id ?: CraftItemType.minecraftToBukkit(item).key()
@@ -101,10 +117,21 @@ val MojangStack.koishTypeId: Identifier?
  * @see koishItem
  */
 val MojangStack.isKoish: Boolean
-    get() = dataContainer(true)?.has(ItemDataTypes.ID) == true
+    get() = koishItem != null
 
+/**
+ * 方便函数, 其行为等同于判断 [exactKoishItem] 是否为空.
+ * @see exactKoishItem
+ */
 val MojangStack.isExactKoish: Boolean
-    get() = dataContainer(false)?.has(ItemDataTypes.ID) == true
+    get() = exactKoishItem != null
+
+/**
+ * 方便函数, 其行为等同于判断该物品堆叠的物品类型是否存在套皮物品实例.
+ * @see proxyKoishItem
+ */
+val MojangStack.isProxyKoish: Boolean
+    get() = item.itemProxy != null
 
 /**
  * 获取该物品堆叠的 *Koish 物品类型*.
@@ -138,6 +165,12 @@ val MojangStack.exactKoishItem: KoishItem?
     get() = dataContainer(false)?.get(ItemDataTypes.ID)?.itemType
 
 /**
+ * 获取该物品堆叠的套皮物品的实例.
+ */
+val MojangStack.proxyKoishItem: KoishItemProxy?
+    get() = item.itemProxy
+
+/**
  * 获取该物品堆叠的持久化数据容器 [ItemDataContainer].
  * 参数 [includeProxy] 可以控制是否包含套皮物品的容器.
  *
@@ -153,14 +186,14 @@ val MojangStack.exactKoishItem: KoishItem?
  * @see removeData
  */
 fun MojangStack.dataContainer(includeProxy: Boolean): ItemDataContainer? =
-    get(ExtraDataComponents.DATA_CONTAINER) ?: if (includeProxy) item.koishProxy?.data else null
+    get(ExtraDataComponents.DATA_CONTAINER) ?: if (includeProxy) item.itemProxy?.data else null
 
 /**
  * 获取该物品堆叠的持久化数据容器 [ItemMetaContainer].
  *
  * * *绝大多数情况下无需使用该函数.*
  */
-fun MojangStack.dataConfig(): ItemMetaContainer? =
+fun MojangStack.metaContainer(): ItemMetaContainer? =
     koishItem?.dataConfig
 
 /**
@@ -174,27 +207,19 @@ fun MojangStack.dataConfig(): ItemMetaContainer? =
  * @see getProperty
  * @see getPropertyOrDefault
  */
-fun MojangStack.propertyContainer(): ItemPropContainer? =
+fun MojangStack.propContainer(): ItemPropContainer? =
     koishItem?.properties
-
-/**
- * 获取该物品类型的套皮物品的实例.
- *
- * *绝大多数情况下无需使用该函数.*
- */
-val Item.koishProxy: KoishItemProxy?
-    get() = CraftItemType.minecraftToBukkit(this).koishProxy
 
 /* Property */
 
 fun <T> MojangStack.getProp(type: ItemPropType<out T>): T? =
-    propertyContainer()?.get(type)
+    propContainer()?.get(type)
 
 fun <T> MojangStack.hasProp(type: ItemPropType<T>): Boolean =
-    propertyContainer()?.has(type) == true
+    propContainer()?.has(type) == true
 
 fun <T> MojangStack.getPropOrDefault(type: ItemPropType<out T>, fallback: T): T? =
-    propertyContainer()?.getOrDefault(type, fallback)
+    propContainer()?.getOrDefault(type, fallback)
 
 @Deprecated("Use getProp instead", ReplaceWith("getProp(type)"))
 fun <T> MojangStack.getProperty(type: ItemPropType<out T>): T? =
@@ -222,13 +247,13 @@ fun <T> MojangStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T 
 /* ItemMeta */
 
 fun <U : ItemMetaEntry<V>, V> MojangStack.getMeta(type: ItemMetaType<U, V>): U? =
-    dataConfig()?.get(type)
+    metaContainer()?.get(type)
 
 fun <U : ItemMetaEntry<V>, V> MojangStack.hasMeta(type: ItemMetaType<U, V>): Boolean =
-    dataConfig()?.has(type) == true
+    metaContainer()?.has(type) == true
 
 fun <U : ItemMetaEntry<V>, V> MojangStack.getMetaOrDefault(type: ItemMetaType<U, V>, fallback: U): U =
-    dataConfig()?.getOrDefault(type, fallback) ?: fallback
+    metaContainer()?.getOrDefault(type, fallback) ?: fallback
 
 /**
  * 向物品堆叠写入 Koish 数据 [T].
@@ -270,6 +295,8 @@ fun <T> MojangStack.removeData(type: ItemDataType<out T>): T? {
 /**
  * 设置该物品堆叠是否应该在网络发包时重写.
  */
+@get:JvmName("isNetworkRewrite")
+@set:JvmName("setNetworkRewrite")
 var MojangStack.isNetworkRewrite: Boolean
     get() {
         return !hasData(ItemDataTypes.BYPASS_NETWORK_REWRITE)
@@ -285,7 +312,9 @@ var MojangStack.isNetworkRewrite: Boolean
 /**
  * 设置该物品堆叠存储于 ItemOrExact.Exact 中时, 是否在配方书移动物品时只匹配 Koish 唯一标识符.
  */
-var MojangStack.isOnlyCompareIdInRecipeBook: Boolean
+@get:JvmName("onlyCompareIdInRecipeBook")
+@set:JvmName("onlyCompareIdInRecipeBook")
+var MojangStack.onlyCompareIdInRecipeBook: Boolean
     get() {
         return !hasData(ItemDataTypes.ONLY_COMPARE_ID_IN_RECIPE_BOOK)
     }

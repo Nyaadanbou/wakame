@@ -9,7 +9,6 @@ import io.papermc.paper.datacomponent.DataComponentTypes
 import net.kyori.adventure.text.Component
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
-import net.minecraft.nbt.ByteTag
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.ItemLore
@@ -85,13 +84,6 @@ val ItemStack.nbt: CompoundTag? get() = toNMS().nbt
 fun ItemStack.setNBT(nbt: CompoundTag) = toNMS().setNbt(nbt)
 fun ItemStack.editNbt(create: Boolean = true, applier: (CompoundTag) -> Unit) = toNMS().editNbt(create, applier)
 fun ItemStack.removeNBT() = toNMS().removeNbt()
-
-
-// 网络数据包相关
-
-var ItemStack.isNetworkRewrite: Boolean
-    get() = toNMS().isNetworkRewrite
-    set(value) = whenNotEmpty { toNMS().isNetworkRewrite = value }
 
 
 // 用于将数据隐藏于 ItemStack 的提示框
@@ -176,20 +168,3 @@ fun <T : Any> MojangStack.fastUpdate(type: DataComponentType<T>, default: () -> 
 
 fun <T : Any, U : Any> MojangStack.fastUpdate(type: DataComponentType<T>, default: () -> T, change: U, applier: (T, U) -> T): T? =
     whenNotEmptyReturn { set(type, applier(get(type) ?: default(), change)) }
-
-private const val BYPASS_NETWORK_REWRITE_FIELD = "bypass_network_rewrite"
-
-/**
- * 检查物品堆叠是否应该在网络发包时重写.
- */
-var MojangStack.isNetworkRewrite: Boolean
-    // 大部分情况都需要重写, 因此实现上用“不包含”来表示“要重写”
-    get() {
-        val nbt = nbt
-        if (nbt == null) return true
-        return !nbt.contains(BYPASS_NETWORK_REWRITE_FIELD)
-    }
-    set(value) = editNbt { nbt ->
-        if (value) nbt.remove(BYPASS_NETWORK_REWRITE_FIELD)
-        else nbt.put(BYPASS_NETWORK_REWRITE_FIELD, ByteTag.ZERO)
-    }

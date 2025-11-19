@@ -12,6 +12,9 @@ import cc.mewcraft.wakame.item.display.IndexedText
 import cc.mewcraft.wakame.item.display.TextAssembler
 import cc.mewcraft.wakame.item.display.implementation.*
 import cc.mewcraft.wakame.item.display.implementation.common.*
+import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.getDataOrDefault
+import cc.mewcraft.wakame.item.getMeta
 import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -65,31 +68,30 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<MergingTableCont
     override fun render(item: ItemStack, context: MergingTableContext?) {
         requireNotNull(context) { "context" }
 
+        // 这里的物品不应该被网络重写
         item.isNetworkRewrite = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 
-        item.process(ItemMetaTypes.CUSTOM_NAME) { data -> MergingTableRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
-        item.process(ItemMetaTypes.ITEM_NAME) { data -> MergingTableRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
+        // ItemMetaTypes
+        MergingTableRenderingHandlerRegistry.CUSTOM_NAME.process(collector, item.getMeta(ItemMetaTypes.CUSTOM_NAME))
+        MergingTableRenderingHandlerRegistry.ITEM_NAME.process(collector, item.getMeta(ItemMetaTypes.ITEM_NAME))
 
-        item.process(ItemDataTypes.ELEMENT) { data -> MergingTableRenderingHandlerRegistry.ELEMENT.process(collector, data) }
-        item.process(ItemDataTypes.LEVEL) { data -> MergingTableRenderingHandlerRegistry.LEVEL.process(collector, data) }
-        item.process(ItemDataTypes.RARITY, ItemDataTypes.REFORGE_HISTORY) { data1, data2 ->
-            val data1 = data1 ?: return@process
-            val data2 = data2 ?: ReforgeHistory.ZERO
-            MergingTableRenderingHandlerRegistry.RARITY.process(collector, data1, data2)
-        }
-        item.process(ItemDataTypes.CORE) { data ->
-            when (context) {
-                is MergingTableContext.MergeInputSlot -> MergingTableRenderingHandlerRegistry.MERGE_IN.process(collector, data, context)
-                is MergingTableContext.MergeOutputSlot -> MergingTableRenderingHandlerRegistry.MERGE_OUT.process(collector, data, context)
-            }
+        // ItemDataTypes
+        MergingTableRenderingHandlerRegistry.ELEMENT.process(collector, item.getData(ItemDataTypes.ELEMENT))
+        MergingTableRenderingHandlerRegistry.LEVEL.process(collector, item.getData(ItemDataTypes.LEVEL))
+        MergingTableRenderingHandlerRegistry.RARITY.process(collector, item.getData(ItemDataTypes.RARITY), item.getDataOrDefault(ItemDataTypes.REFORGE_HISTORY, ReforgeHistory.ZERO))
+        when (context) {
+            is MergingTableContext.MergeInputSlot -> MergingTableRenderingHandlerRegistry.MERGE_IN.process(collector, item.getData(ItemDataTypes.CORE), context)
+            is MergingTableContext.MergeOutputSlot -> MergingTableRenderingHandlerRegistry.MERGE_OUT.process(collector, item.getData(ItemDataTypes.CORE), context)
         }
 
-        val lore = textAssembler.assemble(collector)
-        item.fastLore(lore)
+        val koishLore = textAssembler.assemble(collector)
 
-        // 本 ItemRenderer 专门渲染放在菜单里面的物品,
+        // 应用修改到物品上
+        item.fastLore(koishLore)
+
+        // 本渲染器专门处理放在菜单里面的物品,
         // 而这些物品有些时候会被玩家(用铁砧)修改 `minecraft:custom_name`
         // 导致在菜单里显示的是玩家自己设置的(奇葩)名字.
         // 我们在这里统一清除掉这个组件.
@@ -98,6 +100,7 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<MergingTableCont
 }
 
 internal object MergingTableRenderingHandlerRegistry : RenderingHandlerRegistry(MergingTableItemRenderer) {
+
     @JvmField
     val CUSTOM_NAME: RenderingHandler<MetaCustomName, SingleValueRendererFormat> = CommonRenderingHandlers.CUSTOM_NAME(this)
 

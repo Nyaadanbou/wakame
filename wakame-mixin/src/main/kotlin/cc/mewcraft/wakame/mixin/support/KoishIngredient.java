@@ -43,7 +43,7 @@ public interface KoishIngredient {
             ItemStack mojangStack = getMojangStackById(identifier);
             // 加入特殊标记, 使配方书移动物品时只匹配 id
             // 参与配方的原料的匹配逻辑不受此标记影响, 具体逻辑见 [MixinIngredient]
-            KoishStackData.setOnlyCompareIdInRecipeBook(mojangStack, true);
+            KoishStackData.onlyCompareIdInRecipeBook(mojangStack, true);
             mojangStacks.add(mojangStack);
         }
         // 要正确写入 Exact 所需的物品堆叠, 不然客户端配方书以及JEI类mod无法正确看到配方物品

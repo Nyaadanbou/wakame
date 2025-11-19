@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.display.implementation.standard
 
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item.data.ItemDataTypes
@@ -8,12 +9,16 @@ import cc.mewcraft.wakame.item.datagen.ItemMetaTypes
 import cc.mewcraft.wakame.item.datagen.impl.MetaCustomName
 import cc.mewcraft.wakame.item.datagen.impl.MetaItemName
 import cc.mewcraft.wakame.item.display.IndexedText
+import cc.mewcraft.wakame.item.display.ItemRendererConstants
+import cc.mewcraft.wakame.item.display.NetworkRenderer
 import cc.mewcraft.wakame.item.display.TextAssembler
 import cc.mewcraft.wakame.item.display.implementation.*
 import cc.mewcraft.wakame.item.display.implementation.common.*
 import cc.mewcraft.wakame.item.extension.*
 import cc.mewcraft.wakame.item.feature.EnchantSlotFeature
 import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.getMeta
+import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.Arrow
 import cc.mewcraft.wakame.item.property.impl.EntityBucket
@@ -29,6 +34,8 @@ import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.item.fastLore
 import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
+import cc.mewcraft.wakame.util.yamlLoader
+import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.FoodProperties
 import io.papermc.paper.datacomponent.item.ItemEnchantments
@@ -38,8 +45,10 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Registry
 import org.bukkit.inventory.ItemStack
+import org.spongepowered.configurate.kotlin.extensions.getList
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import java.nio.file.Path
+import kotlin.io.path.readText
 
 internal class StandardRendererFormatRegistry(renderer: StandardItemRenderer) : AbstractRendererFormatRegistry(renderer)
 
@@ -52,15 +61,27 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
     override val formats = StandardRendererFormatRegistry(this)
     override val layout = StandardRendererLayout(this)
     private val textAssembler = TextAssembler(layout)
+    private val removeComponents: ArrayList<DataComponentType> = ArrayList()
 
     @InitFun
     fun init() {
         loadDataFromConfigs()
+        loadExtraDataFromConfigs()
     }
 
     @ReloadFun
     fun reload() {
         loadDataFromConfigs()
+        loadExtraDataFromConfigs()
+    }
+
+    fun loadExtraDataFromConfigs() {
+        // 加载 remove_components
+        val renderersDirectory = KoishDataPaths.CONFIGS.resolve(ItemRendererConstants.DATA_DIR)
+        val layoutPath = renderersDirectory.resolve(name).resolve(ItemRendererConstants.LAYOUT_FILE_NAME)
+        val yaml = yamlLoader { withDefaults() }.buildAndLoadString(layoutPath.readText())
+        removeComponents.clear()
+        removeComponents += yaml.node("remove_components").getList<DataComponentType>(emptyList())
     }
 
     override fun initialize(
@@ -73,67 +94,81 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
     }
 
     override fun render(item: ItemStack, context: Nothing?) {
-        val collector = ReferenceOpenHashSet<IndexedText>()
-
-        item.process(ItemPropTypes.ARROW) { data -> StandardRenderingHandlerRegistry.ARROW.process(collector, data) }
-        item.process(ItemPropTypes.ATTACK_SPEED) { data -> StandardRenderingHandlerRegistry.ATTACK_SPEED.process(collector, data) }
-        item.process(ItemPropTypes.EXTRA_LORE) { data -> StandardRenderingHandlerRegistry.LORE.process(collector, data) }
-        item.process(ItemPropTypes.ENTITY_BUCKET) { data -> StandardRenderingHandlerRegistry.ENTITY_BUCKET_PROP.process(collector, data) }
-        item.process(ItemPropTypes.FUEL) { data -> StandardRenderingHandlerRegistry.FUEL.process(collector, data) }
-
-        // 对于最可能被频繁修改的 `item_name`, `custom_name` 直接读取配置模板里的内容
-        item.process(ItemMetaTypes.ITEM_NAME) { data -> StandardRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
-        item.process(ItemMetaTypes.CUSTOM_NAME) { data -> StandardRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
-
-        item.process(ItemDataTypes.CRATE) { data -> StandardRenderingHandlerRegistry.CRATE.process(collector, data) }
-
-        item.elements.takeUnlessEmpty()?.let { StandardRenderingHandlerRegistry.ELEMENT.process(collector, it) }
-        item.kizamiz.takeUnlessEmpty()?.let { StandardRenderingHandlerRegistry.KIZAMI.process(collector, it) }
-        item.level?.let { StandardRenderingHandlerRegistry.LEVEL.process(collector, it) }
-        item.core?.let { StandardRenderingHandlerRegistry.CORE.process(collector, it) }
-        item.coreContainer?.let { data -> for ((_, core) in data) renderCore(collector, core) }
-        item.rarity2?.let { rarityEntry ->
-            val data2 = item.getData(ItemDataTypes.REFORGE_HISTORY) ?: ReforgeHistory.ZERO
-            StandardRenderingHandlerRegistry.RARITY.process(collector, rarityEntry, data2)
+        if (!(NetworkRenderer.responsible(item))) {
+            return
         }
 
-        item.process(ItemDataTypes.ENTITY_BUCKET_INFO) { data -> StandardRenderingHandlerRegistry.ENTITY_BUCKET_INFO.process(collector, data) }
+        val collector = ReferenceOpenHashSet<IndexedText>()
 
-        item.process(DataComponentTypes.ENCHANTMENTS) { data -> StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
-        item.process(DataComponentTypes.DAMAGE_RESISTANT) { data -> StandardRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, Unit) }
-        item.process(DataComponentTypes.FOOD) { data -> StandardRenderingHandlerRegistry.FOOD.process(collector, data) }
-
+        StandardRenderingHandlerRegistry.ARROW.process(collector, item.getProp(ItemPropTypes.ARROW))
+        StandardRenderingHandlerRegistry.ATTACK_SPEED.process(collector, item.getProp(ItemPropTypes.ATTACK_SPEED))
+        StandardRenderingHandlerRegistry.LORE.process(collector, item.getProp(ItemPropTypes.EXTRA_LORE))
+        StandardRenderingHandlerRegistry.ENTITY_BUCKET_PROP.process(collector, item.getProp(ItemPropTypes.ENTITY_BUCKET))
+        StandardRenderingHandlerRegistry.FUEL.process(collector, item.getProp(ItemPropTypes.FUEL))
+        StandardRenderingHandlerRegistry.ITEM_NAME.process(collector, item.getMeta(ItemMetaTypes.ITEM_NAME)) // 对于最可能被频繁修改的 `item_name`, `custom_name`
+        StandardRenderingHandlerRegistry.CUSTOM_NAME.process(collector, item.getMeta(ItemMetaTypes.CUSTOM_NAME))
+        StandardRenderingHandlerRegistry.CRATE.process(collector, item.getData(ItemDataTypes.CRATE))
+        StandardRenderingHandlerRegistry.ELEMENT.process(collector, item.elements.takeUnlessEmpty())
+        StandardRenderingHandlerRegistry.KIZAMI.process(collector, item.kizamiz.takeUnlessEmpty())
+        StandardRenderingHandlerRegistry.LEVEL.process(collector, item.level)
+        StandardRenderingHandlerRegistry.CORE.process(collector, item.core)
+        renderCoreContainer(collector, item.coreContainer)
+        StandardRenderingHandlerRegistry.RARITY.process(collector, item.rarity2, item.getData(ItemDataTypes.REFORGE_HISTORY) ?: ReforgeHistory.ZERO)
+        StandardRenderingHandlerRegistry.ENTITY_BUCKET_INFO.process(collector, item.getData(ItemDataTypes.ENTITY_BUCKET_INFO))
+        StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, item.getData(DataComponentTypes.ENCHANTMENTS))
+        StandardRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, if (item.hasData(DataComponentTypes.DAMAGE_RESISTANT)) Unit else null)
+        StandardRenderingHandlerRegistry.FOOD.process(collector, item.getData(DataComponentTypes.FOOD))
         StandardRenderingHandlerRegistry.ENCHANT_SLOTS.process(collector, item)
 
-        val lore = textAssembler.assemble(collector)
-        item.fastLore(run {
-            // 尝试在物品原本的 lore 的第一行插入我们渲染的 lore.
-            // 如果原本的 lore 为空, 则直接使用我们渲染的 lore.
-            // 如果原本的 lore 不为空, 则在渲染的 lore 和原本的 lore 之间插入一个空行.
+        // 生成 koish lore
+        val koishLore = textAssembler.assemble(collector)
 
-            val existingLore = item.fastLoreOrEmpty
-            if (existingLore.isEmpty()) {
-                lore
-            } else {
-                buildList {
-                    addAll(existingLore)
-                    add(Component.empty())
-                    addAll(lore)
-                }
+        // 尝试在物品原本的 lore 的最后一行插入我们渲染的 lore:
+        // - 如果原本的 lore 为空, 则直接使用我们渲染的 lore
+        // - 如果原本的 lore 不为空, 则在 koish lore 和 existing lore 之间插入一个空行
+        val existingLore = item.fastLoreOrEmpty
+        val resultantLore = if (existingLore.isEmpty() && koishLore.isNotEmpty()) {
+            // existingLore 为空 && koishLore 不为空
+            koishLore
+        } else if (existingLore.isEmpty()) {
+            // existingLore 为空 && koishLore 为空
+            return
+        } else if (koishLore.isEmpty()) {
+            // existingLore 不为空 && koishLore 为空
+            existingLore
+        } else {
+            // existingLore 不为空 && koishLore 不为空
+            buildList {
+                addAll(existingLore)
+                add(Component.empty()) // 加入空行分隔开
+                addAll(koishLore)
             }
-        })
+        }
+
+        // 应用 lore 到物品上
+        item.fastLore(resultantLore)
+
+        // 移除不需要的物品组件
+        // 注意: 仅在存在需要移除的物品组件时, 才进行移除, 这样可以避免不必要的数据传输
+        for (componentType in removeComponents) {
+            item.unsetData(componentType)
+        }
     }
 
-    private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, core: Core) {
-        when (core) {
-            is AttributeCore -> StandardRenderingHandlerRegistry.CORE_ATTRIBUTE.process(collector, core)
-            is EmptyCore -> StandardRenderingHandlerRegistry.CORE_EMPTY.process(collector, core)
-            is VirtualCore -> IndexedText.NOP
+    private fun renderCoreContainer(collector: ReferenceOpenHashSet<IndexedText>, coreContainer: CoreContainer?) {
+        if (coreContainer == null) return
+        for ((_, core) in coreContainer) {
+            when (core) {
+                is AttributeCore -> StandardRenderingHandlerRegistry.CORE_ATTRIBUTE.process(collector, core)
+                is EmptyCore -> StandardRenderingHandlerRegistry.CORE_EMPTY.process(collector, core)
+                is VirtualCore -> IndexedText.NOP
+            }
         }
     }
 }
 
 internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(StandardItemRenderer) {
+
     @JvmField
     val ARROW: RenderingHandler<Arrow, ListValueRendererFormat> = configure("arrow") { data, format ->
         format.render(

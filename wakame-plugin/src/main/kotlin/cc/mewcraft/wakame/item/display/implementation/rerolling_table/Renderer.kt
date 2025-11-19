@@ -13,6 +13,9 @@ import cc.mewcraft.wakame.item.display.implementation.common.AggregateValueRende
 import cc.mewcraft.wakame.item.display.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.item.display.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.item.display.implementation.common.SingleValueRendererFormat
+import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.getDataOrDefault
+import cc.mewcraft.wakame.item.getMeta
 import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -69,23 +72,30 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<RerollingTable
     override fun render(item: ItemStack, context: RerollingTableContext?) {
         requireNotNull(context) { "context" }
 
+        // 这里的物品不应该被网络重写
         item.isNetworkRewrite = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 
-        item.process(ItemMetaTypes.CUSTOM_NAME) { data -> RerollingTableRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
-        item.process(ItemMetaTypes.ITEM_NAME) { data -> RerollingTableRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
+        // ItemMetaTypes
+        RerollingTableRenderingHandlerRegistry.CUSTOM_NAME.process(collector, item.getMeta(ItemMetaTypes.CUSTOM_NAME))
+        RerollingTableRenderingHandlerRegistry.ITEM_NAME.process(collector, item.getMeta(ItemMetaTypes.ITEM_NAME))
 
-        item.process(ItemDataTypes.CORE_CONTAINER) { data -> for ((id, core) in data) renderCore(collector, id, core, context) }
-        item.process(ItemDataTypes.LEVEL) { data -> RerollingTableRenderingHandlerRegistry.LEVEL.process(collector, data) }
-        item.process(ItemDataTypes.RARITY, ItemDataTypes.REFORGE_HISTORY) { data1, data2 ->
-            val data1 = data1 ?: return@process
-            val data2 = data2 ?: ReforgeHistory.ZERO
-            RerollingTableRenderingHandlerRegistry.RARITY.process(collector, data1, data2)
+        // ItemDataTypes
+        val coreContainer = item.getData(ItemDataTypes.CORE_CONTAINER)
+        if (coreContainer != null) {
+            for ((id, core) in coreContainer) {
+                renderCore(collector, id, core, context)
+            }
         }
+        RerollingTableRenderingHandlerRegistry.ELEMENT.process(collector, item.getData(ItemDataTypes.ELEMENT))
+        RerollingTableRenderingHandlerRegistry.LEVEL.process(collector, item.getData(ItemDataTypes.LEVEL))
+        RerollingTableRenderingHandlerRegistry.RARITY.process(collector, item.getData(ItemDataTypes.RARITY), item.getDataOrDefault(ItemDataTypes.REFORGE_HISTORY, ReforgeHistory.ZERO))
 
-        val lore = textAssembler.assemble(collector)
-        item.fastLore(lore)
+        val koishLore = textAssembler.assemble(collector)
+
+        // 应用修改到物品上
+        item.fastLore(koishLore)
     }
 
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, id: String, core: Core, context: RerollingTableContext) {
@@ -113,6 +123,7 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<RerollingTable
 }
 
 internal object RerollingTableRenderingHandlerRegistry : RenderingHandlerRegistry(RerollingTableItemRenderer) {
+
     @JvmField
     val CORE_ATTRIBUTE_IN: RenderingHandler3<String, AttributeCore, RerollingTableContext, CoreAttributeRendererFormat> =
         configure3("core/attributes/in") { id, core, context, format ->

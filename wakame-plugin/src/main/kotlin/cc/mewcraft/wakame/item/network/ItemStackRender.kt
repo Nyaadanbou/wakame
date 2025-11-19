@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.item.display.ItemRenderers
+import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.item.koishTypeId
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -13,8 +14,6 @@ import cc.mewcraft.wakame.network.event.*
 import cc.mewcraft.wakame.network.event.clientbound.*
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.getOrThrow
-import cc.mewcraft.wakame.util.item.editNbt
-import cc.mewcraft.wakame.util.item.isNetworkRewrite
 import cc.mewcraft.wakame.util.item.toNMS
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
@@ -156,17 +155,17 @@ internal object ItemStackRender : PacketListener, Listener {
     @EventHandler
     private fun handlePlayerChat(event: AsyncChatEvent) {
         val originMessage = event.message()
-        event.message(modifyTextComponent(originMessage))
+        event.message(modifyComponent(originMessage))
     }
 
     @PacketHandler
     private fun handleSystemChat(event: ClientboundSystemChatPacketEvent) {
-        event.message = modifyTextComponent(event.message)
+        event.message = modifyComponent(event.message)
     }
 
     @PacketHandler
     private fun handleCombatKill(event: ClientboundPlayerCombatKillPacketEvent) {
-        event.message = modifyTextComponent(event.message)
+        event.message = modifyComponent(event.message)
     }
 
     private fun modifyIngredientList(optList: Optional<List<Ingredient>>): Optional<List<Ingredient>> =
@@ -260,19 +259,19 @@ internal object ItemStackRender : PacketListener, Listener {
      * @param component Adventure Component
      * @return 修改后的 Adventure Component
      */
-    private fun modifyTextComponent(component: Component): Component {
+    private fun modifyComponent(component: Component): Component {
         if (component !is TranslatableComponent)
             return component
 
-        val modified = modifyTranslatableComponent(component)
+        val modified = modifyComponent0(component)
 
-        val modifiedChildren = modified.children().map { modifyTextComponent(it) }
-        val modifiedArguments = modified.arguments().map { modifyTextComponent(it.asComponent()) }
+        val modifiedChildren = modified.children().map { modifyComponent(it) }
+        val modifiedArguments = modified.arguments().map { modifyComponent(it.asComponent()) }
 
         return modified.children(modifiedChildren).arguments(modifiedArguments)
     }
 
-    private fun modifyTranslatableComponent(component: TranslatableComponent): TranslatableComponent {
+    private fun modifyComponent0(component: TranslatableComponent): TranslatableComponent {
         val hoverEvent = component.hoverEvent() ?: return component
         if (hoverEvent.action() == HoverEvent.Action.SHOW_ITEM) {
             val itemStackInfo = hoverEvent.value() as HoverEvent.ShowItem
@@ -298,26 +297,18 @@ internal object ItemStackRender : PacketListener, Listener {
         return event.player.gameMode == GameMode.CREATIVE
     }
 
-    private const val PDC_FIELD = "PublicBukkitValues"
-
     private fun MojangStack.modify(): MojangStack {
-        val itemStack = asBukkitCopy()
+        if (!isNetworkRewrite)
+            return this
 
-        // 移除任意物品的 PDC
-        itemStack.editNbt { nbt ->
-            nbt.remove(PDC_FIELD)
-        }
-
-        if (itemStack != null && isNetworkRewrite) {
-            try {
-                ItemRenderers.STANDARD.render(itemStack)
-            } catch (e: Throwable) {
-                if (LOGGING) {
-                    LOGGER.error("An error occurred while rewrite network item: ${itemStack.koishTypeId}", e)
-                }
+        val bukkitCopy = asBukkitCopy()
+        try {
+            ItemRenderers.STANDARD.render(bukkitCopy)
+        } catch (e: Throwable) {
+            if (LOGGING) {
+                LOGGER.error("An error occurred while rewrite network item: ${bukkitCopy.koishTypeId}", e)
             }
         }
-
-        return itemStack.toNMS()
+        return bukkitCopy.toNMS()
     }
 }
