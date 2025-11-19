@@ -76,12 +76,11 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
     }
 
     fun loadExtraDataFromConfigs() {
-        removeComponents.clear()
-
+        // 加载 remove_components
         val renderersDirectory = KoishDataPaths.CONFIGS.resolve(ItemRendererConstants.DATA_DIR)
         val layoutPath = renderersDirectory.resolve(name).resolve(ItemRendererConstants.LAYOUT_FILE_NAME)
         val yaml = yamlLoader { withDefaults() }.buildAndLoadString(layoutPath.readText())
-
+        removeComponents.clear()
         removeComponents += yaml.node("remove_components").getList<DataComponentType>(emptyList())
     }
 
