@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.network
 
 import cc.mewcraft.wakame.item.extension.rarity2
 import cc.mewcraft.wakame.item.hasProp
+import cc.mewcraft.wakame.item.isExactKoish
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -56,6 +57,7 @@ internal object ItemEntityRender : PacketListener {
     @PacketHandler
     private fun handleSetEntityData(event: ClientboundSetEntityDataPacketEvent) {
         val item = NMSUtils.getEntity(event.id) as? Item ?: return
+        if (!item.itemStack.isExactKoish) return
         val old = event.packedItems
         val new = old.toMutableList().apply {
             tryAddCustomNameEntityData(item, this)
