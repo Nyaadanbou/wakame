@@ -8,7 +8,7 @@ import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
 import kotlin.jvm.optionals.getOrElse
 
-class MythicMobsEntityRefLookupDictionary : EntityRefLookup.Dictionary {
+class MythicEntityRefLookupDictionary : EntityRefLookup.Dictionary {
 
     private val mythicApi: MythicBukkit by lazy { MythicBukkit.inst() }
 
