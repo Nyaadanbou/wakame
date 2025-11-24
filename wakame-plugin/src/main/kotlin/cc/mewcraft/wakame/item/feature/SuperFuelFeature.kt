@@ -9,9 +9,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.FurnaceBurnEvent
 
-@Init(
-    stage = InitStage.POST_WORLD,
-)
+@Init(stage = InitStage.POST_WORLD)
 object SuperFuelFeature : Listener {
 
     init {

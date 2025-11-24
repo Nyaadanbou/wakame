@@ -16,6 +16,8 @@ import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.entity.typeref.EntityRef
 import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
+import cc.mewcraft.wakame.integration.skill.SkillWrapperType
+import cc.mewcraft.wakame.integration.skill.SkillWrapperTypes
 import cc.mewcraft.wakame.item.ItemRefHandler
 import cc.mewcraft.wakame.item.KoishItem
 import cc.mewcraft.wakame.item.KoishItemProxy
@@ -31,10 +33,7 @@ import cc.mewcraft.wakame.item.datagen.ItemMetaType
 import cc.mewcraft.wakame.item.datagen.ItemMetaTypes
 import cc.mewcraft.wakame.item.property.ItemPropType
 import cc.mewcraft.wakame.item.property.ItemPropertyTypes
-import cc.mewcraft.wakame.item.property.impl.CraftingReminderType
-import cc.mewcraft.wakame.item.property.impl.CraftingReminderTypes
-import cc.mewcraft.wakame.item.property.impl.EnchantSlotCapacityType
-import cc.mewcraft.wakame.item.property.impl.EnchantSlotCapacityTypes
+import cc.mewcraft.wakame.item.property.impl.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.loot.LootTable
 import cc.mewcraft.wakame.loot.entry.LootPoolEntries
@@ -75,6 +74,18 @@ object BuiltInRegistries {
      */
     @JvmField
     val ABILITY_TRIGGER: WritableRegistry<AbilityTrigger> = registerSimple(BuiltInRegistryKeys.ABILITY_TRIGGER)
+
+    /**
+     * 机制触发器.
+     */
+    @JvmField
+    val CASTABLE_TRIGGER: WritableRegistry<CastableTrigger> = registerSimple(BuiltInRegistryKeys.CASTABLE_TRIGGER) { GenericCastableTrigger.LEFT_CLICK; ComboCastableTrigger.LLL }
+
+    /**
+     * SkillWrapper 的类型.
+     */
+    @JvmField
+    val SKILL_WRAPPER_TYPE: WritableRegistry<SkillWrapperType> = registerSimple(BuiltInRegistryKeys.SKILL_WRAPPER_TYPE) { SkillWrapperTypes }
 
     /**
      * 自定义物品的类型.

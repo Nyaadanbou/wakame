@@ -1,0 +1,37 @@
+base: stick
+
+item_name: "MM法杖"
+
+slot: minecraft:mainhand
+
+# 使该物品可以释放机制
+castable:
+
+  # 该机制释放的技能
+  # 类型为 "block", 则值需要指定一个技能的 id
+  # 这里的例子指定了 id 为 "slash" 的技能
+  skill:
+    type: block
+    value: "slash"
+
+  # 机制的触发器:
+  # - special/  # 特殊触发器
+  #   in_mainhand  # 手持物品时(主手)触发一次
+  #   in_offhand  # 手持物品时(副手)触发一次
+  #   on_equip  # 装备该物品时触发一次
+  # - generic/  # 一般触发器, 对应 Koish 内部的 useOn 和 attackOn ???
+  #   left_click  # 手持物品左键时触发
+  #   right_click  # 手持物品右键时触发
+  # - combo/  # 组合键, 需要按顺序连续按下左右键来触发. 0 = left click, 1 = right click
+  #   000
+  #   001
+  #   010
+  #   011
+  #   111
+  #   110
+  #   101
+  #   100
+  trigger: "generic/right_click"
+
+  # 触发所需的法力值
+  mana_cost: 10.0

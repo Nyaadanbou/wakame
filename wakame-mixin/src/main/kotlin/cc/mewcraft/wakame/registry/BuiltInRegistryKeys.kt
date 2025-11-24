@@ -15,6 +15,7 @@ import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.entity.typeref.EntityRef
 import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
+import cc.mewcraft.wakame.integration.skill.SkillWrapperType
 import cc.mewcraft.wakame.item.ItemRefHandler
 import cc.mewcraft.wakame.item.KoishItem
 import cc.mewcraft.wakame.item.KoishItemProxy
@@ -24,6 +25,7 @@ import cc.mewcraft.wakame.item.data.impl.CoreType
 import cc.mewcraft.wakame.item.data.impl.EntityBucketInfoType
 import cc.mewcraft.wakame.item.datagen.ItemMetaType
 import cc.mewcraft.wakame.item.property.ItemPropType
+import cc.mewcraft.wakame.item.property.impl.CastableTrigger
 import cc.mewcraft.wakame.item.property.impl.CraftingReminderType
 import cc.mewcraft.wakame.item.property.impl.EnchantSlotCapacityType
 import cc.mewcraft.wakame.kizami.Kizami
@@ -48,6 +50,12 @@ object BuiltInRegistryKeys {
 
     @JvmField
     val ABILITY_TRIGGER = createRegistryKey<AbilityTrigger>("ability_trigger")
+
+    @JvmField
+    val CASTABLE_TRIGGER = createRegistryKey<CastableTrigger>("mechanic_trigger")
+
+    @JvmField
+    val SKILL_WRAPPER_TYPE = createRegistryKey<SkillWrapperType>("skill_wrapper_type")
 
     @JvmField
     val ITEM = createRegistryKey<KoishItem>("item")

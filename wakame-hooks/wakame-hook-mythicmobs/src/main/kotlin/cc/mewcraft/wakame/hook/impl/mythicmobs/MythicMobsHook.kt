@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.hook.impl.mythicmobs
 import cc.mewcraft.wakame.hook.impl.mythicmobs.listener.ConfigListener
 import cc.mewcraft.wakame.hook.impl.mythicmobs.listener.DamageListener
 import cc.mewcraft.wakame.integration.Hook
+import cc.mewcraft.wakame.integration.skill.SkillIntegration
 import cc.mewcraft.wakame.mixin.support.MythicApi
 import cc.mewcraft.wakame.mixin.support.MythicApiProvider
 import cc.mewcraft.wakame.util.registerEvents
@@ -22,6 +23,7 @@ object MythicMobsHook {
         DamageListener.registerEvents()
 
         MythicApiProvider.register(MythicApiImpl)
+        SkillIntegration.setImplementation(MythicSkillIntegration)
 
         // 目前的所有实现暂时不需要获取 MythicMobs 的怪物的 id, 等之后需要的时候再把这个注释给去掉.
         // BuiltInRegistries.ENTITY_REF_LOOKUP_DIR.add("mythicmobs", MythicMobsEntityRefLookupDictionary())
