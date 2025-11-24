@@ -9,7 +9,7 @@ castable:
 
   # 该机制释放的技能
   # 类型为 "block", 则值需要指定一个技能的 id
-  # 这里的例子指定了 id 为 "slash" 的技能
+  # 这里的例子指定了 id 为 "slash" 的技能 (格式取决于实现)
   skill:
     type: block
     value: "slash"

@@ -9,7 +9,7 @@ castable:
 
   # 该机制释放的技能
   # 类型为 "inline", 则值需要指定一个内联技能的配置
-  # 这里的例子指定了内联技能的具体配置 (需保证合法)
+  # 这里的例子指定了内联技能的具体配置 (格式取决于实现)
   skill:
     type: inline
     value: "feed{amount=10} @trigger"
