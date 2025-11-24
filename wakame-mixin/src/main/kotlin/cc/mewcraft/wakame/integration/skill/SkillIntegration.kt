@@ -21,6 +21,15 @@ interface SkillIntegration {
     fun castInlineSkill(player: Player, line: String)
 
     /**
+     * 检查玩家 [player] 的技能 [id] 是否处于冷却中.
+     *
+     * @param player 需要检查的玩家
+     * @param id 需要检查的技能的唯一标识, 格式取决于实现
+     * @return 如果技能处于冷却中则返回 true, 否则返回 false
+     */
+    fun isCooldown(player: Player, id: String): Boolean
+
+    /**
      * This companion object holds current [SkillIntegration] implementation.
      */
     companion object : SkillIntegration {
@@ -28,6 +37,7 @@ interface SkillIntegration {
         private val NO_OP: SkillIntegration = object : SkillIntegration {
             override fun castBlockSkill(player: Player, id: String) = Unit
             override fun castInlineSkill(player: Player, line: String) = Unit
+            override fun isCooldown(player: Player, id: String): Boolean = false
         }
 
         private var implementation: SkillIntegration = NO_OP
@@ -42,6 +52,10 @@ interface SkillIntegration {
 
         override fun castInlineSkill(player: Player, line: String) {
             return implementation.castInlineSkill(player, line)
+        }
+
+        override fun isCooldown(player: Player, id: String): Boolean {
+            return implementation.isCooldown(player, id)
         }
     }
 }

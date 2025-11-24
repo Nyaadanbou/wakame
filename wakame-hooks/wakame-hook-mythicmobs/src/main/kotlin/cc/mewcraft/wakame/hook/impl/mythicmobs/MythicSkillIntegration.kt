@@ -9,6 +9,7 @@ import io.lumine.mythic.core.skills.SkillMetadataImpl
 import io.lumine.mythic.core.skills.SkillTriggers
 import io.lumine.mythic.core.utils.MythicUtil
 import org.bukkit.entity.Player
+import kotlin.jvm.optionals.getOrNull
 
 object MythicSkillIntegration : SkillIntegration {
 
@@ -37,5 +38,11 @@ object MythicSkillIntegration : SkillIntegration {
             skill.execute(meta)
             LOGGER.info("Trying to running inline skill: $line")
         }
+    }
+
+    override fun isCooldown(player: Player, id: String): Boolean {
+        val skill = mythicApi.skillManager.getSkill(id).getOrNull() ?: return false
+        val caster = mythicApi.skillManager.getCaster(BukkitAdapter.adapt(player))
+        return skill.onCooldown(caster)
     }
 }

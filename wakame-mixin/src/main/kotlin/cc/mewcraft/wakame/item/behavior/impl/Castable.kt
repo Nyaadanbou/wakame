@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.item.behavior.impl
 
 import cc.mewcraft.wakame.integration.playermana.PlayerManaIntegration
+import cc.mewcraft.wakame.integration.skill.SkillIntegration
+import cc.mewcraft.wakame.integration.skill.SkillWrapper
 import cc.mewcraft.wakame.item.behavior.AttackContext
 import cc.mewcraft.wakame.item.behavior.InteractionResult
 import cc.mewcraft.wakame.item.behavior.UseContext
@@ -18,8 +20,17 @@ object Castable : SimpleInteract {
             // 触发 generic/right_click
             val player = context.player
             val manaCost = castable.manaCost
-            if (PlayerManaIntegration.consumeMana(player, manaCost)) {
-                castable.skill.cast(player)
+            val skillWrapper = castable.skill
+            if (skillWrapper is SkillWrapper.Block) {
+                if (!SkillIntegration.isCooldown(player, skillWrapper.id)) {
+                    if (PlayerManaIntegration.consumeMana(player, manaCost)) {
+                        castable.skill.cast(player)
+                    }
+                }
+            } else {
+                if (PlayerManaIntegration.consumeMana(player, manaCost)) {
+                    castable.skill.cast(player)
+                }
             }
         } else if (castable.trigger.unwrap() is ComboCastableTrigger) {
             // 触发 combo
@@ -38,8 +49,17 @@ object Castable : SimpleInteract {
             // 触发 generic/left_click
             val player = context.player
             val manaCost = castable.manaCost
-            if (PlayerManaIntegration.consumeMana(player, manaCost)) {
-                castable.skill.cast(player)
+            val skillWrapper = castable.skill
+            if (skillWrapper is SkillWrapper.Block) {
+                if (!SkillIntegration.isCooldown(player, skillWrapper.id)) {
+                    if (PlayerManaIntegration.consumeMana(player, manaCost)) {
+                        castable.skill.cast(player)
+                    }
+                }
+            } else {
+                if (PlayerManaIntegration.consumeMana(player, manaCost)) {
+                    castable.skill.cast(player)
+                }
             }
         } else if (castable.trigger.unwrap() is ComboCastableTrigger) {
             // 触发 combo
