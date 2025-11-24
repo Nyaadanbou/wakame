@@ -1,22 +1,24 @@
 package cc.mewcraft.wakame.integration.skill
 
+import org.bukkit.entity.Player
+
 interface SkillIntegration {
 
     /**
-     * 根据 ID 查找对应的 [SkillWrapper.Block].
+     * 施放 [id] 对应的技能.
      *
-     * @param id mechanic 的唯一标识, 格式取决实现
-     * @return 对应的 [SkillWrapper.Block] 或 null
+     * @param player 施放技能的玩家
+     * @param id 技能的唯一标识, 格式取决于实现
      */
-    fun lookupBlockSkill(id: String): SkillWrapper.Block
+    fun castBlockSkill(player: Player, id: String)
 
     /**
-     * 根据 ID 查找对应的 [SkillWrapper.Inline].
+     * 施放 [line] 对应的技能.
      *
-     * @param line mechanic 的唯一标识, 格式取决实现
-     * @return 对应的 [SkillWrapper.Inline] 或 null
+     * @param player 施放技能的玩家
+     * @param line 技能的内联配置, 格式取决于实现
      */
-    fun lookupInlineSkill(line: String): SkillWrapper.Inline
+    fun castInlineSkill(player: Player, line: String)
 
     /**
      * This companion object holds current [SkillIntegration] implementation.
@@ -24,8 +26,8 @@ interface SkillIntegration {
     companion object : SkillIntegration {
 
         private val NO_OP: SkillIntegration = object : SkillIntegration {
-            override fun lookupBlockSkill(id: String): SkillWrapper.Block = SkillWrapper.DEFAULT_BLOCK
-            override fun lookupInlineSkill(line: String): SkillWrapper.Inline = SkillWrapper.DEFAULT_INLINE
+            override fun castBlockSkill(player: Player, id: String) = Unit
+            override fun castInlineSkill(player: Player, line: String) = Unit
         }
 
         private var implementation: SkillIntegration = NO_OP
@@ -34,12 +36,12 @@ interface SkillIntegration {
             implementation = impl
         }
 
-        override fun lookupBlockSkill(id: String): SkillWrapper.Block {
-            return implementation.lookupBlockSkill(id)
+        override fun castBlockSkill(player: Player, id: String) {
+            return implementation.castBlockSkill(player, id)
         }
 
-        override fun lookupInlineSkill(line: String): SkillWrapper.Inline {
-            return implementation.lookupInlineSkill(line)
+        override fun castInlineSkill(player: Player, line: String) {
+            return implementation.castInlineSkill(player, line)
         }
     }
 }
