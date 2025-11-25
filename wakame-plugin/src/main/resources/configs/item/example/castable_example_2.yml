@@ -1,18 +1,27 @@
-base: stick
+base: leather_boots
 
-item_name: "MM法杖"
+item_name: "castable_example_2"
 
-slot: minecraft:mainhand
+slot: minecraft:feet
 
 # 使该物品可以释放机制
 castable:
 
-  # 该机制释放的技能
-  # 类型为 "inline", 则值需要指定一个内联技能的配置
-  # 这里的例子指定了内联技能的具体配置 (格式取决于实现)
-  skill:
-    type: inline
-    value: "feed{amount=10} @trigger"
+  # 以下设计说明:
+  # 总体是一个二段跳被动技能的配置.
+  # Koish 这边只负责在装备和脱下时触发技能.
+  # 在装备时给玩家添加一个光环, 使其获得二段跳光环.
+  # 在脱下时给玩家移除该光环, 使其失去二段跳光环.
+  # 拥有光环的持续时间内, 逻辑全由光环处理.
 
-  trigger: "generic/right_click"
-  mana_cost: 10.0
+  on_equip:
+    skill:
+      type: block
+      value: "double_jump_on_equip"
+    trigger: "special/equip"
+
+  on_unequip:
+    skill:
+      type: block
+      value: "double_jump_on_unequip"
+    trigger: "special/on_unequip"

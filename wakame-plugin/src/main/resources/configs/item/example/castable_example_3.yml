@@ -1,0 +1,35 @@
+base: stick
+
+item_name: "castable_example_3"
+
+slot: minecraft:mainhand
+
+# 使该物品可以释放机制
+castable:
+
+  # 以下设计说明:
+  # 总体是一个主动+被动技能的结合.
+  # slash_on_attack 是一个左键时触发的技能, 因此 trigger 设为 generic/left_click·
+  # slash_on_equip 和 slash_on_unequip 是在装备和脱下时触发的技能;
+  # 这两技能可以为该物品添加一些“被动效果” (利用 MM 的光环机制);
+  # 具体来说, slash_on_equip 在装备时给玩家添加一个光环,
+  # 而 slash_on_unequip 则在脱下时移除该光环.
+
+  on_attack:
+    skill:
+      type: block
+      value: "slash_on_attack"
+    trigger: "generic/left_click"
+    mana_cost: 10.0
+
+  on_equip:
+    skill:
+      type: block
+      value: "slash_on_equip"
+    trigger: "special/equip"
+
+  on_unequip:
+    skill:
+      type: block
+      value: "slash_on_unequip"
+    trigger: "special/on_unequip"

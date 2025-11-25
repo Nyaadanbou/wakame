@@ -31,10 +31,12 @@ object CastableFeature : Listener {
         if (prev != null &&
             ItemSlotChanges.testSlot(slot, prev)
         ) {
-            val castable = prev.getProp(ItemPropTypes.CASTABLE)
-            if (castable != null) {
-                if (castable.triggerOff?.unwrap() == SpecialCastableTrigger.ON_UNEQUIP) {
-                    castable.skillOff?.cast(player)
+            val castables = prev.getProp(ItemPropTypes.CASTABLE)
+            if (castables != null) {
+                for (castable in castables.values) {
+                    if (castable.trigger.unwrap() == SpecialCastableTrigger.ON_UNEQUIP) {
+                        castable.skill.cast(player)
+                    }
                 }
             }
         }
@@ -43,10 +45,12 @@ object CastableFeature : Listener {
             ItemSlotChanges.testLevel(player, curr) &&
             ItemSlotChanges.testDurability(curr)
         ) {
-            val castable = curr.getProp(ItemPropTypes.CASTABLE)
-            if (castable != null) {
-                if (castable.trigger.unwrap() == SpecialCastableTrigger.ON_EQUIP) {
-                    castable.skill.cast(player)
+            val castables = curr.getProp(ItemPropTypes.CASTABLE)
+            if (castables != null) {
+                for (castable in castables.values) {
+                    if (castable.trigger.unwrap() == SpecialCastableTrigger.ON_EQUIP) {
+                        castable.skill.cast(player)
+                    }
                 }
             }
         }

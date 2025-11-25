@@ -19,21 +19,13 @@ data class Castable(
      */
     val skill: SkillWrapper,
     /**
-     * 该机制“失效时”施放的技能.
-     */
-    val skillOff: SkillWrapper? = null,
-    /**
      * 触发该机制的触发器.
      */
     val trigger: RegistryEntry<CastableTrigger>,
     /**
-     * 触发该机制“失效”的触发器.
-     */
-    val triggerOff: RegistryEntry<CastableTrigger>? = null,
-    /**
      * 触发该机制所需要的魔法值.
      */
-    val manaCost: Double,
+    val manaCost: Double = .0,
 )
 
 //<editor-fold desc="CastableTrigger">

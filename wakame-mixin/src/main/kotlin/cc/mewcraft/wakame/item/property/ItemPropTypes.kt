@@ -87,7 +87,7 @@ data object ItemPropTypes {
     }
 
     @JvmField
-    val CASTABLE: ItemPropType<Castable> = typeOf("castable") {
+    val CASTABLE: ItemPropType<Map<String, Castable>> = typeOf("castable") {
         serializers {
             registerAll(SkillWrapper.serializers())
             register(BuiltInRegistries.CASTABLE_TRIGGER.holderByNameTypeSerializer())
