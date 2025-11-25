@@ -22,7 +22,6 @@ class Element
 constructor(
     override val displayName: Component,
     override val displayStyles: Array<StyleBuilderApplicable>,
-    val stackEffect: StackEffect?,
 ) : Keyed, Examinable, PlayerFriendlyNamed {
 
     override fun key(): Key {
@@ -33,7 +32,6 @@ constructor(
         ExaminableProperty.of("key", key()),
         ExaminableProperty.of("displayName", displayName.plain),
         ExaminableProperty.of("displayStyles", displayStyles),
-        ExaminableProperty.of("stackEffect", stackEffect),
     )
 
     override fun toString(): String = toSimpleString()

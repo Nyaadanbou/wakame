@@ -21,31 +21,15 @@ import org.bukkit.event.Listener
 internal object KoishFleks : Listener, Fleks, FleksPatcher {
 
     private val SYSTEM_ORDER: List<Identifier> = listOf(
-        "init_ability_container",
         "init_item_cooldown_container",
         "init_attribute_container",
-        "init_element_stack_container",
         "init_kizami_container",
-        "init_mana",
-        "init_player_combo",
         "scan_item_slot_changes",
         "play_attack_speed_animation",
         "apply_attribute_effects",
         "apply_kizami_effects",
         "switch_katana",
         "tick_katana",
-        "ability_activator",
-        "ability_remover",
-        "tick_element_stack",
-        "update_entity_info_boss_bar",
-        "manage_boss_bar",
-        "count_tick",
-        "consume_mana_for_abilities",
-        "tick_ability_blackhole",
-        "tick_ability_blink",
-        "tick_ability_dash",
-        "tick_ability_multi_jump",
-        "render_once_off_item_name",
         "apply_enchantment_effect",
         "tick_antigrav_shot_enchantment",
         "tick_attribute_enchantment",
@@ -53,9 +37,6 @@ internal object KoishFleks : Listener, Fleks, FleksPatcher {
         "tick_fragile_enchantment",
         "tick_smelter_enchantment",
         "tick_veinminer_enchantment",
-        "update_max_mana",
-        "restore_mana",
-        "display_mana",
         "render_particle"
     ).map(Identifiers::of)
 

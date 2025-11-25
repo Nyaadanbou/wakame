@@ -1,9 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.ability.meta.AbilityMeta
-import cc.mewcraft.wakame.ability.meta.AbilityMetaType
-import cc.mewcraft.wakame.ability.meta.AbilityMetaTypes
-import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
 import cc.mewcraft.wakame.ecs.FamiliesBootstrapper
 import cc.mewcraft.wakame.ecs.SystemBootstrapper
 import cc.mewcraft.wakame.element.Element
@@ -56,24 +52,6 @@ object BuiltInRegistries {
     // ------------
     // 注册表
     // ------------
-
-    /**
-     * 技能配置.
-     */
-    @JvmField
-    val ABILITY_META: WritableRegistry<AbilityMeta> = registerSimple(BuiltInRegistryKeys.ABILITY_META)
-
-    /**
-     * 技能配置的类型.
-     */
-    @JvmField
-    val ABILITY_META_TYPE: WritableRegistry<AbilityMetaType<*>> = registerSimple(BuiltInRegistryKeys.ABILITY_META_TYPE) { AbilityMetaTypes }
-
-    /**
-     * 技能触发器.
-     */
-    @JvmField
-    val ABILITY_TRIGGER: WritableRegistry<AbilityTrigger> = registerSimple(BuiltInRegistryKeys.ABILITY_TRIGGER)
 
     /**
      * 机制触发器.

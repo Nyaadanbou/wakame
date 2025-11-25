@@ -70,9 +70,8 @@ internal object ElementRegistryLoader : RegistryLoader {
         val id = Identifiers.of(nodeKey.toString())
         val displayName = node.node("name").get<Component>(Component.text(id.asString()))
         val displayStyles = node.node("styles").get<Array<StyleBuilderApplicable>>(emptyArray())
-        val stackEffect = node.node("stack_effects").get<StackEffect>()
 
-        return id to Element(displayName, displayStyles, stackEffect)
+        return id to Element(displayName, displayStyles)
     }
 }
 

@@ -4,7 +4,6 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
-import cc.mewcraft.wakame.ability.trigger.AbilityTriggerRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorContainer
 import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
@@ -42,7 +41,6 @@ private val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.bui
     stage = InitStage.PRE_WORLD,
     runAfter = [
         AttributeFacadeRegistryLoader::class, // deps: 需要直接的数据
-        AbilityTriggerRegistryLoader::class,
         LootTableRegistryLoader::class
     ]
 )

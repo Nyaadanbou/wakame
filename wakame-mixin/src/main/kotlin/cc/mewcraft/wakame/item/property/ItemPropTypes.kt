@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.property
 
-import cc.mewcraft.wakame.ability.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.integration.skill.SkillWrapper
@@ -78,13 +77,6 @@ data object ItemPropTypes {
 
     @JvmField
     val EXTRA_LORE: ItemPropType<ExtraLore> = typeOf("extra_lore")
-
-    @JvmField
-    val ABILITY: ItemPropType<AbilityOnItem> = typeOf("ability") {
-        serializers {
-            register(AbilityTriggerVariant.SERIALIZER)
-        }
-    }
 
     @JvmField
     val CASTABLE: ItemPropType<Map<String, Castable>> = typeOf("castable") {

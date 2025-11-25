@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.property.impl
 
-import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
 import cc.mewcraft.wakame.integration.skill.SkillWrapper
 import cc.mewcraft.wakame.item.property.impl.GenericCastableTrigger.LEFT_CLICK
 import cc.mewcraft.wakame.item.property.impl.GenericCastableTrigger.RIGHT_CLICK
@@ -36,7 +35,7 @@ data class Castable(
  */
 interface CastableTrigger {
     /**
-     * 用来在配置文件里指定该 [AbilityTrigger].
+     * 用来在配置文件里指定该 [CastableTrigger].
      */
     val id: Key
 }
@@ -50,7 +49,7 @@ enum class GenericCastableTrigger(
      */
     val char: Char,
     /**
-     * 用来在配置文件里指定该 [AbilityTrigger].
+     * 用来在配置文件里指定该 [CastableTrigger].
      */
     override val id: Key,
 ) : CastableTrigger {
@@ -93,7 +92,7 @@ enum class SequenceCastableTrigger(
     ;
 
     /**
-     * 用来在配置文件里指定该 [AbilityTrigger].
+     * 用来在配置文件里指定该 [CastableTrigger].
      */
     override val id: Key = Key.key("koish", "sequence/${sequence.map(GenericCastableTrigger::char).joinToString("")}")
 

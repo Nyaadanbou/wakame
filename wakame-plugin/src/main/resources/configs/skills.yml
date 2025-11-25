@@ -2,6 +2,7 @@
 version: 1
 
 display:
+
   triggers:
     generic/left_click:
       name: "L"
@@ -14,13 +15,12 @@ display:
       failure_style: "<red>"
       progress_style: "<yellow>"
 
-  player_combo:
+  sequence:
     connector: "<gray> ➔ </gray>"
-    success_message:
+    success:
       - type: actionbar
         text: "<trigger_completed>"
-
-    failure_message:
+    failure:
       - type: actionbar
         text: "<trigger_completed>"
       - type: sound
@@ -28,8 +28,7 @@ display:
         source: player
         pitch: 0.2
         emitter: self
-
-    progress_message:
+    in_progress:
       - type: actionbar
         text: "<trigger_completed>"
       - type: sound
@@ -38,10 +37,9 @@ display:
         pitch: 0.3
         emitter: self
 
-    mana_cost_message:
-      - type: item_name
-        text: "<aqua><gray>-</gray> <aqua><count></aqua> <blue>[</blue>●<blue>]</blue></aqua>"
-
-    no_enough_mana_message:
-      - type: item_name
-        text: "<red>你的魔力不足. </red>"
+  mana_cost_message:
+    - type: item_name
+      text: "<aqua><gray>-</gray> <aqua><count></aqua> <blue>[</blue>●<blue>]</blue></aqua>"
+  not_enough_mana_message:
+    - type: item_name
+      text: "<red>你的魔力不足. </red>"

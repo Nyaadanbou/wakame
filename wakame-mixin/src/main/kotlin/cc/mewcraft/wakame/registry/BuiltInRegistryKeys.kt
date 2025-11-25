@@ -1,8 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.ability.meta.AbilityMeta
-import cc.mewcraft.wakame.ability.meta.AbilityMetaType
-import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
 import cc.mewcraft.wakame.ecs.FamiliesBootstrapper
 import cc.mewcraft.wakame.ecs.SystemBootstrapper
 import cc.mewcraft.wakame.element.Element
@@ -41,15 +38,6 @@ object BuiltInRegistryKeys {
     val ROOT_REGISTRY_NAME = Identifiers.of("built_in")
 
     ///
-
-    @JvmField
-    val ABILITY_META = createRegistryKey<AbilityMeta>("ability_meta")
-
-    @JvmField
-    val ABILITY_META_TYPE = createRegistryKey<AbilityMetaType<*>>("ability_meta")
-
-    @JvmField
-    val ABILITY_TRIGGER = createRegistryKey<AbilityTrigger>("ability_trigger")
 
     @JvmField
     val CASTABLE_TRIGGER = createRegistryKey<CastableTrigger>("castable_trigger")
