@@ -1,6 +1,7 @@
-package cc.mewcraft.wakame.ecs.bridge
+package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -12,10 +13,10 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
 /**
- * 负责管理 [org.bukkit.entity.Player] 对应的 [EEntity] 的生命周期
+ * 负责管理 [org.bukkit.entity.Player] 对应的 [cc.mewcraft.wakame.ecs.bridge.EEntity] 的生命周期
  */
 @Init(stage = InitStage.POST_WORLD)
-object BukkitPlayerBridge : Listener {
+object BukkitBridge : Listener {
 
     @InitFun
     fun init() {
