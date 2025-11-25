@@ -79,7 +79,13 @@ object BuiltInRegistries {
      * 机制触发器.
      */
     @JvmField
-    val CASTABLE_TRIGGER: WritableRegistry<CastableTrigger> = registerSimple(BuiltInRegistryKeys.CASTABLE_TRIGGER) { GenericCastableTrigger.LEFT_CLICK; ComboCastableTrigger.LLL }
+    val CASTABLE_TRIGGER: WritableRegistry<CastableTrigger> = registerSimple(BuiltInRegistryKeys.CASTABLE_TRIGGER) { registry ->
+        GenericCastableTrigger.LEFT_CLICK
+        SequenceCastableTrigger.LLL
+        SpecialCastableTrigger.ON_EQUIP
+
+        registry.freeze() // 对于这种纯 enum 类型的注册表, 在初始化后就可以直接 freeze
+    }
 
     /**
      * SkillWrapper 的类型.

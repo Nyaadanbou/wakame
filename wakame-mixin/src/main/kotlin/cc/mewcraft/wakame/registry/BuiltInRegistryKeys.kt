@@ -52,7 +52,7 @@ object BuiltInRegistryKeys {
     val ABILITY_TRIGGER = createRegistryKey<AbilityTrigger>("ability_trigger")
 
     @JvmField
-    val CASTABLE_TRIGGER = createRegistryKey<CastableTrigger>("mechanic_trigger")
+    val CASTABLE_TRIGGER = createRegistryKey<CastableTrigger>("castable_trigger")
 
     @JvmField
     val SKILL_WRAPPER_TYPE = createRegistryKey<SkillWrapperType>("skill_wrapper_type")
