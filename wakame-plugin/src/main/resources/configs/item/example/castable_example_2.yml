@@ -1,0 +1,27 @@
+base: leather_boots
+
+item_name: "castable_example_2"
+
+slot: minecraft:feet
+
+# 使该物品可以释放机制
+castable:
+
+  # 以下设计说明:
+  # 总体是一个二段跳被动技能的配置.
+  # Koish 这边只负责在装备和脱下时触发技能.
+  # 在装备时给玩家添加一个光环, 使其获得二段跳光环.
+  # 在脱下时给玩家移除该光环, 使其失去二段跳光环.
+  # 拥有光环的持续时间内, 逻辑全由光环处理.
+
+  on_equip:
+    skill:
+      type: block
+      value: "double_jump_on_equip"
+    trigger: "special/equip"
+
+  on_unequip:
+    skill:
+      type: block
+      value: "double_jump_on_unequip"
+    trigger: "special/on_unequip"

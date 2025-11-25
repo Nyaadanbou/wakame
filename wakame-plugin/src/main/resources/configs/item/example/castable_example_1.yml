@@ -1,0 +1,53 @@
+base: stick
+
+item_name: "castable_example_1"
+
+slot: minecraft:mainhand
+
+# 使该物品可以释放机制
+castable:
+
+  # 注意这里必须写成一个映射
+  # 映射的键可以随意命名, 只要不和其他机制冲突即可
+  # 实现上会按顺序遍历这些机制, 并检查触发器是否匹配
+
+  # 以下设计说明:
+  # use 是一个右键时触发的技能, 因此 trigger 设为 generic/right_click·
+
+  on_use:
+    # 类型为 "block", 则值需要指定一个技能的 id
+    # 这里的例子指定了 id 为 "hide" 的技能
+    # (id 的格式取决于实现)
+    skill:
+      type: block
+      value: "hide"
+    # 机制的触发器:
+    # - special/        # 特殊触发器
+    #   on_equip        # 在生效槽位装备该物品时触发一次
+    #   on_unequip      # 从生效槽位脱下该物品时触发一次
+    # - generic/        # 一般触发器, 对应 Koish 内部的 use 和 attack
+    #   left_click      # 手持物品左键时触发
+    #   right_click     # 手持物品右键时触发
+    # - sequence/          # 组合键, 需要按顺序连续按下左右键来触发. 0 = left click, 1 = right click
+    #   [0|1]{3}        # 例如: 000, 001, 010
+    # - input/          # 玩家输入触发器
+    #   forward
+    #   backward
+    #   left
+    #   right
+    #   jump
+    #   sneak
+    #   sprint
+    trigger: "generic/right_click"
+    # 触发所需的法力值, 默认为 0
+    mana_cost: 10.0
+
+  on_attack:
+    # 类型为 "inline", 则值需要指定技能的内联配置
+    # 这里的例子指定了一个治疗技能的内联配置
+    # (内联配置的格式取决于实现)
+    skill:
+      type: inline
+      value: "heal{amount=20} @self"
+    trigger: "generic/left_click"
+    mana_cost: 15.0

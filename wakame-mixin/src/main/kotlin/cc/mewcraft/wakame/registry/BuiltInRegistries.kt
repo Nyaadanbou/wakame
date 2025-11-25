@@ -1,9 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.ability.meta.AbilityMeta
-import cc.mewcraft.wakame.ability.meta.AbilityMetaType
-import cc.mewcraft.wakame.ability.meta.AbilityMetaTypes
-import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
 import cc.mewcraft.wakame.ecs.FamiliesBootstrapper
 import cc.mewcraft.wakame.ecs.SystemBootstrapper
 import cc.mewcraft.wakame.element.Element
@@ -16,6 +12,8 @@ import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.entity.typeref.EntityRef
 import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
+import cc.mewcraft.wakame.integration.skill.SkillWrapperType
+import cc.mewcraft.wakame.integration.skill.SkillWrapperTypes
 import cc.mewcraft.wakame.item.ItemRefHandler
 import cc.mewcraft.wakame.item.KoishItem
 import cc.mewcraft.wakame.item.KoishItemProxy
@@ -31,10 +29,7 @@ import cc.mewcraft.wakame.item.datagen.ItemMetaType
 import cc.mewcraft.wakame.item.datagen.ItemMetaTypes
 import cc.mewcraft.wakame.item.property.ItemPropType
 import cc.mewcraft.wakame.item.property.ItemPropertyTypes
-import cc.mewcraft.wakame.item.property.impl.CraftingReminderType
-import cc.mewcraft.wakame.item.property.impl.CraftingReminderTypes
-import cc.mewcraft.wakame.item.property.impl.EnchantSlotCapacityType
-import cc.mewcraft.wakame.item.property.impl.EnchantSlotCapacityTypes
+import cc.mewcraft.wakame.item.property.impl.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.loot.LootTable
 import cc.mewcraft.wakame.loot.entry.LootPoolEntries
@@ -59,22 +54,23 @@ object BuiltInRegistries {
     // ------------
 
     /**
-     * 技能配置.
+     * 机制触发器.
      */
     @JvmField
-    val ABILITY_META: WritableRegistry<AbilityMeta> = registerSimple(BuiltInRegistryKeys.ABILITY_META)
+    val CASTABLE_TRIGGER: WritableRegistry<CastableTrigger> = registerSimple(BuiltInRegistryKeys.CASTABLE_TRIGGER) { registry ->
+        GenericCastableTrigger.LEFT_CLICK
+        SequenceCastableTrigger.LLL
+        SpecialCastableTrigger.ON_EQUIP
+        InputCastableTrigger.FORWARD
+
+        registry.freeze() // 对于这种纯 enum 类型的注册表, 在初始化后就可以直接 freeze
+    }
 
     /**
-     * 技能配置的类型.
+     * SkillWrapper 的类型.
      */
     @JvmField
-    val ABILITY_META_TYPE: WritableRegistry<AbilityMetaType<*>> = registerSimple(BuiltInRegistryKeys.ABILITY_META_TYPE) { AbilityMetaTypes }
-
-    /**
-     * 技能触发器.
-     */
-    @JvmField
-    val ABILITY_TRIGGER: WritableRegistry<AbilityTrigger> = registerSimple(BuiltInRegistryKeys.ABILITY_TRIGGER)
+    val SKILL_WRAPPER_TYPE: WritableRegistry<SkillWrapperType> = registerSimple(BuiltInRegistryKeys.SKILL_WRAPPER_TYPE) { SkillWrapperTypes }
 
     /**
      * 自定义物品的类型.

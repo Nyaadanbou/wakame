@@ -65,14 +65,12 @@ class RendererConfigTest : KoinTest {
             // registries
             AttributeRegistry.onPreWorld()
             ElementRegistry.onPreWorld()
-            AbilityRegistry.onPreWorld()
             KizamiRegistry.onPreWorld()
             RarityRegistry.onPreWorld()
 
             // item cells
             AttributeCoreBootstrap.onPostWorld()
             EmptyCoreBootstrap.onPostWorld()
-            AbilityCoreBootstrap.onPostWorld()
 
             // item meta
             ItemMetaBootstrap.onPostWorld()

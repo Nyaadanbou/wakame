@@ -44,34 +44,34 @@ interface PlayerManaIntegration {
 
     companion object : PlayerManaIntegration {
 
-        override val manaType: PlayerManaType get() = currentImpl.manaType
-        override fun getMana(player: Player): Double = currentImpl.getMana(player)
-        override fun setMana(player: Player, amount: Double) = currentImpl.setMana(player, amount)
-        override fun getMaxMana(player: Player): Double = currentImpl.getMaxMana(player)
-        override fun consumeMana(player: Player, amount: Double): Boolean = currentImpl.consumeMana(player, amount)
+        override val manaType: PlayerManaType get() = implementation.manaType
+        override fun getMana(player: Player): Double = implementation.getMana(player)
+        override fun setMana(player: Player, amount: Double) = implementation.setMana(player, amount)
+        override fun getMaxMana(player: Player): Double = implementation.getMaxMana(player)
+        override fun consumeMana(player: Player, amount: Double): Boolean = implementation.consumeMana(player, amount)
 
         /**
          * 设置当前的实现.
          */
         fun setImplementation(impl: PlayerManaIntegration) {
-            currentImpl = impl
+            implementation = impl
         }
 
         /**
-         * 无操作实现.
+         * 无限魔法实现.
          */
-        private val zeroImpl = object : PlayerManaIntegration {
+        private val INFINITE = object : PlayerManaIntegration {
             override val manaType: PlayerManaType = PlayerManaType.ZERO
-            override fun getMana(player: Player): Double = 0.0
+            override fun getMana(player: Player): Double = Double.MAX_VALUE
             override fun setMana(player: Player, amount: Double) {}
-            override fun getMaxMana(player: Player): Double = 0.0
-            override fun consumeMana(player: Player, amount: Double): Boolean = false
+            override fun getMaxMana(player: Player): Double = Double.MAX_VALUE
+            override fun consumeMana(player: Player, amount: Double): Boolean = true
         }
 
         /**
          * 当前实现.
          */
-        private var currentImpl: PlayerManaIntegration = zeroImpl
+        private var implementation: PlayerManaIntegration = INFINITE
     }
 
 }

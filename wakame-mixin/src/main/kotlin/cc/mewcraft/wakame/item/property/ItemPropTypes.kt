@@ -1,26 +1,15 @@
 package cc.mewcraft.wakame.item.property
 
-import cc.mewcraft.wakame.ability.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.player.AttackSpeed
+import cc.mewcraft.wakame.integration.skill.SkillWrapper
 import cc.mewcraft.wakame.item.SlotDisplayDictData
 import cc.mewcraft.wakame.item.SlotDisplayLoreData
 import cc.mewcraft.wakame.item.SlotDisplayNameData
 import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.item.data.impl.CoreContainer
 import cc.mewcraft.wakame.item.data.impl.ItemLevel
-import cc.mewcraft.wakame.item.property.impl.AbilityOnItem
-import cc.mewcraft.wakame.item.property.impl.Arrow
-import cc.mewcraft.wakame.item.property.impl.CraftingReminder
-import cc.mewcraft.wakame.item.property.impl.EnchantSlotCapacity
-import cc.mewcraft.wakame.item.property.impl.EntityBucket
-import cc.mewcraft.wakame.item.property.impl.ExtraLore
-import cc.mewcraft.wakame.item.property.impl.Fuel
-import cc.mewcraft.wakame.item.property.impl.HoldLastDamage
-import cc.mewcraft.wakame.item.property.impl.ItemBase
-import cc.mewcraft.wakame.item.property.impl.ItemSlot
-import cc.mewcraft.wakame.item.property.impl.ItemSlotGroup
-import cc.mewcraft.wakame.item.property.impl.LiquidCollisionBlockSettings
+import cc.mewcraft.wakame.item.property.impl.*
 import cc.mewcraft.wakame.item.property.impl.weapon.DualSword
 import cc.mewcraft.wakame.item.property.impl.weapon.Katana
 import cc.mewcraft.wakame.item.property.impl.weapon.Melee
@@ -90,9 +79,10 @@ data object ItemPropTypes {
     val EXTRA_LORE: ItemPropType<ExtraLore> = typeOf("extra_lore")
 
     @JvmField
-    val ABILITY: ItemPropType<AbilityOnItem> = typeOf("ability") {
+    val CASTABLE: ItemPropType<Map<String, Castable>> = typeOf("castable") {
         serializers {
-            register(AbilityTriggerVariant.SERIALIZER)
+            registerAll(SkillWrapper.serializers())
+            register(BuiltInRegistries.CASTABLE_TRIGGER.holderByNameTypeSerializer())
         }
     }
 
@@ -186,7 +176,7 @@ data object ItemPropTypes {
      * 物品在工作台中合成后返还的物品.
      */
     @JvmField
-    val CRAFTING_REMINDER: ItemPropType<CraftingReminder> = typeOf("crafting_reminder"){
+    val CRAFTING_REMINDER: ItemPropType<CraftingReminder> = typeOf("crafting_reminder") {
         serializers {
             registerAll(CraftingReminder.serializers())
         }

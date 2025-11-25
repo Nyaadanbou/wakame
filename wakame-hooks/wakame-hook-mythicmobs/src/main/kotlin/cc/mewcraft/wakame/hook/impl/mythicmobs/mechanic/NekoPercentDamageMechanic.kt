@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.hook.impl.mythicmobs.mechanic
 import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.entity.attribute.Attributes
-import cc.mewcraft.wakame.hook.impl.mythicmobs.MythicMobsUtils
+import cc.mewcraft.wakame.hook.impl.mythicmobs.MythicUtils
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.ITargetedEntitySkill
@@ -125,7 +125,7 @@ class NekoPercentDamageMechanic(
             KoishDamageSources.mobAttack(casterEntity)
         }
 
-        val mythicDamageMetadata = MythicMobsUtils.createMythicDamageMetadata(data)
+        val mythicDamageMetadata = MythicUtils.createMythicDamageMetadata(data)
         // 添加标记使本次伤害被视为技能伤害, 而不再触发 ~onAttack 触发器, 避免堆栈溢出
         target.setMetadata("skill-damage", mythicDamageMetadata)
         // 对目标生物造成自定义的萌芽伤害

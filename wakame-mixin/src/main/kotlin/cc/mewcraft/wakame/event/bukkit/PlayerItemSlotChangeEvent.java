@@ -16,8 +16,8 @@ public class PlayerItemSlotChangeEvent extends PlayerEvent {
     public static final HandlerList HANDLERS = new HandlerList();
 
     private final ItemSlot slot;
-    private final ItemStack oldItemStack;
-    private final ItemStack newItemStack;
+    private final @Nullable ItemStack oldItemStack;
+    private final @Nullable ItemStack newItemStack;
 
     public PlayerItemSlotChangeEvent(
             Player player,

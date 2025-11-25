@@ -1,0 +1,45 @@
+# 不要修改!
+version: 1
+
+display:
+
+  triggers:
+    generic/left_click:
+      name: "L"
+      success_style: "<green>"
+      failure_style: "<red>"
+      progress_style: "<yellow>"
+    generic/right_click:
+      name: "R"
+      success_style: "<green>"
+      failure_style: "<red>"
+      progress_style: "<yellow>"
+
+  sequence:
+    connector: "<gray> ➔ </gray>"
+    success:
+      - type: actionbar
+        text: "<trigger_completed>"
+    failure:
+      - type: actionbar
+        text: "<trigger_completed>"
+      - type: sound
+        name: "minecraft:block.glass.break"
+        source: player
+        pitch: 0.2
+        emitter: self
+    in_progress:
+      - type: actionbar
+        text: "<trigger_completed>"
+      - type: sound
+        name: "minecraft:ui.button.click"
+        source: player
+        pitch: 0.3
+        emitter: self
+
+  mana_cost_message:
+    - type: item_name
+      text: "<aqua><gray>-</gray> <aqua><count></aqua> <blue>[</blue>●<blue>]</blue></aqua>"
+  not_enough_mana_message:
+    - type: item_name
+      text: "<red>你的魔力不足. </red>"

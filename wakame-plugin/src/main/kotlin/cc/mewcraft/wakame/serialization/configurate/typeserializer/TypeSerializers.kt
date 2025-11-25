@@ -54,9 +54,6 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     .register(RegistryKey.ITEM.valueByNameTypeSerializer())
     .register(RegistryKey.MOB_EFFECT.valueByNameTypeSerializer())
     // Koish Registry
-    .register(BuiltInRegistries.ABILITY_META.holderByNameTypeSerializer())
-    .register(BuiltInRegistries.ABILITY_META_TYPE.valueByNameTypeSerializer())
-    .register(BuiltInRegistries.ABILITY_TRIGGER.valueByNameTypeSerializer())
     .register(BuiltInRegistries.ATTRIBUTE.holderByNameTypeSerializer())
     .register(BuiltInRegistries.ELEMENT.holderByNameTypeSerializer())
     .register(BuiltInRegistries.ENTITY_REF.holderByNameTypeSerializer())

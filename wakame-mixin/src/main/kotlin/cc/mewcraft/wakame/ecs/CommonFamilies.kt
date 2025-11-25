@@ -1,8 +1,5 @@
 package cc.mewcraft.wakame.ecs
 
-import cc.mewcraft.wakame.ability.component.Ability
-import cc.mewcraft.wakame.ability.component.CastBy
-import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.*
 import com.github.quillraven.fleks.Family
@@ -26,14 +23,5 @@ object CommonFamilies : Families {
 
     @JvmField
     val BUKKIT_PLAYER: Family = EWorld.family { all(BukkitObject, BukkitEntity, BukkitPlayer) }
-
-    // ------------------------------
-    // 其余 family 为任意系统的具体实现, 其具体定义应该参考具体的文档
-    // 在这里声明 family 仅仅是 Fleks 最佳实践 (https://github.com/Quillraven/Fleks/wiki/Family)
-    // 创建 family 有消耗, 并且 family 中的 entity 始终会在每 tick 更新
-    // ------------------------------
-
-    @JvmField
-    val ABILITY: Family = EWorld.family { all(Ability, CastBy, TargetTo, TickCount) }
 
 }

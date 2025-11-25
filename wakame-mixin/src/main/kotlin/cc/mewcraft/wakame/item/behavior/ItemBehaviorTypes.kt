@@ -32,7 +32,7 @@ object ItemBehaviorTypes {
     val TEST_INTERACT = typeOf("test_interact", TestInteract)
 
     /**
-     * 物品具有该行为时, 可以触发技能组合键.
+     * 物品具有该行为时, 可以触发指定的机制.
      */
     @JvmField
     val CASTABLE = typeOf("castable", Castable)

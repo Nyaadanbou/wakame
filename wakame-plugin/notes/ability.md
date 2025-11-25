@@ -1,3 +1,5 @@
+# !!! DEPRECATED !!!
+
 ## 关于技能的修改
 
 ### Ability (技能)

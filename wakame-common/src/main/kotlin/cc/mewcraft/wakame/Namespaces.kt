@@ -47,11 +47,6 @@ object Namespaces {
     const val STATISTICS = "statistics"
 
     /**
-     * The namespace of all types of Ability.
-     */
-    const val ABILITY = "ability"
-
-    /**
      * The namespace of all types of Trigger.
      */
     const val TRIGGER = "trigger"
