@@ -14,11 +14,16 @@ castable:
     type: block
     value: "slash"
 
+  # 可以省略
+  # 该机制“失效时”施放的技能, 配合 trigger_off 使用
+  # 具体用例的话, 可用于实现“伤害反弹”,“二段跳”等机制
+  skill_off:
+    type: block
+    value: "slash_off"
+
   # 机制的触发器:
   # - special/  # 特殊触发器
-  #   in_mainhand  # 手持物品时(主手)触发一次
-  #   in_offhand  # 手持物品时(副手)触发一次
-  #   on_equip  # 装备该物品时触发一次
+  #   on_equip  # 装备该物品在生效槽位时触发一次 (skill); 从生效槽位脱下该物品触发一次 (skill_off)
   # - generic/  # 一般触发器, 对应 Koish 内部的 useOn 和 attackOn ???
   #   left_click  # 手持物品左键时触发
   #   right_click  # 手持物品右键时触发
@@ -32,6 +37,11 @@ castable:
   #   101
   #   100
   trigger: "generic/right_click"
+
+  # 可以省略
+  # “失效”机制的触发器
+  # 具体用例的话, 可用于实现“伤害反弹”,“二段跳”等机制
+  trigger_off: "special/on_unequip"
 
   # 触发所需的法力值
   mana_cost: 10.0
