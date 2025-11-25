@@ -14,7 +14,6 @@ internal object ConfigsExtractor {
 
     // 要抽取的文件, 全部位于 zip 的 /configs 之下
     private val FILES_TO_EXTRACT: List<String> = listOf(
-        "ability.yml",
         "attributes.yml",
         "brewery/config.yml",
         "config.yml",
@@ -32,7 +31,6 @@ internal object ConfigsExtractor {
 
     // 要抽取的文件夹, 全部位于 zip 的 /configs 之下
     private val DIRECTORIES_TO_EXTRACT: List<String> = listOf(
-        "ability/",
         "attack_speed/",
         "catalog/",
         "crafting_station/",
@@ -55,8 +53,8 @@ internal object ConfigsExtractor {
 
             // 先检查文件类型是否都正确
             // 注意这里检查的是 srcRootDir 下的文件, 所以这里其实是检查程序员有没有犯错
-            require(FILES_TO_EXTRACT.all { srcRootDir.resolve(it).isRegularFile() })
-            require(DIRECTORIES_TO_EXTRACT.all { srcRootDir.resolve(it).isDirectory() })
+            require(FILES_TO_EXTRACT.all { srcRootDir.resolve(it).isRegularFile() }) { "ConfigsExtractor: 要提取的默认配置文件不存在!" }
+            require(DIRECTORIES_TO_EXTRACT.all { srcRootDir.resolve(it).isDirectory() }) { "ConfigsExtractor: 要提取的默认配置文件夹不存在!" }
 
             // 对于文件, 如果目标文件不存在, 则直接从压缩包中提取; 否则什么也不做
             for (file in FILES_TO_EXTRACT) {
