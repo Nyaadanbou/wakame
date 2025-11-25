@@ -19,7 +19,7 @@ object MythicSkillIntegration : SkillIntegration {
     override fun castBlockSkill(player: Player, id: String) {
         val origin = player.location
         val entityTargets = listOf(MythicUtil.getTargetedEntity(player))
-        val locationTargets = listOf(player.getLineOfSight(null, 16).last().location)
+        val locationTargets = listOf(player.getLineOfSight(null, 32).last().location)
         mythicApi.apiHelper.castSkill(player, id, player, origin, entityTargets, locationTargets, 1f)
         LOGGER.info("Trying to running block skill: $id")
     }
@@ -30,7 +30,7 @@ object MythicSkillIntegration : SkillIntegration {
         val caster = mythicApi.skillManager.getCaster(entity)
         val skill = mythicApi.skillManager.getSkill(line).orElse(null)
         val entityTargets = listOf(entity)
-        val locationTargets = listOf(player.getLineOfSight(null, 16).last().location).map(BukkitAdapter::adapt)
+        val locationTargets = listOf(BukkitAdapter.adapt(player.getLineOfSight(null, 32).last().location))
         val meta = SkillMetadataImpl(SkillTriggers.API, caster, entity, entity.location, entityTargets, locationTargets, 1f)
         if (skill == null) {
             LOGGER.error("Invalid line supplied to MythicInlineSkillWrapper: $line")
