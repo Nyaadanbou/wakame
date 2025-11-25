@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.property.impl.GenericCastableTrigger.RIGHT_CLICK
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import net.kyori.adventure.key.Key
+import org.bukkit.Input
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 /**
@@ -41,7 +42,7 @@ interface CastableTrigger {
 }
 
 /**
- * 单机左/右键.
+ * 单击左/右键.
  */
 enum class GenericCastableTrigger(
     /**
@@ -57,22 +58,22 @@ enum class GenericCastableTrigger(
     /**
      * 玩家左键点击时触发.
      */
-    LEFT_CLICK('0', "generic/left_click"),
+    LEFT_CLICK('0', "left_click"),
     /**
      * 玩家右键点击时触发.
      */
-    RIGHT_CLICK('1', "generic/right_click"),
+    RIGHT_CLICK('1', "right_click"),
     ;
 
     init {
         BuiltInRegistries.CASTABLE_TRIGGER.add(id, this)
     }
 
-    constructor(char: Char, id: String) : this(char, Key.key("koish", id))
+    constructor(char: Char, id: String) : this(char, Key.key("koish", "generic/${id}"))
 }
 
 /**
- * 连续点击左/右键组成特定序列.
+ * 连续点击左/右键组成的特定序列.
  */
 enum class SequenceCastableTrigger(
     /**
@@ -94,7 +95,7 @@ enum class SequenceCastableTrigger(
     /**
      * 用来在配置文件里指定该 [AbilityTrigger].
      */
-    override val id: Key = Key.key("koish", "combo/${sequence.map(GenericCastableTrigger::char).joinToString("")}")
+    override val id: Key = Key.key("koish", "sequence/${sequence.map(GenericCastableTrigger::char).joinToString("")}")
 
     init {
         BuiltInRegistries.CASTABLE_TRIGGER.add(id, this)
@@ -111,17 +112,52 @@ enum class SpecialCastableTrigger(
     /**
      * 在生效槽位装备该物品时触发一次.
      */
-    ON_EQUIP("special/on_equip"),
+    ON_EQUIP("on_equip"),
     /**
      * 从生效槽位脱下该物品时触发一次.
      */
-    ON_UNEQUIP("special/on_unequip")
+    ON_UNEQUIP("on_unequip")
     ;
 
-    constructor(id: String) : this(Key.key("koish", id))
+    constructor(id: String) : this(Key.key("koish", "special/${id}"))
 
     init {
         BuiltInRegistries.CASTABLE_TRIGGER.add(id, this)
+    }
+}
+
+/**
+ * 输入.
+ */
+enum class InputCastableTrigger(
+    override val id: Key,
+) : CastableTrigger {
+    FORWARD("forward"),
+    BACKWARD("backward"),
+    LEFT("left"),
+    RIGHT("right"),
+    JUMP("jump"),
+    SNEAK("sneak"),
+    SPRINT("sprint")
+    ;
+
+    constructor(id: String) : this(Key.key("koish", "input/${id}"))
+
+    init {
+        BuiltInRegistries.CASTABLE_TRIGGER.add(id, this)
+    }
+
+    fun equals(input: Input): Boolean {
+        return when {
+            input.isForward && this == FORWARD -> true
+            input.isBackward && this == BACKWARD -> true
+            input.isLeft && this == LEFT -> true
+            input.isRight && this == RIGHT -> true
+            input.isJump && this == JUMP -> true
+            input.isSneak && this == SNEAK -> true
+            input.isSprint && this == SPRINT -> true
+            else -> false
+        }
     }
 }
 

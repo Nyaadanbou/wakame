@@ -4,17 +4,26 @@ import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.item.ItemSlotChanges
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
+import cc.mewcraft.wakame.item.property.impl.InputCastableTrigger
 import cc.mewcraft.wakame.item.property.impl.SpecialCastableTrigger
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.registerEvents
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerInputEvent
 
 // 开发日记 2025/11/24:
 // 这里仅仅用来实现 castable 中的几个特殊触发器:
 // - special/on_equip
 // - special/on_unequip
+// - input/forward
+// - input/backward
+// - input/left
+// - input/right
+// - input/jump
+// - input/sneak
+// - input/sprint
 @Init(stage = InitStage.POST_WORLD)
 object CastableFeature : Listener {
 
@@ -51,6 +60,21 @@ object CastableFeature : Listener {
                     if (castable.trigger.unwrap() == SpecialCastableTrigger.ON_EQUIP) {
                         castable.skill.cast(player, castable)
                     }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    fun on(event: PlayerInputEvent) {
+        val player = event.player
+        val input = event.input
+        val castables = player.inventory.itemInMainHand.getProp(ItemPropTypes.CASTABLE)
+        if (castables != null) {
+            for (castable in castables.values) {
+                val trigger = castable.trigger.unwrap()
+                if (trigger is InputCastableTrigger && trigger.equals(input)) {
+                    castable.skill.cast(player, castable)
                 }
             }
         }

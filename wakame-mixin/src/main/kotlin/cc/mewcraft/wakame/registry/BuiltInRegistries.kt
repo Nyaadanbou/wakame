@@ -83,6 +83,7 @@ object BuiltInRegistries {
         GenericCastableTrigger.LEFT_CLICK
         SequenceCastableTrigger.LLL
         SpecialCastableTrigger.ON_EQUIP
+        InputCastableTrigger.FORWARD
 
         registry.freeze() // 对于这种纯 enum 类型的注册表, 在初始化后就可以直接 freeze
     }
