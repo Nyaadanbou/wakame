@@ -35,7 +35,7 @@ object CastableFeature : Listener {
             if (castables != null) {
                 for (castable in castables.values) {
                     if (castable.trigger.unwrap() == SpecialCastableTrigger.ON_UNEQUIP) {
-                        castable.skill.cast(player)
+                        castable.skill.cast(player, castable)
                     }
                 }
             }
@@ -49,7 +49,7 @@ object CastableFeature : Listener {
             if (castables != null) {
                 for (castable in castables.values) {
                     if (castable.trigger.unwrap() == SpecialCastableTrigger.ON_EQUIP) {
-                        castable.skill.cast(player)
+                        castable.skill.cast(player, castable)
                     }
                 }
             }

@@ -9,8 +9,8 @@ import cc.mewcraft.wakame.item.behavior.UseContext
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.CastableTrigger
-import cc.mewcraft.wakame.item.property.impl.ComboCastableTrigger
 import cc.mewcraft.wakame.item.property.impl.GenericCastableTrigger
+import cc.mewcraft.wakame.item.property.impl.SequenceCastableTrigger
 import org.bukkit.entity.Player
 import cc.mewcraft.wakame.item.property.impl.Castable as CastableProp
 
@@ -48,19 +48,19 @@ object Castable : SimpleInteract {
                 val skill = castable.skill
                 if (skill is SkillWrapper.Block) {
                     if (
-                        SkillIntegration.isCooldown(player, skill.id).not() &&
+                        SkillIntegration.isCooldown(player, skill.id, castable).not() &&
                         PlayerManaIntegration.consumeMana(player, mana)
                     ) {
-                        skill.cast(player)
+                        skill.cast(player, castable)
                     }
                 } else {
                     if (PlayerManaIntegration.consumeMana(player, mana)) {
-                        skill.cast(player)
+                        skill.cast(player, castable)
                     }
                 }
             }
 
-            is ComboCastableTrigger -> {
+            is SequenceCastableTrigger -> {
                 // 触发 combo
                 // TODO 积累 combo
                 //   检查当前积累的 combo 是否有3个

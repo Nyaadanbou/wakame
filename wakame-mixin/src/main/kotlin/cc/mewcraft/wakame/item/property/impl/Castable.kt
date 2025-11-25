@@ -45,7 +45,7 @@ interface CastableTrigger {
  */
 enum class GenericCastableTrigger(
     /**
-     * 用于拼接成 [ComboCastableTrigger] 的字符.
+     * 用于拼接成 [SequenceCastableTrigger] 的字符.
      */
     val char: Char,
     /**
@@ -74,7 +74,7 @@ enum class GenericCastableTrigger(
 /**
  * 连续点击左/右键组成特定序列.
  */
-enum class ComboCastableTrigger(
+enum class SequenceCastableTrigger(
     /**
      * 组成该组合键序列的 [GenericCastableTrigger].
      */

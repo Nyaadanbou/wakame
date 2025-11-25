@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.integration.skill
 
+import cc.mewcraft.wakame.item.property.impl.Castable
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.Registry
 import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
@@ -29,7 +30,7 @@ interface SkillWrapper {
      *
      * @param player 释放者
      */
-    fun cast(player: Player)
+    fun cast(player: Player, ctx: Castable)
 
     /**
      * 一个完整的机制, 以 [id] 唯一识别.
@@ -44,8 +45,8 @@ interface SkillWrapper {
         override val type: SkillWrapperType
             get() = SkillWrapperTypes.BLOCK
 
-        override fun cast(player: Player) {
-            SkillIntegration.castBlockSkill(player, id)
+        override fun cast(player: Player, ctx: Castable) {
+            SkillIntegration.castBlockSkill(player, id, ctx)
         }
     }
 
@@ -62,8 +63,8 @@ interface SkillWrapper {
         override val type: SkillWrapperType
             get() = SkillWrapperTypes.INLINE
 
-        override fun cast(player: Player) {
-            SkillIntegration.castInlineSkill(player, line)
+        override fun cast(player: Player, ctx: Castable) {
+            SkillIntegration.castInlineSkill(player, line, ctx)
         }
     }
 
@@ -72,7 +73,7 @@ interface SkillWrapper {
         fun serializers(): TypeSerializerCollection {
             val serials = TypeSerializerCollection.builder()
             serials.register<SkillWrapperType>(BuiltInRegistries.SKILL_WRAPPER_TYPE.valueByNameTypeSerializer())
-            serials.registerExact<SkillWrapper>(DispatchingSerializer.create(SkillWrapper::type, SkillWrapperType::kotlinType))
+            serials.registerExact<SkillWrapper>(DispatchingSerializer.create<SkillWrapperType, SkillWrapper>(SkillWrapper::type, SkillWrapperType::kotlinType))
             return serials.build()
         }
     }
