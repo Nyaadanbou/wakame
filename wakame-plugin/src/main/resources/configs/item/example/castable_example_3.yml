@@ -26,7 +26,7 @@ castable:
     skill:
       type: block
       value: "slash_on_equip"
-    trigger: "special/equip"
+    trigger: "special/on_equip"
 
   on_unequip:
     skill:

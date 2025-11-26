@@ -5,7 +5,9 @@ import cc.mewcraft.wakame.item.ItemSlotChanges
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.InputCastableTrigger
+import cc.mewcraft.wakame.item.property.impl.ItemSlotRegistry
 import cc.mewcraft.wakame.item.property.impl.SpecialCastableTrigger
+import cc.mewcraft.wakame.item.tryCastSkill
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.registerEvents
@@ -13,17 +15,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInputEvent
 
-// 开发日记 2025/11/24:
-// 这里仅仅用来实现 castable 中的几个特殊触发器:
-// - special/on_equip
-// - special/on_unequip
-// - input/forward
-// - input/backward
-// - input/left
-// - input/right
-// - input/jump
-// - input/sneak
-// - input/sprint
+
 @Init(stage = InitStage.POST_WORLD)
 object CastableFeature : Listener {
 
@@ -31,6 +23,10 @@ object CastableFeature : Listener {
         registerEvents()
     }
 
+    // Dev log 2025/11/24:
+    // Implements the following triggers in castable:
+    // - special/on_equip
+    // - special/on_unequip
     @EventHandler
     fun on(event: PlayerItemSlotChangeEvent) {
         val player = event.player
@@ -43,9 +39,10 @@ object CastableFeature : Listener {
             val castables = prev.getProp(ItemPropTypes.CASTABLE)
             if (castables != null) {
                 for (castable in castables.values) {
-                    if (castable.trigger.unwrap() == SpecialCastableTrigger.ON_UNEQUIP) {
-                        castable.skill.cast(player, castable)
-                    }
+                    val trigger = castable.trigger.unwrap()
+                    if (trigger != SpecialCastableTrigger.ON_UNEQUIP)
+                        continue
+                    tryCastSkill(player, castable)
                 }
             }
         }
@@ -57,24 +54,40 @@ object CastableFeature : Listener {
             val castables = curr.getProp(ItemPropTypes.CASTABLE)
             if (castables != null) {
                 for (castable in castables.values) {
-                    if (castable.trigger.unwrap() == SpecialCastableTrigger.ON_EQUIP) {
-                        castable.skill.cast(player, castable)
-                    }
+                    val trigger = castable.trigger.unwrap()
+                    if (trigger != SpecialCastableTrigger.ON_EQUIP)
+                        continue
+                    tryCastSkill(player, castable)
                 }
             }
         }
     }
 
+    // Dev log 2025/11/24:
+    // Implements the following triggers in castable:
+    // - input/forward
+    // - input/backward
+    // - input/left
+    // - input/right
+    // - input/jump
+    // - input/sneak
+    // - input/sprint
     @EventHandler
     fun on(event: PlayerInputEvent) {
         val player = event.player
         val input = event.input
-        val castables = player.inventory.itemInMainHand.getProp(ItemPropTypes.CASTABLE)
-        if (castables != null) {
-            for (castable in castables.values) {
-                val trigger = castable.trigger.unwrap()
-                if (trigger is InputCastableTrigger && trigger.equals(input)) {
-                    castable.skill.cast(player, castable)
+        for (slot in ItemSlotRegistry.itemSlots()) {
+            val item = slot.getItem(player) ?: continue
+            val castables = item.getProp(ItemPropTypes.CASTABLE) ?: continue
+            if (ItemSlotChanges.testSlot(slot, item) &&
+                ItemSlotChanges.testLevel(player, item) &&
+                ItemSlotChanges.testDurability(item)
+            ) {
+                for (castable in castables.values) {
+                    val trigger = castable.trigger.unwrap()
+                    if (trigger is InputCastableTrigger && trigger.test(input)) {
+                        tryCastSkill(player, castable)
+                    }
                 }
             }
         }

@@ -87,6 +87,9 @@ object TranslatableMessages {
     val MSG_VILLAGER_TRADE_DISABLED_IN_THIS_WORLD = create("msg_villager_trade_disabled_in_this_world")
     val MSG_RECV_TELEPORT_REQUEST_BLOCKED = create("msg_recv_teleport_request_blocked")
     val MSG_SEND_TELEPORT_REQUEST_BLOCKED = create("msg_send_teleport_request_blocked")
+    val MSG_ERR_SKILL_ON_COOLDOWN = create("msg_err_skill_on_cooldown")
+    val MSG_ERR_NOT_ENOUGH_MANA = create("msg_err_not_enough_mana")
+    val MSG_MANA_CONSUMED = create("msg_mana_consumed")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)
