@@ -16,6 +16,7 @@ object Castable : SimpleInteract {
 
     // Implements the following triggers in castable:
     // - generic/right_click
+    // - sequence/1
     override fun handleSimpleUse(context: UseContext): InteractionResult {
         val castable = context.itemstack.getProp(ItemPropTypes.CASTABLE) ?: return InteractionResult.PASS
         val player = context.player
@@ -29,6 +30,7 @@ object Castable : SimpleInteract {
 
     // Implements the following triggers in castable:
     // - generic/left_click
+    // - sequence/0
     override fun handleSimpleAttack(context: AttackContext): InteractionResult {
         val castable = context.itemstack.getProp(ItemPropTypes.CASTABLE) ?: return InteractionResult.PASS
         val player = context.player
