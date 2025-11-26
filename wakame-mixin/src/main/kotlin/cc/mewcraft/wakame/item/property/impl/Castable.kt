@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import net.kyori.adventure.key.Key
 import org.bukkit.Input
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import java.util.function.Predicate
 
 /**
  * 机制, 储存了一个物品可以释放出的机制的信息.
@@ -130,33 +131,23 @@ enum class SpecialCastableTrigger(
  */
 enum class InputCastableTrigger(
     override val id: Key,
-) : CastableTrigger {
-    FORWARD("forward"),
-    BACKWARD("backward"),
-    LEFT("left"),
-    RIGHT("right"),
-    JUMP("jump"),
-    SNEAK("sneak"),
-    SPRINT("sprint")
+    private val predicate: Predicate<Input>,
+) : CastableTrigger, Predicate<Input> by predicate {
+    FORWARD("forward", Input::isForward),
+    BACKWARD("backward", Input::isBackward),
+    LEFT("left", Input::isLeft),
+    RIGHT("right", Input::isRight),
+    JUMP("jump", Input::isJump),
+    SNEAK("sneak", Input::isSneak),
+    SPRINT("sprint", Input::isSprint)
     ;
 
-    constructor(id: String) : this(Key.key("koish", "input/${id}"))
+    constructor(id: String, test: (Input) -> Boolean) : this(
+        Key.key("koish", "input/${id}"), test
+    )
 
     init {
         BuiltInRegistries.CASTABLE_TRIGGER.add(id, this)
-    }
-
-    fun equals(input: Input): Boolean {
-        return when {
-            input.isForward && this == FORWARD -> true
-            input.isBackward && this == BACKWARD -> true
-            input.isLeft && this == LEFT -> true
-            input.isRight && this == RIGHT -> true
-            input.isJump && this == JUMP -> true
-            input.isSneak && this == SNEAK -> true
-            input.isSprint && this == SPRINT -> true
-            else -> false
-        }
     }
 }
 
