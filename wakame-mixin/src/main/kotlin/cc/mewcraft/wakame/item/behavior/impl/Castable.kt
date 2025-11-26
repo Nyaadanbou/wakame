@@ -16,6 +16,8 @@ import cc.mewcraft.wakame.item.property.impl.Castable as CastableProp
 
 object Castable : SimpleInteract {
 
+    // 用来实现 castable 中的以下触发器:
+    // - generic/right_click
     override fun handleSimpleUse(context: UseContext): InteractionResult {
         val castable = context.itemstack.getProp(ItemPropTypes.CASTABLE) ?: return InteractionResult.PASS
         val player = context.player
@@ -27,6 +29,8 @@ object Castable : SimpleInteract {
         return InteractionResult.SUCCESS_AND_CANCEL
     }
 
+    // 用来实现 castable 中的以下触发器:
+    // - generic/left_click
     override fun handleSimpleAttack(context: AttackContext): InteractionResult {
         val castable = context.itemstack.getProp(ItemPropTypes.CASTABLE) ?: return InteractionResult.PASS
         val player = context.player
@@ -44,17 +48,17 @@ object Castable : SimpleInteract {
         val trigger = castable.trigger.unwrap()
         when (trigger) {
             expected -> {
-                val mana = castable.manaCost
                 val skill = castable.skill
+                val manaCost = castable.manaCost
                 if (skill is SkillWrapper.Block) {
                     if (
                         SkillIntegration.isCooldown(player, skill.id, castable).not() &&
-                        PlayerManaIntegration.consumeMana(player, mana)
+                        PlayerManaIntegration.consumeMana(player, manaCost)
                     ) {
                         skill.cast(player, castable)
                     }
                 } else {
-                    if (PlayerManaIntegration.consumeMana(player, mana)) {
+                    if (PlayerManaIntegration.consumeMana(player, manaCost)) {
                         skill.cast(player, castable)
                     }
                 }
