@@ -15,14 +15,14 @@ object MythicDungeonsListener : Listener {
 
     @EventHandler
     private fun on(event: DungeonDisposeEvent) {
-        for (player in event.instance.players) {
+        for (player in event.instance.players.toList()) {
             MythicDungeonsApi.leaveParty(player.player)
         }
     }
 
     @EventHandler
     private fun on(event: DungeonEndEvent) {
-        for (player in event.gamePlayers) {
+        for (player in event.gamePlayers.toList()) {
             MythicDungeonsApi.leaveParty(player.player)
         }
     }
@@ -39,8 +39,7 @@ object MythicDungeonsListener : Listener {
 
     @EventHandler
     private fun on(event: PlayerQuitEvent) {
-        val player = event.player
-        MythicDungeonsApi.leaveParty(player)
+        MythicDungeonsApi.leaveParty(event.player)
     }
     //</editor-fold>
 }

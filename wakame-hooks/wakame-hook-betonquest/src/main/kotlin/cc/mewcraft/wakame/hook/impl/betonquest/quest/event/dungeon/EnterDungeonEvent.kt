@@ -18,7 +18,7 @@ class EnterDungeonEvent(
         val dungeonValue = dungeon.getValue(profile)
         val usePartyValue = useParty.getValue(profile)
 
-        if (MythicDungeonsApi.hasDungeon(dungeonValue)) {
+        if (!MythicDungeonsApi.hasDungeon(dungeonValue)) {
             logger.warn("No dungeon found with name '$dungeonValue'")
             return
         }
