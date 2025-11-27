@@ -1,5 +1,8 @@
 package cc.mewcraft.wakame.hook.impl.betonquest
 
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.dungeon.AwaitingDungeonFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.dungeon.InsideDungeonFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.party.HasPartyFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.dungeon.EnterDungeonEventFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.party.CreatePartyEventFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.party.LeavePartyEventFactory
@@ -21,6 +24,9 @@ object BetonQuestHook {
         /* Quest Type Registries */
 
         // Condition
+        val conditionRegistry = plugin.questRegistries.condition()
+        conditionRegistry.register("insidedungeon", InsideDungeonFactory(loggerFactory, data))
+        conditionRegistry.register("hasparty", HasPartyFactory(loggerFactory))
 
         // Event
         val eventRegistry = plugin.questRegistries.event()
