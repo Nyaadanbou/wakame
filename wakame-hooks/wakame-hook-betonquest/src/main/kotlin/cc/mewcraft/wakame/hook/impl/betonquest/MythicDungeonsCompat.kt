@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.betonquest
 
 import cc.mewcraft.wakame.hook.impl.betonquest.dungeon.MythicDungeonsListener
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.EnterDungeonEventFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.dungeon.EnterDungeonEventFactory
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.util.registerEvents
 import org.betonquest.betonquest.BetonQuest

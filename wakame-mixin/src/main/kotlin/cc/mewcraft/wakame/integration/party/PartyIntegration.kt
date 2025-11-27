@@ -34,41 +34,57 @@ interface PartyIntegration {
      */
     fun lookupPartyById(id: UUID): CompletableFuture<Party?>
 
-    fun lookupPartyByPlayer(player: Player): CompletableFuture<Party?>
+    /**
+     * Look up the party a player is currently in.
+     *
+     * @param id the player
+     * @return existing party
+     */
+    fun lookupPartyByPlayer(id: UUID): CompletableFuture<Party?>
+
+    /**
+     * Look up the party a player is currently in.
+     *
+     * @param player the player
+     * @return existing party
+     */
+    fun lookupPartyByPlayer(player: Player): CompletableFuture<Party?> {
+        return lookupPartyByPlayer(player.uniqueId)
+    }
 
     /**
      * This companion object holds current [PartyIntegration] implementation.
      */
     companion object : PartyIntegration {
 
-        private var currImpl: PartyIntegration = object : PartyIntegration {
+        private var implementation: PartyIntegration = object : PartyIntegration {
             override fun createParty(name: Component): Party {
-                return Party.noOp()
+                return Party.NO_OP
             }
 
             override fun lookupPartyById(id: UUID): CompletableFuture<Party?> {
                 return CompletableFuture.completedFuture(null)
             }
 
-            override fun lookupPartyByPlayer(player: Player): CompletableFuture<Party?> {
+            override fun lookupPartyByPlayer(id: UUID): CompletableFuture<Party?> {
                 return CompletableFuture.completedFuture(null)
             }
         }
 
         fun setImplementation(impl: PartyIntegration) {
-            currImpl = impl
+            implementation = impl
         }
 
         override fun createParty(name: Component): Party {
-            return currImpl.createParty(name)
+            return implementation.createParty(name)
         }
 
         override fun lookupPartyById(id: UUID): CompletableFuture<Party?> {
-            return currImpl.lookupPartyById(id)
+            return implementation.lookupPartyById(id)
         }
 
-        override fun lookupPartyByPlayer(player: Player): CompletableFuture<Party?> {
-            return currImpl.lookupPartyByPlayer(player)
+        override fun lookupPartyByPlayer(id: UUID): CompletableFuture<Party?> {
+            return implementation.lookupPartyByPlayer(id)
         }
     }
 }

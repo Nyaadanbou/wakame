@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.hook.impl.betonquest.quest.event
+package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.dungeon
 
 import org.betonquest.betonquest.api.instruction.Instruction
 import org.betonquest.betonquest.api.instruction.argument.Argument
@@ -23,11 +23,9 @@ class EnterDungeonEventFactory(
         val useParty = instruction.getValue("party", Argument.BOOLEAN, false)
             ?: error("Failed to get 'party' argument")
 
-        val enterDungeonEvent = OnlineEventAdapter(
-            EnterDungeonEvent(dungeon, useParty, logger),
-            logger,
-            instruction.getPackage(),
-        )
-        return PrimaryServerThreadEvent(enterDungeonEvent, threadData)
+        val onlineEvent = EnterDungeonEvent(dungeon, useParty, logger)
+        val questPackage = instruction.getPackage()
+        val onlineEventAdapter = OnlineEventAdapter(onlineEvent, logger, questPackage)
+        return PrimaryServerThreadEvent(onlineEventAdapter, threadData)
     }
 }
