@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.hook.impl.betonquest
 
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.EnterDungeonEventFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.dungeon.EnterDungeonEventFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.party.CreatePartyEventFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.party.LeavePartyEventFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.item.KoishQuestItemFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.item.KoishQuestItemSerializer
 import cc.mewcraft.wakame.integration.Hook
@@ -11,7 +13,9 @@ object BetonQuestHook {
 
     init {
         val plugin = BetonQuest.getInstance()
-        val logger = plugin.loggerFactory
+        val questTypeApi = plugin.questTypeApi
+        val profileProvider = plugin.profileProvider
+        val loggerFactory = plugin.loggerFactory
         val data = plugin.primaryServerThreadData
 
         /* Quest Type Registries */
@@ -20,7 +24,9 @@ object BetonQuestHook {
 
         // Event
         val eventRegistry = plugin.questRegistries.event()
-        eventRegistry.register("playdungeon", EnterDungeonEventFactory(logger, data))
+        eventRegistry.register("playdungeon", EnterDungeonEventFactory(loggerFactory, data))
+        eventRegistry.register("createparty", CreatePartyEventFactory(loggerFactory, questTypeApi, profileProvider))
+        eventRegistry.register("leaveparty", LeavePartyEventFactory(loggerFactory))
 
         // Objective
 

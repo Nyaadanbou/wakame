@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.integration.party.Party
 import cc.mewcraft.wakame.integration.party.PartyIntegration
 import net.draycia.carbon.api.CarbonChatProvider
 import net.kyori.adventure.text.Component
-import org.bukkit.entity.Player
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import net.draycia.carbon.api.users.Party as InternalParty
@@ -62,10 +61,10 @@ private object CarbonChatPartyIntegration : PartyIntegration {
             }
     }
 
-    override fun lookupPartyByPlayer(player: Player): CompletableFuture<Party?> {
+    override fun lookupPartyByPlayer(id: UUID): CompletableFuture<Party?> {
         return CarbonChatProvider.carbonChat()
             .userManager()
-            .user(player.uniqueId)
+            .user(id)
             .thenCompose { user ->
                 user.party()
             }.thenApply { handle ->
