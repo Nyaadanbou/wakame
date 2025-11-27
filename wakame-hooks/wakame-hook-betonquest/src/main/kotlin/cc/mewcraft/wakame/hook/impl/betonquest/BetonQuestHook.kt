@@ -25,6 +25,7 @@ object BetonQuestHook {
 
         // Condition
         val conditionRegistry = plugin.questRegistries.condition()
+        conditionRegistry.register("awaitingdungeon", AwaitingDungeonFactory(loggerFactory, data))
         conditionRegistry.register("insidedungeon", InsideDungeonFactory(loggerFactory, data))
         conditionRegistry.register("hasparty", HasPartyFactory(loggerFactory))
 
