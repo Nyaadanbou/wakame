@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.dungeon
 
-import cc.mewcraft.wakame.SERVER
+import cc.mewcraft.wakame.hook.impl.betonquest.MythicDungeonsApi
 import cc.mewcraft.wakame.integration.party.PartyIntegration
-import net.playavalon.mythicdungeons.MythicDungeons
 import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.profile.OnlineProfile
 import org.betonquest.betonquest.api.quest.event.online.OnlineEvent
+import org.bukkit.Bukkit
 
 class EnterDungeonEvent(
     private val dungeon: Variable<String>,
@@ -14,21 +14,17 @@ class EnterDungeonEvent(
     private val logger: BetonQuestLogger,
 ) : OnlineEvent {
 
-    private val mdApi: MythicDungeons
-        get() = MythicDungeons.inst()
-
     override fun execute(profile: OnlineProfile) {
-        val player = profile.player
         val dungeonValue = dungeon.getValue(profile)
         val usePartyValue = useParty.getValue(profile)
 
-        if (mdApi.dungeonManager.get(dungeonValue) == null) {
+        if (MythicDungeonsApi.hasDungeon(dungeonValue)) {
             logger.warn("No dungeon found with name '$dungeonValue'")
             return
         }
 
         // 先使该玩家退出所在小队 (如果有)
-        mdApi.removeFromParty(player)
+        MythicDungeonsApi.leaveParty(profile.player)
 
         // MythicDungeons 的 API 实在是太乱了
         //
@@ -43,29 +39,25 @@ class EnterDungeonEvent(
     }
 
     private fun sendPartyToDungeon(profile: OnlineProfile, dungeon: String) {
-        val player = profile.player
-        PartyIntegration.lookupPartyByPlayer(player).thenAccept { koishParty ->
+        PartyIntegration.lookupPartyByPlayer(profile.player).thenAccept { koishParty ->
             if (koishParty != null) {
                 // 创建一个 MythicDungeons 小队
-                mdApi.createParty(player)
-                // 获取刚才创建的 MythicDungeons 小队
-                val mdParty = mdApi.getParty(player) ?: run {
-                    logger.error("Failed to get MythicDungeons party for player ${profile.player.name}.")
-                    return@thenAccept
-                }
+                val mdParty = MythicDungeonsApi.createParty(profile.player)
                 // 将 KoishParty 的成员添加到 MythicDungeons 小队
                 koishParty.members
                     .asSequence()
-                    .filter { it != player.uniqueId } // 排除队长
-                    .mapNotNull(SERVER::getPlayer)
-                    .filter { it.world == player.world } // 仅包含与队长在同一世界的玩家
+                    .filter { it != profile.player.uniqueId } // 排除队长
+                    .mapNotNull(Bukkit::getPlayer)
+                    .filter { it.world == profile.player.world } // 仅包含与队长在同一世界的玩家
                     .forEach { member ->
+                        // 先将每个成员从倒计时队列中移除 (如果有)
+                        MythicDungeonsApi.unqueue(member)
                         // 使每个成员退出当前的 MythicDungeons 小队 (如果有)
-                        mdApi.removeFromParty(member)
+                        MythicDungeonsApi.leaveParty(member)
                         // 将该玩家添加到刚才创建的 MythicDungeons 小队
                         mdParty.addPlayer(member)
                     }
-                mdApi.sendToDungeon(player, dungeon)
+                MythicDungeonsApi.sendToDungeon(profile.player, dungeon)
             } else {
                 logger.info("Player ${profile.player.name} is not in a party, but 'party:true' argument was used.")
                 sendSoloToDungeon(profile, dungeon)
@@ -74,7 +66,6 @@ class EnterDungeonEvent(
     }
 
     private fun sendSoloToDungeon(profile: OnlineProfile, dungeon: String) {
-        val player = profile.player
-        mdApi.sendToDungeon(player, dungeon)
+        MythicDungeonsApi.sendToDungeon(profile.player, dungeon)
     }
 }
