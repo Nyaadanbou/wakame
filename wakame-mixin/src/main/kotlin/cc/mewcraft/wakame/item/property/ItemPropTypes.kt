@@ -183,6 +183,16 @@ data object ItemPropTypes {
     }
 
     /**
+     * 物品进行特定行为时触发额外战利品.
+     */
+    @JvmField
+    val EXTRA_LOOTS: ItemPropType<ExtraLoots> = typeOf("extra_loots"){
+        serializers {
+            register(ExtraLoots.Serializer)
+        }
+    }
+
+    /**
      * 物品放置出来的普通方块.
      *
      * 需要安装对应插件才能正常使用.
