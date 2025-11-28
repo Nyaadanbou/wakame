@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(files("libs/TheBrewingProject-1.9.0.jar"))
+    compileOnly(local.thebrewingproject)
 
     // internal
     compileOnly(project(":wakame-mixin"))

@@ -55,6 +55,7 @@ townyflight = "1.13.0"
 nightcore = "2.7.8"
 economybridge = "1.2.1" # 同上
 breweryx = "3.4.10"
+thebrewingproject = "v2.4.1"
 chestshop = "3.12.3-SNAPSHOT"
 craftengine = "0.0.63"
 auraskills = "2.2.4"
@@ -143,6 +144,7 @@ townyflight = { group = "com.github.TownyAdvanced", name = "TownyFlight", versio
 nightcore = { group = "su.nightexpress.nightcore", name = "main", version.ref = "nightcore" }
 economybridge = { group = "su.nightexpress.economybridge", name = "economy-bridge", version.ref = "economybridge" }
 breweryx = { group = "com.dre.brewery", name = "BreweryX", version.ref = "breweryx" }
+thebrewingproject = { group = "com.github.BreweryTeam", name = "TheBrewingProject", version.ref = "thebrewingproject" }
 chestshop = { group = "com.acrobot.chestshop", name = "chestshop", version.ref = "chestshop" }
 craftengine-core = { group = "net.momirealms", name = "craft-engine-core", version.ref = "craftengine" }
 craftengine-bukkit = { group = "net.momirealms", name = "craft-engine-bukkit", version.ref = "craftengine" }
