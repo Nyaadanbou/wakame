@@ -4,10 +4,12 @@ import cc.mewcraft.wakame.hook.impl.craftengine.item.behavior.CraftEnginePlaceBl
 import cc.mewcraft.wakame.hook.impl.craftengine.item.behavior.CraftEnginePlaceDoubleHighBlock
 import cc.mewcraft.wakame.hook.impl.craftengine.item.behavior.CraftEnginePlaceLiquidCollisionBlock
 import cc.mewcraft.wakame.integration.Hook
-import cc.mewcraft.wakame.item.behavior.CustomBlockChecker
 import cc.mewcraft.wakame.item.behavior.impl.external.PlaceBlock
 import cc.mewcraft.wakame.item.behavior.impl.external.PlaceDoubleHighBlock
 import cc.mewcraft.wakame.item.behavior.impl.external.PlaceLiquidCollisionBlock
+import cc.mewcraft.wakame.util.BlockUtils
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
 import net.momirealms.craftengine.bukkit.api.CraftEngineBlocks
 import org.bukkit.block.Block
 
@@ -21,16 +23,26 @@ object CraftEngineHook {
         PlaceDoubleHighBlock.register(CraftEnginePlaceDoubleHighBlock)
         PlaceLiquidCollisionBlock.register(CraftEnginePlaceLiquidCollisionBlock)
 
-        // 修改 Koish 交互系统判定自定义方块的方法
-        CustomBlockChecker.register(CraftEngineCustomBlockChecker)
+        // 修改 Koish BlockUtils中的方法
+        BlockUtils.register(CraftEngineBlockUtils)
     }
 
     /**
-     * CraftEngine 的自定义方块检查器.
+     * Hook CraftEngine 后 [cc.mewcraft.wakame.util.BlockUtils] 的实现.
      */
-    object CraftEngineCustomBlockChecker : CustomBlockChecker {
+    object CraftEngineBlockUtils : BlockUtils {
         override fun isCustomBlock(block: Block): Boolean {
             return CraftEngineBlocks.isCustomBlock(block)
+        }
+
+        override fun getBlockId(block: Block): Identifier {
+            val immutableBlockState = CraftEngineBlocks.getCustomBlockState(block)
+            if (immutableBlockState == null) {
+                return block.type.key()
+            } else {
+                val ceKey = immutableBlockState.owner().value().id()
+                return Identifiers.of(ceKey.namespace, ceKey.value)
+            }
         }
     }
 }

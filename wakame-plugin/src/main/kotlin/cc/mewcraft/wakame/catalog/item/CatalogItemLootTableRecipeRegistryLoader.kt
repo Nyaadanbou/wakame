@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
-import cc.mewcraft.wakame.catalog.item.recipe.MojangLootTable
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -16,13 +15,18 @@ import cc.mewcraft.wakame.registry.DynamicRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.MINECRAFT_SERVER
+import cc.mewcraft.wakame.util.MojangLootTable
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.yamlLoader
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.Registries
-import kotlin.io.path.*
+import kotlin.io.path.extension
+import kotlin.io.path.name
+import kotlin.io.path.readText
+import kotlin.io.path.relativeTo
+import kotlin.io.path.walk
 import kotlin.streams.asSequence
 
 @Init(
