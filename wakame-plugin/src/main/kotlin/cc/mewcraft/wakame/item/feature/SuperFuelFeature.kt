@@ -9,6 +9,9 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.FurnaceBurnEvent
 
+/**
+ * 实现了自定义燃料.
+ */
 @Init(stage = InitStage.POST_WORLD)
 object SuperFuelFeature : Listener {
 
