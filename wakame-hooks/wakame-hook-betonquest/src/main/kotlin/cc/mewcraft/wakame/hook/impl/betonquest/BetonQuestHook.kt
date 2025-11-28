@@ -6,6 +6,8 @@ import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.party.HasPartyFac
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.dungeon.EnterDungeonEventFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.party.CreatePartyEventFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.party.LeavePartyEventFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.item.BrewQuestItemFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.item.BrewQuestItemSerializer
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.item.KoishQuestItemFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.item.KoishQuestItemSerializer
 import cc.mewcraft.wakame.integration.Hook
@@ -49,6 +51,8 @@ object BetonQuestHook {
         val itemRegistry = plugin.featureRegistries.item()
         itemRegistry.register("koish", KoishQuestItemFactory())
         itemRegistry.registerSerializer("koish", KoishQuestItemSerializer())
+        itemRegistry.register("brew", BrewQuestItemFactory())
+        itemRegistry.registerSerializer("brew", BrewQuestItemSerializer())
 
         // TextParser
 
