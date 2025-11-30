@@ -25,6 +25,7 @@ dependencies {
 
     // libraries
     compileOnly(local.betonquest) { isTransitive = false }
+    compileOnly(local.betonquest)
     compileOnly(local.thebrewingproject) { isTransitive = false }
     //compileOnly(local.mythicdungeons) // FIXME 等 MythicDungeons 仓库恢复后使用在线依赖
     compileOnly(files("libs/MythicDungeons.jar"))
