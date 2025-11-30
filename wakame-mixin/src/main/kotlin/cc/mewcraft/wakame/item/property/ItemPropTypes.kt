@@ -9,7 +9,19 @@ import cc.mewcraft.wakame.item.SlotDisplayNameData
 import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.item.data.impl.CoreContainer
 import cc.mewcraft.wakame.item.data.impl.ItemLevel
-import cc.mewcraft.wakame.item.property.impl.*
+import cc.mewcraft.wakame.item.property.impl.Arrow
+import cc.mewcraft.wakame.item.property.impl.Castable
+import cc.mewcraft.wakame.item.property.impl.CraftingReminder
+import cc.mewcraft.wakame.item.property.impl.EnchantSlotCapacity
+import cc.mewcraft.wakame.item.property.impl.EntityBucket
+import cc.mewcraft.wakame.item.property.impl.ExtraLoots
+import cc.mewcraft.wakame.item.property.impl.ExtraLore
+import cc.mewcraft.wakame.item.property.impl.Fuel
+import cc.mewcraft.wakame.item.property.impl.HoldLastDamage
+import cc.mewcraft.wakame.item.property.impl.ItemBase
+import cc.mewcraft.wakame.item.property.impl.ItemSlot
+import cc.mewcraft.wakame.item.property.impl.ItemSlotGroup
+import cc.mewcraft.wakame.item.property.impl.LiquidCollisionBlockSettings
 import cc.mewcraft.wakame.item.property.impl.weapon.DualSword
 import cc.mewcraft.wakame.item.property.impl.weapon.Katana
 import cc.mewcraft.wakame.item.property.impl.weapon.Melee
@@ -191,6 +203,16 @@ data object ItemPropTypes {
             register(ExtraLoots.Serializer)
         }
     }
+
+    /**
+     * 该物品类型所属的标签.
+     * 不使用该 Property 直接进行物品标签相关的判定, 而是使用 plugin 包下的 ItemTagManager 中的相关方法.
+     *
+     * 这并非原版的标签系统, 而是由 Koish 管理的一套标签系统.
+     * 目前来说, 仅用于配方系统中原料的创建.
+     */
+    @JvmField
+    val ITEM_TAG: ItemPropType<Set<Identifier>> = typeOf("tag")
 
     /**
      * 物品放置出来的普通方块.

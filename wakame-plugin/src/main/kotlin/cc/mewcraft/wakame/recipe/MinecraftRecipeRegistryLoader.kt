@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.event.map.MinecraftRecipeRegistrationDoneEvent
 import cc.mewcraft.wakame.item.ItemRef
+import cc.mewcraft.wakame.item.ItemTagManager
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -21,8 +22,17 @@ import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.VisibleForTesting
 
-@Init(stage = InitStage.POST_WORLD)
-@Reload
+@Init(
+    stage = InitStage.POST_WORLD,
+    runAfter = [
+        ItemTagManager::class // 需要在标签加载后
+    ]
+)
+@Reload(
+    runAfter = [
+        ItemTagManager::class // 需要在标签加载后
+    ]
+)
 internal object MinecraftRecipeRegistryLoader {
 
     @VisibleForTesting
