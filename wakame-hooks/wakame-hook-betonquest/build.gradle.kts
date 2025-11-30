@@ -8,10 +8,14 @@ version = "0.0.1"
 repositories {
     nyaadanbouReleases()
     nyaadanbouPrivate()
+
+    // plugin: BetonQuest
     maven {
         name = "betonquestRepo"
         url = uri("https://nexus.betonquest.org/repository/betonquest/")
     }
+
+    // plugin: MythicDungeons
     //maven { // FIXME 等 MythicDungeons 仓库恢复后使用在线依赖
     //    name = "aestrusReleases"
     //    url = uri("https://maven.aestrus.io/releases")
@@ -24,9 +28,14 @@ dependencies {
     compileOnly(project(":wakame-plugin"))
 
     // libraries
-    compileOnly(local.betonquest) { isTransitive = false }
+
+    // plugin: BetonQuest
     compileOnly(local.betonquest)
+
+    // plugin: TheBrewingProject
     compileOnly(local.thebrewingproject) { isTransitive = false }
+
+    // plugin: MythicDungeons
     //compileOnly(local.mythicdungeons) // FIXME 等 MythicDungeons 仓库恢复后使用在线依赖
     compileOnly(files("libs/MythicDungeons.jar"))
 }
