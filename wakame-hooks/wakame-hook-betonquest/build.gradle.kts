@@ -11,8 +11,14 @@ repositories {
 
     // plugin: BetonQuest
     maven {
-        name = "betonquestRepo"
+        name = "betonquest"
         url = uri("https://nexus.betonquest.org/repository/betonquest/")
+    }
+
+    // plugin: TheBrewingProject
+    maven {
+        name = "jitpack"
+        url = uri("https://jitpack.io")
     }
 
     // plugin: MythicDungeons
@@ -30,7 +36,9 @@ dependencies {
     // libraries
 
     // plugin: BetonQuest
-    compileOnly(local.betonquest)
+    compileOnly(local.betonquest) {
+        exclude("de.themoep")
+    }
 
     // plugin: TheBrewingProject
     compileOnly(local.thebrewingproject) { isTransitive = false }
