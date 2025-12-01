@@ -38,8 +38,11 @@ class BrewQuestItem(
     }
 
     override fun generate(stackSize: Int, profile: Profile?): ItemStack {
+        // TODO 2025/12/01:
+        //  使用 RecipeResult#newBrewItem 来生成物品堆叠
+        //  这需要我们传入更多的参数来指定物品酒的各种属性 (如蒸馏次数)
         // 如果未指定 quality (为 null), 则生成 GOOD 品质的酒酿
-        return recipe.getRecipeResult(quality ?: BrewQuality.GOOD).newLorelessItem()
+        return recipe.getRecipeResult(quality ?: BrewQuality.GOOD).newLorelessItem().apply { amount = stackSize }
     }
 
     override fun matches(item: ItemStack?): Boolean {
@@ -49,6 +52,8 @@ class BrewQuestItem(
 
         // 比较 Recipe
         if (this.recipe.recipeName != recipe.recipeName) return false
+
+        // FIXME 2025/12/01: 目前这里拿到的 quality 始终是 EXCELLENT, 而非 Brew 实际的品质
         val quality = brew.quality(recipe).getOrNull() ?: return false
 
         // 比较 Quality

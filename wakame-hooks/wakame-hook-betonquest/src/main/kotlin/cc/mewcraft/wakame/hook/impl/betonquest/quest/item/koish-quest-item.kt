@@ -41,7 +41,7 @@ class KoishQuestItem(
             val ctx = ItemGenerationContext(itemType, 0f, level)
             KoishStackGenerator.generate(itemType, ctx)
         }
-        return itemstack
+        return itemstack.apply { amount = stackSize }
     }
 
     override fun matches(item: ItemStack?): Boolean {
