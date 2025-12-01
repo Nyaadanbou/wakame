@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.dungeon
 
-import cc.mewcraft.wakame.hook.impl.betonquest.MythicDungeonsApi
+import cc.mewcraft.wakame.hook.impl.betonquest.util.MythicDungeonsBridge
 import cc.mewcraft.wakame.integration.party.PartyIntegration
 import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
@@ -18,13 +18,13 @@ class EnterDungeonEvent(
         val dungeonValue = dungeon.getValue(profile)
         val usePartyValue = useParty.getValue(profile)
 
-        if (!MythicDungeonsApi.hasDungeon(dungeonValue)) {
+        if (!MythicDungeonsBridge.hasDungeon(dungeonValue)) {
             logger.warn("No dungeon found with name '$dungeonValue'")
             return
         }
 
         // 先使该玩家退出所在小队 (如果有)
-        MythicDungeonsApi.leaveParty(profile.player)
+        MythicDungeonsBridge.leaveParty(profile.player)
 
         // MythicDungeons 的 API 实在是太乱了
         //
@@ -42,7 +42,7 @@ class EnterDungeonEvent(
         PartyIntegration.lookupPartyByPlayer(profile.player).thenAccept { koishParty ->
             if (koishParty != null) {
                 // 创建一个 MythicDungeons 小队
-                val mdParty = MythicDungeonsApi.createParty(profile.player)
+                val mdParty = MythicDungeonsBridge.createParty(profile.player)
                 // 将 KoishParty 的成员添加到 MythicDungeons 小队
                 koishParty.members
                     .asSequence()
@@ -51,13 +51,13 @@ class EnterDungeonEvent(
                     .filter { it.world == profile.player.world } // 仅包含与队长在同一世界的玩家
                     .forEach { member ->
                         // 先将每个成员从倒计时队列中移除 (如果有)
-                        MythicDungeonsApi.unqueue(member)
+                        MythicDungeonsBridge.unqueue(member)
                         // 使每个成员退出当前的 MythicDungeons 小队 (如果有)
-                        MythicDungeonsApi.leaveParty(member)
+                        MythicDungeonsBridge.leaveParty(member)
                         // 将该玩家添加到刚才创建的 MythicDungeons 小队
                         mdParty.addPlayer(member)
                     }
-                MythicDungeonsApi.sendToDungeon(profile.player, dungeon)
+                MythicDungeonsBridge.sendToDungeon(profile.player, dungeon)
             } else {
                 logger.info("Player ${profile.player.name} is not in a party, but 'party:true' argument was used.")
                 sendSoloToDungeon(profile, dungeon)
@@ -66,6 +66,6 @@ class EnterDungeonEvent(
     }
 
     private fun sendSoloToDungeon(profile: OnlineProfile, dungeon: String) {
-        MythicDungeonsApi.sendToDungeon(profile.player, dungeon)
+        MythicDungeonsBridge.sendToDungeon(profile.player, dungeon)
     }
 }

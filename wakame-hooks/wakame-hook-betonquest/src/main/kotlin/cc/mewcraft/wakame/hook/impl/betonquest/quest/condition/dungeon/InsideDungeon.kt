@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.dungeon
 
-import cc.mewcraft.wakame.hook.impl.betonquest.MythicDungeonsApi
+import cc.mewcraft.wakame.hook.impl.betonquest.util.MythicDungeonsBridge
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.profile.OnlineProfile
 import org.betonquest.betonquest.api.quest.condition.online.OnlineCondition
@@ -10,6 +10,6 @@ class InsideDungeon(
 ) : OnlineCondition {
 
     override fun check(profile: OnlineProfile): Boolean {
-        return MythicDungeonsApi.isInsideDungeon(profile.player)
+        return MythicDungeonsBridge.isInsideDungeon(profile.player)
     }
 }

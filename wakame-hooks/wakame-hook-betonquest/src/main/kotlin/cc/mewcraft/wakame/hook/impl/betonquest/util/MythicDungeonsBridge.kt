@@ -1,10 +1,13 @@
-package cc.mewcraft.wakame.hook.impl.betonquest
+package cc.mewcraft.wakame.hook.impl.betonquest.util
 
 import net.playavalon.mythicdungeons.MythicDungeons
 import net.playavalon.mythicdungeons.player.party.partysystem.MythicParty
 import org.bukkit.entity.Player
 
-object MythicDungeonsApi {
+// 开发日记 2025/11/30:
+// 由于 MythicDungeons 的 API 过于狗屎, 写个桥接类来简化调用 (垃圾接口就应该封装起来!!!)
+
+object MythicDungeonsBridge {
 
     private val mdApi: MythicDungeons
         get() = MythicDungeons.inst()

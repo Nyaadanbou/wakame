@@ -50,11 +50,13 @@ luckperms = "5.4"
 papi = "2.11.6"
 quickshop = "6.2.0.10"
 towny = "0.100.4.0"
+worldedit = "7.3.0"
 worldguard = "7.0.7"
 townyflight = "1.13.0"
 nightcore = "2.7.8"
 economybridge = "1.2.1" # 同上
 breweryx = "3.4.10"
+thebrewingproject = "v2.4.1"
 chestshop = "3.12.3-SNAPSHOT"
 craftengine = "0.0.63"
 auraskills = "2.2.4"
@@ -131,6 +133,7 @@ betterhud-bukkit = { group = "io.github.toxicity188", name = "BetterHud-bukkit-a
 bettercommand = { group = "io.github.toxicity188", name = "BetterCommand", version.ref = "bettercommand" }
 economy = { group = "cc.mewcraft.economy", name = "api", version.ref = "economy" }
 chestsort = { group = "de.jeff_media", name = "ChestSortAPI", version.ref = "chestsort" }
+worldedit = { group = "com.sk89q.worldedit", name = "worldedit-bukkit", version.ref = "worldguard" }
 worldguard = { group = "com.sk89q.worldguard", name = "worldguard-bukkit", version.ref = "worldguard" }
 vault = { group = "com.github.MilkBowl", name = "VaultAPI", version.ref = "vault" }
 luckperms = { group = "net.luckperms", name = "api", version.ref = "luckperms" }
@@ -143,6 +146,7 @@ townyflight = { group = "com.github.TownyAdvanced", name = "TownyFlight", versio
 nightcore = { group = "su.nightexpress.nightcore", name = "main", version.ref = "nightcore" }
 economybridge = { group = "su.nightexpress.economybridge", name = "economy-bridge", version.ref = "economybridge" }
 breweryx = { group = "com.dre.brewery", name = "BreweryX", version.ref = "breweryx" }
+thebrewingproject = { group = "com.github.BreweryTeam", name = "TheBrewingProject", version.ref = "thebrewingproject" }
 chestshop = { group = "com.acrobot.chestshop", name = "chestshop", version.ref = "chestshop" }
 craftengine-core = { group = "net.momirealms", name = "craft-engine-core", version.ref = "craftengine" }
 craftengine-bukkit = { group = "net.momirealms", name = "craft-engine-bukkit", version.ref = "craftengine" }

@@ -1,15 +1,13 @@
 package cc.mewcraft.wakame.hook.impl.betonquest
 
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.party.HasPartyFactory
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.party.CreatePartyEventFactory
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.party.LeavePartyEventFactory
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.item.KoishQuestItemFactory
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.item.KoishQuestItemSerializer
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.plot.HasPlotFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.plot.PlotClaimEventFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.plot.PlotHomeEventFactory
 import cc.mewcraft.wakame.integration.Hook
 import org.betonquest.betonquest.BetonQuest
 
-@Hook(plugins = ["BetonQuest"])
-object BetonQuestHook {
+@Hook(plugins = ["BetonQuest", "PlotSquared"])
+object PlotSquaredCompat {
 
     init {
         val plugin = BetonQuest.getInstance()
@@ -22,12 +20,12 @@ object BetonQuestHook {
 
         // Condition
         val conditionRegistry = plugin.questRegistries.condition()
-        conditionRegistry.register("hasparty", HasPartyFactory(loggerFactory))
+        conditionRegistry.register("p2has", HasPlotFactory(loggerFactory))
 
         // Event
         val eventRegistry = plugin.questRegistries.event()
-        eventRegistry.register("createparty", CreatePartyEventFactory(loggerFactory, questTypeApi, profileProvider))
-        eventRegistry.register("leaveparty", LeavePartyEventFactory(loggerFactory))
+        eventRegistry.register("p2claim", PlotClaimEventFactory(loggerFactory))
+        eventRegistry.register("p2home", PlotHomeEventFactory(loggerFactory))
 
         // Objective
         val objectiveRegistry = plugin.questRegistries.objective()
@@ -38,21 +36,19 @@ object BetonQuestHook {
         /* Feature Registries */
 
         // ConversationIO
-        val conversationIoRegistry = plugin.featureRegistries.conversationIO()
+        val conversationIORegistry = plugin.featureRegistries.conversationIO()
 
         // Interceptor
         val interceptorRegistry = plugin.featureRegistries.interceptor()
 
         // Item
         val itemRegistry = plugin.featureRegistries.item()
-        itemRegistry.register("koish", KoishQuestItemFactory())
-        itemRegistry.registerSerializer("koish", KoishQuestItemSerializer())
 
         // TextParser
         val textParserRegistry = plugin.featureRegistries.textParser()
 
         // NotifyIO
-        val notifyIoRegistry = plugin.featureRegistries.notifyIO()
+        val notifyIORegistry = plugin.featureRegistries.notifyIO()
 
         // Schedule
         val scheduleRegistry = plugin.featureRegistries.eventScheduling()
