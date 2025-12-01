@@ -1,0 +1,60 @@
+package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.plot
+
+import com.plotsquared.bukkit.util.BukkitUtil
+import com.plotsquared.core.PlotSquared
+import com.plotsquared.core.events.TeleportCause
+import org.betonquest.betonquest.api.instruction.variable.Variable
+import org.betonquest.betonquest.api.logger.BetonQuestLogger
+import org.betonquest.betonquest.api.profile.OnlineProfile
+import org.betonquest.betonquest.api.quest.event.online.OnlineEvent
+import org.bukkit.World
+
+/**
+ * 将玩家传送到他们位于 [dimension] 维度中的第 [order] 个地皮.
+ *
+ * @param order 要传送到的地皮顺序, 从 1 开始计数; 未指定则随机选择一个地皮
+ * @param dimension 指定在哪个维度的地皮区域传送地皮, 未指定则使用第一个地皮区域
+ * @param logger BetonQuest 的日志记录器
+ */
+class PlotHomeEvent(
+    private val order: Variable<Number>?,
+    private val dimension: Variable<World>?,
+    private val logger: BetonQuestLogger,
+) : OnlineEvent {
+
+    companion object {
+        const val RANDOM_ORDER: Int = -1
+    }
+
+    private val psApi: PlotSquared
+        get() = PlotSquared.get()
+
+    override fun execute(profile: OnlineProfile) {
+        val orderValue = order?.getValue(profile)?.toInt() ?: RANDOM_ORDER
+        val dimName = dimension?.getValue(profile)?.name
+        val plotPlayer = BukkitUtil.adapt(profile.player)
+        val plotArea = if (dimName != null) {
+            psApi.plotAreaManager.getPlotArea(dimName, null) ?: run {
+                logger.error("The dimension $dimName has no plot area, aborting execution")
+                return
+            }
+        } else {
+            psApi.plotAreaManager.allPlotAreas.firstOrNull() ?: run {
+                logger.error("No plot area found in this server, aborting execution")
+                return
+            }
+        }
+        val ownedPlots = plotArea.getPlots(profile.playerUUID).toList()
+        val ownedPlotsCount = ownedPlots.size
+        if (ownedPlotsCount <= 0) {
+            logger.error("Player ${profile.player.name} has no plots in area ${plotArea.id}, cannot teleport")
+            return
+        }
+        val targetPlot = if (orderValue == RANDOM_ORDER) {
+            ownedPlots.random()
+        } else {
+            ownedPlots[orderValue.coerceIn(1, ownedPlotsCount) - 1]
+        }
+        targetPlot.teleportPlayer(plotPlayer, TeleportCause.PLUGIN) {}
+    }
+}
