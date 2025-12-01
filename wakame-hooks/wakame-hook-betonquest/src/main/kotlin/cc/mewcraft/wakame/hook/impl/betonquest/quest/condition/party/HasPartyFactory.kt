@@ -12,7 +12,7 @@ class HasPartyFactory(
 ) : PlayerConditionFactory {
 
     override fun parsePlayer(instruction: Instruction): PlayerCondition {
-        val amount = instruction.getValue("amount", Argument.NUMBER)
+        val amount = instruction.getValue("amount", Argument.NUMBER_NOT_LESS_THAN_ZERO)
         val logger = loggerFactory.create(HasParty::class.java)
         val hasParty = HasParty(amount, logger)
         val questPackage = instruction.getPackage()
