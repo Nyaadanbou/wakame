@@ -13,7 +13,7 @@ class PlotClaimEventFactory(
 
     override fun parsePlayer(instruction: Instruction): PlayerEvent {
         val skipIfExists = instruction.hasArgument("skipIfExists")
-        val dimension = instruction.getValue("dimension", Argument.WORLD)
+        val dimension = instruction.getValue("dimension", Argument.STRING)
         val logger = loggerFactory.create(PlotClaimEvent::class.java)
         val questPackage = instruction.getPackage()
         val plotClaimEvent = PlotClaimEvent(skipIfExists, dimension, logger)

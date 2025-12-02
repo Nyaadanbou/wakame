@@ -5,7 +5,6 @@ import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.profile.OnlineProfile
 import org.betonquest.betonquest.api.quest.condition.online.OnlineCondition
-import org.bukkit.World
 
 /**
  * 检查玩家是否拥有指定数量的地皮.
@@ -16,7 +15,7 @@ import org.bukkit.World
  */
 class HasPlot(
     private val amount: Variable<Number>?,
-    private val dimension: Variable<World>?,
+    private val dimension: Variable<String>?,
     private val logger: BetonQuestLogger,
 ) : OnlineCondition {
 
@@ -26,10 +25,9 @@ class HasPlot(
     override fun check(profile: OnlineProfile): Boolean {
         val amountValue = amount?.getValue(profile)?.toInt() ?: 1
         val dimensionValue = dimension?.getValue(profile)
-        val dimName = dimensionValue?.name
-        val plotArea = if (dimName != null) {
-            psApi.plotAreaManager.getPlotArea(dimName, null) ?: run {
-                logger.error("The dimension $dimName has no plot area, aborting condition check")
+        val plotArea = if (dimensionValue != null) {
+            psApi.plotAreaManager.getPlotArea(dimensionValue, null) ?: run {
+                logger.error("The dimension $dimensionValue has no plot area, aborting condition check")
                 return false
             }
         } else {

@@ -6,7 +6,6 @@ import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.profile.OnlineProfile
 import org.betonquest.betonquest.api.quest.event.online.OnlineEvent
-import org.bukkit.World
 
 /**
  * 为玩家领取一个地皮.
@@ -17,7 +16,7 @@ import org.bukkit.World
  */
 class PlotClaimEvent(
     private val skipIfExists: Boolean,
-    private val dimension: Variable<World>?,
+    private val dimension: Variable<String>?,
     private val logger: BetonQuestLogger,
 ) : OnlineEvent {
 
@@ -25,10 +24,10 @@ class PlotClaimEvent(
         get() = PlotSquared.get()
 
     override fun execute(profile: OnlineProfile) {
-        val dimName = dimension?.getValue(profile)?.name
-        val plotArea = if (dimName != null) {
-            psApi.plotAreaManager.getPlotArea(dimName, null) ?: run {
-                logger.error("The dimension $dimName has no plot area, aborting execution")
+        val dimensionValue = dimension?.getValue(profile)
+        val plotArea = if (dimensionValue != null) {
+            psApi.plotAreaManager.getPlotArea(dimensionValue, null) ?: run {
+                logger.error("The dimension $dimensionValue has no plot area, aborting execution")
                 return
             }
         } else {
