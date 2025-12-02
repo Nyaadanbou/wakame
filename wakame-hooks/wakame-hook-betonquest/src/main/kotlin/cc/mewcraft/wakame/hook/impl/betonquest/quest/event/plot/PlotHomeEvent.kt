@@ -7,7 +7,6 @@ import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.profile.OnlineProfile
 import org.betonquest.betonquest.api.quest.event.online.OnlineEvent
-import org.bukkit.World
 
 /**
  * 将玩家传送到他们位于 [dimension] 维度中的第 [order] 个地皮.
@@ -18,7 +17,7 @@ import org.bukkit.World
  */
 class PlotHomeEvent(
     private val order: Variable<Number>?,
-    private val dimension: Variable<World>?,
+    private val dimension: Variable<String>?,
     private val logger: BetonQuestLogger,
 ) : OnlineEvent {
 
@@ -31,11 +30,11 @@ class PlotHomeEvent(
 
     override fun execute(profile: OnlineProfile) {
         val orderValue = order?.getValue(profile)?.toInt() ?: RANDOM_ORDER
-        val dimName = dimension?.getValue(profile)?.name
+        val dimensionValue = dimension?.getValue(profile)
         val plotPlayer = BukkitUtil.adapt(profile.player)
-        val plotArea = if (dimName != null) {
-            psApi.plotAreaManager.getPlotArea(dimName, null) ?: run {
-                logger.error("The dimension $dimName has no plot area, aborting execution")
+        val plotArea = if (dimensionValue != null) {
+            psApi.plotAreaManager.getPlotArea(dimensionValue, null) ?: run {
+                logger.error("The dimension $dimensionValue has no plot area, aborting execution")
                 return
             }
         } else {

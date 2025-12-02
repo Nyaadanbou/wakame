@@ -13,7 +13,7 @@ class PlotHomeEventFactory(
 
     override fun parsePlayer(instruction: Instruction): PlayerEvent {
         val order = instruction.getValue("order", Argument.NUMBER_NOT_LESS_THAN_ONE)
-        val dimension = instruction.getValue("dimension", Argument.WORLD)
+        val dimension = instruction.getValue("dimension", Argument.STRING)
         val logger = loggerFactory.create(PlotHomeEvent::class.java)
         val questPackage = instruction.getPackage()
         val plotHomeEvent = PlotHomeEvent(order, dimension, logger)

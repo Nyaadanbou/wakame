@@ -13,7 +13,7 @@ class HasPlotFactory(
 
     override fun parsePlayer(instruction: Instruction): PlayerCondition {
         val amount = instruction.getValue("amount", Argument.NUMBER_NOT_LESS_THAN_ONE)
-        val dimension = instruction.getValue("dimension", Argument.WORLD)
+        val dimension = instruction.getValue("dimension", Argument.STRING)
         val logger = loggerFactory.create(HasPlot::class.java)
         val hasPlot = HasPlot(amount, dimension, logger)
         val questPackage = instruction.getPackage()
