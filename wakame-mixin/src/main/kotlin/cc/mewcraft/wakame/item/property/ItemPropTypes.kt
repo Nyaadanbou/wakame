@@ -10,11 +10,13 @@ import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.item.data.impl.CoreContainer
 import cc.mewcraft.wakame.item.data.impl.ItemLevel
 import cc.mewcraft.wakame.item.property.impl.Arrow
+import cc.mewcraft.wakame.item.property.impl.BlockExtraLootEntry
 import cc.mewcraft.wakame.item.property.impl.Castable
 import cc.mewcraft.wakame.item.property.impl.CraftingReminder
 import cc.mewcraft.wakame.item.property.impl.EnchantSlotCapacity
 import cc.mewcraft.wakame.item.property.impl.EntityBucket
-import cc.mewcraft.wakame.item.property.impl.ExtraLoots
+import cc.mewcraft.wakame.item.property.impl.EntityExtraLootEntry
+import cc.mewcraft.wakame.item.property.impl.ExtraLoot
 import cc.mewcraft.wakame.item.property.impl.ExtraLore
 import cc.mewcraft.wakame.item.property.impl.Fuel
 import cc.mewcraft.wakame.item.property.impl.HoldLastDamage
@@ -198,9 +200,10 @@ data object ItemPropTypes {
      * 物品进行特定行为时触发额外战利品.
      */
     @JvmField
-    val EXTRA_LOOTS: ItemPropType<ExtraLoots> = typeOf("extra_loots"){
+    val EXTRA_LOOT: ItemPropType<ExtraLoot> = typeOf("extra_loot"){
         serializers {
-            register(ExtraLoots.Serializer)
+            register(BlockExtraLootEntry.Serializer)
+            register(EntityExtraLootEntry.Serializer)
         }
     }
 
