@@ -2,16 +2,11 @@ package cc.mewcraft.wakame.item.feature
 
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
-import cc.mewcraft.wakame.item.property.impl.BreakBlockExtraLoot
-import cc.mewcraft.wakame.item.property.impl.ExtraLootType
-import cc.mewcraft.wakame.item.property.impl.KillEntityExtraLoot
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.MojangLootParams
 import cc.mewcraft.wakame.util.MojangLootParamsBuilder
-import cc.mewcraft.wakame.util.getBlockId
 import cc.mewcraft.wakame.util.handle
-import cc.mewcraft.wakame.util.item.toBukkit
 import cc.mewcraft.wakame.util.item.toNMS
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.serverLevel
@@ -21,7 +16,6 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams
 import net.minecraft.world.phys.Vec3
 import org.bukkit.Location
-import org.bukkit.World
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -50,24 +44,16 @@ object ExtraLootFeature : Listener {
 
         val itemInMainHand = player.inventory.itemInMainHand
         if (itemInMainHand.isEmpty) return
-        val extraLoots = itemInMainHand.getProp(ItemPropTypes.EXTRA_LOOTS) ?: return
-        val breakBlockExtraLoots = extraLoots.loots[ExtraLootType.BREAK_BLOCK] ?: return
-
+        val extraLoot = itemInMainHand.getProp(ItemPropTypes.EXTRA_LOOT) ?: return
         val block = event.block
-        val blockId = block.getBlockId()
+
         // 匹配第一个符合条件的额外战利品
-        val matchedExtraLoot = breakBlockExtraLoots.firstOrNull {
-            it is BreakBlockExtraLoot && it.matches(blockId)
-        }
-        if (matchedExtraLoot != null) {
-            val centerLocation = block.location.add(0.5, 0.5, 0.5)
-            val world = block.world
-            matchedExtraLoot.lootTable.getRandomItems(
-                generatePlayerBreakBlockLootParams(world, block.location, itemInMainHand, player)
-            ).forEach {
-                world.dropItemNaturally(centerLocation, it.toBukkit())
-            }
-        }
+        extraLoot.breakBlock.firstOrNull {
+            it.matches(block)
+        }?.dropItemsNaturally(
+            generatePlayerBreakBlockLootParams(block.location, itemInMainHand, player),
+            block.location.add(0.5, 0.5, 0.5)
+        )
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -77,28 +63,22 @@ object ExtraLootFeature : Listener {
 
         val itemInMainHand = player.inventory.itemInMainHand
         if (itemInMainHand.isEmpty) return
-        val extraLoots = itemInMainHand.getProp(ItemPropTypes.EXTRA_LOOTS) ?: return
-        val killEntityExtraLoots = extraLoots.loots[ExtraLootType.KILL_ENTITY] ?: return
+        val extraLoot = itemInMainHand.getProp(ItemPropTypes.EXTRA_LOOT) ?: return
 
         // 匹配第一个符合条件的额外战利品
-        val matchedExtraLoot = killEntityExtraLoots.firstOrNull {
-            it is KillEntityExtraLoot && it.matches(deceased.type.key())
-        }
-        if (matchedExtraLoot != null) {
-            val world = deceased.world
-            matchedExtraLoot.lootTable.getRandomItems(
-                generatePlayerKillEntityLootParams(world, deceased, event.damageSource, player)
-            ).forEach {
-                world.dropItemNaturally(deceased.location, it.toBukkit())
-            }
-        }
+        extraLoot.killEntity.firstOrNull {
+            it.matches(deceased)
+        }?.dropItemsNaturally(
+            generatePlayerKillEntityLootParams(deceased, event.damageSource, player),
+            deceased.location
+        )
     }
 
     /**
      * 生成玩家破坏方块时的战利品上下文, 逻辑与 nms 一致.
      */
-    private fun generatePlayerBreakBlockLootParams(world: World, blockLocation: Location, itemInMainHand: ItemStack, player: Player): MojangLootParams {
-        val serverLevel = world.serverLevel
+    private fun generatePlayerBreakBlockLootParams(blockLocation: Location, itemInMainHand: ItemStack, player: Player): MojangLootParams {
+        val serverLevel = blockLocation.world.serverLevel
         val blockPos = BlockPos(blockLocation.blockX, blockLocation.blockY, blockLocation.blockZ)
         return MojangLootParamsBuilder(serverLevel)
             .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockPos))
@@ -109,12 +89,11 @@ object ExtraLootFeature : Listener {
             .create(LootContextParamSets.BLOCK)
     }
 
-
     /**
      * 生成玩家杀死生物时的战利品上下文, 逻辑与 nms 一致.
      */
-    private fun generatePlayerKillEntityLootParams(world: World, deceased: LivingEntity, damageSource: DamageSource, player: Player): MojangLootParams {
-        val serverLevel = world.serverLevel
+    private fun generatePlayerKillEntityLootParams(deceased: LivingEntity, damageSource: DamageSource, player: Player): MojangLootParams {
+        val serverLevel = deceased.world.serverLevel
         val mojangEntity = deceased.handle
         val serverPlayer = player.serverPlayer
         return MojangLootParamsBuilder(serverLevel)

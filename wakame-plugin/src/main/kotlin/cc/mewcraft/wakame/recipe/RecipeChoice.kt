@@ -101,7 +101,7 @@ internal object RecipeChoiceSerializer : TypeSerializer2<RecipeChoice> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeChoice {
         val str = node.rawScalar().toString()
         // 以 `#` 开头的认为是一个标签
-        if (str.startsWith("#")) {
+        if (str.startsWith('#')) {
             return TagRecipeChoice(Identifier.key(str.drop(1)))
         }
         // 注册成功的配方中的 ItemRef 必然是合法有效的, 因为无效的会在这里产生序列化异常
