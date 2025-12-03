@@ -14,6 +14,19 @@ description = "The core gameplay implementation of Xiaomi's server (ignite mod)"
 repositories {
     nyaadanbouReleases()
     nyaadanbouPrivate()
+
+    // 在这里直接声明 repository 实际上违背了我们 Nyaadanbou 项目组的 conventions
+    // 即, 所有 repositories 都应该由 cc.mewcraft.libraries-repository 这个 gradle 插件提供
+    // 但为了方便, 就还是直接写在这里了, 以后也都尽量写在这里, 保持项目简洁
+
+    // Messenger: https://github.com/Hexaoxide/Messenger
+    maven {
+        name = "jmpRepositorySnapshots"
+        url = uri("https://repo.jpenilla.xyz/snapshots")
+        mavenContent {
+            includeGroup("de.hexaoxi")
+        }
+    }
 }
 
 paperweight {
@@ -60,6 +73,10 @@ dependencies {
     implementation(platform(libs.bom.configurate.gson))
     implementation(platform(libs.bom.configurate.extra.kotlin))
     implementation(platform(libs.bom.configurate.extra.dfu8))
+    implementation(local.messenger)
+    implementation(local.messenger.nats)
+    implementation(local.messenger.rabbitmq)
+    implementation(local.messenger.redis)
 }
 
 sourceSets {
