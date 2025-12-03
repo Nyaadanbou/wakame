@@ -1,11 +1,28 @@
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.entity.player.isInventoryListenable
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.extensions.toVector3d
-import cc.mewcraft.wakame.item.behavior.*
+import cc.mewcraft.wakame.item.behavior.AttackContext
+import cc.mewcraft.wakame.item.behavior.AttackEntityContext
+import cc.mewcraft.wakame.item.behavior.AttackOnContext
+import cc.mewcraft.wakame.item.behavior.BehaviorResult
+import cc.mewcraft.wakame.item.behavior.BlockInteractContext
+import cc.mewcraft.wakame.item.behavior.CauseDamageContext
+import cc.mewcraft.wakame.item.behavior.ConsumeContext
+import cc.mewcraft.wakame.item.behavior.DurabilityDecreaseContext
+import cc.mewcraft.wakame.item.behavior.InteractionHand
+import cc.mewcraft.wakame.item.behavior.InteractionResult
 import cc.mewcraft.wakame.item.behavior.ItemStackActivationChecker.isActive
+import cc.mewcraft.wakame.item.behavior.ReceiveDamageContext
+import cc.mewcraft.wakame.item.behavior.StopUseContext
+import cc.mewcraft.wakame.item.behavior.UseContext
+import cc.mewcraft.wakame.item.behavior.UseEntityContext
+import cc.mewcraft.wakame.item.behavior.UseOnContext
+import cc.mewcraft.wakame.item.behavior.handleBehavior
+import cc.mewcraft.wakame.item.behavior.isInteractable
+import cc.mewcraft.wakame.item.behavior.isSuccess
+import cc.mewcraft.wakame.item.behavior.shouldCancel
 import cc.mewcraft.wakame.item.property.impl.ItemSlotRegistry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -17,23 +34,17 @@ import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import io.papermc.paper.event.player.PrePlayerAttackEntityEvent
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import org.bukkit.GameMode
-import org.bukkit.entity.AbstractArrow
 import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
-import org.bukkit.entity.ThrowableProjectile
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
-import org.bukkit.event.entity.ProjectileHitEvent
-import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.inventory.ItemStack
 
 @Init(stage = InitStage.POST_WORLD)
 internal object ItemBehaviorListener : Listener {
@@ -363,54 +374,6 @@ internal object ItemBehaviorListener : Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    fun onProjectileLaunch(event: ProjectileLaunchEvent) {
-        val projectile = event.entity
-        // 弹射物实体的主人UUID不存在 - 不处理
-        val ownerUniqueId = projectile.ownerUniqueId ?: return
-        // 发射弹射物的玩家不存在(玩家不在线) - 不处理
-        val player = SERVER.getPlayer(ownerUniqueId) ?: return
-        // 确保此时玩家的背包可以监听
-        if (!player.isInventoryListenable) return
-        // 无法获取弹射物实体对应的物品 - 不处理
-        val itemStack = projectile.itemStack ?: return
-
-        val context = ProjectileLaunchContext(player, itemStack, projectile)
-        itemStack.handleBehavior { behavior ->
-            val result = behavior.handleProjectileLaunch(context)
-            if (result == BehaviorResult.FINISH_AND_CANCEL) {
-                event.isCancelled = true
-            }
-            if (result != BehaviorResult.PASS) {
-                return
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.LOW)
-    fun onProjectileHit(event: ProjectileHitEvent) {
-        val projectile = event.entity
-        // 弹射物实体的主人UUID不存在 - 不处理
-        val ownerUniqueId = projectile.ownerUniqueId ?: return
-        // 发射弹射物的玩家不存在(玩家不在线) - 不处理
-        val player = SERVER.getPlayer(ownerUniqueId) ?: return
-        // 确保此时玩家的背包可以监听
-        if (!player.isInventoryListenable) return
-        // 无法获取弹射物实体对应的物品 - 不处理
-        val itemStack = projectile.itemStack ?: return
-
-        val context = ProjectileHitContext(player, itemStack, projectile, event.hitEntity, event.hitBlock, event.hitBlockFace)
-        itemStack.handleBehavior { behavior ->
-            val result = behavior.handleProjectileHit(context)
-            if (result == BehaviorResult.FINISH_AND_CANCEL) {
-                event.isCancelled = true
-            }
-            if (result != BehaviorResult.PASS) {
-                return
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.LOW)
     fun on(event: PlayerItemDamageEvent) {
         val player = event.player
         // 确保此时玩家的背包可以监听
@@ -474,13 +437,6 @@ internal object ItemBehaviorListener : Listener {
             }
         }
     }
-
-    private val Projectile.itemStack: ItemStack?
-        get() = when (this) {
-            is AbstractArrow -> itemStack
-            is ThrowableProjectile -> item
-            else -> null
-        }
 
 }
 
