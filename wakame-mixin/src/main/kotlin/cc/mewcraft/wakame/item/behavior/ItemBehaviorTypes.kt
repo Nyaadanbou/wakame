@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.behavior
 
-import cc.mewcraft.wakame.item.behavior.impl.Arrow
 import cc.mewcraft.wakame.item.behavior.impl.Castable
 import cc.mewcraft.wakame.item.behavior.impl.EntityBucket
 import cc.mewcraft.wakame.item.behavior.impl.HoldLastDamage
@@ -9,7 +8,13 @@ import cc.mewcraft.wakame.item.behavior.impl.external.PlaceBlock
 import cc.mewcraft.wakame.item.behavior.impl.external.PlaceDoubleHighBlock
 import cc.mewcraft.wakame.item.behavior.impl.external.PlaceLiquidCollisionBlock
 import cc.mewcraft.wakame.item.behavior.impl.test.TestInteract
-import cc.mewcraft.wakame.item.behavior.impl.weapon.*
+import cc.mewcraft.wakame.item.behavior.impl.weapon.Bow
+import cc.mewcraft.wakame.item.behavior.impl.weapon.Crossbow
+import cc.mewcraft.wakame.item.behavior.impl.weapon.DualSword
+import cc.mewcraft.wakame.item.behavior.impl.weapon.Katana
+import cc.mewcraft.wakame.item.behavior.impl.weapon.Mace
+import cc.mewcraft.wakame.item.behavior.impl.weapon.Melee
+import cc.mewcraft.wakame.item.behavior.impl.weapon.Trident
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 
 /**
@@ -36,12 +41,6 @@ object ItemBehaviorTypes {
      */
     @JvmField
     val CASTABLE = typeOf("castable", Castable)
-
-    /**
-     * 物品具有该行为时, 作为箭矢射出和命中时可执行自定义效果.
-     */
-    @JvmField
-    val ARROW = typeOf("arrow", Arrow)
 
     /**
      * 物品具有该行为时, 会保留最后的耐久(维持在0).

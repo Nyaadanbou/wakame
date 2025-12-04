@@ -76,16 +76,6 @@ interface ItemBehavior {
     fun handleReceiveDamage(context: ReceiveDamageContext) = BehaviorResult.PASS
 
     /**
-     * 该物品作为箭矢/光灵箭/三叉戟射出时, 执行的行为.
-     */
-    fun handleProjectileLaunch(context: ProjectileLaunchContext) = BehaviorResult.PASS
-
-    /**
-     * 该物品作为箭矢/光灵箭/三叉戟命中目标时, 执行的行为.
-     */
-    fun handleProjectileHit(context: ProjectileHitContext) = BehaviorResult.PASS
-
-    /**
      * 该物品失去耐久度时, 执行的行为.
      */
     fun handleDurabilityDecrease(context: DurabilityDecreaseContext) = BehaviorResult.PASS
