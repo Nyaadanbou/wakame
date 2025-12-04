@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
-import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
+import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.eventbus.MapEventBus
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
@@ -21,6 +21,10 @@ import cc.mewcraft.wakame.util.yamlLoader
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.VisibleForTesting
+import kotlin.io.path.extension
+import kotlin.io.path.readText
+import kotlin.io.path.relativeTo
+import kotlin.io.path.walk
 
 @Init(
     stage = InitStage.POST_WORLD,
@@ -34,6 +38,7 @@ import org.jetbrains.annotations.VisibleForTesting
     ]
 )
 internal object MinecraftRecipeRegistryLoader {
+    const val DATA_DIR = "recipe"
 
     @VisibleForTesting
     val uncheckedRecipes: HashMap<Key, MinecraftRecipe> = HashMap(512)
@@ -64,33 +69,33 @@ internal object MinecraftRecipeRegistryLoader {
     fun load() {
         uncheckedRecipes.clear()
 
-        val recipeDir = KoishDataPaths.CONFIGS.resolve(VanillaRecipeConstants.DATA_DIR).toFile()
-        for ((file, namespace, path) in NamespacedFileTreeWalker(recipeDir, "yml", true)) {
-            try {
-                val fileText = file.readText()
-                val key = Key.key(namespace, path)
+        val recipeDir = KoishDataPaths.CONFIGS.resolve(DATA_DIR)
+        recipeDir.walk()
+            .filter { it.extension == "yml" }
+            .forEach { path ->
+                try {
+                    val rootNode = yamlLoader {
+                        withDefaults()
+                        serializers {
+                            register<MinecraftRecipe>(MinecraftRecipe.Serializer)
+                            register<RecipeChoice>(RecipeChoiceSerializer)
+                            register<RecipeResult>(RecipeResultSerializer)
+                            register(ItemRef.SERIALIZER)
+                        }
+                    }.buildAndLoadString(path.readText())
 
-                val recipeNode = yamlLoader {
-                    withDefaults()
-                    serializers {
-                        register<MinecraftRecipe>(MinecraftRecipe.Serializer)
-                        register<RecipeChoice>(RecipeChoiceSerializer)
-                        register<RecipeResult>(RecipeResultSerializer)
-                        register(ItemRef.SERIALIZER)
-                    }
-                }.buildAndLoadString(fileText)
+                    val recipeId = Identifiers.ofKoish(path.relativeTo(recipeDir).toString())
+                    // 注入 key 节点
+                    rootNode.hint(RepresentationHints.MINECRAFT_RECIPE_ID, recipeId)
+                    // 反序列化 Recipe
+                    val minecraftRecipe = rootNode.require<MinecraftRecipe>()
+                    // 添加进临时注册表
+                    uncheckedRecipes[recipeId] = minecraftRecipe
 
-                // 注入 key 节点
-                recipeNode.hint(RepresentationHints.MINECRAFT_RECIPE_ID, key)
-                // 反序列化 Recipe
-                val minecraftRecipe = recipeNode.require<MinecraftRecipe>()
-                // 添加进临时注册表
-                uncheckedRecipes[key] = minecraftRecipe
-
-            } catch (e: Throwable) {
-                Util.pauseInIde(IllegalStateException("Can't load vanilla recipe: '${file.relativeTo(recipeDir)}'", e))
+                } catch (e: Throwable) {
+                    Util.pauseInIde(IllegalStateException("Can't load vanilla recipe: '${path.relativeTo(recipeDir)}'", e))
+                }
             }
-        }
     }
 
     private fun registerRecipes() {
