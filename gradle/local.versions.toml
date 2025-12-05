@@ -65,6 +65,7 @@ huskhomes = "4.9.9"
 carbonchat = "3.0.0-beta.26"
 mythicdungeons = "1.3.0-SNAPSHOT"
 betonquest = "3.0.0-SNAPSHOT"
+messenger = "1.1.0-SNAPSHOT"
 
 [libraries]
 
@@ -157,6 +158,10 @@ huskhomes-bukkit = { group = "net.william278.huskhomes", name = "huskhomes-bukki
 carbonchat = { group = "de.hexaoxi", name = "carbonchat-api", version.ref = "carbonchat" }
 mythicdungeons = { group = "net.playavalon", name = "MythicDungeons", version.ref = "mythicdungeons" }
 betonquest = { group = "org.betonquest", name = "betonquest", version.ref = "betonquest" }
+messenger = { group = "de.hexaoxi", name = "messenger-api", version.ref = "messenger" }
+messenger-nats = { group = "de.hexaoxi", name = "messenger-nats", version.ref = "messenger" }
+messenger-rabbitmq = { group = "de.hexaoxi", name = "messenger-rabbitmq", version.ref = "messenger" }
+messenger-redis = { group = "de.hexaoxi", name = "messenger-redis", version.ref = "messenger" }
 
 [plugins]
 
