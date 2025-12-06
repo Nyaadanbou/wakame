@@ -7,11 +7,10 @@ import cc.mewcraft.wakame.util.LootTableUtils
 import cc.mewcraft.wakame.util.MojangLootParams
 import cc.mewcraft.wakame.util.MojangLootTable
 import cc.mewcraft.wakame.util.getBlockId
+import cc.mewcraft.wakame.util.isTagged
 import cc.mewcraft.wakame.util.item.toBukkit
 import cc.mewcraft.wakame.util.require
-import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
-import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.tag.TagKey
 import org.bukkit.Location
 import org.bukkit.block.Block
@@ -95,13 +94,7 @@ data class BlockTagExtraLootEntry(
     val tagKey = TagKey.create(RegistryKey.BLOCK, blockTagId)
 
     override fun matches(block: Block): Boolean {
-        val registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.BLOCK)
-        if (!registry.hasTag(tagKey)) {
-            LOGGER.warn("Block tag not found: '$blockTagId', never trigger extra loot table: '$lootTableId")
-            return false
-        } else {
-            return registry.getTag(tagKey).contains(TypedKey.create(RegistryKey.BLOCK, block.getBlockId()))
-        }
+        return block.isTagged(tagKey);
     }
 }
 
