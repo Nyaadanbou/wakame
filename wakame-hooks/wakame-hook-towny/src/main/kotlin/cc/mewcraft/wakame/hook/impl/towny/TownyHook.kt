@@ -2,7 +2,11 @@ package cc.mewcraft.wakame.hook.impl.towny
 
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration.ExecutionMode
+import cc.mewcraft.wakame.hook.impl.towny.messaging.TownyNetworkImpl
 import cc.mewcraft.wakame.integration.Hook
+import cc.mewcraft.wakame.integration.townynetwork.TownyNetworkIntegration
+import cc.mewcraft.wakame.messaging.packet.TownyNetworkHandler
+import cc.mewcraft.wakame.util.registerEvents
 import com.palmergames.bukkit.towny.TownyAPI
 import com.palmergames.bukkit.towny.`object`.TownyPermission
 import com.palmergames.bukkit.towny.utils.PlayerCacheUtil
@@ -13,9 +17,24 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 @Hook(plugins = ["Towny"])
-object TownyHook : ProtectionIntegration {
+object TownyHook : ProtectionIntegration by TownyProtectionIntegration {
 
-    internal val TOWNY = TownyAPI.getInstance()
+    // Java interop fix - start
+    override fun getExecutionMode(): ExecutionMode {
+        return super.getExecutionMode()
+    }
+    // Java interop fix - end
+
+    init {
+        TownyNetworkImpl.registerEvents()
+        TownyNetworkIntegration.setImplementation(TownyNetworkImpl)
+        TownyNetworkHandler.setImplementation(TownyNetworkImpl)
+    }
+}
+
+private object TownyProtectionIntegration : ProtectionIntegration {
+
+    private val townyApi = TownyAPI.getInstance()
 
     override fun getExecutionMode(): ExecutionMode {
         return ExecutionMode.SERVER
@@ -43,7 +62,7 @@ object TownyHook : ProtectionIntegration {
 
     override fun canHurtEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?): Boolean {
         if (player is Player && entity is Player) {
-            return TOWNY.isPVP(entity.location)
+            return townyApi.isPVP(entity.location)
         }
         return hasPermission(player, entity.location, TownyPermission.ActionType.DESTROY)
     }
@@ -63,5 +82,4 @@ object TownyHook : ProtectionIntegration {
         // 离线玩家没有任何权限. 如果玩家离线, 则返回 false
         return false
     }
-
 }
