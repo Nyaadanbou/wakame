@@ -94,7 +94,7 @@ data class BlockTagExtraLootEntry(
     val tagKey = TagKey.create(RegistryKey.BLOCK, blockTagId)
 
     override fun matches(block: Block): Boolean {
-        return block.isTagged(tagKey);
+        return block.isTagged(tagKey)
     }
 }
 

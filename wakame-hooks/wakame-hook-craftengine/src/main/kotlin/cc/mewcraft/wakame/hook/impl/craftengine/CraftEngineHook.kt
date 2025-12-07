@@ -52,12 +52,10 @@ object CraftEngineHook {
         }
 
         override fun isTagged(block: Block, tagKey: TagKey<BlockType>): Boolean {
-            if (isCustomBlock(block)) {
-                val immutableBlockState = CraftEngineBlocks.getCustomBlockState(block)
-                if (immutableBlockState != null) {
-                    val tagId = tagKey.key()
-                    return immutableBlockState.settings().tags().contains(CEKey.of(tagId.namespace(), tagId.value()))
-                }
+            val immutableBlockState = CraftEngineBlocks.getCustomBlockState(block)
+            if (immutableBlockState != null) {
+                val tagId = tagKey.key()
+                return immutableBlockState.settings().tags().contains(CEKey.of(tagId.namespace(), tagId.value()))
             }
 
             val registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.BLOCK)
