@@ -7,7 +7,7 @@ messaging:
   # 是否启用消息队列
   enabled: false
   # 使用的消息队列: NATS, RABBITMQ, REDIS
-  broker_type: NONE
+  broker_type: NATS
   # NATS
   nats:
     host: "localhost"

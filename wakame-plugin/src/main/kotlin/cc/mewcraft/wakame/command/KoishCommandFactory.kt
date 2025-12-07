@@ -22,7 +22,7 @@ internal interface KoishCommandFactory<C : Any> : CommandFactory<C> {
         private val commandManager: CommandManager<C>,
     ) {
         private val commandList: ArrayList<Command<C>> = ArrayList()
-        private val pluginName = BootstrapContexts.PLUGIN_NAME.lowercase()
+        private val commandName = BootstrapContexts.PLUGIN_NAME.lowercase()
 
         /**
          * 创建一个 [Command] 并添加到 [commandList].
@@ -45,11 +45,26 @@ internal interface KoishCommandFactory<C : Any> : CommandFactory<C> {
 
         /**
          * 创建一个 [MutableCommandBuilder].
+         *
+         * @param lambda 用于配置 [MutableCommandBuilder]
          */
         fun build(
             lambda: MutableCommandBuilder<C>.() -> Unit,
         ): MutableCommandBuilder<C> {
-            return MutableCommandBuilder(pluginName, Description.empty(), emptyArray(), commandManager, lambda)
+            return build(commandName, lambda)
+        }
+
+        /**
+         * 创建一个 [MutableCommandBuilder].
+         *
+         * @param name 指令名称
+         * @param lambda 用于配置 [MutableCommandBuilder]
+         */
+        fun build(
+            name: String,
+            lambda: MutableCommandBuilder<C>.() -> Unit,
+        ): MutableCommandBuilder<C> {
+            return MutableCommandBuilder(name, Description.empty(), emptyArray(), commandManager, lambda)
         }
 
         /**
@@ -57,5 +72,4 @@ internal interface KoishCommandFactory<C : Any> : CommandFactory<C> {
          */
         fun getAddedCommands(): List<Command<C>> = commandList
     }
-
 }

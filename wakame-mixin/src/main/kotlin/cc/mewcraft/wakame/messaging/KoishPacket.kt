@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.util.messenger
+package cc.mewcraft.wakame.messaging
 
 import io.netty.buffer.ByteBuf
 import net.kyori.adventure.key.Key
@@ -9,9 +9,7 @@ import java.util.*
 import java.util.function.BiConsumer
 import java.util.function.Function
 
-abstract class KoishPacket(
-    sender: UUID,
-) : AbstractPacket(sender) {
+abstract class KoishPacket(sender: UUID) : AbstractPacket(sender) {
 
     private val componentSerializer = GsonComponentSerializer.gson()
 
@@ -53,7 +51,7 @@ abstract class KoishPacket(
         valueReader: Function<ByteBuf, V>,
     ): MutableMap<K, V> {
         val size = this.readVarInt(buffer)
-        val map: MutableMap<K, V> = HashMap<K, V>()
+        val map = HashMap<K, V>()
 
         for (i in 0..<size) {
             map[keyReader.apply(buffer)] = valueReader.apply(buffer)
@@ -67,6 +65,10 @@ abstract class KoishPacket(
     }
 
     protected fun <E : Enum<E>> readEnum(buf: ByteBuf, cls: Class<E>): E {
-        return cls.getEnumConstants()[this.readVarInt(buf)]
+        return cls.enumConstants[this.readVarInt(buf)]
+    }
+
+    protected inline fun <reified E : Enum<E>> readEnum(buf: ByteBuf): E {
+        return readEnum(buf, E::class.java)
     }
 }

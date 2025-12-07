@@ -52,6 +52,7 @@ internal object KoishCommandManager {
                 command(PluginCommand)
                 command(ReforgeCommand)
                 command(ResourcepackCommand)
+                command(TownyNetworkCommand)
             }
         } catch (e: Exception) {
             LOGGER.error("Failed to bootstrap Koish command manager", e)
