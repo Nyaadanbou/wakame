@@ -58,7 +58,6 @@ dependencies {
     compileOnly(libs.hikari)
     compileOnly(libs.mocha)
     implementation(platform(libs.bom.adventure))
-    implementation(platform(libs.bom.caffeine))
     compileOnly(platform(libs.bom.exposed))
     compileOnly(platform(libs.bom.configurate.yaml)) // 运行时由 koish-mod 提供
     compileOnly(platform(libs.bom.configurate.gson))
