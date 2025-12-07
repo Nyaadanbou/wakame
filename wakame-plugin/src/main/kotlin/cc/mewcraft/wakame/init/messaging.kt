@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.lifecycle.implementation
+package cc.mewcraft.wakame.init
 
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
