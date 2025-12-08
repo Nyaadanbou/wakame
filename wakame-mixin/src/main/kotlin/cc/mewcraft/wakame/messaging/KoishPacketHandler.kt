@@ -13,7 +13,8 @@ class KoishPacketHandler(
 
     override fun handlePacket(packet: Packet): Boolean {
         when (packet) {
-            // Towny
+            /* Towny */
+
             is TownSpawnRequestPacket -> {
                 TownyNetworkHandler.handle(packet); return true
             }
@@ -31,7 +32,8 @@ class KoishPacketHandler(
             }
 
             // 后续添加更多封包类型时, 在这里添加处理的逻辑
-            // ...
+
+            /* ... */
         }
 
         return false
