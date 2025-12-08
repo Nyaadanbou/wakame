@@ -42,12 +42,12 @@ internal object TownyNetworkCommand : KoishCommandFactory<Source> {
     private suspend fun handleTownSpawn(context: CommandContext<Source>) {
         val sender = (context.sender() as PlayerSource).source()
         val server = context.get<String>("server")
-        TownyNetworkIntegration.requestTeleportTown(sender, server)
+        TownyNetworkIntegration.reqTownSpawn(sender, server)
     }
 
     private suspend fun handleNationSpawn(context: CommandContext<Source>) {
         val sender = (context.sender() as PlayerSource).source()
         val server = context.get<String>("server")
-        TownyNetworkIntegration.requestTeleportNation(sender, server)
+        TownyNetworkIntegration.reqNationSpawn(sender, server)
     }
 }

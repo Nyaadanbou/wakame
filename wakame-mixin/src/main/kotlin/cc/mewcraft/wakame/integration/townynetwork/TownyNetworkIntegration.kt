@@ -12,29 +12,29 @@ interface TownyNetworkIntegration {
     /**
      * 将玩家 [player] 传送到指定服务器 [targetServer] 里面的(玩家所属的)城镇传送点.
      */
-    suspend fun requestTeleportTown(player: Player, targetServer: String)
+    suspend fun reqTownSpawn(player: Player, targetServer: String)
 
     /**
      * 将玩家 [player] 传送到指定服务器 [targetServer] 里面的(玩家所属的)国家传送点.
      */
-    suspend fun requestTeleportNation(player: Player, targetServer: String)
+    suspend fun reqNationSpawn(player: Player, targetServer: String)
 
     /**
      * 该伴生对象持有了 [TownyNetworkIntegration] 的当前实现.
      */
     companion object : TownyNetworkIntegration {
-        private var implementation: TownyNetworkIntegration? = null
+        private var implementation: TownyNetworkIntegration = TownylessNetworkImpl
 
         fun setImplementation(impl: TownyNetworkIntegration) {
             this.implementation = impl
         }
 
-        override suspend fun requestTeleportTown(player: Player, targetServer: String) {
-            implementation?.requestTeleportTown(player, targetServer)
+        override suspend fun reqTownSpawn(player: Player, targetServer: String) {
+            implementation.reqTownSpawn(player, targetServer)
         }
 
-        override suspend fun requestTeleportNation(player: Player, targetServer: String) {
-            implementation?.requestTeleportNation(player, targetServer)
+        override suspend fun reqNationSpawn(player: Player, targetServer: String) {
+            implementation.reqNationSpawn(player, targetServer)
         }
     }
 }

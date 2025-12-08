@@ -19,6 +19,7 @@
  */
 package cc.mewcraft.wakame.messaging.packet
 
+import cc.mewcraft.wakame.integration.townynetwork.TownylessNetworkImpl
 import cc.mewcraft.wakame.messaging.KoishPacket
 import io.netty.buffer.ByteBuf
 import java.util.*
@@ -38,26 +39,26 @@ interface TownyNetworkHandler : CustomPacketHandler {
     fun handle(packet: NationSpawnResponsePacket)
 
     companion object : TownyNetworkHandler {
-        private var implementation: TownyNetworkHandler? = null
+        private var implementation: TownyNetworkHandler = TownylessNetworkImpl
 
         fun setImplementation(impl: TownyNetworkHandler) {
             this.implementation = impl
         }
 
         override fun handle(packet: TownSpawnRequestPacket) {
-            implementation?.handle(packet)
+            implementation.handle(packet)
         }
 
         override fun handle(packet: TownSpawnResponsePacket) {
-            implementation?.handle(packet)
+            implementation.handle(packet)
         }
 
         override fun handle(packet: NationSpawnRequestPacket) {
-            implementation?.handle(packet)
+            implementation.handle(packet)
         }
 
         override fun handle(packet: NationSpawnResponsePacket) {
-            implementation?.handle(packet)
+            implementation.handle(packet)
         }
     }
 }
