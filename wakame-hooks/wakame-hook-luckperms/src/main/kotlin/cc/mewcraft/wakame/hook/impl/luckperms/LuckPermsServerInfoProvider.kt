@@ -27,9 +27,9 @@ internal class LuckPermsServerInfoProvider : ServerInfoProvider {
 
     override val serverId: UUID = UUID.randomUUID()
 
-    override val serverMemorableId: String
+    override val serverKey: String
         get() = luckPermsApi.contextManager.staticContext.getAnyValue("server-id").getOrDefault("unset")
-    override val serverGroupId: String
+    override val serverGroup: String
         get() = luckPermsApi.contextManager.staticContext.getAnyValue("server-group").getOrDefault("unset")
     override val serverName: String
         get() = luckPermsApi.contextManager.staticContext.getAnyValue("server-name").getOrDefault("unset")

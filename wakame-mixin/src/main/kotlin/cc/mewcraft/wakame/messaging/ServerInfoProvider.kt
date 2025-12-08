@@ -5,22 +5,26 @@ import java.util.*
 interface ServerInfoProvider {
 
     /**
-     * 当前服务器的唯一标识符.
+     * 当前服务器的唯一标识符 (UUID).
+     * 每次服务端启动时随机生成.
      */
     val serverId: UUID
 
     /**
-     * 当前服务器的可记忆唯一标识符.
+     * 当前服务器的唯一标识符 (String).
+     * 比如 "home1", "home2", "mine1", "mine2".
      */
-    val serverMemorableId: String
+    val serverKey: String
 
     /**
      * 当前服务器所属的组名.
+     * 比如 "home", "mine".
      */
-    val serverGroupId: String
+    val serverGroup: String
 
     /**
      * 当前服务器的名称.
+     * 比如 "家园#1", "冒险#2".
      */
     val serverName: String
 
@@ -30,8 +34,8 @@ interface ServerInfoProvider {
     companion object : ServerInfoProvider {
         private val default = object : ServerInfoProvider {
             override val serverId: UUID = UUID.randomUUID()
-            override val serverMemorableId: String = "unset"
-            override val serverGroupId: String = "unset"
+            override val serverKey: String = "unset"
+            override val serverGroup: String = "unset"
             override val serverName: String = "unset"
         }
 
@@ -43,10 +47,10 @@ interface ServerInfoProvider {
 
         override val serverId: UUID
             get() = implementation.serverId
-        override val serverMemorableId: String
-            get() = implementation.serverMemorableId
-        override val serverGroupId: String
-            get() = implementation.serverGroupId
+        override val serverKey: String
+            get() = implementation.serverKey
+        override val serverGroup: String
+            get() = implementation.serverGroup
         override val serverName: String
             get() = implementation.serverName
     }

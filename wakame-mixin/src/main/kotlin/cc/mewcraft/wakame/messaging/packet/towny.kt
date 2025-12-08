@@ -24,9 +24,14 @@ import io.netty.buffer.ByteBuf
 import java.util.*
 
 /**
- * 该接口封装了当服务器接收到封包时如何处理的具体逻辑.
+ * 该 [CustomPacketHandler] 负责处理以下封包:
+ *
+ * - [TownSpawnRequestPacket]
+ * - [TownSpawnResponsePacket]
+ * - [NationSpawnRequestPacket]
+ * - [NationSpawnResponsePacket]
  */
-interface TownyNetworkHandler {
+interface TownyNetworkHandler : CustomPacketHandler {
     fun handle(packet: TownSpawnRequestPacket)
     fun handle(packet: TownSpawnResponsePacket)
     fun handle(packet: NationSpawnRequestPacket)

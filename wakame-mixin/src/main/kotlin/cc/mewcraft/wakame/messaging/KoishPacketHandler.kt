@@ -13,35 +13,27 @@ class KoishPacketHandler(
 
     override fun handlePacket(packet: Packet): Boolean {
         when (packet) {
-
             // Towny
-
             is TownSpawnRequestPacket -> {
-                TownyNetworkHandler.handle(packet)
-                return true
+                TownyNetworkHandler.handle(packet); return true
             }
 
             is TownSpawnResponsePacket -> {
-                TownyNetworkHandler.handle(packet)
-                return true
+                TownyNetworkHandler.handle(packet); return true
             }
 
             is NationSpawnRequestPacket -> {
-                TownyNetworkHandler.handle(packet)
-                return true
+                TownyNetworkHandler.handle(packet); return true
             }
 
             is NationSpawnResponsePacket -> {
-                TownyNetworkHandler.handle(packet)
-                return true
+                TownyNetworkHandler.handle(packet); return true
             }
 
-            // ???
-
-            // is ... -> {
-            //     return true
-            // }
+            // 后续添加更多封包类型时, 在这里添加处理的逻辑
+            // ...
         }
+
         return false
     }
 }

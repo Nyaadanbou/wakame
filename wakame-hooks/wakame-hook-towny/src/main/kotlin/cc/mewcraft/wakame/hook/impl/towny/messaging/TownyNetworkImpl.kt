@@ -22,14 +22,17 @@ object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkHandler, Listener
     private val townyApi: TownyAPI
         get() = TownyAPI.getInstance()
 
-    // 当前服务器的 id, 每次服务端启动时随机生成
-    private val serverId: UUID get() = MessagingManager.serverId
+    // 当前服务器的 id
+    private val serverId: UUID
+        get() = MessagingManager.serverId
 
     // 当前服务器的名字, e.g. "home1", "home2", "mine1", "mine2"
-    private val serverReadableId: String get() = MessagingManager.serverReadableId
+    private val serverKey: String
+        get() = MessagingManager.serverKey
 
     // 当前服务器的组名, e.g. "home", "mine"
-    private val serverGroup: String get() = MessagingManager.serverGroup
+    private val serverGroup: String
+        get() = MessagingManager.serverGroup
 
     // 使用 Caffeine cache, entries expire 5 seconds after last access
     private val townTeleportSessionCache: Cache<UUID, TownTeleportSession> = Caffeine.newBuilder()
@@ -76,7 +79,7 @@ object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkHandler, Listener
         val targetServer = packet.targetServer
 
         // 如果请求不由本服务器负责, 则 return
-        if (targetServer != this.serverReadableId) return
+        if (targetServer != this.serverKey) return
         val playerId = packet.playerId
 
         // resident 为 null 时通常说明玩家从没来过本服务器, 所以直接 return
@@ -115,7 +118,7 @@ object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkHandler, Listener
         val targetServer = packet.targetServer
 
         // 如果请求不由本服务器负责, 则 return
-        if (targetServer != this.serverReadableId) return
+        if (targetServer != this.serverKey) return
 
         // TODO #441
     }
@@ -129,7 +132,7 @@ object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkHandler, Listener
     }
 
     @EventHandler
-    fun on(event: PlayerSpawnLocationEvent) {
+    private fun on(event: PlayerSpawnLocationEvent) {
         // TODO #441 切换成 AsyncPlayerSpawnLocationEvent 并确保线程安全
 
         // 当玩家进入服务器时:

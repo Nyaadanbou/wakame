@@ -31,22 +31,22 @@ object MessagingManager {
     private const val PROTOCOL_VERSION: Byte = 1
 
     /**
-     * 当前服务器的唯一标识符.
+     * @see ServerInfoProvider.serverId
      */
     val serverId: UUID
         get() = ServerInfoProvider.serverId
 
     /**
-     * 当前服务器的名字.
+     * @see ServerInfoProvider.serverKey
      */
-    val serverReadableId: String
-        get() = ServerInfoProvider.serverMemorableId
+    val serverKey: String
+        get() = ServerInfoProvider.serverKey
 
     /**
-     * 当前服务器所属的组名.
+     * @see ServerInfoProvider.serverGroup
      */
     val serverGroup: String
-        get() = ServerInfoProvider.serverGroupId
+        get() = ServerInfoProvider.serverGroup
 
     private lateinit var scheduledExecutor: ScheduledExecutorService
     private lateinit var messagingService: MessagingService
@@ -65,13 +65,17 @@ object MessagingManager {
             return
         }
 
-        // 注册封包
+        /* 注册封包 */
+
+        // 基础封包类型 (没这些框架跑不起来)
         registerPacket(::MultiPacket)
         registerPacket(::KeepAlivePacket)
         registerPacket(::InitializationPacket)
         registerPacket(::PacketVersionPacket)
         registerPacket(::PacketVersionRequestPacket)
         registerPacket(::ShutdownPacket)
+
+        // 自定义封包类型, 每个都得注册, 按需更新这里
         registerPacket(::TownSpawnRequestPacket)
         registerPacket(::TownSpawnResponsePacket)
         registerPacket(::NationSpawnRequestPacket)
@@ -126,6 +130,17 @@ object MessagingManager {
         if (this::messagingService.isInitialized) {
             this.messagingService.close()
         }
+    }
+
+    fun queuePacketAndFlush(makePacket: Supplier<out AbstractPacket>) {
+        this.withPacketService { service: PacketService ->
+            service.queuePacket(makePacket.get())
+            service.flushQueue()
+        }
+    }
+
+    fun queuePacket(makePacket: Supplier<out AbstractPacket>) {
+        this.withPacketService { service: PacketService -> service.queuePacket(makePacket.get()) }
     }
 
     private fun initMessagingService(
@@ -200,19 +215,10 @@ object MessagingManager {
         }
     }
 
-    fun queuePacketAndFlush(makePacket: Supplier<out AbstractPacket>) {
-        this.withPacketService { service: PacketService ->
-            service.queuePacket(makePacket.get())
-            service.flushQueue()
-        }
-    }
-
-    fun queuePacket(makePacket: Supplier<out AbstractPacket>) {
-        this.withPacketService { service: PacketService -> service.queuePacket(makePacket.get()) }
-    }
-
     private class KoishServerHandler(
-        serverId: UUID, packetService: PacketService, messagingHandler: MessagingHandler,
+        serverId: UUID,
+        packetService: PacketService,
+        messagingHandler: MessagingHandler,
     ) : AbstractServerMessagingHandler(serverId, packetService, messagingHandler) {
 
         override fun handleInitialization(packet: InitializationPacket) {
