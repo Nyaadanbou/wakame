@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.PermanentStorage
 import cc.mewcraft.wakame.lang.LanguageExtractor
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
-import cc.mewcraft.wakame.pack.AssetExtractor
 import cc.mewcraft.wakame.util.data.Version
 import cc.mewcraft.wakame.util.data.VersionRange
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
@@ -79,7 +78,7 @@ internal class KoishBootstrap : PluginBootstrap {
             // 从而导致读取配置项时找不到需要的配置项, 抛出 NPE
             Configs.initialize()
             LanguageExtractor.extractDefaults()
-            AssetExtractor.extractDefaults()
+            //AssetExtractor.extractDefaults() // 暂时没资源文件可以提取
 
             // 初始化所有 InitFun (PRE_WORLD)
             Initializer.initialize()
