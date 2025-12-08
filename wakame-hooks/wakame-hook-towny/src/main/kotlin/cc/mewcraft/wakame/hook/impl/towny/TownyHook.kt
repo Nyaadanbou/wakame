@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.hook.impl.towny
 
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration.ExecutionMode
-import cc.mewcraft.wakame.hook.impl.towny.messaging.TownyNetworkImpl
+import cc.mewcraft.wakame.hook.impl.towny.messaging.TownyNetworkImplementations
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.integration.townynetwork.TownyNetworkIntegration
 import cc.mewcraft.wakame.messaging.packet.TownyNetworkHandler
@@ -26,9 +26,11 @@ object TownyHook : ProtectionIntegration by TownyProtectionIntegration {
     // Java interop fix - end
 
     init {
-        TownyNetworkImpl.registerEvents()
-        TownyNetworkIntegration.setImplementation(TownyNetworkImpl)
-        TownyNetworkHandler.setImplementation(TownyNetworkImpl)
+        with(TownyNetworkImplementations) {
+            registerEvents()
+            TownyNetworkIntegration.setImplementation(this)
+            TownyNetworkHandler.setImplementation(this)
+        }
     }
 }
 

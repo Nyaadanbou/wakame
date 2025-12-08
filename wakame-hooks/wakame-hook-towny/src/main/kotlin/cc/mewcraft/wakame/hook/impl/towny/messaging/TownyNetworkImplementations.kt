@@ -17,24 +17,54 @@ import org.spigotmc.event.player.PlayerSpawnLocationEvent
 import java.time.Duration
 import java.util.*
 
-object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkHandler, Listener {
+private val townyApi: TownyAPI
+    get() = TownyAPI.getInstance()
 
-    private val townyApi: TownyAPI
-        get() = TownyAPI.getInstance()
+private val serverId: UUID
+    get() = MessagingManager.serverId
 
-    // 当前服务器的 id
-    private val serverId: UUID
-        get() = MessagingManager.serverId
+private val serverKey: String
+    get() = MessagingManager.serverKey
 
-    // 当前服务器的名字, e.g. "home1", "home2", "mine1", "mine2"
-    private val serverKey: String
-        get() = MessagingManager.serverKey
+private val serverGroup: String
+    get() = MessagingManager.serverGroup
 
-    // 当前服务器的组名, e.g. "home", "mine"
-    private val serverGroup: String
-        get() = MessagingManager.serverGroup
+object TownyNetworkImplementations : TownyNetworkIntegration, TownyNetworkHandler, Listener {
 
-    // 使用 Caffeine cache, entries expire 5 seconds after last access
+    override suspend fun requestTeleportTown(player: Player, targetServer: String) {
+        TownyTeleportImplementation.requestTeleportTown(player, targetServer)
+    }
+
+    override suspend fun requestTeleportNation(player: Player, targetServer: String) {
+        TownyTeleportImplementation.requestTeleportNation(player, targetServer)
+    }
+
+    override fun handle(packet: TownSpawnRequestPacket) {
+        TownyTeleportImplementation.handle(packet)
+    }
+
+    override fun handle(packet: TownSpawnResponsePacket) {
+        TownyTeleportImplementation.handle(packet)
+    }
+
+    override fun handle(packet: NationSpawnRequestPacket) {
+        TownyTeleportImplementation.handle(packet)
+    }
+
+    override fun handle(packet: NationSpawnResponsePacket) {
+        TownyTeleportImplementation.handle(packet)
+    }
+
+    @EventHandler
+    private fun on(event: PlayerSpawnLocationEvent) {
+        TownyTeleportImplementation.on(event)
+    }
+}
+
+// Towny 跨服传送部分的具体实现
+// 单独写个类是为了让逻辑清晰一些
+private object TownyTeleportImplementation {
+
     private val townTeleportSessionCache: Cache<UUID, TownTeleportSession> = Caffeine.newBuilder()
         .expireAfterAccess(Duration.ofSeconds(5))
         .build()
@@ -43,7 +73,7 @@ object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkHandler, Listener
         .expireAfterAccess(Duration.ofSeconds(5))
         .build()
 
-    override suspend fun requestTeleportTown(player: Player, targetServer: String) {
+    fun requestTeleportTown(player: Player, targetServer: String) {
         val playerId = player.uniqueId
 
         // 如果有未完成的传送请求, 则 return
@@ -56,10 +86,10 @@ object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkHandler, Listener
         this.townTeleportSessionCache.put(playerId, TownTeleportSession(TownTeleportSession.Stage.AWAITING_RESPONSE, targetServer))
 
         // 广播封包
-        MessagingManager.queuePacket { TownSpawnRequestPacket(this.serverId, playerId, targetServer) }
+        MessagingManager.queuePacket { TownSpawnRequestPacket(serverId, playerId, targetServer) }
     }
 
-    override suspend fun requestTeleportNation(player: Player, targetServer: String) {
+    fun requestTeleportNation(player: Player, targetServer: String) {
         val playerId = player.uniqueId
 
         // 如果有未完成的传送请求, 则 return
@@ -72,23 +102,24 @@ object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkHandler, Listener
         this.nationTeleportSessionCache.put(playerId, NationTeleportSession(NationTeleportSession.Stage.AWAITING_RESPONSE, targetServer))
 
         // 广播封包
-        MessagingManager.queuePacket { NationSpawnRequestPacket(this.serverId, playerId, targetServer) }
+        MessagingManager.queuePacket { NationSpawnRequestPacket(serverId, playerId, targetServer) }
     }
 
-    override fun handle(packet: TownSpawnRequestPacket) {
+    fun handle(packet: TownSpawnRequestPacket) {
         val targetServer = packet.targetServer
 
         // 如果请求不由本服务器负责, 则 return
-        if (targetServer != this.serverKey) return
+        if (targetServer != serverKey) return
         val playerId = packet.playerId
 
-        // resident 为 null 时通常说明玩家从没来过本服务器, 所以直接 return
-        val resident = townyApi.getResident(playerId) ?: return
-        val town = resident.townOrNull
+        // resident 为 null 时通常说明玩家从没来过本服务器
+        val resident = townyApi.getResident(playerId)
+        // town 为 null 时说明玩家不属于任何城镇
+        val town = resident?.townOrNull
 
         // 如果玩家不属于任何城镇, 则广播“拒绝传送”, 通知请求方无法进行传送
-        if (town == null) {
-            MessagingManager.queuePacket { TownSpawnResponsePacket(this.serverId, playerId, TownSpawnResponsePacket.ResponseType.DENY_FOR_NO_TOWN) }
+        if (resident == null || town == null) {
+            MessagingManager.queuePacket { TownSpawnResponsePacket(serverId, playerId, TownSpawnResponsePacket.ResponseType.DENY_FOR_NO_TOWN) }
             return
         }
 
@@ -101,10 +132,10 @@ object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkHandler, Listener
         //  将玩家转移到新的服务器. 不让当前服务器转移玩家是因为当前服务器可能没人,
         //  因此 Plugin Message 也就根本无法使用.
         //  同样的原因适用于跨服国家传送.
-        MessagingManager.queuePacket { TownSpawnResponsePacket(this.serverId, playerId, TownSpawnResponsePacket.ResponseType.ALLOW) }
+        MessagingManager.queuePacket { TownSpawnResponsePacket(serverId, playerId, TownSpawnResponsePacket.ResponseType.ALLOW) }
     }
 
-    override fun handle(packet: TownSpawnResponsePacket) {
+    fun handle(packet: TownSpawnResponsePacket) {
         val playerId = packet.playerId
         val session = this.townTeleportSessionCache.asMap().remove(playerId) ?: return
         val player = Bukkit.getPlayer(playerId) ?: return
@@ -114,16 +145,16 @@ object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkHandler, Listener
         }
     }
 
-    override fun handle(packet: NationSpawnRequestPacket) {
+    fun handle(packet: NationSpawnRequestPacket) {
         val targetServer = packet.targetServer
 
         // 如果请求不由本服务器负责, 则 return
-        if (targetServer != this.serverKey) return
+        if (targetServer != serverKey) return
 
         // TODO #441
     }
 
-    override fun handle(packet: NationSpawnResponsePacket) {
+    fun handle(packet: NationSpawnResponsePacket) {
         val playerId = packet.playerId
         val session = this.nationTeleportSessionCache.asMap().remove(playerId) ?: return
         val player = Bukkit.getPlayer(playerId) ?: return
@@ -131,8 +162,7 @@ object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkHandler, Listener
         // TODO #441
     }
 
-    @EventHandler
-    private fun on(event: PlayerSpawnLocationEvent) {
+    fun on(event: PlayerSpawnLocationEvent) {
         // TODO #441 切换成 AsyncPlayerSpawnLocationEvent 并确保线程安全
 
         // 当玩家进入服务器时:
@@ -157,7 +187,7 @@ object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkHandler, Listener
         }
 
         val playerId = event.player.uniqueId
-        val resident = this.townyApi.getResident(playerId) ?: return
+        val resident = townyApi.getResident(playerId) ?: return
         handleTownTeleport(playerId, resident, event::setSpawnLocation)
         handleNationTeleport(playerId, resident, event::setSpawnLocation)
     }
