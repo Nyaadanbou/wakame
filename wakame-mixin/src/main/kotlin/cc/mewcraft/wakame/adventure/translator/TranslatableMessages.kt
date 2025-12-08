@@ -90,6 +90,9 @@ object TranslatableMessages {
     val MSG_ERR_SKILL_ON_COOLDOWN = create("msg_err_skill_on_cooldown")
     val MSG_ERR_NOT_ENOUGH_MANA = create("msg_err_not_enough_mana")
     val MSG_MANA_CONSUMED = create("msg_mana_consumed")
+    val MSG_ERR_NO_TOWN_AT_TARGET_SERVER = create("msg_err_no_town_at_target_server")
+    val MSG_ERR_NO_NATION_AT_TARGET_SERVER = create("msg_err_no_nation_at_target_server")
+    val MSG_ERR_NETWORK_TELEPORT_REQUEST_ALREADY_PENDING = create("msg_err_network_teleport_request_already_pending")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.towny.messaging
 
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.townynetwork.TownyNetworkIntegration
 import cc.mewcraft.wakame.messaging.MessagingManager
 import cc.mewcraft.wakame.messaging.packet.*
@@ -78,7 +79,7 @@ private object TownyTeleportImplementation {
 
         // 如果有未完成的传送请求, 则 return
         if (this.townTeleportSessionCache.getIfPresent(playerId) != null) {
-            player.sendMessage("You already have a pending town teleport request.") // TODO #441
+            player.sendMessage(TranslatableMessages.MSG_ERR_NETWORK_TELEPORT_REQUEST_ALREADY_PENDING)
             return
         }
 
@@ -94,7 +95,7 @@ private object TownyTeleportImplementation {
 
         // 如果有未完成的传送请求, 则 return
         if (this.nationTeleportSessionCache.getIfPresent(playerId) != null) {
-            player.sendMessage("You already have a pending nation teleport request.") // TODO #441
+            player.sendMessage(TranslatableMessages.MSG_ERR_NETWORK_TELEPORT_REQUEST_ALREADY_PENDING)
             return
         }
 
@@ -141,25 +142,33 @@ private object TownyTeleportImplementation {
         val player = Bukkit.getPlayer(playerId) ?: return
         when (packet.response) {
             TownSpawnResponsePacket.ResponseType.ALLOW -> ProxyServerSwitcher.switch(player, session.targetServer)
-            TownSpawnResponsePacket.ResponseType.DENY_FOR_NO_TOWN -> player.sendMessage("No town found at the target server.") // TODO #441
+            TownSpawnResponsePacket.ResponseType.DENY_FOR_NO_TOWN -> player.sendMessage(TranslatableMessages.MSG_ERR_NO_TOWN_AT_TARGET_SERVER)
         }
     }
 
     fun handle(packet: NationSpawnRequestPacket) {
         val targetServer = packet.targetServer
-
-        // 如果请求不由本服务器负责, 则 return
         if (targetServer != serverKey) return
+        val playerId = packet.playerId
+        val resident = townyApi.getResident(playerId)
+        val nation = resident?.nationOrNull
+        if (resident == null || nation == null) {
+            MessagingManager.queuePacket { NationSpawnResponsePacket(serverId, playerId, NationSpawnResponsePacket.ResponseType.DENY_FOR_NO_NATION) }
+            return
+        }
 
-        // TODO #441
+        this.nationTeleportSessionCache.put(playerId, NationTeleportSession(NationTeleportSession.Stage.READY_TO_TELEPORT, targetServer))
+        MessagingManager.queuePacket { TownSpawnResponsePacket(serverId, playerId, TownSpawnResponsePacket.ResponseType.ALLOW) }
     }
 
     fun handle(packet: NationSpawnResponsePacket) {
         val playerId = packet.playerId
         val session = this.nationTeleportSessionCache.asMap().remove(playerId) ?: return
         val player = Bukkit.getPlayer(playerId) ?: return
-
-        // TODO #441
+        when (packet.response) {
+            NationSpawnResponsePacket.ResponseType.ALLOW -> ProxyServerSwitcher.switch(player, session.targetServer)
+            NationSpawnResponsePacket.ResponseType.DENY_FOR_NO_NATION -> player.sendMessage(TranslatableMessages.MSG_ERR_NO_NATION_AT_TARGET_SERVER)
+        }
     }
 
     fun on(event: PlayerSpawnLocationEvent) {

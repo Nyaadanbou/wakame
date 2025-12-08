@@ -84,6 +84,9 @@ msg_send_teleport_request_blocked: "<red>你尝试向 <arg:0> 发送传送请求
 msg_err_skill_on_cooldown: "<red>技能冷却中."
 msg_err_not_enough_mana: "<red>魔法值不足."
 msg_mana_consumed: "<aqua>消耗 <yellow><arg:0:'zh-CN':'#'></yellow> 点魔法值."
+msg_err_no_town_at_target_server: "<red>你在目标位面上没有城镇."
+msg_err_no_nation_at_target_server: "<red>你在目标位面上没有国家."
+msg_err_network_teleport_request_already_pending: "<red>你已经有一个待处理的传送请求了."
 
 # 像这样制定一个数字的格式, '#' 是 Java 的 DecimalFormat 的语法
 msg_number_format: "This is a decimal number: <arg:0:'zh-CN':'#'>."
