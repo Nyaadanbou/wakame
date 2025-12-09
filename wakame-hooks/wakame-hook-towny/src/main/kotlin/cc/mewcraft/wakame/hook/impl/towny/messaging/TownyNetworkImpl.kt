@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.messaging.packet.*
 import cc.mewcraft.wakame.util.ProxyServerSwitcher
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.RemovalCause
 import com.palmergames.bukkit.towny.TownyAPI
 import com.palmergames.bukkit.towny.`object`.Resident
 import org.bukkit.Bukkit
@@ -61,9 +62,11 @@ private object TownyTeleportImpl {
 
     private val townSessions: Cache<UUID, TownSession> = Caffeine.newBuilder()
         .expireAfterAccess(Duration.ofSeconds(5))
+        .removalListener<UUID, TownSession>(::notifyRequestExpiration)
         .build()
     private val nationSessions: Cache<UUID, NationSession> = Caffeine.newBuilder()
         .expireAfterAccess(Duration.ofSeconds(5))
+        .removalListener<UUID, NationSession>(::notifyRequestExpiration)
         .build()
 
     fun reqTownSpawn(player: Player, targetServer: String) {
@@ -221,6 +224,12 @@ private object TownyTeleportImpl {
             return
         }
         player.teleportAsync(spawn, PlayerTeleportEvent.TeleportCause.PLUGIN)
+    }
+
+    private fun <V> notifyRequestExpiration(k: UUID?, v: V?, c: RemovalCause) {
+        if (k != null && v != null && c == RemovalCause.EXPIRED) {
+            Bukkit.getPlayer(k)?.sendMessage(TranslatableMessages.MSG_ERR_NETWORK_TELEPORT_REQUEST_EXPIRED)
+        }
     }
 
     // 封装了一次跨服城镇传送请求所需要的所有信息
