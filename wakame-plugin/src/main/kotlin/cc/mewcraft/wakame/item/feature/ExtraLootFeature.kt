@@ -4,13 +4,8 @@ import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.util.MojangLootParams
-import cc.mewcraft.wakame.util.MojangLootParamsBuilder
-import cc.mewcraft.wakame.util.handle
+import cc.mewcraft.wakame.util.*
 import cc.mewcraft.wakame.util.item.toNMS
-import cc.mewcraft.wakame.util.registerEvents
-import cc.mewcraft.wakame.util.serverLevel
-import cc.mewcraft.wakame.util.serverPlayer
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams

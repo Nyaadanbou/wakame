@@ -3,14 +3,7 @@
 package cc.mewcraft.wakame.command
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.command.command.AttributeCommand
-import cc.mewcraft.wakame.command.command.CatalogCommand
-import cc.mewcraft.wakame.command.command.CraftCommand
-import cc.mewcraft.wakame.command.command.DebugCommand
-import cc.mewcraft.wakame.command.command.ItemCommand
-import cc.mewcraft.wakame.command.command.PluginCommand
-import cc.mewcraft.wakame.command.command.ReforgeCommand
-import cc.mewcraft.wakame.command.command.ResourcepackCommand
+import cc.mewcraft.wakame.command.command.*
 import cc.mewcraft.wakame.command.parser.AttributeParser
 import cc.mewcraft.wakame.command.parser.BlockTagParser
 import cc.mewcraft.wakame.command.parser.ItemParser

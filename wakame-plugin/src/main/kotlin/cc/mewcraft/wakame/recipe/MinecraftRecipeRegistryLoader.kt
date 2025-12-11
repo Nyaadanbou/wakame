@@ -12,12 +12,8 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.*
 import cc.mewcraft.wakame.util.eventbus.MapEventBus
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.runTask
-import cc.mewcraft.wakame.util.yamlLoader
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.VisibleForTesting

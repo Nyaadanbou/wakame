@@ -75,7 +75,7 @@ data class MultiItemRecipeChoice(
  * @see cc.mewcraft.wakame.item.ItemTagManager
  */
 data class TagRecipeChoice(
-    val tagId: Identifier
+    val tagId: Identifier,
 ) : RecipeChoice {
     override fun toMojangIngredient(): MojangIngredient {
         val items = ItemTagManager.getValues(tagId)

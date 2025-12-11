@@ -8,13 +8,7 @@ import cc.mewcraft.wakame.item.behavior.impl.external.PlaceBlock
 import cc.mewcraft.wakame.item.behavior.impl.external.PlaceDoubleHighBlock
 import cc.mewcraft.wakame.item.behavior.impl.external.PlaceLiquidCollisionBlock
 import cc.mewcraft.wakame.item.behavior.impl.test.TestInteract
-import cc.mewcraft.wakame.item.behavior.impl.weapon.Bow
-import cc.mewcraft.wakame.item.behavior.impl.weapon.Crossbow
-import cc.mewcraft.wakame.item.behavior.impl.weapon.DualSword
-import cc.mewcraft.wakame.item.behavior.impl.weapon.Katana
-import cc.mewcraft.wakame.item.behavior.impl.weapon.Mace
-import cc.mewcraft.wakame.item.behavior.impl.weapon.Melee
-import cc.mewcraft.wakame.item.behavior.impl.weapon.Trident
+import cc.mewcraft.wakame.item.behavior.impl.weapon.*
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 
 /**

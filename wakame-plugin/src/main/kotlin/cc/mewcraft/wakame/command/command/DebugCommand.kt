@@ -138,7 +138,7 @@ internal object DebugCommand : KoishCommandFactory<Source> {
     private fun handleDumpBlockTagValues(context: CommandContext<Source>) {
         val sender = (context.sender() as PlayerSource).source()
         val tag = context.get<Tag<BlockType>>("tag")
-        tag.forEachIndexed { index, typedKey->
+        tag.forEachIndexed { index, typedKey ->
             sender.sendPlainMessage("$index: ${typedKey.key()}")
         }
     }
