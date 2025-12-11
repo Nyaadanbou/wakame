@@ -1,7 +1,7 @@
 # 修复台的 id
-repair: "example_a"
+repair: "example"
 # 回收站的 id
-recycle: "example_a"
+recycle: "example"
 
 # 主要的菜单的设置
 primary_menu_settings:
@@ -30,7 +30,7 @@ primary_menu_settings:
 repairing_menu_settings:
 
   # 修复台菜单的标题
-  title: "修复台: example_a"
+  title: "修复台: example"
 
   # 注意: 该 structure 必须能够放进 primary_menu_settings.structure 的 * 之中
   # i: 可修复物品的槽位
@@ -43,14 +43,14 @@ repairing_menu_settings:
   # background: 背景
   # background2: 背景2
   icons:
-    background: "menu/common/default/background"
-    background2: "menu/blacksmith/default/background2"
+    background: "internal/menu/common/default/background"
+    background2: "internal/menu/blacksmith/default/background2"
 
 # 回收站的菜单的设置
 recycling_menu_settings:
 
   # 回收站菜单的标题
-  title: "回收站: example_a"
+  title: "回收站: example"
 
   # 注意: 该 structure 必须能够放进 primary_menu_settings.structure 的 * 之中
   # i: 物品回收的槽位
@@ -66,8 +66,8 @@ recycling_menu_settings:
   # recycle_when_confirmed: 回收 (已确认)
   # recycle_when_unconfirmed: 回收 (未确认)
   icons:
-    background: "menu/common/default/background"
-    recycle_when_empty: "menu/blacksmith/default/recycle_when_empty"
-    recycle_when_error: "menu/blacksmith/default/recycle_when_error"
-    recycle_when_confirmed: "menu/blacksmith/default/recycle_when_confirmed"
-    recycle_when_unconfirmed: "menu/blacksmith/default/recycle_when_unconfirmed"
+    background: "internal/menu/common/default/background"
+    recycle_when_empty: "internal/menu/blacksmith/default/recycle_when_empty"
+    recycle_when_error: "internal/menu/blacksmith/default/recycle_when_error"
+    recycle_when_confirmed: "internal/menu/blacksmith/default/recycle_when_confirmed"
+    recycle_when_unconfirmed: "internal/menu/blacksmith/default/recycle_when_unconfirmed"

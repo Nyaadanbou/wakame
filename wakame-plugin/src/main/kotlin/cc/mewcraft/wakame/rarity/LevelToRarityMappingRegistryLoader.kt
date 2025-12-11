@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.util.*
@@ -23,7 +24,7 @@ internal object LevelToRarityMappingRegistryLoader : RegistryLoader {
         BuiltInRegistries.LEVEL_TO_RARITY_MAPPING.freeze()
     }
 
-    @InitFun
+    @ReloadFun
     fun reload() {
         consumeData(BuiltInRegistries.LEVEL_TO_RARITY_MAPPING::update)
     }
