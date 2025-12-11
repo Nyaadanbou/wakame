@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.reforge.common.PriceModifierSerializer
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.registerExact
 import cc.mewcraft.wakame.util.yamlLoader
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -30,7 +31,7 @@ internal object RecyclingStationSerializer {
             withDefaults()
             serializers {
                 register(PriceInstanceSerializer)
-                register(PriceModifierSerializer)
+                registerExact(PriceModifierSerializer)
             }
         }
 

@@ -14,7 +14,7 @@ repositories {
     maven { url = uri("https://repo.codemc.io/repository/maven-snapshots/") }
 
     // plugin: WorldEdit
-    maven { url = uri("https://maven.enginehub.org/repo/") }
+    //maven { url = uri("https://maven.enginehub.org/repo/") }
 }
 
 dependencies {
@@ -30,5 +30,5 @@ dependencies {
     compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit") { isTransitive = false }
 
     // plugin: WorldEdit
-    compileOnly(local.worldedit)
+    //compileOnly(local.worldedit)
 }

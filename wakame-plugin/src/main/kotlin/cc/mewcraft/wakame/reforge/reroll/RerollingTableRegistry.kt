@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload()
+@Reload
 object RerollingTableRegistry  {
     private val tables = HashMap<String, RerollingTable>()
 

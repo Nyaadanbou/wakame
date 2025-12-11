@@ -55,11 +55,22 @@ dependencies {
     implementation(local.commons.provider)
     implementation(local.commons.reflection)
     implementation(local.commons.tuple)
+    api(platform(libs.bom.caffeine))
     implementation(platform(libs.bom.exposed))
     implementation(platform(libs.bom.configurate.yaml))
     implementation(platform(libs.bom.configurate.gson))
     implementation(platform(libs.bom.configurate.extra.kotlin))
     implementation(platform(libs.bom.configurate.extra.dfu8))
+    api(local.messenger)
+    implementation(local.messenger.nats)
+    implementation(local.messenger.rabbitmq)
+    implementation(local.messenger.redis)
+    implementation(local.zstdjni)
+    implementation(local.jedis) {
+        exclude("com.google.code.gson", "gson")
+    }
+    implementation(local.rabbitmq)
+    implementation(local.nats)
 }
 
 sourceSets {

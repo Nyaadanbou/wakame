@@ -31,6 +31,18 @@ mixin-extras = "0.4.1"
 ignite = "1.1.0"
 shadow-nbt = "1.21.3-SNAPSHOT"
 shadow-bukkit = "1.21.3-SNAPSHOT"
+messenger = "1.1.0-SNAPSHOT"
+zstdjni = "1.5.7-5"
+jedis = "7.0.0"
+postgresql = "42.7.8"
+rabbitmq = "5.27.0"
+nats = "2.23.0"
+
+# synced with version used by lowest supported mc (currently 1.21.4 on paper)
+gson = "2.11.0"
+guava = "33.3.1-jre"
+log4j = "2.24.1"
+netty = "4.1.115.Final"
 
 # Test deps
 datafixerupper = "8.0.16"
@@ -157,6 +169,15 @@ huskhomes-bukkit = { group = "net.william278.huskhomes", name = "huskhomes-bukki
 carbonchat = { group = "de.hexaoxi", name = "carbonchat-api", version.ref = "carbonchat" }
 mythicdungeons = { group = "net.playavalon", name = "MythicDungeons", version.ref = "mythicdungeons" }
 betonquest = { group = "org.betonquest", name = "betonquest", version.ref = "betonquest" }
+messenger = { group = "de.hexaoxi", name = "messenger-api", version.ref = "messenger" }
+messenger-nats = { group = "de.hexaoxi", name = "messenger-nats", version.ref = "messenger" }
+messenger-rabbitmq = { group = "de.hexaoxi", name = "messenger-rabbitmq", version.ref = "messenger" }
+messenger-redis = { group = "de.hexaoxi", name = "messenger-redis", version.ref = "messenger" }
+netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
+zstdjni = { group = "com.github.luben", name = "zstd-jni", version.ref = "zstdjni" }
+jedis = { group = "redis.clients", name = "jedis", version.ref = "jedis" }
+rabbitmq = { group = "com.rabbitmq", name = "amqp-client", version.ref = "rabbitmq" }
+nats = { group = "io.nats", name = "jnats", version.ref = "nats" }
 
 [plugins]
 

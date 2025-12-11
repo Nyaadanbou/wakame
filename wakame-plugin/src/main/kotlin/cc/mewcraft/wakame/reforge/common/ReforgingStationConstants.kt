@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.reforge.common
 
 internal object ReforgingStationConstants {
-    const val DATA_DIR = "reforge"
+    const val DATA_DIR = "reforging_station"
 
     const val MERING_LOG_PREFIX = "[Reforge/Merge] "
     const val MODDING_LOG_PREFIX = "[Reforge/Mod] "

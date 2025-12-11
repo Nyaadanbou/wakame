@@ -3,11 +3,12 @@ package cc.mewcraft.wakame.pack
 import cc.mewcraft.wakame.BootstrapContexts
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.util.data.useZip
-import kotlin.io.path.*
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
 
 internal object AssetExtractor {
 
-    @OptIn(ExperimentalPathApi::class)
     fun extractDefaults() {
         BootstrapContexts.PLUGIN_JAR.useZip { zip ->
             val src = zip.resolve("assets/")
@@ -17,7 +18,7 @@ internal object AssetExtractor {
             require(dst.isDirectory())
 
             if (!dst.exists()) {
-                src.copyToRecursively(dst, followLinks = false, overwrite = false)
+                src.toFile().copyRecursively(dst.toFile(), overwrite = false)
             }
         }
     }
