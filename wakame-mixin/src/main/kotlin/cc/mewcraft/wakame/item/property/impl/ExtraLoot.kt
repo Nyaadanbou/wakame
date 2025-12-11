@@ -2,14 +2,8 @@ package cc.mewcraft.wakame.item.property.impl
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.LootTableUtils
-import cc.mewcraft.wakame.util.MojangLootParams
-import cc.mewcraft.wakame.util.MojangLootTable
-import cc.mewcraft.wakame.util.getBlockId
-import cc.mewcraft.wakame.util.isTagged
+import cc.mewcraft.wakame.util.*
 import cc.mewcraft.wakame.util.item.toBukkit
-import cc.mewcraft.wakame.util.require
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.tag.TagKey
 import org.bukkit.Location
@@ -79,7 +73,7 @@ data class BlockSetExtraLootEntry(
     val blockIds: Set<Identifier>,
 ) : BlockExtraLootEntry {
     override fun matches(block: Block): Boolean {
-        return blockIds.contains(block.getBlockId())
+        return blockIds.contains(UniversalBlocks.getBlockId(block))
     }
 }
 
@@ -94,7 +88,7 @@ data class BlockTagExtraLootEntry(
     val tagKey = TagKey.create(RegistryKey.BLOCK, blockTagId)
 
     override fun matches(block: Block): Boolean {
-        return block.isTagged(tagKey)
+        return UniversalBlocks.isTagged(block, tagKey)
     }
 }
 

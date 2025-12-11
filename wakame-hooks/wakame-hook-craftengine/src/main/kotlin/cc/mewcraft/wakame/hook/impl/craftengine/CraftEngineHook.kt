@@ -8,9 +8,9 @@ import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.item.behavior.impl.external.PlaceBlock
 import cc.mewcraft.wakame.item.behavior.impl.external.PlaceDoubleHighBlock
 import cc.mewcraft.wakame.item.behavior.impl.external.PlaceLiquidCollisionBlock
-import cc.mewcraft.wakame.util.BlockUtils
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.UniversalBlocks
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
@@ -23,20 +23,20 @@ import org.bukkit.block.BlockType
 object CraftEngineHook {
 
     init {
-
         // 注册 CraftEngine 带来的新物品行为实例
         PlaceBlock.register(CraftEnginePlaceBlock)
         PlaceDoubleHighBlock.register(CraftEnginePlaceDoubleHighBlock)
         PlaceLiquidCollisionBlock.register(CraftEnginePlaceLiquidCollisionBlock)
 
-        // 修改 Koish BlockUtils中的方法
-        BlockUtils.register(CraftEngineBlockUtils)
+        // 修改 UniversalBlocks 的实现
+        UniversalBlocks.setImplementation(CraftEngineUniversalBlocks)
     }
 
     /**
-     * Hook CraftEngine 后 [cc.mewcraft.wakame.util.BlockUtils] 的实现.
+     * 有 CraftEngine 运行时, 由 CraftEngine 提供的 [cc.mewcraft.wakame.util.UniversalBlocks] 实现.
      */
-    object CraftEngineBlockUtils : BlockUtils {
+    object CraftEngineUniversalBlocks : UniversalBlocks {
+
         override fun isCustomBlock(block: Block): Boolean {
             return CraftEngineBlocks.isCustomBlock(block)
         }

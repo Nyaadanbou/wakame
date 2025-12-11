@@ -4,42 +4,20 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.extensions.toLocation
 import cc.mewcraft.wakame.item.behavior.InteractableBlocks.INTERACTABLE_BLOCKS
 import cc.mewcraft.wakame.item.behavior.InteractableEntities.INTERACTABLE_ENTITIES
-import cc.mewcraft.wakame.util.isCustomBlock
+import cc.mewcraft.wakame.util.UniversalBlocks
 import io.papermc.paper.entity.Shearable
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
-import org.bukkit.Bukkit
-import org.bukkit.GameMode
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
-import org.bukkit.Tag
-import org.bukkit.World
+import org.bukkit.*
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
-import org.bukkit.block.data.type.Beehive
-import org.bukkit.block.data.type.Bell
-import org.bukkit.block.data.type.CaveVines
-import org.bukkit.block.data.type.ChiseledBookshelf
-import org.bukkit.block.data.type.Jukebox
-import org.bukkit.block.data.type.RespawnAnchor
-import org.bukkit.block.data.type.Vault
+import org.bukkit.block.data.type.*
 import org.bukkit.craftbukkit.block.impl.CraftComposter
 import org.bukkit.craftbukkit.block.impl.CraftSweetBerryBush
-import org.bukkit.entity.Ageable
-import org.bukkit.entity.Allay
-import org.bukkit.entity.Entity
-import org.bukkit.entity.EntityType
-import org.bukkit.entity.HappyGhast
-import org.bukkit.entity.IronGolem
-import org.bukkit.entity.MushroomCow
-import org.bukkit.entity.Piglin
-import org.bukkit.entity.Player
-import org.bukkit.entity.Steerable
-import org.bukkit.entity.Tameable
+import org.bukkit.entity.*
 import org.bukkit.entity.memory.MemoryKey
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
@@ -838,7 +816,7 @@ fun Block.isInteractable(player: Player, itemStack: ItemStack, interactContext: 
     // 自定义方块的交互判定在 Koish 的交互判定之前, 代码执行到此处, 自定义方块的交互早已检查过
     // 如果当时自定义方块可交互, 代码不会执行到此处
     // 因此, 此时自定义方块方块必然不可交互
-    if (this.isCustomBlock()) return false
+    if (UniversalBlocks.isCustomBlock(this)) return false
     val blockType = this.type.asBlockType() ?: return false // 不可能在此处return
     val checkLogic = INTERACTABLE_BLOCKS[blockType] ?: return false
     return checkLogic(player, itemStack, blockData, interactContext)
