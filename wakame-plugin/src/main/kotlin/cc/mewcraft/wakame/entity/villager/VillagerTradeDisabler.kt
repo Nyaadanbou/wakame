@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.registerEvents
 import net.kyori.adventure.key.Key
 import org.bukkit.Sound
+import org.bukkit.entity.Villager
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -27,7 +28,7 @@ object VillagerTradeDisabler : Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     private fun on(event: PlayerInteractEntityEvent) {
-        val rightClicked = event.rightClicked
+        val rightClicked = event.rightClicked as? Villager ?: return
         val rightClickedLocation = rightClicked.location
         val worldKey = rightClickedLocation.world.key
         if (worldKey in DISABLED_WORLDS) {
