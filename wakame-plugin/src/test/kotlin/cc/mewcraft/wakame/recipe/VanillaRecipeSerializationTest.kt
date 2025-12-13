@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.recipe
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.core.ItemRefMock
+import cc.mewcraft.wakame.init.RecipeInitializer
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.item.ItemRefBootstrap
 import cc.mewcraft.wakame.util.Identifier
@@ -28,7 +29,7 @@ class VanillaRecipeSerializationTest {
             every { ItemRef.create(any<Identifier>()) } answers { ItemRefMock(firstArg<Identifier>()) }
 
             ItemRefBootstrap.init()
-            MinecraftRecipeRegistryLoader.load()
+            RecipeInitializer.preLoad()
         }
 
         @JvmStatic
@@ -49,7 +50,7 @@ class VanillaRecipeSerializationTest {
     fun `blasting recipe serialization`() {
         key = Key.key("test:blasting")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<BlastingRecipe>(recipe)
 
@@ -94,7 +95,7 @@ class VanillaRecipeSerializationTest {
     fun `campfire recipe serialization`() {
         key = Key.key("test:campfire")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<CampfireRecipe>(recipe)
 
@@ -118,7 +119,7 @@ class VanillaRecipeSerializationTest {
     fun `furnace recipe serialization`() {
         key = Key.key("test:furnace")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<FurnaceRecipe>(recipe)
 
@@ -142,7 +143,7 @@ class VanillaRecipeSerializationTest {
     fun `shaped recipe serialization`() {
         key = Key.key("test:shaped")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<ShapedRecipe>(recipe)
 
@@ -179,7 +180,7 @@ class VanillaRecipeSerializationTest {
     fun `shapeless recipe serialization`() {
         key = Key.key("test:shapeless")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<ShapelessRecipe>(recipe)
         val ingredients = recipe.ingredients
@@ -218,7 +219,7 @@ class VanillaRecipeSerializationTest {
     fun `smithing transform recipe serialization`() {
         key = Key.key("test:smithing_transform")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<SmithingTransformRecipe>(recipe)
 
@@ -250,7 +251,7 @@ class VanillaRecipeSerializationTest {
     fun `smithing trim recipe serialization`() {
         key = Key.key("test:smithing_trim")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<SmithingTrimRecipe>(recipe)
 
@@ -309,7 +310,7 @@ class VanillaRecipeSerializationTest {
     fun `smoking recipe serialization`() {
         key = Key.key("test:smoking")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<SmokingRecipe>(recipe)
 
@@ -333,7 +334,7 @@ class VanillaRecipeSerializationTest {
     fun `stonecutting recipe serialization`() {
         key = Key.key("test:stonecutting")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<StonecuttingRecipe>(recipe)
 

@@ -31,7 +31,7 @@ internal object Reloader {
     /**
      * Reloads all [ReloadableFunctions][ReloadableFunction].
      */
-    internal fun performReload() {
+    fun reload() {
         if (Initializer.isDone) {
             runBlocking {
                 LOGGER.info("Calling Reload Functions")

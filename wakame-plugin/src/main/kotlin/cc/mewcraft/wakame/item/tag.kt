@@ -3,10 +3,7 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init
-import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifier
 import io.papermc.paper.registry.RegistryAccess
@@ -25,24 +22,40 @@ import org.bukkit.inventory.ItemStack
  * TODO 自动识别数据包标签并注册替换相应原版配方
  */
 @Init(stage = InitStage.POST_WORLD)
-@Reload
 object ItemTagManager {
+
     /**
-     * 装有 `标签 -> 物品引用集合` 的 Map.
+     * `标签唯一标识 -> 物品引用集合` 的映射.
      */
     private val map: MutableMap<Identifier, MutableSet<ItemRef>> = mutableMapOf()
 
-    @InitFun
-    fun init() {
-        reloadTags()
+    /**
+     * 检查特定物品是否属于某个标签.
+     * 标签不存在时返回 false.
+     */
+    fun ItemStack.isTagged(tagId: Identifier): Boolean {
+        return map[tagId]?.contains(ItemRef.create(this)) == true
     }
 
-    @ReloadFun
+    /**
+     * 获取特定标签中全部物品引用的集合.
+     * 标签不存在时返回空集合.
+     */
+    fun getValues(tagId: Identifier): Set<ItemRef> {
+        return map[tagId] ?: emptySet()
+    }
+
+    /**
+     * 重新载入标签数据.
+     */
     fun reload() {
-        reloadTags()
+        loadTags()
     }
 
-    private fun reloadTags() {
+    /**
+     * 载入标签数据.
+     */
+    fun loadTags() {
         map.clear()
 
         // 载入原版数据包中的标签.
@@ -75,21 +88,5 @@ object ItemTagManager {
         }
 
         LOGGER.info("Loaded ${map.size} item tags")
-    }
-
-    /**
-     * 检查特定物品是否属于某个标签.
-     * 标签不存在时返回 false.
-     */
-    fun ItemStack.isTagged(tagId: Identifier): Boolean {
-        return map[tagId]?.contains(ItemRef.create(this)) == true
-    }
-
-    /**
-     * 获取特定标签中全部物品引用的集合.
-     * 标签不存在时返回 空集合.
-     */
-    fun getValues(tagId: Identifier): Set<ItemRef> {
-        return map[tagId] ?: emptySet()
     }
 }
