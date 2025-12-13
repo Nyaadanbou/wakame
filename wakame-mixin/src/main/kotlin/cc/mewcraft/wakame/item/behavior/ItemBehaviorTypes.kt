@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.behavior
 
-import cc.mewcraft.wakame.item.behavior.impl.Arrow
 import cc.mewcraft.wakame.item.behavior.impl.Castable
 import cc.mewcraft.wakame.item.behavior.impl.EntityBucket
 import cc.mewcraft.wakame.item.behavior.impl.HoldLastDamage
@@ -36,12 +35,6 @@ object ItemBehaviorTypes {
      */
     @JvmField
     val CASTABLE = typeOf("castable", Castable)
-
-    /**
-     * 物品具有该行为时, 作为箭矢射出和命中时可执行自定义效果.
-     */
-    @JvmField
-    val ARROW = typeOf("arrow", Arrow)
 
     /**
      * 物品具有该行为时, 会保留最后的耐久(维持在0).

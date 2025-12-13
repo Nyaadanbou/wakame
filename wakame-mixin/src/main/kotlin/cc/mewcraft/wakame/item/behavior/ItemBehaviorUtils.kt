@@ -14,12 +14,9 @@ import cc.mewcraft.wakame.util.item.isDamageable
 import cc.mewcraft.wakame.util.item.maxDamage
 import cc.mewcraft.wakame.util.item.toNMS
 import org.bukkit.World
-import org.bukkit.block.Block
-import org.bukkit.block.BlockFace
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
 import org.bukkit.inventory.ItemStack
 
 interface ItemBehaviorContext {
@@ -55,27 +52,6 @@ data class ReceiveDamageContext(
     // 需要用到更多方便的get方法的话, 自行在下方补充即可
     val finalDamage: Double
         get() = finalDamageContext.finalDamageMap.values.sum()
-}
-
-data class ProjectileLaunchContext(
-    override val player: Player,
-    override val itemstack: ItemStack,
-    val projectile: Projectile,
-) : ItemBehaviorContext {
-    val world: World
-        get() = player.world
-}
-
-data class ProjectileHitContext(
-    override val player: Player,
-    override val itemstack: ItemStack,
-    val projectile: Projectile,
-    val hitEntity: Entity?,
-    val hitBlock: Block?,
-    val hitBlockFace: BlockFace?,
-) : ItemBehaviorContext {
-    val world: World
-        get() = player.world
 }
 
 data class DurabilityDecreaseContext(

@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.recipe
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.core.ItemRefMock
+import cc.mewcraft.wakame.init.RecipeInitializer
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.item.ItemRefBootstrap
 import cc.mewcraft.wakame.util.Identifier
@@ -28,7 +29,7 @@ class VanillaRecipeSerializationTest {
             every { ItemRef.create(any<Identifier>()) } answers { ItemRefMock(firstArg<Identifier>()) }
 
             ItemRefBootstrap.init()
-            MinecraftRecipeRegistryLoader.load()
+            RecipeInitializer.preLoad()
         }
 
         @JvmStatic
@@ -49,12 +50,12 @@ class VanillaRecipeSerializationTest {
     fun `blasting recipe serialization`() {
         key = Key.key("test:blasting")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<BlastingRecipe>(recipe)
 
         val input = recipe.input
-        assertIs<MultiRecipeChoice>(input)
+        assertIs<MultiItemRecipeChoice>(input)
         assertContentEquals(
             expected = listOf(
                 ItemRefMock("minecraft:glass"),
@@ -94,12 +95,12 @@ class VanillaRecipeSerializationTest {
     fun `campfire recipe serialization`() {
         key = Key.key("test:campfire")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<CampfireRecipe>(recipe)
 
         val input = recipe.input
-        assertIs<SingleRecipeChoice>(input)
+        assertIs<SingleItemRecipeChoice>(input)
         assertEquals(ItemRefMock("minecraft:poisonous_potato"), input.item)
 
         val cookingTime = recipe.cookingTime
@@ -118,12 +119,12 @@ class VanillaRecipeSerializationTest {
     fun `furnace recipe serialization`() {
         key = Key.key("test:furnace")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<FurnaceRecipe>(recipe)
 
         val input = recipe.input
-        assertIs<SingleRecipeChoice>(input)
+        assertIs<SingleItemRecipeChoice>(input)
         assertEquals(ItemRefMock("minecraft:gravel"), input.item)
 
         val cookingTime = recipe.cookingTime
@@ -142,7 +143,7 @@ class VanillaRecipeSerializationTest {
     fun `shaped recipe serialization`() {
         key = Key.key("test:shaped")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<ShapedRecipe>(recipe)
 
@@ -159,8 +160,8 @@ class VanillaRecipeSerializationTest {
         val recipeChoiceB = ingredients['B']
         assertNotNull(recipeChoiceA)
         assertNotNull(recipeChoiceB)
-        assertIs<MultiRecipeChoice>(recipeChoiceA)
-        assertIs<SingleRecipeChoice>(recipeChoiceB)
+        assertIs<MultiItemRecipeChoice>(recipeChoiceA)
+        assertIs<SingleItemRecipeChoice>(recipeChoiceB)
         assertContentEquals(
             listOf(
                 ItemRefMock("minecraft:gold_block"),
@@ -179,14 +180,14 @@ class VanillaRecipeSerializationTest {
     fun `shapeless recipe serialization`() {
         key = Key.key("test:shapeless")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<ShapelessRecipe>(recipe)
         val ingredients = recipe.ingredients
-        assertContains(ingredients, SingleRecipeChoice(ItemRefMock("minecraft", "poppy")))
+        assertContains(ingredients, SingleItemRecipeChoice(ItemRefMock("minecraft", "poppy")))
         assertContains(
             ingredients,
-            MultiRecipeChoice(
+            MultiItemRecipeChoice(
                 listOf(
                     ItemRefMock("minecraft:red_dye"),
                     ItemRefMock("minecraft:pink_dye"),
@@ -195,12 +196,12 @@ class VanillaRecipeSerializationTest {
         )
         assertEquals(
             4, ingredients
-                .filterIsInstance<SingleRecipeChoice>()
+                .filterIsInstance<SingleItemRecipeChoice>()
                 .count { it.item == ItemRefMock("minecraft:poppy") }
         )
         assertEquals(
             1, ingredients
-                .filterIsInstance<MultiRecipeChoice>()
+                .filterIsInstance<MultiItemRecipeChoice>()
                 .count {
                     it.items == listOf(
                         ItemRefMock("minecraft:red_dye"),
@@ -218,12 +219,12 @@ class VanillaRecipeSerializationTest {
     fun `smithing transform recipe serialization`() {
         key = Key.key("test:smithing_transform")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<SmithingTransformRecipe>(recipe)
 
         val base = recipe.base
-        assertIs<MultiRecipeChoice>(base)
+        assertIs<MultiItemRecipeChoice>(base)
         assertContentEquals(
             listOf(
                 ItemRefMock("minecraft:cobblestone"),
@@ -232,7 +233,7 @@ class VanillaRecipeSerializationTest {
         )
 
         val addition = recipe.addition
-        assertIs<SingleRecipeChoice>(addition)
+        assertIs<SingleItemRecipeChoice>(addition)
         assertEquals(ItemRefMock("minecraft:ender_pearl"), addition.item)
 
         val template = recipe.template
@@ -250,16 +251,16 @@ class VanillaRecipeSerializationTest {
     fun `smithing trim recipe serialization`() {
         key = Key.key("test:smithing_trim")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<SmithingTrimRecipe>(recipe)
 
         val base = recipe.base
-        assertIs<SingleRecipeChoice>(base)
+        assertIs<SingleItemRecipeChoice>(base)
         assertEquals(ItemRefMock("armor/bronze_helmet"), base.item)
 
         val addition = recipe.addition
-        assertIs<MultiRecipeChoice>(addition)
+        assertIs<MultiItemRecipeChoice>(addition)
         assertContentEquals(
             listOf(
                 ItemRefMock("minecraft:amethyst_shard"),
@@ -276,7 +277,7 @@ class VanillaRecipeSerializationTest {
         )
 
         val template = recipe.template
-        assertIs<MultiRecipeChoice>(template)
+        assertIs<MultiItemRecipeChoice>(template)
         assertContentEquals(
             listOf(
                 ItemRefMock("minecraft:coast_armor_trim_smithing_template"),
@@ -309,12 +310,12 @@ class VanillaRecipeSerializationTest {
     fun `smoking recipe serialization`() {
         key = Key.key("test:smoking")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<SmokingRecipe>(recipe)
 
         val input = recipe.input
-        assertIs<SingleRecipeChoice>(input)
+        assertIs<SingleItemRecipeChoice>(input)
         assertEquals(ItemRefMock("minecraft:cobblestone"), input.item)
 
         val cookingTime = recipe.cookingTime
@@ -333,12 +334,12 @@ class VanillaRecipeSerializationTest {
     fun `stonecutting recipe serialization`() {
         key = Key.key("test:stonecutting")
 
-        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
+        val recipe = RecipeInitializer.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<StonecuttingRecipe>(recipe)
 
         val input = recipe.input
-        assertIs<MultiRecipeChoice>(input)
+        assertIs<MultiItemRecipeChoice>(input)
         assertContentEquals(
             listOf(
                 ItemRefMock("minecraft:oak_planks"),

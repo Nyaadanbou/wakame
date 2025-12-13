@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.mixin.support.KoishLootItem
 import cc.mewcraft.wakame.shadow.loot.*
 import cc.mewcraft.wakame.util.MINECRAFT_SERVER
+import cc.mewcraft.wakame.util.MojangLootTable
 import cc.mewcraft.wakame.util.namespacedKey
 import cc.mewcraft.wakame.util.shadow
 import me.lucko.shadow.bukkit.BukkitShadowFactory
@@ -13,7 +14,6 @@ import net.kyori.adventure.key.Key
 import org.bukkit.craftbukkit.inventory.CraftItemType
 
 
-typealias MojangLootTable = net.minecraft.world.level.storage.loot.LootTable
 typealias MojangLootPoolEntryContainer = net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer
 typealias MojangCompositeEntryBase = net.minecraft.world.level.storage.loot.entries.CompositeEntryBase
 typealias MojangLootItem = net.minecraft.world.level.storage.loot.entries.LootItem

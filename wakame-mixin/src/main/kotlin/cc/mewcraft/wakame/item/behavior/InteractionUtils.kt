@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.item.behavior
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.extensions.toLocation
-import cc.mewcraft.wakame.item.behavior.CustomBlockChecker.Companion.isCustomBlock
 import cc.mewcraft.wakame.item.behavior.InteractableBlocks.INTERACTABLE_BLOCKS
 import cc.mewcraft.wakame.item.behavior.InteractableEntities.INTERACTABLE_ENTITIES
+import cc.mewcraft.wakame.util.UniversalBlocks
 import io.papermc.paper.entity.Shearable
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -22,7 +22,6 @@ import org.bukkit.entity.memory.MemoryKey
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
-import org.jetbrains.annotations.ApiStatus
 import org.joml.Vector3d
 
 data class UseOnContext(
@@ -817,7 +816,7 @@ fun Block.isInteractable(player: Player, itemStack: ItemStack, interactContext: 
     // 自定义方块的交互判定在 Koish 的交互判定之前, 代码执行到此处, 自定义方块的交互早已检查过
     // 如果当时自定义方块可交互, 代码不会执行到此处
     // 因此, 此时自定义方块方块必然不可交互
-    if (isCustomBlock()) return false
+    if (UniversalBlocks.isCustomBlock(this)) return false
     val blockType = this.type.asBlockType() ?: return false // 不可能在此处return
     val checkLogic = INTERACTABLE_BLOCKS[blockType] ?: return false
     return checkLogic(player, itemStack, blockData, interactContext)
@@ -832,40 +831,3 @@ fun Entity.isInteractable(player: Player, itemStack: ItemStack): Boolean {
     val checkLogic = INTERACTABLE_ENTITIES[this.type] ?: return false
     return checkLogic(player, itemStack, this)
 }
-
-/**
- * 自定义方块检查器.
- */
-interface CustomBlockChecker {
-    fun isCustomBlock(block: Block): Boolean
-
-    /**
-     * 伴生对象, 提供 [CustomBlockChecker] 的实例.
-     */
-    companion object {
-
-        @get:JvmName("getInstance")
-        var INSTANCE: CustomBlockChecker = Default
-            private set
-
-        @ApiStatus.Internal
-        fun register(instance: CustomBlockChecker) {
-            this.INSTANCE = instance
-        }
-
-        fun Block.isCustomBlock(): Boolean {
-            return INSTANCE.isCustomBlock(this)
-        }
-
-    }
-}
-
-/**
- * 默认的自定义方块检查器.
- */
-private object Default : CustomBlockChecker {
-    override fun isCustomBlock(block: Block): Boolean {
-        return false
-    }
-}
-

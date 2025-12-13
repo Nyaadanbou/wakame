@@ -183,6 +183,27 @@ data object ItemPropTypes {
     }
 
     /**
+     * 物品进行特定行为时触发额外战利品.
+     */
+    @JvmField
+    val EXTRA_LOOT: ItemPropType<ExtraLoot> = typeOf("extra_loot") {
+        serializers {
+            register(BlockExtraLootEntry.Serializer)
+            register(EntityExtraLootEntry.Serializer)
+        }
+    }
+
+    /**
+     * 该物品类型所属的标签.
+     * 不使用该 Property 直接进行物品标签相关的判定, 而是使用 plugin 包下的 ItemTagManager 中的相关方法.
+     *
+     * 这并非原版的标签系统, 而是由 Koish 管理的一套标签系统.
+     * 目前来说, 仅用于配方系统中原料的创建.
+     */
+    @JvmField
+    val ITEM_TAG: ItemPropType<Set<Identifier>> = typeOf("tag")
+
+    /**
      * 物品放置出来的普通方块.
      *
      * 需要安装对应插件才能正常使用.

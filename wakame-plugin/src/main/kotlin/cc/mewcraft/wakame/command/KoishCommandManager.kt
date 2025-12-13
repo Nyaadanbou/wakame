@@ -5,6 +5,7 @@ package cc.mewcraft.wakame.command
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.command.command.*
 import cc.mewcraft.wakame.command.parser.AttributeParser
+import cc.mewcraft.wakame.command.parser.BlockTagParser
 import cc.mewcraft.wakame.command.parser.ItemParser
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -36,6 +37,7 @@ internal object KoishCommandManager {
                 // 在这里注册形如命名空间的指令参数, 否则 Brigadier 无法正常工作
                 registerMapping(typeTokenOf<AttributeParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
                 registerMapping(typeTokenOf<ItemParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
+                registerMapping(typeTokenOf<BlockTagParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
             }
 
             manager.apply {

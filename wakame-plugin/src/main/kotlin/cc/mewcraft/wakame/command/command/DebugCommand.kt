@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.command.command
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
+import cc.mewcraft.wakame.command.parser.BlockTagParser
 import cc.mewcraft.wakame.damage.KoishDamageSources
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.damageBundle
@@ -17,7 +18,9 @@ import cc.mewcraft.wakame.util.coroutine.minecraft
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
+import io.papermc.paper.registry.tag.Tag
 import kotlinx.coroutines.Dispatchers
+import org.bukkit.block.BlockType
 import org.bukkit.entity.LivingEntity
 import org.incendo.cloud.bukkit.data.MultipleEntitySelector
 import org.incendo.cloud.bukkit.parser.selector.MultipleEntitySelectorParser
@@ -62,6 +65,14 @@ internal object DebugCommand : KoishCommandFactory<Source> {
         buildAndAdd(commonBuilder) {
             literal("read_item_ref")
             koishHandler(context = Dispatchers.minecraft, handler = ::handleReadItemRef)
+        }
+
+        // <root> debug dump_block_tag_values <tag>
+        // 在聊天栏打印数据包方块标签 <tag> 中的内容
+        buildAndAdd(commonBuilder) {
+            literal("dump_block_tag_values")
+            required("tag", BlockTagParser.blockTagParser())
+            koishHandler(context = Dispatchers.minecraft, handler = ::handleDumpBlockTagValues)
         }
     }
 
@@ -122,6 +133,14 @@ internal object DebugCommand : KoishCommandFactory<Source> {
 
         val itemRef = ItemRef.create(itemInMainHand)
         sender.sendPlainMessage("ItemRef: $itemRef")
+    }
+
+    private fun handleDumpBlockTagValues(context: CommandContext<Source>) {
+        val sender = (context.sender() as PlayerSource).source()
+        val tag = context.get<Tag<BlockType>>("tag")
+        tag.forEachIndexed { index, typedKey ->
+            sender.sendPlainMessage("$index: ${typedKey.key()}")
+        }
     }
 
 }
