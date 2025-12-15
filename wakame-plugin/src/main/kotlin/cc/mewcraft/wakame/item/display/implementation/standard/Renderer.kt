@@ -20,10 +20,7 @@ import cc.mewcraft.wakame.item.getData
 import cc.mewcraft.wakame.item.getMeta
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
-import cc.mewcraft.wakame.item.property.impl.Arrow
-import cc.mewcraft.wakame.item.property.impl.EntityBucket
-import cc.mewcraft.wakame.item.property.impl.ExtraLore
-import cc.mewcraft.wakame.item.property.impl.Fuel
+import cc.mewcraft.wakame.item.property.impl.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -105,6 +102,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         StandardRenderingHandlerRegistry.LORE.process(collector, item.getProp(ItemPropTypes.EXTRA_LORE))
         StandardRenderingHandlerRegistry.ENTITY_BUCKET_PROP.process(collector, item.getProp(ItemPropTypes.ENTITY_BUCKET))
         StandardRenderingHandlerRegistry.FUEL.process(collector, item.getProp(ItemPropTypes.FUEL))
+        StandardRenderingHandlerRegistry.CASTABLE.process(collector, item.getProp(ItemPropTypes.CASTABLE))
         StandardRenderingHandlerRegistry.ITEM_NAME.process(collector, item.getMeta(ItemMetaTypes.ITEM_NAME)) // 对于最可能被频繁修改的 `item_name`, `custom_name`
         StandardRenderingHandlerRegistry.CUSTOM_NAME.process(collector, item.getMeta(ItemMetaTypes.CUSTOM_NAME))
         StandardRenderingHandlerRegistry.CRATE.process(collector, item.getData(ItemDataTypes.CRATE))
@@ -281,4 +279,7 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
             Placeholder.component("consume", Component.text(data.consume))
         )
     }
+
+    @JvmField
+    val CASTABLE: RenderingHandler<Map<String, Castable>, CastableRendererFormat> = configure("castable") { data, format -> format.render(data) }
 }

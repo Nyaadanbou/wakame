@@ -5,14 +5,18 @@ import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item.data.impl.*
 import cc.mewcraft.wakame.item.display.*
 import cc.mewcraft.wakame.item.display.implementation.common.*
+import cc.mewcraft.wakame.item.property.impl.*
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
+import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.entity.EntityType
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import org.spongepowered.configurate.objectmapping.meta.Setting
 
 @ConfigSerializable
 internal data class CoreAttributeRendererFormat(
@@ -208,5 +212,130 @@ internal data class EntityBucketInfoRendererFormat(
         SHEARABLE,
         TAMEABLE,
         VARIABLE
+    }
+}
+
+@ConfigSerializable
+internal data class CastableRendererFormat(
+    override val namespace: String,
+    @Setting("content")
+    private val content: List<String>,
+    @Setting("trigger")
+    private val trigger: Trigger,
+) : RendererFormat.Simple {
+    override val id: String = "castable"
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory.fixed()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate.literal(namespace, id)
+
+    fun render(data: Map<String, Castable>): IndexedText {
+        val lines = data.flatMap { (_, v) -> render(v) }
+        return SimpleIndexedText(index, lines)
+    }
+
+    private fun render(data: Castable): List<Component> {
+        val skillTrigger = data.trigger.unwrap()
+        val triggerConfig = this.trigger
+        val lines = when (skillTrigger) {
+            is SpecialCastableTrigger -> {
+                val line = triggerConfig.special.generate(skillTrigger)
+                content.map { MM.deserialize(it, Placeholder.component("trigger", line)) }
+            }
+
+            is GenericCastableTrigger -> {
+                val line = triggerConfig.generic.generate(skillTrigger)
+                content.map { MM.deserialize(it, Placeholder.component("trigger", line)) }
+            }
+
+            is SequenceCastableTrigger -> {
+                val line = triggerConfig.sequence.generate(skillTrigger)
+                content.map { MM.deserialize(it, Placeholder.component("trigger", line)) }
+            }
+
+            is InputCastableTrigger -> {
+                val line = triggerConfig.input.generate(skillTrigger)
+                content.map { MM.deserialize(it, Placeholder.component("trigger", line)) }
+            }
+        }
+        return lines
+    }
+
+    @ConfigSerializable
+    data class Trigger(
+        @Setting("special")
+        val special: Special,
+        @Setting("generic")
+        val generic: Generic,
+        @Setting("sequence")
+        val sequence: Sequence,
+        @Setting("input")
+        val input: Input,
+    )
+
+    @ConfigSerializable
+    data class Special(
+        val onEquip: Component,
+        val onUnequip: Component,
+    ) {
+        fun generate(trigger: SpecialCastableTrigger): Component {
+            return when (trigger) {
+                SpecialCastableTrigger.ON_EQUIP -> onEquip
+                SpecialCastableTrigger.ON_UNEQUIP -> onUnequip
+            }
+        }
+    }
+
+    @ConfigSerializable
+    data class Generic(
+        val leftClick: Component,
+        val rightClick: Component,
+    ) {
+        fun generate(trigger: GenericCastableTrigger): Component {
+            return when (trigger) {
+                GenericCastableTrigger.LEFT_CLICK -> leftClick
+                GenericCastableTrigger.RIGHT_CLICK -> rightClick
+            }
+        }
+    }
+
+    @ConfigSerializable
+    data class Sequence(
+        val left: Component,
+        val right: Component,
+        val separator: Component,
+    ) {
+        fun generate(trigger: SequenceCastableTrigger): Component {
+            return trigger.sequence.map {
+                when (it) {
+                    GenericCastableTrigger.LEFT_CLICK -> left
+                    GenericCastableTrigger.RIGHT_CLICK -> right
+                }
+            }.join(
+                JoinConfiguration.separator(separator)
+            )
+        }
+    }
+
+    @ConfigSerializable
+    data class Input(
+        val forward: Component,
+        val backward: Component,
+        val left: Component,
+        val right: Component,
+        val jump: Component,
+        val sneak: Component,
+        val sprint: Component,
+    ) {
+        fun generate(trigger: InputCastableTrigger): Component {
+            return when (trigger) {
+                InputCastableTrigger.FORWARD -> forward
+                InputCastableTrigger.BACKWARD -> backward
+                InputCastableTrigger.LEFT -> left
+                InputCastableTrigger.RIGHT -> right
+                InputCastableTrigger.JUMP -> jump
+                InputCastableTrigger.SNEAK -> sneak
+                InputCastableTrigger.SPRINT -> sprint
+            }
+        }
     }
 }
