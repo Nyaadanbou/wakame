@@ -34,7 +34,7 @@ data class Castable(
 /**
  * 机制触发器.
  */
-interface CastableTrigger {
+sealed interface CastableTrigger {
     /**
      * 用来在配置文件里指定该 [CastableTrigger].
      */
