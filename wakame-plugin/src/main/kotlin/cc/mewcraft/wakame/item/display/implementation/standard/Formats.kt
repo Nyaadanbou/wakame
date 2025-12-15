@@ -20,7 +20,7 @@ internal data class CoreAttributeRendererFormat(
     private val ordinal: AttributeCoreOrdinalFormat,
 ) : RendererFormat.Dynamic<AttributeCore> {
     override val textMetaFactory: TextMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
-    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace) { id: String -> BuiltInRegistries.ATTRIBUTE_FACADE.containsId(id) }
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate.predicate(namespace) { id: String -> BuiltInRegistries.ATTRIBUTE_FACADE.containsId(id) }
 
     fun render(data: AttributeCore): IndexedText {
         return SimpleIndexedText(computeIndex(data), data.description)
@@ -42,7 +42,7 @@ internal data class CoreEmptyRendererFormat(
     override val id: String = "core/empty"
     override val index: DerivedIndex = createIndex()
     override val textMetaFactory: TextMetaFactory = CyclicTextMetaFactory(namespace, id, CyclicIndexRule.SLASH)
-    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate.literal(namespace, id)
 
     private val tooltipCycle = IndexedTextCycle(limit = CyclicTextMeta.MAX_DISPLAY_COUNT) { i ->
         SimpleIndexedText(CyclicIndexRule.SLASH.make(index, i), tooltip)
@@ -60,8 +60,8 @@ internal data class AttackSpeedRendererFormat(
 ) : RendererFormat.Simple {
     override val id: String = "attack_speed"
     override val index: DerivedIndex = createIndex()
-    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
-    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory.fixed()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate.literal(namespace, id)
 
     fun render(data: RegistryEntry<AttackSpeed>): IndexedText {
         val resolver = Placeholder.component("value", data.unwrap().displayName)
@@ -72,10 +72,6 @@ internal data class AttackSpeedRendererFormat(
     data class Tooltip(
         val line: String = "Attack Speed: <value>",
     )
-
-    companion object Shared {
-        private val UNKNOWN_LEVEL = Component.text("???")
-    }
 }
 
 @ConfigSerializable
