@@ -276,11 +276,13 @@ internal data class CastableRendererFormat(
     data class Special(
         val onEquip: Component,
         val onUnequip: Component,
+        val onConsume: Component,
     ) {
         fun generate(trigger: SpecialCastableTrigger): Component {
             return when (trigger) {
                 SpecialCastableTrigger.ON_EQUIP -> onEquip
                 SpecialCastableTrigger.ON_UNEQUIP -> onUnequip
+                SpecialCastableTrigger.ON_CONSUME -> onConsume
             }
         }
     }
