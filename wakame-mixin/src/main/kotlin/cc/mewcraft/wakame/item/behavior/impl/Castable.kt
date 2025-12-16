@@ -52,7 +52,6 @@ object Castable : SimpleInteract {
             }
 
             is SequenceCastableTrigger -> {
-                // Trigger combo
                 // TODO Accumulate combo
                 //   Check whether there are 3 accumulated combos
                 //   If there are 3, check whether they match the current sequence; if matched, cast; otherwise, clear
