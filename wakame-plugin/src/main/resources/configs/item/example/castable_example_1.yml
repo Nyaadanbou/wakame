@@ -25,6 +25,7 @@ castable:
     # - special/        # 特殊触发器
     #   on_equip        # 在生效槽位装备该物品时触发一次
     #   on_unequip      # 从生效槽位脱下该物品时触发一次
+    #   on_consume      # 消耗该物品时触发一次
     # - generic/        # 一般触发器, 对应 Koish 内部的 use 和 attack
     #   left_click      # 手持物品左键时触发
     #   right_click     # 手持物品右键时触发
