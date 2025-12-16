@@ -7,22 +7,20 @@ import cc.mewcraft.wakame.item.behavior.UseOnContext
 
 object PlaceLiquidCollisionBlock : ItemBehavior {
 
-    @get:JvmName("getInstance")
-    var INSTANCE: ItemBehavior = ItemBehavior.NO_OP
-        private set
-
-    override fun handleUseOn(context: UseOnContext): InteractionResult {
-        return INSTANCE.handleUseOn(context)
-    }
-
-    override fun handleUse(context: UseContext): InteractionResult {
-        return INSTANCE.handleUse(context)
-    }
+    private var implementation: ItemBehavior? = null
 
     /**
      * 替换 [PlaceLiquidCollisionBlock] 物品行为的实现.
      */
-    fun register(itemBehavior: ItemBehavior) {
-        INSTANCE = itemBehavior
+    fun setImplementation(itemBehavior: ItemBehavior) {
+        implementation = itemBehavior
+    }
+
+    override fun handleUseOn(context: UseOnContext): InteractionResult {
+        return implementation?.handleUseOn(context) ?: super.handleUseOn(context)
+    }
+
+    override fun handleUse(context: UseContext): InteractionResult {
+        return implementation?.handleUse(context) ?: super.handleUse(context)
     }
 }

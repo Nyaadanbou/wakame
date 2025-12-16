@@ -6,18 +6,16 @@ import cc.mewcraft.wakame.item.behavior.UseOnContext
 
 object PlaceBlock : ItemBehavior {
 
-    @get:JvmName("getInstance")
-    var INSTANCE: ItemBehavior = ItemBehavior.NO_OP
-        private set
-
-    override fun handleUseOn(context: UseOnContext): InteractionResult {
-        return INSTANCE.handleUseOn(context)
-    }
+    private var implementation: ItemBehavior? = null
 
     /**
      * 替换 [PlaceBlock] 物品行为的实现.
      */
-    fun register(itemBehavior: ItemBehavior) {
-        INSTANCE = itemBehavior
+    fun setImplementation(itemBehavior: ItemBehavior) {
+        implementation = itemBehavior
+    }
+
+    override fun handleUseOn(context: UseOnContext): InteractionResult {
+        return implementation?.handleUseOn(context) ?: super.handleUseOn(context)
     }
 }
