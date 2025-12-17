@@ -14,22 +14,20 @@ class HoldingCondition(
     line: String,
     mlc: MythicLineConfig,
 ) : SkillCondition(line), IEntityCondition {
+
     init {
         threadSafetyLevel = ThreadSafetyLevel.SYNC_ONLY
     }
 
-    private val comparisons: Collection<Key>
-
-    init {
+    private val comparisons: Collection<Key> = run {
         val itemsString = mlc.getString(arrayOf("type", "t", "item", "i", "material", "m"), "minecraft:dirt", *arrayOf(this.conditionVar))
-        this.comparisons = buildList {
+        buildList {
             for (itemString in itemsString.split(",")) {
                 val key = try {
                     Key.key(itemString)
                 } catch (_: Exception) {
                     Key.key("minecraft:dirt").also { MythicLogger.errorConditionConfig(this@HoldingCondition, mlc, "'$itemString' is not a valid key.") }
                 }
-
                 add(key)
             }
         }

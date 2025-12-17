@@ -18,25 +18,22 @@ import org.bukkit.inventory.InventoryHolder
 
 class HasItemCondition(
     line: String,
-    private val mlc: MythicLineConfig,
+    mlc: MythicLineConfig,
 ) : SkillCondition(line), IEntityCondition, ILocationCondition {
+
     init {
         threadSafetyLevel = ThreadSafetyLevel.SYNC_ONLY
     }
 
-    private val itemKey: Key
-    private val amount: RangedInt
-
-    init {
+    private val itemKey: Key = run {
         val itemString = mlc.getString(arrayOf("type", "t", "item", "i", "material", "m"), "minecraft:dirt", *arrayOf<String>(this.conditionVar))
-        itemKey = try {
+        try {
             Key.key(itemString)
         } catch (_: Exception) {
             Key.key("minecraft:dirt").also { MythicLogger.errorConditionConfig(this, mlc, "'$itemString' is not a valid key.") }
         }
-
-        amount = RangedInt(mlc.getString(arrayOf("amount", "a"), ">0", *arrayOfNulls<String>(0)))
     }
+    private val amount: RangedInt = RangedInt(mlc.getString(arrayOf("amount", "a"), ">0", *arrayOfNulls<String>(0)))
 
     override fun check(target: AbstractEntity): Boolean {
         val bukkitEntity = target.bukkitEntity
