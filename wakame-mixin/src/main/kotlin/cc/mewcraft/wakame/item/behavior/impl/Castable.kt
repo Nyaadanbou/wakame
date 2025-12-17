@@ -1,13 +1,12 @@
 package cc.mewcraft.wakame.item.behavior.impl
 
-import cc.mewcraft.wakame.item.behavior.AttackContext
-import cc.mewcraft.wakame.item.behavior.InteractionResult
-import cc.mewcraft.wakame.item.behavior.UseContext
+import cc.mewcraft.wakame.item.behavior.*
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.CastableTrigger
 import cc.mewcraft.wakame.item.property.impl.GenericCastableTrigger
 import cc.mewcraft.wakame.item.property.impl.SequenceCastableTrigger
+import cc.mewcraft.wakame.item.property.impl.SpecialCastableTrigger
 import cc.mewcraft.wakame.item.tryCastSkill
 import org.bukkit.entity.Player
 import cc.mewcraft.wakame.item.property.impl.Castable as CastableProp
@@ -42,6 +41,19 @@ object Castable : SimpleInteract {
         return InteractionResult.SUCCESS_AND_CANCEL
     }
 
+    // Implements the following triggers in castable:
+    // - special/on_consume
+    override fun handleConsume(context: ConsumeContext): BehaviorResult {
+        val castable = context.itemstack.getProp(ItemPropTypes.CASTABLE) ?: return BehaviorResult.PASS
+        val player = context.player
+
+        castable.values.forEach { entry ->
+            handleTrigger(player, entry, SpecialCastableTrigger.ON_CONSUME)
+        }
+
+        return BehaviorResult.PASS
+    }
+
     //region Logic for handling trigger-based casting
 
     private fun handleTrigger(player: Player, castable: CastableProp, expected: CastableTrigger) {
@@ -52,7 +64,6 @@ object Castable : SimpleInteract {
             }
 
             is SequenceCastableTrigger -> {
-                // Trigger combo
                 // TODO Accumulate combo
                 //   Check whether there are 3 accumulated combos
                 //   If there are 3, check whether they match the current sequence; if matched, cast; otherwise, clear

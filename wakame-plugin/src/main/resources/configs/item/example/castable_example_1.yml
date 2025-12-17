@@ -25,10 +25,11 @@ castable:
     # - special/        # 特殊触发器
     #   on_equip        # 在生效槽位装备该物品时触发一次
     #   on_unequip      # 从生效槽位脱下该物品时触发一次
+    #   on_consume      # 消耗该物品时触发一次
     # - generic/        # 一般触发器, 对应 Koish 内部的 use 和 attack
     #   left_click      # 手持物品左键时触发
     #   right_click     # 手持物品右键时触发
-    # - sequence/          # 组合键, 需要按顺序连续按下左右键来触发. 0 = left click, 1 = right click
+    # - sequence/       # 组合键, 需要按顺序连续按下左右键来触发. 0 = left click, 1 = right click
     #   [0|1]{3}        # 例如: 000, 001, 010
     # - input/          # 玩家输入触发器
     #   forward

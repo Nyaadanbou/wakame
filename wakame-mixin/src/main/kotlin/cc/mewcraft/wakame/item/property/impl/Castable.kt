@@ -116,7 +116,11 @@ enum class SpecialCastableTrigger(
     /**
      * 从生效槽位脱下该物品时触发一次.
      */
-    ON_UNEQUIP("on_unequip")
+    ON_UNEQUIP("on_unequip"),
+    /**
+     * 物品被消耗掉时触发一次.
+     */
+    ON_CONSUME("on_consume")
     ;
 
     constructor(id: String) : this(Key.key("koish", "special/${id}"))

@@ -18,7 +18,8 @@ class LevelCondition(
     line: String,
     mlc: MythicLineConfig,
 ) : SkillCondition(line), IEntityCondition, ILocationCondition {
-    private val level: RangedInt = RangedInt(mlc.getString(arrayOf("level"), ">0", *arrayOfNulls<String>(0)))
+
+    private val level: RangedInt = RangedInt(mlc.getString(arrayOf("level", "amount", "a"), ">0", *arrayOfNulls<String>(0)))
     private val searchRadius: Double = mlc.getDouble(arrayOf("radius", "r"), .0)
 
     override fun check(target: AbstractEntity): Boolean {

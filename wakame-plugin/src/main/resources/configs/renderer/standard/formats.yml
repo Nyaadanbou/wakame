@@ -258,6 +258,7 @@ castable:
     special:
       on_equip: "<!i><light_purple>穿戴时</light_purple>"
       on_unequip: "<!i><light_purple>脱下时</light_purple>"
+      on_consume: "<!i><light_purple>消耗时</light_purple>"
     generic:
       left_click: "<!i><light_purple>左键</light_purple>"
       right_click: "<!i><light_purple>右键</light_purple>"

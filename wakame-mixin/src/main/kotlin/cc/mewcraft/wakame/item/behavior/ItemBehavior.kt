@@ -26,42 +26,33 @@ package cc.mewcraft.wakame.item.behavior
  */
 interface ItemBehavior {
 
-    companion object {
-
-        /**
-         * 一个不执行任何操作的 [ItemBehavior] 实现.
-         */
-        @JvmField
-        val NO_OP: ItemBehavior = object : ItemBehavior {}
-    }
-
     /**
-     * 玩家手持该物品对方块按下使用键(默认为鼠标右键)进行交互时, 执行的行为.
+     * 玩家手持该物品对方块按下使用键 (默认为鼠标右键) 进行交互时, 执行的行为.
      */
     fun handleUseOn(context: UseOnContext): InteractionResult = InteractionResult.PASS
 
     /**
-     * 玩家手持该物品对空气按下使用键(默认为鼠标右键)进行交互时, 执行的行为.
+     * 玩家手持该物品对空气按下使用键 (默认为鼠标右键) 进行交互时, 执行的行为.
      */
     fun handleUse(context: UseContext): InteractionResult = InteractionResult.PASS
 
     /**
-     * 玩家手持该物品对实体按下使用键(默认为鼠标右键)进行交互时, 执行的行为.
+     * 玩家手持该物品对实体按下使用键 (默认为鼠标右键) 进行交互时, 执行的行为.
      */
     fun handleUseEntity(context: UseEntityContext): InteractionResult = InteractionResult.PASS
 
     /**
-     * 玩家手持该物品对方块按下攻击键(默认为鼠标左键)进行交互时, 执行的行为.
+     * 玩家手持该物品对方块按下攻击键 (默认为鼠标左键) 进行交互时, 执行的行为.
      */
     fun handleAttackOn(context: AttackOnContext) = InteractionResult.PASS
 
     /**
-     * 玩家手持该物品对空气按下攻击键(默认为鼠标左键)进行交互时, 执行的行为.
+     * 玩家手持该物品对空气按下攻击键 (默认为鼠标左键) 进行交互时, 执行的行为.
      */
     fun handleAttack(context: AttackContext) = InteractionResult.PASS
 
     /**
-     * 玩家手持该物品对实体按下攻击键(默认为鼠标左键)进行交互时, 执行的行为.
+     * 玩家手持该物品对实体按下攻击键 (默认为鼠标左键) 进行交互时, 执行的行为.
      */
     fun handleAttackEntity(context: AttackEntityContext) = InteractionResult.PASS
 
@@ -82,12 +73,13 @@ interface ItemBehavior {
 
     /**
      * 玩家手持该物品并停止使用时, 执行的行为.
-     * 相关事件无法取消(取消也没有意义).
+     *
+     * 相关事件无法取消 (取消也没有意义).
      */
     fun handleStopUse(context: StopUseContext) = BehaviorResult.PASS
 
     /**
-     * 玩家手持该物品并消耗(Consumable组件)时, 执行的行为.
+     * 玩家手持该物品并消耗 (`minecraft:consumable` 物品组件) 时, 执行的行为.
      */
     fun handleConsume(context: ConsumeContext) = BehaviorResult.PASS
 

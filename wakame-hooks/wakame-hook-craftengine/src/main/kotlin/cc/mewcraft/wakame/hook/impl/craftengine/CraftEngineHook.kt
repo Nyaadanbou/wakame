@@ -23,12 +23,10 @@ import org.bukkit.block.BlockType
 object CraftEngineHook {
 
     init {
-        // 注册 CraftEngine 带来的新物品行为实例
-        PlaceBlock.register(CraftEnginePlaceBlock)
-        PlaceDoubleHighBlock.register(CraftEnginePlaceDoubleHighBlock)
-        PlaceLiquidCollisionBlock.register(CraftEnginePlaceLiquidCollisionBlock)
-
-        // 修改 UniversalBlocks 的实现
+        // 修改实现为 CraftEngine 提供的版本
+        PlaceBlock.setImplementation(CraftEnginePlaceBlock)
+        PlaceDoubleHighBlock.setImplementation(CraftEnginePlaceDoubleHighBlock)
+        PlaceLiquidCollisionBlock.setImplementation(CraftEnginePlaceLiquidCollisionBlock)
         UniversalBlocks.setImplementation(CraftEngineUniversalBlocks)
     }
 
