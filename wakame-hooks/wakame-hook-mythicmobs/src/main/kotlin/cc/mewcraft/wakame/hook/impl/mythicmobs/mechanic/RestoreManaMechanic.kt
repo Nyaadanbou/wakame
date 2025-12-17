@@ -9,6 +9,7 @@ import io.lumine.mythic.core.skills.SkillExecutor
 import io.lumine.mythic.core.skills.SkillMechanic
 import org.bukkit.entity.Player
 import java.io.File
+import kotlin.math.min
 
 class RestoreManaMechanic(
     manager: SkillExecutor,
@@ -39,7 +40,8 @@ class RestoreManaMechanic(
 
     private fun restore(player: Player, amount: Double) {
         val mana = PlayerManaIntegration.getMana(player)
-        val resultMana = mana + amount
+        val maxMana = PlayerManaIntegration.getMaxMana(player)
+        val resultMana = min(mana + amount, maxMana)
         PlayerManaIntegration.setMana(player, resultMana)
     }
 }

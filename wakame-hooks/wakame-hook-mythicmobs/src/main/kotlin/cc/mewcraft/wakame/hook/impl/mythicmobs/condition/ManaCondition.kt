@@ -22,10 +22,6 @@ class ManaCondition(
 
     override fun check(target: AbstractEntity): Boolean {
         val player = target.bukkitEntity as? Player ?: return false
-        return passesManaCondition(player)
-    }
-
-    private fun passesManaCondition(player: Player): Boolean {
         val mana = PlayerManaIntegration.getMana(player)
         return level.equals(mana)
     }

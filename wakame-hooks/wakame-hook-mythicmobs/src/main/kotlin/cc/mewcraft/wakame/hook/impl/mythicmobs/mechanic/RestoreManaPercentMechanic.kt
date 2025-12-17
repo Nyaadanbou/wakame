@@ -9,6 +9,7 @@ import io.lumine.mythic.core.skills.SkillExecutor
 import io.lumine.mythic.core.skills.SkillMechanic
 import org.bukkit.entity.Player
 import java.io.File
+import kotlin.math.min
 
 class RestoreManaPercentMechanic(
     manager: SkillExecutor,
@@ -40,7 +41,7 @@ class RestoreManaPercentMechanic(
     private fun restorePercent(player: Player, multiplier: Double) {
         val mana = PlayerManaIntegration.getMana(player)
         val maxMana = PlayerManaIntegration.getMaxMana(player)
-        val resultMana = mana + maxMana * multiplier
+        val resultMana = min(maxMana, mana + maxMana * multiplier)
         PlayerManaIntegration.setMana(player, resultMana)
     }
 }
