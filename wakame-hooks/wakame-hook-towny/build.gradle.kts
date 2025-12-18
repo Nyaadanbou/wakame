@@ -15,10 +15,6 @@ dependencies {
     compileOnly(project(":wakame-mixin"))
     compileOnly(project(":wakame-plugin"))
     compileOnly(platform(libs.bom.exposed))
-    compileOnly(local.fleks) {
-        exclude("org.jetbrains.kotlin")
-        exclude("org.jetbrains.kotlinx")
-    }
 
     // libraries
     compileOnly(local.paper)

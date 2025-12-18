@@ -13,10 +13,6 @@ dependencies {
     // internal
     compileOnly(project(":wakame-mixin"))
     compileOnly(project(":wakame-plugin"))
-    compileOnly(local.fleks) {
-        exclude("org.jetbrains.kotlin")
-        exclude("org.jetbrains.kotlinx")
-    }
 
     // libraries
     compileOnly(local.paper)
