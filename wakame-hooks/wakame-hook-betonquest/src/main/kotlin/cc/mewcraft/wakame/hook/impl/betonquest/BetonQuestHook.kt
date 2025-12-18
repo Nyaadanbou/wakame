@@ -5,8 +5,11 @@ import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.party.CreatePartyEven
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.party.LeavePartyEventFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.item.KoishQuestItemFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.item.KoishQuestItemSerializer
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.schedule.GameTickScheduleFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.schedule.GameTickScheduler
 import cc.mewcraft.wakame.integration.Hook
 import org.betonquest.betonquest.BetonQuest
+import org.betonquest.betonquest.schedule.EventScheduling
 
 @Hook(plugins = ["BetonQuest"])
 object BetonQuestHook {
@@ -16,6 +19,8 @@ object BetonQuestHook {
         val questTypeApi = plugin.questTypeApi
         val profileProvider = plugin.profileProvider
         val loggerFactory = plugin.loggerFactory
+        val variableProcessor = plugin.variableProcessor
+        val packManager = plugin.questPackageManager
         val data = plugin.primaryServerThreadData
 
         /* Quest Type Registries */
@@ -56,5 +61,12 @@ object BetonQuestHook {
 
         // Schedule
         val scheduleRegistry = plugin.featureRegistries.eventScheduling()
+        scheduleRegistry.register(
+            "game-tick",
+            EventScheduling.ScheduleType(
+                GameTickScheduleFactory(variableProcessor, packManager),
+                GameTickScheduler(loggerFactory.create(GameTickScheduler::class.java), questTypeApi)
+            ),
+        )
     }
 }
