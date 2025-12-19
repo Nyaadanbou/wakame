@@ -12,7 +12,7 @@ repositories {
     // plugin: BetonQuest
     maven {
         name = "betonquest"
-        url = uri("https://nexus.betonquest.org/repository/betonquest/")
+        url = uri("https://repo.betonquest.org/betonquest/")
     }
 
     // plugin: TheBrewingProject
