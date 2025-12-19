@@ -2,10 +2,17 @@ package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.plot
 
 import com.plotsquared.bukkit.util.BukkitUtil
 import com.plotsquared.core.PlotSquared
+import org.betonquest.betonquest.api.instruction.Instruction
+import org.betonquest.betonquest.api.instruction.argument.Argument
 import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
+import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
+import org.betonquest.betonquest.api.quest.event.PlayerEvent
+import org.betonquest.betonquest.api.quest.event.PlayerEventFactory
 import org.betonquest.betonquest.api.quest.event.online.OnlineEvent
+import org.betonquest.betonquest.api.quest.event.online.OnlineEventAdapter
+
 
 /**
  * 为玩家领取一个地皮.
@@ -51,5 +58,20 @@ class PlotClaimEvent(
                 logger.info("Successfully claimed a plot for player ${profile.player.name} in area ${plotArea.id}")
             }
         }
+    }
+}
+
+
+class PlotClaimEventFactory(
+    private val loggerFactory: BetonQuestLoggerFactory,
+) : PlayerEventFactory {
+
+    override fun parsePlayer(instruction: Instruction): PlayerEvent {
+        val skipIfExists = instruction.hasArgument("skipIfExists")
+        val dimension = instruction.getValue("dimension", Argument.STRING)
+        val logger = loggerFactory.create(PlotClaimEvent::class.java)
+        val questPackage = instruction.getPackage()
+        val plotClaimEvent = PlotClaimEvent(skipIfExists, dimension, logger)
+        return OnlineEventAdapter(plotClaimEvent, logger, questPackage)
     }
 }

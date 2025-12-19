@@ -43,6 +43,7 @@ dependencies {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
+    compileOnlyApi(local.fleks)
     implementation(libs.hikari) {
         exclude("org.slf4j", "slf4j-api")
     }
