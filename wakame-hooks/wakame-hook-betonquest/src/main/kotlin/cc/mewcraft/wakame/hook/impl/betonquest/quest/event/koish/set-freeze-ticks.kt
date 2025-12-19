@@ -53,9 +53,9 @@ class SetFreezeTicks(
             }
         }
 
-        // 根据 Minecraft Wiki: freezeTicks 在原版机制下最多增加到 140 ticks
-        // minecraft.wiki/w/Powder_Snow#Freezing
-        player.freezeTicks = result.coerceIn(0, 140)
+        // 根据 Minecraft Wiki: freezeTicks 增加到 140 ticks 时就会冻结玩家.
+        // Player#setFreezeTicks 不会限制 freezeTicks 的最大值, 需要手动限制.
+        player.freezeTicks = result.coerceIn(0, player.maxFreezeTicks)
     }
 }
 
