@@ -1,7 +1,7 @@
 [versions]
 
 # Gradle plugins
-kotlin = "2.2.10"
+kotlin = "2.3.0"
 kotlinx-coroutines = "1.10.2"
 libraries-repository = "0.0.4-snapshot"
 copy-jar-build = "0.0.1-snapshot"
