@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.hook.impl.mythicmobs.listener
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.util.event
-import com.github.benmanes.caffeine.cache.Cache
-import com.github.benmanes.caffeine.cache.Caffeine
-import com.github.benmanes.caffeine.cache.RemovalCause
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.RemovalCause
 import io.lumine.mythic.bukkit.events.MythicMobDeathEvent
 import io.lumine.mythic.bukkit.events.MythicMobItemGenerateEvent
 import org.bukkit.entity.Player
@@ -26,14 +26,16 @@ object MobDropListener {
     }
 
     // 记录MM怪物将要掉落的物品堆叠, 以及物品对应的所有者
-    private val mobDropRecords: Cache<ItemStack, UUID> = Caffeine.newBuilder()
+    private val mobDropRecords: Cache<ItemStack, UUID> = CacheBuilder.newBuilder()
         // 为了防止任何潜在的内存泄漏, 设置个保底的过期时间.
         // 理论上一旦玩家死亡爆了物品, 那么缓存应该就立马会被读取, 并被无效化.
         // 理论上这个过期永远都不应该自动触发, 如果是那应该是 BUG.
         .expireAfterWrite(10, TimeUnit.SECONDS)
-        .removalListener<ItemStack, UUID> { key, _, cause ->
-            if (cause != RemovalCause.EXPLICIT) {
-                LOGGER.warn("[${this::class.simpleName}] ItemStack $key was evicted (but not explicitly) from cache. This is a bug!")
+        .removalListener<ItemStack, UUID> { notification ->
+            val k = notification.key
+            val c = notification.cause
+            if (c != RemovalCause.EXPLICIT) {
+                LOGGER.warn("[${this::class.simpleName}] ItemStack $k was evicted (but not explicitly) from cache. This is a bug!")
             }
         }.build()
 

@@ -9,8 +9,8 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.metadata.MetadataKey
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.ui.whisper
-import com.github.benmanes.caffeine.cache.Cache
-import com.github.benmanes.caffeine.cache.Caffeine
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -70,7 +70,7 @@ internal object UnbreakableArmorStand : Listener {
 
     // aux data
     private val itemStacksOnArmorStands: Cache<ArmorStand, Map<EquipmentSlot, ItemStack>> =
-        Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.SECONDS).build()
+        CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.SECONDS).build()
 
     private fun getItems(armorStand: ArmorStand): Map<EquipmentSlot, ItemStack> {
         return EquipmentSlot.entries

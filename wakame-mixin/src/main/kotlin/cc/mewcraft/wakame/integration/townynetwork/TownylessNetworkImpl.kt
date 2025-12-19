@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.messaging.MessagingManager
 import cc.mewcraft.wakame.messaging.packet.*
 import cc.mewcraft.wakame.util.ProxyServerSwitcher
-import com.github.benmanes.caffeine.cache.Cache
-import com.github.benmanes.caffeine.cache.Caffeine
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.time.Duration
@@ -41,7 +41,7 @@ private object TownylessTeleportImpl {
         get() = MessagingManager.serverId
 
     // expireAfterAccess 设置为 5 秒可以让玩家在请求传送后的一段时间内不能重复请求传送
-    private val sessions: Cache<UUID, Session> = Caffeine.newBuilder()
+    private val sessions: Cache<UUID, Session> = CacheBuilder.newBuilder()
         .expireAfterAccess(Duration.ofSeconds(5))
         .build()
 
