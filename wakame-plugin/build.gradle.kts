@@ -16,19 +16,23 @@ repositories {
 }
 
 dependencies {
-    // internal
-    compileOnly(project(":wakame-api")) // 运行时由 koish-mod 提供
-    compileOnly(project(":wakame-common")) // 运行时由 koish-mod 提供
-    compileOnly(project(":wakame-mixin")) // 运行时由 koish-mod 提供
+    /* internal */
+
+    //region 运行时由 koish-mod 提供
+    compileOnly(project(":wakame-api"))
+    compileOnly(project(":wakame-common"))
+    compileOnly(project(":wakame-mixin"))
+    //endregion
     runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-auraskills"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-betonquest"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-betterhud"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-breweryx"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-carbonchat"))
-     runtimeOnly(project(":wakame-hooks:wakame-hook-chestshop"))
-    // runtimeOnly(project(":wakame-hooks:wakame-hook-chestsort")) // FIXME 仓库已经挂掉并且作者似乎没有修复的打算
-     runtimeOnly(project(":wakame-hooks:wakame-hook-craftengine"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-chestshop"))
+    // FIXME 仓库已经挂掉并且作者似乎没有修复的打算
+    // runtimeOnly(project(":wakame-hooks:wakame-hook-chestsort"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-craftengine"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-economy"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-economybridge"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-husksync"))
@@ -44,38 +48,37 @@ dependencies {
     runtimeOnly(project(":wakame-hooks:wakame-hook-vault"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-worldguard"))
 
-    // libraries
-    compileOnly(local.shadow.bukkit) // 运行时由 koish-mod 提供
-    compileOnly(local.commons.collections)
-    compileOnly(local.commons.gson)
-    compileOnly(local.commons.provider)
-    compileOnly(local.commons.reflection)
-    compileOnly(local.commons.tuple)
-    compileOnly(local.fleks) {
-        exclude("org.jetbrains.kotlin")
-        exclude("org.jetbrains.kotlinx")
+    /* libraries */
+
+    // 数据库
+    api(platform(libs.bom.exposed))
+    implementation(local.hikaricp) {
+        exclude("org.slf4j", "slf4j-api")
     }
-    compileOnly(libs.hikari)
-    compileOnly(libs.mocha)
-    implementation(platform(libs.bom.adventure))
-    compileOnly(platform(libs.bom.exposed))
-    compileOnly(platform(libs.bom.configurate.yaml)) // 运行时由 koish-mod 提供
-    compileOnly(platform(libs.bom.configurate.gson))
-    compileOnly(platform(libs.bom.configurate.extra.kotlin))
-    compileOnly(platform(libs.bom.configurate.extra.dfu8))
-    implementation(platform(libs.bom.creative))
-    implementation(platform(libs.bom.cloud.paper))
-    implementation(platform(libs.bom.cloud.kotlin))
-    compileOnly(platform(libs.bom.invui)) /* 由自定义的 classloader 加载 */ {
+    implementation(local.mariadb.jdbc) {
+        exclude("org.slf4j", "slf4j-api")
+    }
+
+    // 原版UI
+    api(platform(libs.bom.adventure))
+
+    // 箱子UI (该依赖将由自定义的 classloader 加载, 所以这里是 compileOnly)
+    compileOnly(platform(libs.bom.invui)) {
         exclude("org.jetbrains")
     }
+
+    // 资源包
+    api(platform(libs.bom.creative))
+
+    // 指令框架
+    implementation(platform(libs.bom.cloud.paper))
+    implementation(platform(libs.bom.cloud.kotlin))
+
+    // Git
     implementation(platform(libs.bom.jgit))
-    implementation(local.jdbc.mariadb)
 
-    // other plugins (hard dependencies)
-    compileOnly(local.adventurelevel)
+    /* test environment (just add whatever we need) */
 
-    // test
     testImplementation(project(":wakame-api"))
     testImplementation(project(":wakame-common"))
     testImplementation(project(":wakame-mixin"))
@@ -93,8 +96,8 @@ dependencies {
     testImplementation(local.paper)
     testImplementation(local.datafixerupper)
     testImplementation(local.kotlinx.serialization.core)
-    testImplementation(local.jdbc.mariadb)
-    testImplementation(local.jdbc.sqlite)
+    testImplementation(local.mariadb.jdbc)
+    testImplementation(local.sqlite.jdbc)
     testImplementation(platform(libs.bom.exposed))
     testImplementation(platform(libs.bom.configurate.yaml))
     testImplementation(platform(libs.bom.configurate.gson))

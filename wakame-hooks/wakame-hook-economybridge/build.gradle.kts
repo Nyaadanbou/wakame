@@ -6,6 +6,7 @@ plugins {
 version = "0.0.1"
 
 repositories {
+    nyaadanbouReleases()
     nyaadanbouPrivate()
     maven {
         name = "nightexpress-releases"

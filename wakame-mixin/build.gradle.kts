@@ -26,42 +26,53 @@ paperweight {
 }
 
 dependencies {
+    // 写在最前面:
+    // 在本 mixin project 中添加为 implementation 的依赖意味着
+    // 该依赖会直接由服务端的 system classloader 加载,
+    // 可以直接被服务端 (nms) 和 *任意插件* 直接访问.
+
+    // Paper API + NMS
     paperweight.paperDevBundle(local.versions.paper)
 
+    // Mixin & Ignite (这些依赖由 ignite 启动器提供)
     remapper("net.fabricmc", "tiny-remapper", "0.10.4", classifier = "fat")
-
     compileOnly(local.ignite)
     compileOnly(local.mixin)
     compileOnly(local.mixin.extras)
 
-    // 在本 mixin 中添加为 implementation 的依赖意味着
-    // 该依赖会直接由服务端的 system classloader 加载,
-    // 可以直接被服务端 (nms) 和 *任意插件* 直接访问.
-    implementation(project(":wakame-api"))
-    implementation(project(":wakame-common"))
-    implementation(local.fleks) {
+    // 内部模块
+    api(project(":wakame-api"))
+    api(project(":wakame-common"))
+
+    // ECS
+    api(local.fleks) {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
-    compileOnlyApi(local.fleks)
-    implementation(libs.hikari) {
-        exclude("org.slf4j", "slf4j-api")
-    }
-    implementation(libs.mocha)
-    implementation(local.shadow.bukkit)
-    implementation(local.commons.collections)
-    implementation(local.commons.gson) {
+
+    // 表达式解析
+    api(libs.mocha)
+
+    // 反射
+    api(local.shadow.bukkit)
+
+    // 通用库
+    api(local.commons.collections)
+    api(local.commons.gson) {
         exclude("com.google.code.gson")
     }
-    implementation(local.commons.provider)
-    implementation(local.commons.reflection)
-    implementation(local.commons.tuple)
-    api(platform(libs.bom.caffeine))
-    implementation(platform(libs.bom.exposed))
-    implementation(platform(libs.bom.configurate.yaml))
-    implementation(platform(libs.bom.configurate.gson))
-    implementation(platform(libs.bom.configurate.extra.kotlin))
-    implementation(platform(libs.bom.configurate.extra.dfu8))
+    api(local.commons.gson)
+    api(local.commons.provider)
+    api(local.commons.reflection)
+    api(local.commons.tuple)
+
+    // 配置文件
+    api(platform(libs.bom.configurate.yaml))
+    api(platform(libs.bom.configurate.gson))
+    api(platform(libs.bom.configurate.extra.kotlin))
+    api(platform(libs.bom.configurate.extra.dfu8))
+
+    // 跨进程通讯
     api(local.messenger)
     implementation(local.messenger.nats)
     implementation(local.messenger.rabbitmq)
@@ -72,6 +83,7 @@ dependencies {
     }
     implementation(local.rabbitmq)
     implementation(local.nats)
+    runtimeOnly(local.caffeine)
 }
 
 sourceSets {
