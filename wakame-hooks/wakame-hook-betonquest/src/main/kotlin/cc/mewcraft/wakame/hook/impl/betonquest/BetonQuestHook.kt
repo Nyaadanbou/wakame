@@ -75,7 +75,7 @@ object BetonQuestHook {
             "game-tick",
             EventScheduling.ScheduleType(
                 GameTickScheduleFactory(variableProcessor, packManager),
-                GameTickScheduler(loggerFactory.create(GameTickScheduler::class.java), questTypeApi)
+                GameTickScheduler(loggerFactory.create(GameTickScheduler::class.java), questTypeApi, plugin)
             ),
         )
     }

@@ -3,10 +3,17 @@ package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.plot
 import com.plotsquared.bukkit.util.BukkitUtil
 import com.plotsquared.core.PlotSquared
 import com.plotsquared.core.events.TeleportCause
+import org.betonquest.betonquest.api.instruction.Instruction
+import org.betonquest.betonquest.api.instruction.argument.Argument
 import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
+import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
+import org.betonquest.betonquest.api.quest.event.PlayerEvent
+import org.betonquest.betonquest.api.quest.event.PlayerEventFactory
 import org.betonquest.betonquest.api.quest.event.online.OnlineEvent
+import org.betonquest.betonquest.api.quest.event.online.OnlineEventAdapter
+
 
 /**
  * 将玩家传送到他们位于 [dimension] 维度中的第 [order] 个地皮.
@@ -55,5 +62,20 @@ class PlotHomeEvent(
             ownedPlots[orderValue.coerceIn(1, ownedPlotsCount) - 1]
         }
         targetPlot.teleportPlayer(plotPlayer, TeleportCause.PLUGIN) {}
+    }
+}
+
+
+class PlotHomeEventFactory(
+    private val loggerFactory: BetonQuestLoggerFactory,
+) : PlayerEventFactory {
+
+    override fun parsePlayer(instruction: Instruction): PlayerEvent {
+        val order = instruction.getValue("order", Argument.NUMBER_NOT_LESS_THAN_ONE)
+        val dimension = instruction.getValue("dimension", Argument.STRING)
+        val logger = loggerFactory.create(PlotHomeEvent::class.java)
+        val questPackage = instruction.getPackage()
+        val plotHomeEvent = PlotHomeEvent(order, dimension, logger)
+        return OnlineEventAdapter(plotHomeEvent, logger, questPackage)
     }
 }
