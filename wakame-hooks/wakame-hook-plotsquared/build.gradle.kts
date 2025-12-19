@@ -19,7 +19,6 @@ repositories {
 
 dependencies {
     // internal
-    compileOnly(project(":wakame-mixin"))
     compileOnly(project(":wakame-plugin"))
 
     // libraries

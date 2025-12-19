@@ -32,8 +32,8 @@ import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.handle
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.serverLevel
-import com.github.benmanes.caffeine.cache.Cache
-import com.github.benmanes.caffeine.cache.Caffeine
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import net.kyori.adventure.extra.kotlin.join
@@ -859,7 +859,7 @@ internal object DamageManagerImpl : DamageManagerApi {
      * ## 注意
      * 不要跟 [registeredProjectileDamageMap] 搞混了, 这里的伤害基本来源于由代码额外造成的伤害(比如: 武器攻击特效, MythicMobs Mechanic).
      */
-    private val registeredCustomDamageMap: Cache<UUID, DamageMetadata> = Caffeine.newBuilder()
+    private val registeredCustomDamageMap: Cache<UUID, DamageMetadata> = CacheBuilder.newBuilder()
         .expireAfterAccess(Duration.ofSeconds(30))
         .build()
 
@@ -883,7 +883,7 @@ internal object DamageManagerImpl : DamageManagerApi {
      * 这样设计可以让弹射物的属性在*打中*实体时被拦截和修改, 允许代码根据受伤实体的状态来修改属性;
      * 而不是*创建*弹射物时拦截属性和修改 - 因为代码无法从这个时机得知受伤实体的状态.
      */
-    private val registeredProjectileDamageMap: Cache<UUID, RegisteredProjectileDamage> = Caffeine.newBuilder()
+    private val registeredProjectileDamageMap: Cache<UUID, RegisteredProjectileDamage> = CacheBuilder.newBuilder()
         .expireAfterAccess(Duration.ofSeconds(30))
         .build()
 

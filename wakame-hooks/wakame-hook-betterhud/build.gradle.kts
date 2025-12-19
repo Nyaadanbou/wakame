@@ -6,16 +6,15 @@ plugins {
 version = "0.0.1"
 
 repositories {
+    nyaadanbouReleases()
     nyaadanbouPrivate()
 }
 
 dependencies {
     // internal
-    compileOnly(project(":wakame-mixin"))
     compileOnly(project(":wakame-plugin"))
 
     // libraries
-    compileOnly(local.paper)
     compileOnly(local.betterhud.api) { isTransitive = false }
     compileOnly(local.betterhud.bukkit) { isTransitive = false }
     compileOnly(local.bettercommand) { isTransitive = false }

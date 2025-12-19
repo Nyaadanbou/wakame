@@ -5,9 +5,10 @@ import cc.mewcraft.wakame.integration.townynetwork.TownyNetworkIntegration
 import cc.mewcraft.wakame.messaging.MessagingManager
 import cc.mewcraft.wakame.messaging.packet.*
 import cc.mewcraft.wakame.util.ProxyServerSwitcher
-import com.github.benmanes.caffeine.cache.Cache
-import com.github.benmanes.caffeine.cache.Caffeine
-import com.github.benmanes.caffeine.cache.RemovalCause
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.RemovalCause
+import com.google.common.cache.RemovalNotification
 import com.palmergames.bukkit.towny.TownyAPI
 import com.palmergames.bukkit.towny.`object`.Resident
 import org.bukkit.Bukkit
@@ -60,11 +61,11 @@ object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkHandler, Listener
 // 跨服传送部分的实现
 private object TownyTeleportImpl {
 
-    private val townSessions: Cache<UUID, TownSession> = Caffeine.newBuilder()
+    private val townSessions: Cache<UUID, TownSession> = CacheBuilder.newBuilder()
         .expireAfterAccess(Duration.ofSeconds(5))
         .removalListener<UUID, TownSession>(::notifyRequestExpiration)
         .build()
-    private val nationSessions: Cache<UUID, NationSession> = Caffeine.newBuilder()
+    private val nationSessions: Cache<UUID, NationSession> = CacheBuilder.newBuilder()
         .expireAfterAccess(Duration.ofSeconds(5))
         .removalListener<UUID, NationSession>(::notifyRequestExpiration)
         .build()
@@ -226,7 +227,10 @@ private object TownyTeleportImpl {
         player.teleportAsync(spawn, PlayerTeleportEvent.TeleportCause.PLUGIN)
     }
 
-    private fun <V> notifyRequestExpiration(k: UUID?, v: V?, c: RemovalCause) {
+    private fun <V> notifyRequestExpiration(notification: RemovalNotification<UUID, V>) {
+        val k = notification.key
+        val v = notification.value
+        val c = notification.cause
         if (k != null && v != null && c == RemovalCause.EXPIRED) {
             Bukkit.getPlayer(k)?.sendMessage(TranslatableMessages.MSG_ERR_NETWORK_TELEPORT_REQUEST_EXPIRED)
         }

@@ -8,19 +8,17 @@ version = "0.0.1"
 repositories {
     nyaadanbouReleases()
     nyaadanbouPrivate()
-    repositories {
-        maven {
-            name = "chestshop-repo"
-            url = uri("https://repo.minebench.de/")
-        }
+    maven {
+        name = "chestshop-repo"
+        url = uri("https://repo.minebench.de/")
     }
+
 }
 
 dependencies {
     // internal
-    compileOnly(project(":wakame-mixin"))
     compileOnly(project(":wakame-plugin"))
 
     // libraries
-     compileOnly(local.chestshop)
+    compileOnly(local.chestshop)
 }

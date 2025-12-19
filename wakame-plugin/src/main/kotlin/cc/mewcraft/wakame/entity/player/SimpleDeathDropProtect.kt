@@ -7,9 +7,9 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.registerEvents
-import com.github.benmanes.caffeine.cache.Cache
-import com.github.benmanes.caffeine.cache.Caffeine
-import com.github.benmanes.caffeine.cache.RemovalCause
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.RemovalCause
 import org.bukkit.entity.EntityType
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -38,14 +38,14 @@ internal object SimpleDeathDropProtect : Listener {
     }
 
     // 记录了将要掉落的物品堆叠, 以及物品对应的所有者
-    private val deathDropRecords: Cache<ItemStack, UUID> = Caffeine.newBuilder()
+    private val deathDropRecords: Cache<ItemStack, UUID> = CacheBuilder.newBuilder()
         // 为了防止任何潜在的内存泄漏, 设置个保底的过期时间.
         // 理论上一旦玩家死亡爆了物品, 那么缓存应该就立马会被读取, 并被无效化.
         // 理论上这个过期永远都不应该自动触发, 如果是那应该是 BUG.
         .expireAfterWrite(10, TimeUnit.SECONDS)
-        .removalListener<ItemStack, UUID> { key, _, cause ->
-            if (cause != RemovalCause.EXPLICIT) {
-                LOGGER.warn("[${this::class.simpleName}] ItemStack $key was evicted (but not explicitly) from cache. This is a bug!")
+        .removalListener<ItemStack, UUID> { notification ->
+            if (notification.cause != RemovalCause.EXPLICIT) {
+                LOGGER.warn("[${this::class.simpleName}] ItemStack ${notification.key} was evicted (but not explicitly) from cache. This is a bug!")
             }
         }
         .build()

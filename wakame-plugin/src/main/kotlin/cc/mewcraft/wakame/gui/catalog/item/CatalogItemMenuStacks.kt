@@ -1,21 +1,23 @@
 package cc.mewcraft.wakame.gui.catalog.item
 
-import com.github.benmanes.caffeine.cache.Caffeine
-import com.github.benmanes.caffeine.cache.LoadingCache
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.CacheLoader
+import com.google.common.cache.LoadingCache
 import org.bukkit.entity.Player
 import xyz.xenondevs.invui.window.WindowManager
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayDeque
+import kotlin.collections.last
 
 object CatalogItemMenuStacks {
 
     // 注意!
     // 由于设置了 expireAfterAccess, 即使玩家退出服务器, 其菜单栈依然会驻留在此一段时间
     // 也就是说菜单栈里面被 CatalogItemMenu 直接持有的 BukkitPlayer 实例也会驻留在此一段时间
-    private val menuStackMap: LoadingCache<UUID, ArrayDeque<CatalogItemMenu>> = Caffeine.newBuilder()
+    private val menuStackMap: LoadingCache<UUID, ArrayDeque<CatalogItemMenu>> = CacheBuilder.newBuilder()
         .expireAfterAccess(5, TimeUnit.MINUTES)
-        .build { _ -> ArrayDeque() }
+        .build(CacheLoader.from { _ -> ArrayDeque() })
 
     /**
      * 获取 [player] 的菜单栈的大小.
