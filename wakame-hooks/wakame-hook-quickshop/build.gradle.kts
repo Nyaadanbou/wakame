@@ -12,11 +12,9 @@ repositories {
 
 dependencies {
     // internal
-    compileOnly(project(":wakame-mixin"))
     compileOnly(project(":wakame-plugin"))
 
     // libraries
-    compileOnly(local.paper)
     compileOnly(local.quickshop.api)
     compileOnly(local.quickshop.bukkit)
 }

@@ -16,11 +16,9 @@ repositories {
 
 dependencies {
     // internal
-    compileOnly(project(":wakame-mixin"))
     compileOnly(project(":wakame-plugin"))
 
     // libraries
-    compileOnly(local.paper)
     compileOnly(local.nightcore)
     compileOnly(local.economybridge)
     compileOnly(local.economy) { isTransitive = false } // 我们使用 Koish 让 Economy 去兼容 EeconomyBridge

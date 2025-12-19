@@ -19,9 +19,9 @@ dependencies {
     /* internal */
 
     //region 运行时由 koish-mod 提供
-    compileOnly(project(":wakame-api"))
-    compileOnly(project(":wakame-common"))
-    compileOnly(project(":wakame-mixin"))
+    compileOnlyApi(project(":wakame-api"))
+    compileOnlyApi(project(":wakame-common"))
+    compileOnlyApi(project(":wakame-mixin"))
     //endregion
     runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-auraskills"))

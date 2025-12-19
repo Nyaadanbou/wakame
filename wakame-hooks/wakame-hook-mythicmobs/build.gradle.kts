@@ -12,11 +12,8 @@ repositories {
 
 dependencies {
     // internal
-    compileOnly(project(":wakame-mixin"))
     compileOnly(project(":wakame-plugin"))
 
     // libraries
-    compileOnly(local.paper)
     compileOnly(local.mythicmobs) { isTransitive = false /* we don't want trash from the MM jar */ }
-    compileOnly(platform(libs.bom.caffeine))
 }

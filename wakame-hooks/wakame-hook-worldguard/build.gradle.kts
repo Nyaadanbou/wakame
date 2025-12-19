@@ -12,11 +12,8 @@ repositories {
 
 dependencies {
     // internal
-    compileOnly(project(":wakame-api"))
-    compileOnly(project(":wakame-mixin"))
     compileOnly(project(":wakame-plugin"))
 
     // libraries
-    compileOnly(local.paper)
     compileOnly(local.worldguard)
 }

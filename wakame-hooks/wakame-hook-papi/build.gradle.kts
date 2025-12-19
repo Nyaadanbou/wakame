@@ -12,12 +12,8 @@ repositories {
 
 dependencies {
     // internal
-    compileOnly(project(":wakame-mixin"))
     compileOnly(project(":wakame-plugin"))
 
     // libraries
-    compileOnly(local.paper)
     compileOnly(local.papi) { isTransitive = false }
-    compileOnly(platform(libs.bom.configurate.yaml))
-    compileOnly(local.commons.provider)
 }
