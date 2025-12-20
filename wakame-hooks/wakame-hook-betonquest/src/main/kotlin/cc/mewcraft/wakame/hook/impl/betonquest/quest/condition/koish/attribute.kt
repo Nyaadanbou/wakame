@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.hook.impl.betonquest.util.ComparisonOp
 import cc.mewcraft.wakame.hook.impl.betonquest.util.FriendlyEnumParser
+import org.betonquest.betonquest.api.QuestException
 import org.betonquest.betonquest.api.instruction.Instruction
 import org.betonquest.betonquest.api.instruction.argument.Argument
 import org.betonquest.betonquest.api.instruction.variable.Variable
@@ -12,7 +13,6 @@ import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
 import org.betonquest.betonquest.api.quest.PrimaryServerThreadData
-import org.betonquest.betonquest.api.quest.QuestException
 import org.betonquest.betonquest.api.quest.condition.PlayerCondition
 import org.betonquest.betonquest.api.quest.condition.PlayerConditionFactory
 import org.betonquest.betonquest.api.quest.condition.online.OnlineCondition

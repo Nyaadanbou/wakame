@@ -19,8 +19,6 @@ dependencies {
     /* internal */
 
     //region 运行时由 koish-mod 提供
-    compileOnlyApi(project(":wakame-api"))
-    compileOnlyApi(project(":wakame-common"))
     compileOnlyApi(project(":wakame-mixin"))
     //endregion
     runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
@@ -80,7 +78,6 @@ dependencies {
     /* test environment (just add whatever we need) */
 
     testImplementation(project(":wakame-api"))
-    testImplementation(project(":wakame-common"))
     testImplementation(project(":wakame-mixin"))
     testImplementation(libs.mockk) {
         exclude("org.jetbrains.kotlin")

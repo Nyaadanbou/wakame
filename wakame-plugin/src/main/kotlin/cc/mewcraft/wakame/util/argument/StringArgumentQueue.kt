@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package cc.mewcraft.wakame.argument
+package cc.mewcraft.wakame.util.argument
 
 class StringArgumentQueue(
     private val args: List<String>,

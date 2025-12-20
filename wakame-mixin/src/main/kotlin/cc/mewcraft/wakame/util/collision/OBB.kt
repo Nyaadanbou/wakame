@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.component.ParticleEffect
 import cc.mewcraft.wakame.ecs.data.LinePath
 import cc.mewcraft.wakame.ecs.data.ParticleConfiguration
-import cc.mewcraft.wakame.extensions.*
+import cc.mewcraft.wakame.util.*
 import com.destroystokyo.paper.ParticleBuilder
 import org.bukkit.Particle
 import org.bukkit.entity.Entity

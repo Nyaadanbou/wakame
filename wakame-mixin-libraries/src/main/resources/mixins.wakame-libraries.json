@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "minVersion": "0.8.7",
+  "package": "cc.mewcraft.wakame.mixin.libraries.core",
+  "plugin": "cc.mewcraft.wakame.mixin.libraries.plugin.CorePlugin",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_21",
+  "server": []
+}

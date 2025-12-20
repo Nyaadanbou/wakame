@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.quest.schedule
 
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
+import org.betonquest.betonquest.api.QuestException
 import org.betonquest.betonquest.api.config.quest.QuestPackageManager
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
-import org.betonquest.betonquest.api.quest.QuestException
 import org.betonquest.betonquest.api.quest.QuestTypeApi
 import org.betonquest.betonquest.api.quest.event.EventID
 import org.betonquest.betonquest.api.schedule.CatchupStrategy

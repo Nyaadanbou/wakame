@@ -1,0 +1,7 @@
+{
+  "id": "wakame-libraries",
+  "version": "{{ version }}",
+  "mixins": [
+    "mixins.wakame-libraries.json"
+  ]
+}

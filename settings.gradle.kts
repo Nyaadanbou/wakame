@@ -26,7 +26,6 @@ dependencyResolutionManagement {
 rootProject.name = "wakame"
 
 include(":wakame-api")
-include(":wakame-common")
 include(":wakame-hooks:wakame-hook-adventurelevel")
 include(":wakame-hooks:wakame-hook-auraskills")
 include(":wakame-hooks:wakame-hook-betonquest")
@@ -52,4 +51,5 @@ include(":wakame-hooks:wakame-hook-townyflight")
 include(":wakame-hooks:wakame-hook-vault")
 include(":wakame-hooks:wakame-hook-worldguard")
 include(":wakame-mixin")
+include(":wakame-mixin-libraries")
 include(":wakame-plugin")
