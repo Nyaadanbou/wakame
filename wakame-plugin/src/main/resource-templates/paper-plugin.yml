@@ -17,6 +17,9 @@ dependencies:
     BetonQuest:
       required: false
       load: BEFORE
+    BetterGUI:
+      required: false
+      load: OMIT
     BetterHud:
       required: false
       load: OMIT

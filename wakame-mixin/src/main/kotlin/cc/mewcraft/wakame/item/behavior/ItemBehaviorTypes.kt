@@ -3,10 +3,7 @@ package cc.mewcraft.wakame.item.behavior
 import cc.mewcraft.wakame.item.behavior.impl.Castable
 import cc.mewcraft.wakame.item.behavior.impl.EntityBucket
 import cc.mewcraft.wakame.item.behavior.impl.HoldLastDamage
-import cc.mewcraft.wakame.item.behavior.impl.external.BrewRecipe
-import cc.mewcraft.wakame.item.behavior.impl.external.PlaceBlock
-import cc.mewcraft.wakame.item.behavior.impl.external.PlaceDoubleHighBlock
-import cc.mewcraft.wakame.item.behavior.impl.external.PlaceLiquidCollisionBlock
+import cc.mewcraft.wakame.item.behavior.impl.external.*
 import cc.mewcraft.wakame.item.behavior.impl.test.TestInteract
 import cc.mewcraft.wakame.item.behavior.impl.weapon.*
 import cc.mewcraft.wakame.registry.BuiltInRegistries
@@ -148,6 +145,14 @@ object ItemBehaviorTypes {
      */
     @JvmField
     val PLACE_DOUBLE_HIGH_BLOCK = typeOf("place_double_high_block", PlaceDoubleHighBlock)
+
+    /**
+     * 物品具有该行为时, 可以使用以打开外部菜单.
+     *
+     * @see cc.mewcraft.wakame.item.property.ItemPropTypes.OPEN_EXTERNAL_MENU
+     */
+    @JvmField
+    val OPEN_EXTERNAL_MENU = typeOf("open_external_menu", OpenExternalMenu)
 
     // ------------
     // 方便函数

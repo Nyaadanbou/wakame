@@ -302,6 +302,12 @@ data object ItemPropTypes {
         }
     }
 
+    /**
+     * 右键使用物品时打开的外置菜单.
+     */
+    @JvmField
+    val OPEN_EXTERNAL_MENU = typeOf<OpenExternalMenu>("open_external_menu")
+
     // ------------
     // 方便函数
     // ------------

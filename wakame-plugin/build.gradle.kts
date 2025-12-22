@@ -24,6 +24,7 @@ dependencies {
     runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-auraskills"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-betonquest"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-bettergui"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-betterhud"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-breweryx"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-carbonchat"))
