@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.behavior
 import cc.mewcraft.wakame.item.behavior.impl.Castable
 import cc.mewcraft.wakame.item.behavior.impl.EntityBucket
 import cc.mewcraft.wakame.item.behavior.impl.HoldLastDamage
+import cc.mewcraft.wakame.item.behavior.impl.OpenCatalog
 import cc.mewcraft.wakame.item.behavior.impl.external.*
 import cc.mewcraft.wakame.item.behavior.impl.test.TestInteract
 import cc.mewcraft.wakame.item.behavior.impl.weapon.*
@@ -95,7 +96,6 @@ object ItemBehaviorTypes {
      */
     @JvmField
     val KATANA = typeOf("katana", Katana)
-
     /**
      * 物品具有该行为时, 可以捕捉和释放生物.
      *
@@ -153,6 +153,14 @@ object ItemBehaviorTypes {
      */
     @JvmField
     val OPEN_EXTERNAL_MENU = typeOf("open_external_menu", OpenExternalMenu)
+
+    /**
+     * 物品具有该行为时, 可以使用以打开图鉴.
+     *
+     * @see cc.mewcraft.wakame.item.property.ItemPropTypes.OPEN_CATALOG
+     */
+    @JvmField
+    val OPEN_CATALOG = typeOf("open_catalog", OpenCatalog)
 
     // ------------
     // 方便函数
