@@ -79,6 +79,7 @@ huskhomes = "4.9.9"
 carbonchat = "3.0.0-beta.26"
 mythicdungeons = "1.3.0-SNAPSHOT"
 betonquest = "3.0.0-SNAPSHOT"
+bettergui = "10.2"
 
 [libraries]
 
@@ -117,6 +118,15 @@ caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version
 hikaricp = {group = "com.zaxxer", name = "HikariCP", version = "5.1.0" }
 mariadb-jdbc = { group = "org.mariadb.jdbc", name = "mariadb-java-client", version.ref = "mariadb-jdbc" }
 snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version.ref = "snakeyaml-engine" }
+messenger = { group = "de.hexaoxi", name = "messenger-api", version.ref = "messenger" }
+messenger-nats = { group = "de.hexaoxi", name = "messenger-nats", version.ref = "messenger" }
+messenger-rabbitmq = { group = "de.hexaoxi", name = "messenger-rabbitmq", version.ref = "messenger" }
+messenger-redis = { group = "de.hexaoxi", name = "messenger-redis", version.ref = "messenger" }
+netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
+zstdjni = { group = "com.github.luben", name = "zstd-jni", version.ref = "zstdjni" }
+jedis = { group = "redis.clients", name = "jedis", version.ref = "jedis" }
+rabbitmq = { group = "com.rabbitmq", name = "amqp-client", version.ref = "rabbitmq" }
+nats = { group = "io.nats", name = "jnats", version.ref = "nats" }
 
 # Server deps
 # 这些依赖属于服务端核心, 由服务端的 classloader 加载
@@ -173,15 +183,7 @@ huskhomes-bukkit = { group = "net.william278.huskhomes", name = "huskhomes-bukki
 carbonchat = { group = "de.hexaoxi", name = "carbonchat-api", version.ref = "carbonchat" }
 mythicdungeons = { group = "net.playavalon", name = "MythicDungeons", version.ref = "mythicdungeons" }
 betonquest = { group = "org.betonquest", name = "betonquest", version.ref = "betonquest" }
-messenger = { group = "de.hexaoxi", name = "messenger-api", version.ref = "messenger" }
-messenger-nats = { group = "de.hexaoxi", name = "messenger-nats", version.ref = "messenger" }
-messenger-rabbitmq = { group = "de.hexaoxi", name = "messenger-rabbitmq", version.ref = "messenger" }
-messenger-redis = { group = "de.hexaoxi", name = "messenger-redis", version.ref = "messenger" }
-netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
-zstdjni = { group = "com.github.luben", name = "zstd-jni", version.ref = "zstdjni" }
-jedis = { group = "redis.clients", name = "jedis", version.ref = "jedis" }
-rabbitmq = { group = "com.rabbitmq", name = "amqp-client", version.ref = "rabbitmq" }
-nats = { group = "io.nats", name = "jnats", version.ref = "nats" }
+bettergui = { group = "me.hsgamer", name = "bettergui", version.ref = "bettergui" }
 
 [plugins]
 
