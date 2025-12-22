@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.registerEvents
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 
@@ -16,9 +17,11 @@ import org.bukkit.event.player.PlayerJoinEvent
 internal object PlayerMaxHealthScale : Listener {
 
     @InitFun
-    fun init() = registerEvents()
+    fun init() {
+        registerEvents()
+    }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun on(event: PlayerJoinEvent) {
         val player = event.player
         // Koish 系统下玩家的最大生命值可以超过 20f,
@@ -26,5 +29,4 @@ internal object PlayerMaxHealthScale : Listener {
         // 但这也要求需要在其他地方显示玩家的当前/最大生命值
         player.healthScale = 20.0
     }
-
 }

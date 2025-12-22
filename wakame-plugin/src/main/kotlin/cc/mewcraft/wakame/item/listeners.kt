@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.entity.player.isInventoryListenable
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
-import cc.mewcraft.wakame.extensions.toVector3d
 import cc.mewcraft.wakame.item.behavior.*
 import cc.mewcraft.wakame.item.behavior.ItemStackActivationChecker.isActive
 import cc.mewcraft.wakame.item.property.impl.ItemSlotRegistry
@@ -11,6 +10,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.registerEvents
+import cc.mewcraft.wakame.util.toVector3d
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import io.papermc.paper.event.player.PrePlayerAttackEntityEvent

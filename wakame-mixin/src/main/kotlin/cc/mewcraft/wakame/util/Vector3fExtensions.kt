@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.extensions
+package cc.mewcraft.wakame.util
 
 import org.bukkit.Location
 import org.bukkit.World

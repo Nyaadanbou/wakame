@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.behavior
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.extensions.toLocation
 import cc.mewcraft.wakame.item.behavior.InteractableBlocks.INTERACTABLE_BLOCKS
 import cc.mewcraft.wakame.item.behavior.InteractableEntities.INTERACTABLE_ENTITIES
 import cc.mewcraft.wakame.util.UniversalBlocks
+import cc.mewcraft.wakame.util.toLocation
 import io.papermc.paper.entity.Shearable
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap

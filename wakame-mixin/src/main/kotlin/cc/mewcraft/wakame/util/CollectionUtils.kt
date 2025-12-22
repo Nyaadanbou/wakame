@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.util
 
-import java.util.LinkedList
+import java.util.*
 
 object CollectionUtils {
 

@@ -1,4 +1,5 @@
-import cc.mewcraft.wakame.ecs.FleksPatcher
+package cc.mewcraft.wakame.ecs
+
 import cc.mewcraft.wakame.ecs.system.RenderParticle
 import cc.mewcraft.wakame.enchantment.system.*
 import cc.mewcraft.wakame.entity.attribute.system.ApplyAttributeEffects

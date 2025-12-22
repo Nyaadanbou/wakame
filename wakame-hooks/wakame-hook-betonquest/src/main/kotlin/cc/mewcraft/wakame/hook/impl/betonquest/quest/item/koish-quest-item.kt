@@ -8,11 +8,11 @@ import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import net.kyori.adventure.text.Component
+import org.betonquest.betonquest.api.QuestException
 import org.betonquest.betonquest.api.instruction.Instruction
 import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.kernel.TypeFactory
 import org.betonquest.betonquest.api.profile.Profile
-import org.betonquest.betonquest.api.quest.QuestException
 import org.betonquest.betonquest.item.QuestItem
 import org.betonquest.betonquest.item.QuestItemSerializer
 import org.betonquest.betonquest.item.QuestItemTagAdapterWrapper

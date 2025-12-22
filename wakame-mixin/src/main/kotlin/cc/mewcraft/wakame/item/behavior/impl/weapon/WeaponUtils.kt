@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
-import cc.mewcraft.wakame.extensions.mul
-import cc.mewcraft.wakame.extensions.plus
 import cc.mewcraft.wakame.util.collision.OBB
 import cc.mewcraft.wakame.util.collision.calculateOrthonormalBasis
+import cc.mewcraft.wakame.util.mul
+import cc.mewcraft.wakame.util.plus
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.joml.Vector3f
