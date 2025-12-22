@@ -2,7 +2,6 @@
 
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.item.data.ItemDataContainer
 import cc.mewcraft.wakame.item.data.ItemDataTypes
@@ -16,10 +15,7 @@ import cc.mewcraft.wakame.item.property.impl.ItemBase
 import cc.mewcraft.wakame.mixin.support.ExtraDataComponents
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.MojangStack
-import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
 import cc.mewcraft.wakame.util.item.toBukkit
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.inventory.ItemStack
 import kotlin.time.measureTimedValue
 
@@ -54,7 +50,8 @@ object KoishStackGenerator {
      */
     fun generate(type: KoishItem, context: ItemGenerationContext): ItemStack {
         val result = measureTimedValue { generate0(type, context) }
-        LOGGER.info(Component.text("Generated item ${context.koishItem.id.asMinimalStringKoish()} in ${result.duration.inWholeMilliseconds}ms").color(NamedTextColor.DARK_GRAY))
+        // TODO 紧急!! 尽可能的缓存或 clone 需要的 ItemStack
+        //LOGGER.info(Component.text("Generated item ${context.koishItem.id.asMinimalStringKoish()} in ${result.duration.inWholeMilliseconds}ms").color(NamedTextColor.DARK_GRAY))
         return result.value
     }
 
