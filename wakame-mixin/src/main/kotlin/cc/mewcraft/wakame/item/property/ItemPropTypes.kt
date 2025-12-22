@@ -308,6 +308,12 @@ data object ItemPropTypes {
     @JvmField
     val OPEN_EXTERNAL_MENU = typeOf<OpenExternalMenu>("open_external_menu")
 
+    /**
+     * 右键使用物品时打开的目录.
+     */
+    @JvmField
+    val OPEN_CATALOG = typeOf<OpenCatalog>("open_catalog")
+
     // ------------
     // 方便函数
     // ------------

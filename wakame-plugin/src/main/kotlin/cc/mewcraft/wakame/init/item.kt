@@ -1,8 +1,10 @@
 package cc.mewcraft.wakame.init
 
+import cc.mewcraft.wakame.catalog.OpenCatalogImpl
 import cc.mewcraft.wakame.item.CustomItemRegistryLoader
 import cc.mewcraft.wakame.item.ItemProxyRegistryLoader
 import cc.mewcraft.wakame.item.ItemTagManager
+import cc.mewcraft.wakame.item.behavior.impl.OpenCatalog
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -15,7 +17,8 @@ object ItemInitializer {
 
     @InitFun
     fun init() {
-
+        // 注册物品行为实现
+        OpenCatalog.setImplementation(OpenCatalogImpl)
     }
 
     fun reload() {
