@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.koish
 import cc.mewcraft.wakame.hook.impl.betonquest.util.ArithmeticOp
 import cc.mewcraft.wakame.hook.impl.betonquest.util.FriendlyEnumParser
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.argument.Argument
 import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
@@ -66,7 +65,7 @@ class SetFreezeTicksFactory(
 
     override fun parsePlayer(instruction: Instruction): PlayerEvent {
         val operation = instruction.get(FriendlyEnumParser<ArithmeticOp>())
-        val amount = instruction.get(Argument.NUMBER)
+        val amount = instruction.get(instruction.parsers.number())
         val logger = loggerFactory.create(SetFreezeTicks::class.java)
         val event = SetFreezeTicks(operation, amount, logger)
         val questPackage = instruction.getPackage()

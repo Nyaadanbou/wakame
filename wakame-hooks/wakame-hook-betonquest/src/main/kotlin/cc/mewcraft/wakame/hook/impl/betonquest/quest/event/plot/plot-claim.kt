@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.plot
 import com.plotsquared.bukkit.util.BukkitUtil
 import com.plotsquared.core.PlotSquared
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.argument.Argument
 import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
@@ -68,7 +67,7 @@ class PlotClaimEventFactory(
 
     override fun parsePlayer(instruction: Instruction): PlayerEvent {
         val skipIfExists = instruction.hasArgument("skipIfExists")
-        val dimension = instruction.getValue("dimension", Argument.STRING)
+        val dimension = instruction.getValue("dimension", instruction.parsers.string())
         val logger = loggerFactory.create(PlotClaimEvent::class.java)
         val questPackage = instruction.getPackage()
         val plotClaimEvent = PlotClaimEvent(skipIfExists, dimension, logger)

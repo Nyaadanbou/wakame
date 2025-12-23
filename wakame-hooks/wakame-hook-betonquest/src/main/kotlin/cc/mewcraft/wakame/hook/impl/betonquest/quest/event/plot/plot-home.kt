@@ -4,7 +4,6 @@ import com.plotsquared.bukkit.util.BukkitUtil
 import com.plotsquared.core.PlotSquared
 import com.plotsquared.core.events.TeleportCause
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.argument.Argument
 import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
@@ -71,8 +70,8 @@ class PlotHomeEventFactory(
 ) : PlayerEventFactory {
 
     override fun parsePlayer(instruction: Instruction): PlayerEvent {
-        val order = instruction.getValue("order", Argument.NUMBER_NOT_LESS_THAN_ONE)
-        val dimension = instruction.getValue("dimension", Argument.STRING)
+        val order = instruction.getValue("order", instruction.parsers.number().atLeast(1))
+        val dimension = instruction.getValue("dimension", instruction.parsers.string())
         val logger = loggerFactory.create(PlotHomeEvent::class.java)
         val questPackage = instruction.getPackage()
         val plotHomeEvent = PlotHomeEvent(order, dimension, logger)

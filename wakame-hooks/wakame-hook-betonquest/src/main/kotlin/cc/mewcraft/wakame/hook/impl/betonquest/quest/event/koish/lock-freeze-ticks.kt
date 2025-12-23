@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.koish
 
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.argument.Argument
 import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
@@ -51,7 +50,7 @@ class LockFreezeTicksFactory(
 ) : PlayerEventFactory {
 
     override fun parsePlayer(instruction: Instruction): PlayerEvent {
-        val type = instruction.get(Argument.ENUM(LockFreezeTicks.Type::class.java))
+        val type = instruction.get(instruction.parsers.forEnum(LockFreezeTicks.Type::class.java))
         val logger = loggerFactory.create(LockFreezeTicks::class.java)
         val event = LockFreezeTicks(type)
         val questPackage = instruction.getPackage()
