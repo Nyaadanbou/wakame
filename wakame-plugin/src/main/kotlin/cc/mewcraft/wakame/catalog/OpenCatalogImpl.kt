@@ -32,14 +32,20 @@ object OpenCatalogImpl : SimpleInteract {
     private fun handleOpenItemCatalog(player: Player, item: ItemStack, openCatalog: OpenCatalog): InteractionResult {
         val catalogType = openCatalog.catalogType
         val catalogId = openCatalog.catalogId
-        val category = DynamicRegistries.ITEM_CATEGORY[catalogId] ?: run {
-            LOGGER.error("Found an unknown catalog item category id '$catalogId' for type '$catalogType' when opening catalog from item")
-            return InteractionResult.PASS
-        }
+        if (catalogId == null) {
+            val menu = CatalogItemMainMenu(player)
+            CatalogItemMenuStacks.rewrite(player, menu)
 
-        val parentMenu = CatalogItemMainMenu(player)
-        val childMenu = CatalogItemCategoryMenu(category, player)
-        CatalogItemMenuStacks.rewrite(player, parentMenu, childMenu)
+        } else {
+            val category = DynamicRegistries.ITEM_CATEGORY[catalogId] ?: run {
+                LOGGER.error("Found an unknown catalog item category id '$catalogId' for type '$catalogType' when opening catalog from item")
+                return InteractionResult.PASS
+            }
+
+            val parent = CatalogItemMainMenu(player)
+            val child = CatalogItemCategoryMenu(category, player)
+            CatalogItemMenuStacks.rewrite(player, parent, child)
+        }
 
         return InteractionResult.SUCCESS
     }

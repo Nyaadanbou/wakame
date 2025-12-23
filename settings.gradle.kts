@@ -26,6 +26,7 @@ dependencyResolutionManagement {
 rootProject.name = "wakame"
 
 include(":wakame-api")
+include(":wakame-externals:bettergui-addon")
 include(":wakame-hooks:wakame-hook-adventurelevel")
 include(":wakame-hooks:wakame-hook-auraskills")
 include(":wakame-hooks:wakame-hook-betonquest")

@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.integration.party.PartyIntegration
 import cc.mewcraft.wakame.util.adventure.plain
 import net.kyori.adventure.text.Component
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.argument.Argument
 import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
@@ -133,9 +132,9 @@ class CreatePartyEventFactory(
 ) : PlayerEventFactory {
 
     override fun parsePlayer(instruction: Instruction): PlayerEvent {
-        val range = instruction.get(Argument.NUMBER)
+        val range = instruction.get(instruction.parsers.number())
         val conditions = instruction.getList(::ConditionID)
-        val amount = instruction.getValue("amount", Argument.NUMBER)
+        val amount = instruction.getValue("amount", instruction.parsers.number())
         val logger = loggerFactory.create(CreatePartyEvent::class.java)
         val questPackage = instruction.getPackage()
         val createPartyEvent = CreatePartyEvent(questTypeApi, profileProvider, range, conditions, amount, logger)

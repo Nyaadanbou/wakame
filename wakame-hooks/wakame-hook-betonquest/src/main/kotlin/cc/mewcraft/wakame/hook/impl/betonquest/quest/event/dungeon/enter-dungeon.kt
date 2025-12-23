@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.dungeon
 import cc.mewcraft.wakame.hook.impl.betonquest.util.MythicDungeonsBridge
 import cc.mewcraft.wakame.integration.party.PartyIntegration
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.argument.Argument
 import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
@@ -87,10 +86,10 @@ class EnterDungeonEventFactory(
 
     override fun parsePlayer(instruction: Instruction): PlayerEvent {
         val logger = loggerFactory.create(EnterDungeonEvent::class.java)
-        val dungeon = instruction.get(Argument.STRING)
+        val dungeon = instruction.get(instruction.parsers.string())
 
         // 使用 Instruction#getValue 可以使该事件支持按玩家独立计算的变量
-        val useParty = instruction.getValue("party", Argument.BOOLEAN, false)
+        val useParty = instruction.getValue("party", instruction.parsers.bool(), false)
             ?: error("Failed to get 'party' argument")
 
         val onlineEvent = EnterDungeonEvent(dungeon, useParty, logger)

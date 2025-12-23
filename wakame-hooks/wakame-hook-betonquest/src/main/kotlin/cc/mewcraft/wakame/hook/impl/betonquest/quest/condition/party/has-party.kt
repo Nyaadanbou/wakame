@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.party
 
 import cc.mewcraft.wakame.integration.party.PartyIntegration
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.argument.Argument
 import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
@@ -36,7 +35,7 @@ class HasPartyFactory(
 ) : PlayerConditionFactory {
 
     override fun parsePlayer(instruction: Instruction): PlayerCondition {
-        val amount = instruction.getValue("amount", Argument.NUMBER_NOT_LESS_THAN_ZERO)
+        val amount = instruction.getValue("amount", instruction.parsers.number().atLeast(0))
         val logger = loggerFactory.create(HasParty::class.java)
         val hasParty = HasParty(amount, logger)
         val questPackage = instruction.getPackage()

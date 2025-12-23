@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.koish
 import cc.mewcraft.wakame.hook.impl.betonquest.util.ComparisonOp
 import cc.mewcraft.wakame.hook.impl.betonquest.util.FriendlyEnumParser
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.argument.Argument
 import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
@@ -82,9 +81,9 @@ class LightFactory(
 ) : PlayerConditionFactory {
 
     override fun parsePlayer(instruction: Instruction): PlayerCondition {
-        val type = instruction.get(Argument.ENUM(Light.Type::class.java))
+        val type = instruction.get(instruction.parsers.forEnum(Light.Type::class.java))
         val operation = instruction.get(FriendlyEnumParser<ComparisonOp>())
-        val value = instruction.get(Argument.NUMBER)
+        val value = instruction.get(instruction.parsers.number())
         val logger = loggerFactory.create(Light::class.java)
         val condition = Light(type, operation, value)
         val questPackage = instruction.getPackage()

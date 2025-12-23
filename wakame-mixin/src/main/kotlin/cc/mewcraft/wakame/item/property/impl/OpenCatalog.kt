@@ -9,5 +9,5 @@ data class OpenCatalog(
     @Setting("type")
     val catalogType: String,
     @Setting("id")
-    val catalogId: String,
+    val catalogId: String? = null,
 )
