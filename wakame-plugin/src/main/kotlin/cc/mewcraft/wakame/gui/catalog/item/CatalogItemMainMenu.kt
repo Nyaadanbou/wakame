@@ -26,7 +26,7 @@ import xyz.xenondevs.invui.window.type.context.setTitle
  * 物品图鉴主菜单.
  * 展示所有的物品类别.
  */
-internal class CatalogItemMainMenu(
+class CatalogItemMainMenu(
 
     /**
      * 该菜单的用户, 也就是正在查看该菜单的玩家.
