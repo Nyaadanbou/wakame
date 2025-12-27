@@ -8,6 +8,9 @@ import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.transformation.ConfigurationTransformation
 
+/**
+ * 用于修复物品堆叠的数据格式.
+ */
 object ItemDataFixer {
 
     @JvmStatic
