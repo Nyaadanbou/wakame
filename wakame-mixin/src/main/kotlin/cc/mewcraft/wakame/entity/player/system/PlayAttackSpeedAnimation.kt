@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.entity.player.system
 
-import cc.mewcraft.wakame.PluginHolder
+import cc.mewcraft.wakame.PluginProvider
 import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
@@ -24,7 +24,7 @@ object PlayAttackSpeedAnimation : IteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer, ItemSlotChanges) }
 ) {
 
-    private val MODIFIER_ID = NamespacedKey(PluginHolder.instance, "animation")
+    private val MODIFIER_ID = NamespacedKey(PluginProvider.instance, "animation")
 
     override fun onTickEntity(entity: Entity) {
         val player = entity[BukkitPlayer]

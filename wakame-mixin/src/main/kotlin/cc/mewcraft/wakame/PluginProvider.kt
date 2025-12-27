@@ -3,19 +3,18 @@ package cc.mewcraft.wakame
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.ApiStatus
 
-object PluginHolder {
+object PluginProvider {
 
     /**
-     * 插件实例.
+     * (Koish) 插件实例.
      */
-    @get:JvmName("getInstance")
+    @get:JvmName("get")
     @get:JvmStatic
-    lateinit var INSTANCE: JavaPlugin
+    lateinit var instance: JavaPlugin
         private set
 
     @ApiStatus.Internal
     fun register(plugin: JavaPlugin) {
-        this.INSTANCE = plugin
+        this.instance = plugin
     }
-
 }

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.integration.protection
 
-import cc.mewcraft.wakame.PluginHolder
+import cc.mewcraft.wakame.PluginProvider
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.api.tileentity.TileEntity
 import cc.mewcraft.wakame.context.Context
@@ -296,7 +296,7 @@ object ProtectionManager {
         args: ProtectionArgs,
         check: ProtectionIntegration.() -> Boolean,
     ): Boolean {
-        if (!PluginHolder.instance.isEnabled) {
+        if (!PluginProvider.instance.isEnabled) {
             return false
         }
 

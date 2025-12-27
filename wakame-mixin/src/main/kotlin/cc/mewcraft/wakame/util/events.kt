@@ -2,7 +2,7 @@
 
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.PluginHolder
+import cc.mewcraft.wakame.PluginProvider
 import cc.mewcraft.wakame.SERVER
 import org.bukkit.Bukkit
 import org.bukkit.event.Event
@@ -67,7 +67,7 @@ fun <T : Event> event(
         this,
         priority,
         { _, event -> if (eventClazz.isInstance(event)) callback(event as T) },
-        PluginHolder.instance,
+        PluginProvider.instance,
         ignoreCancelled
     )
 }
@@ -80,7 +80,7 @@ class KoishListener : Listener {
 }
 
 fun Listener.registerEvents() {
-    Bukkit.getPluginManager().registerEvents(this, PluginHolder.instance)
+    Bukkit.getPluginManager().registerEvents(this, PluginProvider.instance)
 }
 
 fun Listener.unregisterEvents() {

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.PluginHolder
+import cc.mewcraft.wakame.PluginProvider
 import org.bukkit.entity.Player
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
@@ -42,6 +42,6 @@ class BungeeCordProxyServerSwitcher : ProxyServerSwitcher {
         val out = DataOutputStream(pluginMessage)
         out.writeUTF("Connect")
         out.writeUTF(targetServer)
-        player.sendPluginMessage(PluginHolder.instance, "BungeeCord", pluginMessage.toByteArray())
+        player.sendPluginMessage(PluginProvider.instance, "BungeeCord", pluginMessage.toByteArray())
     }
 }
