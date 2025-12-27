@@ -94,7 +94,7 @@ internal object KoishPlugin : JavaPlugin(), IKoish {
     override fun getItemRegistry(): KoishItemRegistry = ApiItemRegistry
 
     override fun registerProtectionIntegration(integration: ProtectionIntegration) {
-        ProtectionManager.integrations += integration
+        ProtectionManager.addImplementation(integration)
     }
     //</editor-fold>
 }

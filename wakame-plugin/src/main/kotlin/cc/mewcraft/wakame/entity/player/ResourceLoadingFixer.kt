@@ -14,25 +14,34 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
 
-/** 该接口允许外部代码实现一个 [ResourceLoadingFixBootstrap] 的具体逻辑, 以此来避免 CNF 异常. */
+/**
+ * 该接口允许外部代码实现一个 [ResourceLoadingFixBootstrap] 的具体逻辑, 以此来避免 CNF 异常.
+ */
 fun interface ResourceLoadingFixHandler {
 
     /** 实现该函数来执行必要的逻辑, 例如注册 Event Handler. */
     fun fix()
 
     companion object : ResourceLoadingFixHandler {
-        internal var CURRENT_HANDLER: ResourceLoadingFixHandler = ResourceLoadingFixHandler {
+        private var implementation: ResourceLoadingFixHandler = ResourceLoadingFixHandler {
             LOGGER.error("The current PlayerResourceFixHandler is a no-op but it's being called. This is a bug!", Error())
         }
 
+        fun setImplementation(impl: ResourceLoadingFixHandler) {
+            implementation = impl
+            LOGGER.info("PlayerResourceFixHandler implementation set to: ${impl::class.qualifiedName}")
+        }
+
         override fun fix() {
-            CURRENT_HANDLER.fix()
+            implementation.fix()
         }
     }
 
 }
 
-/** 该 object 用于解决玩家资源(当前血量/魔法值)在进出服务器时无法正确加载的问题. */
+/**
+ * 该 object 用于解决玩家资源(当前血量/魔法值)在进出服务器时无法正确加载的问题.
+ */
 @Init(
     stage = InitStage.POST_WORLD,
     runAfter = [HooksLoader::class /* 依赖于 PlayerLevelManager */]
@@ -51,7 +60,7 @@ internal object ResourceLoadingFixBootstrap {
         }
 
         // 在玩家的冒险等级加载完毕后, 加载玩家的资源数据 (这里根据运行时的冒险等级系统加载对应的监听器)
-        when (PlayerLevelIntegration.levelType) {
+        when (PlayerLevelIntegration.type) {
 
             // 这两冒险等级系统完全依赖原版游戏自身, 没有额外的数据储存,
             // 所以可以直接在进入游戏时读取玩家的等级信息并且加载资源数据.

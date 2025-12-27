@@ -67,7 +67,7 @@ fun <T : Event> event(
         this,
         priority,
         { _, event -> if (eventClazz.isInstance(event)) callback(event as T) },
-        PluginHolder.INSTANCE,
+        PluginHolder.instance,
         ignoreCancelled
     )
 }
@@ -80,7 +80,7 @@ class KoishListener : Listener {
 }
 
 fun Listener.registerEvents() {
-    Bukkit.getPluginManager().registerEvents(this, PluginHolder.INSTANCE)
+    Bukkit.getPluginManager().registerEvents(this, PluginHolder.instance)
 }
 
 fun Listener.unregisterEvents() {

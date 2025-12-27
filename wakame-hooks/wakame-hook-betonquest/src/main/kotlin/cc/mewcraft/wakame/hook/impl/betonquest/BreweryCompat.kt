@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.hook.impl.betonquest.quest.item.BrewQuestItemSerialize
 import cc.mewcraft.wakame.integration.Hook
 import org.betonquest.betonquest.BetonQuest
 
-@Hook(plugins = ["BetonQuest", "TheBrewingProject"])
+@Hook(plugins = ["BetonQuest", "TheBrewingProject"], requireAll = true)
 object BreweryCompat {
 
     init {

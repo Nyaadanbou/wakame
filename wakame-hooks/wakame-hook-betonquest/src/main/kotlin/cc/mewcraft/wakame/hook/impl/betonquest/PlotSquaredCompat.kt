@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.plot.PlotHomeEventFac
 import cc.mewcraft.wakame.integration.Hook
 import org.betonquest.betonquest.BetonQuest
 
-@Hook(plugins = ["BetonQuest", "PlotSquared"])
+@Hook(plugins = ["BetonQuest", "PlotSquared"], requireAll = true)
 object PlotSquaredCompat {
 
     init {

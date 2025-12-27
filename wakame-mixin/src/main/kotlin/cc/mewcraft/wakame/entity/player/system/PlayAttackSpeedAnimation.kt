@@ -24,7 +24,7 @@ object PlayAttackSpeedAnimation : IteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer, ItemSlotChanges) }
 ) {
 
-    private val MODIFIER_ID = NamespacedKey(PluginHolder.INSTANCE, "animation")
+    private val MODIFIER_ID = NamespacedKey(PluginHolder.instance, "animation")
 
     override fun onTickEntity(entity: Entity) {
         val player = entity[BukkitPlayer]

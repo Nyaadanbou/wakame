@@ -18,7 +18,14 @@ import java.util.concurrent.CompletableFuture
  */
 object PermissionManager {
 
-    val integrations = ArrayList<PermissionIntegration>()
+    val integrations: List<PermissionIntegration>
+        get() = _integrations
+
+    private val _integrations = ArrayList<PermissionIntegration>()
+
+    fun addImplementation(integration: PermissionIntegration) {
+        _integrations.add(integration)
+    }
 
     /**
      * 检查给定的 [玩家][player] 在给定的 [世界][world] 是否有给定的 [权限][permission].
@@ -57,7 +64,7 @@ object PermissionManager {
         require(!Bukkit.isPrimaryThread()) {
             "offline player permissions should never be checked from the main thread"
         }
-        return integrations[0].hasPermission(world, player, permission).thenApply { it == true }
+        return _integrations[0].hasPermission(world, player, permission).thenApply { it == true }
     }
 
 }
