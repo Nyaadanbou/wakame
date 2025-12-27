@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.item.display.implementation.common
 
-import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.item.display.*
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.component
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -47,15 +47,15 @@ internal data class SingleValueRendererFormat(
     override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     fun render(): IndexedText {
-        return SimpleIndexedText(index, listOf(MM.deserialize(tooltip)))
+        return SimpleIndexedText(index, listOf(MiniMessage.miniMessage().deserialize(tooltip)))
     }
 
     fun render(resolver: TagResolver): IndexedText {
-        return SimpleIndexedText(index, listOf(MM.deserialize(tooltip, resolver)))
+        return SimpleIndexedText(index, listOf(MiniMessage.miniMessage().deserialize(tooltip, resolver)))
     }
 
     fun render(vararg resolver: TagResolver): IndexedText {
-        return SimpleIndexedText(index, listOf(MM.deserialize(tooltip, *resolver)))
+        return SimpleIndexedText(index, listOf(MiniMessage.miniMessage().deserialize(tooltip, *resolver)))
     }
 }
 
@@ -79,15 +79,15 @@ internal data class ListValueRendererFormat(
     override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     fun render(): IndexedText {
-        return SimpleIndexedText(index, tooltip.map(MM::deserialize))
+        return SimpleIndexedText(index, tooltip.map(MiniMessage.miniMessage()::deserialize))
     }
 
     fun render(resolver: TagResolver): IndexedText {
-        return SimpleIndexedText(index, tooltip.map { MM.deserialize(it, resolver) })
+        return SimpleIndexedText(index, tooltip.map { MiniMessage.miniMessage().deserialize(it, resolver) })
     }
 
     fun render(vararg resolver: TagResolver): IndexedText {
-        return SimpleIndexedText(index, tooltip.map { MM.deserialize(it, *resolver) })
+        return SimpleIndexedText(index, tooltip.map { MiniMessage.miniMessage().deserialize(it, *resolver) })
     }
 }
 
@@ -136,9 +136,9 @@ internal data class AggregateValueRendererFormat(
         vararg resolver: TagResolver,
     ): Component {
         val merged = collection
-            .mapTo(ObjectArrayList(collection.size)) { MM.deserialize(tooltip.single, component("single", transform(it))) }
-            .join(JoinConfiguration.separator(MM.deserialize(tooltip.separator)))
-        return MM.deserialize(tooltip.merged, component("merged", merged), *resolver)
+            .mapTo(ObjectArrayList(collection.size)) { MiniMessage.miniMessage().deserialize(tooltip.single, component("single", transform(it))) }
+            .join(JoinConfiguration.separator(MiniMessage.miniMessage().deserialize(tooltip.separator)))
+        return MiniMessage.miniMessage().deserialize(tooltip.merged, component("merged", merged), *resolver)
     }
 
     /**

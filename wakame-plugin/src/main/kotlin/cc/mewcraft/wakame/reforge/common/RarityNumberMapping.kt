@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.reforge.common
 
-import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
@@ -47,7 +46,7 @@ internal object RarityNumberMappingSerializer : TypeSerializer2<RarityNumberMapp
     ): RarityNumberMapping {
         // FIXME: 稀有度不要 Namespace
         val map = node.childrenMap()
-            .mapKeys { Key.key(Namespaces.RARITY, it.key.toString()) }
+            .mapKeys { Key.key("rarity", it.key.toString()) }
             .mapValues { it.value.double }
         val ret = SimpleRarityNumberMapping(map)
 

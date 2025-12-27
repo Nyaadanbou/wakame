@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.integration.playerlevel
 
-import cc.mewcraft.wakame.SERVER
+import org.bukkit.Bukkit
 import java.util.*
 
 /**
@@ -52,5 +52,5 @@ interface PlayerLevelIntegration {
  */
 private object VanillaLevelIntegration : PlayerLevelIntegration {
     override val type: PlayerLevelType = PlayerLevelType.VANILLA
-    override fun get(uuid: UUID): Int? = SERVER.getPlayer(uuid)?.level
+    override fun get(uuid: UUID): Int? = Bukkit.getServer().getPlayer(uuid)?.level
 }

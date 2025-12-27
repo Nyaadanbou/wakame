@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.item.display.implementation.crafting_station
 
-import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.item.data.impl.AttributeCore
 import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.item.display.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.enchantments.Enchantment
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -25,7 +25,7 @@ internal data class FuzzyEnchantmentRendererFormat(
      */
     fun render(data: Map<Enchantment, Int>): IndexedText {
         val tooltip = data.map { (enchantment, level) ->
-            MM.deserialize(
+            MiniMessage.miniMessage().deserialize(
                 tooltip,
                 Placeholder.component("name", enchantment.description()),
                 Placeholder.component("level", Component.text(level)),

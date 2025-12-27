@@ -8,13 +8,15 @@ object PluginProvider {
     /**
      * (Koish) 插件实例.
      */
-    @get:JvmName("get")
-    @get:JvmStatic
-    lateinit var instance: JavaPlugin
-        private set
+    @JvmStatic
+    private lateinit var instance: JavaPlugin
 
     @ApiStatus.Internal
-    fun register(plugin: JavaPlugin) {
+    fun set(plugin: JavaPlugin) {
         this.instance = plugin
+    }
+
+    fun get(): JavaPlugin {
+        return instance
     }
 }

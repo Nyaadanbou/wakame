@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
@@ -19,6 +18,7 @@ import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.format.StyleBuilderApplicable
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.Color
@@ -277,7 +277,7 @@ internal interface DamageDisplaySettings : DamageDisplaySettingsFields {
         val criticalStrikeStyle = criticalStrikeStyle(criticalStrikeMetadata)
         val criticalStrikeText = criticalStrikeText(criticalStrikeMetadata)
 
-        val finalText = MM.deserialize(
+        val finalText = MiniMessage.miniMessage().deserialize(
             MergedDamageDisplaySettings.finalText,
             Placeholder.styling("critical_strike_style", *criticalStrikeStyle),
             Placeholder.component("critical_strike_text", criticalStrikeText),
@@ -340,7 +340,7 @@ internal object MergedDamageDisplaySettings : DamageDisplaySettings, DamageDispl
         val elementType = damageMap.maxWithOrNull(
             compareBy { it.value }
         )?.key ?: BuiltInRegistries.ELEMENT.getDefaultEntry()
-        val damageValueText = MM.deserialize(
+        val damageValueText = MiniMessage.miniMessage().deserialize(
             damageValueText,
             Placeholder.component("element_name", elementType.unwrap().displayName),
             Placeholder.styling("element_style", *elementType.unwrap().displayStyles),
@@ -359,7 +359,7 @@ internal object SeparatedDamageDisplaySettings : DamageDisplaySettings, DamageDi
     override fun damageValueText(context: PostprocessDamageEvent): Component {
         val damageMap = context.finalDamageMap
         val damageValueText = damageMap.map { (elementType, damageValue) ->
-            MM.deserialize(
+            MiniMessage.miniMessage().deserialize(
                 damageValueText,
                 Placeholder.component("element_name", elementType.unwrap().displayName),
                 Placeholder.styling("element_style", *elementType.unwrap().displayStyles),

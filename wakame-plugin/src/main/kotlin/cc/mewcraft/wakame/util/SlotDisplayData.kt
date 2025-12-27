@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.util
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -107,14 +107,14 @@ data class SlotDisplayNameData(
      * 解析 [SlotDisplayNameData] 中的 [name], 返回一个 [Component].
      */
     fun resolve(placeholder: TagResolver): Component {
-        return MM.deserialize(name, placeholder)
+        return MiniMessage.miniMessage().deserialize(name, placeholder)
     }
 
     /**
      * 解析 [SlotDisplayNameData] 中的 [name], 返回一个 [Component].
      */
     fun resolve(dict: SlotDisplayDictData = SlotDisplayDictData(), dsl: SlotDisplayData.PlaceholderBuilder.() -> Unit): Component {
-        return MM.deserialize(name, SlotDisplayData.PlaceholderBuilder(dict).apply(dsl).build())
+        return MiniMessage.miniMessage().deserialize(name, SlotDisplayData.PlaceholderBuilder(dict).apply(dsl).build())
     }
 }
 
@@ -153,7 +153,7 @@ data class SlotDisplayLoreData(
                 is Line.Standard -> {
                     val rawText = line.rawText
                     val placeholders = config.getPlaceholders()
-                    val resolved = MM.deserialize(rawText, placeholders)
+                    val resolved = MiniMessage.miniMessage().deserialize(rawText, placeholders)
                     listOf(resolved)
                 }
 
@@ -162,7 +162,7 @@ data class SlotDisplayLoreData(
                     val rawText = line.rawText
                     val folded = config.getFoldedLines(key) ?: return@flatMap emptyList()
                     val placeholders = config.getPlaceholders()
-                    folded.map { MM.deserialize(rawText, TagResolver.resolver(placeholders, Placeholder.component(key, it))) }
+                    folded.map { MiniMessage.miniMessage().deserialize(rawText, TagResolver.resolver(placeholders, Placeholder.component(key, it))) }
                 }
             }
         }
@@ -239,7 +239,7 @@ data class SlotDisplayLoreData(
                  * 添加一行内容.
                  */
                 fun literal(text: String) {
-                    resolvedLines.add(MM.deserialize(text, placeholders))
+                    resolvedLines.add(MiniMessage.miniMessage().deserialize(text, placeholders))
                 }
 
                 /**
@@ -256,7 +256,7 @@ data class SlotDisplayLoreData(
                     val rawText = dict(key)
                     // local tag resolver & preprocess logic
                     val (resolver, preprocess) = DedicatedPlaceholderBuilder(dictionary).apply(dsl).buildPreprocessResult()
-                    val parsed = MM.deserialize(preprocess.applyTo(rawText), resolver, placeholders)
+                    val parsed = MiniMessage.miniMessage().deserialize(preprocess.applyTo(rawText), resolver, placeholders)
                     resolvedLines.add(parsed)
                 }
 

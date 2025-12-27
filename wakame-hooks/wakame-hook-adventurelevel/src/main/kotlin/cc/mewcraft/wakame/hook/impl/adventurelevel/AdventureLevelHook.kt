@@ -4,7 +4,6 @@ import cc.mewcraft.adventurelevel.event.AdventureLevelDataLoadEvent
 import cc.mewcraft.adventurelevel.level.category.LevelCategory
 import cc.mewcraft.adventurelevel.plugin.AdventureLevelProvider
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.entity.player.PlayerDataLoadingCoordinator
@@ -13,6 +12,7 @@ import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.util.event
+import org.bukkit.Bukkit
 import java.util.*
 
 /**
@@ -38,7 +38,7 @@ private object AdventureResourceLoadingFixHandler : ResourceLoadingFixHandler {
 
         event<AdventureLevelDataLoadEvent> { event ->
             val data = event.userData
-            val player = SERVER.getPlayer(data.uuid) ?: run {
+            val player = Bukkit.getServer().getPlayer(data.uuid) ?: run {
                 LOGGER.warn("Player ${data.uuid} is not online, skipping resource synchronization")
                 return@event
             }

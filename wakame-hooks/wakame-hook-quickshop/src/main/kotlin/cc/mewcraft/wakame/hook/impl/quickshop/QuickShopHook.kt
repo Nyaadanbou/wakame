@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.hook.impl.quickshop
 
-import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.item.hasProp
@@ -14,6 +13,7 @@ import com.ghostchu.quickshop.api.event.settings.type.ShopItemEvent
 import com.ghostchu.quickshop.api.event.settings.type.ShopTypeEvent
 import com.ghostchu.quickshop.api.shop.Shop
 import com.ghostchu.quickshop.api.shop.ShopType
+import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
@@ -61,7 +61,7 @@ object QuickShopHook : Listener {
     private fun tryCancel(shop: Shop, shopItem: ItemStack, event: QSCancellable) {
         if (shopItem.isExactKoish && !shopItem.hasProp(ItemPropTypes.PLAYER_PURCHASABLE)) {
             event.setCancelled(true, TranslatableMessages.MSG_ITEM_NOT_PURCHASABLE.build())
-            shop.permissionAudiences.keys.mapNotNull { SERVER.getPlayer(it) }.forEach { player ->
+            shop.permissionAudiences.keys.mapNotNull { Bukkit.getServer().getPlayer(it) }.forEach { player ->
                 // 通知所有在线的商店管理者
                 player.sendMessage(TranslatableMessages.MSG_ITEM_NOT_PURCHASABLE.build())
             }

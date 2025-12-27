@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.integration.economy.intrinsics
 
-import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.integration.economy.EconomyIntegration2
 import cc.mewcraft.wakame.integration.economy.EconomyType
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -43,6 +43,6 @@ internal object VanillaEconomyIntegration : EconomyIntegration2 {
     }
 
     private fun getPlayer(uuid: UUID): Player {
-        return SERVER.getPlayer(uuid) ?: error("Player is not online")
+        return Bukkit.getServer().getPlayer(uuid) ?: error("Player is not online")
     }
 }

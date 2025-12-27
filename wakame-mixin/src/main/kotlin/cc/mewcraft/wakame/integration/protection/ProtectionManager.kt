@@ -296,7 +296,7 @@ object ProtectionManager {
         args: ProtectionArgs,
         check: ProtectionIntegration.() -> Boolean,
     ): Boolean {
-        if (!PluginProvider.instance.isEnabled) {
+        if (!PluginProvider.get().isEnabled) {
             return false
         }
 

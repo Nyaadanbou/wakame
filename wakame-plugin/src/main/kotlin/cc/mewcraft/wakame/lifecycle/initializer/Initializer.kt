@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.lifecycle.initializer
 
 import cc.mewcraft.wakame.BootstrapContexts
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.adventure.BuiltInMessages
 import cc.mewcraft.wakame.api.event.KoishLoadDataEvent
 import cc.mewcraft.wakame.config.PermanentStorage
@@ -16,6 +15,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import java.io.File
 import java.nio.file.Path
@@ -225,7 +225,7 @@ internal object Initializer : Listener {
         isDone = true
         KoishLoadDataEvent().callEvent()
         PermanentStorage.store("last_version", BootstrapContexts.PLUGIN_VERSION.toString())
-        BuiltInMessages.STARTUP_BANNER.send(SERVER.consoleSender)
+        BuiltInMessages.STARTUP_BANNER.send(Bukkit.getServer().consoleSender)
         LOGGER.info(Component.text("Done loading").color(NamedTextColor.AQUA))
     }
 

@@ -22,7 +22,7 @@ import cc.mewcraft.wakame.api.Koish as IKoish
 internal object KoishPlugin : JavaPlugin(), IKoish {
 
     override fun onLoad() {
-        PluginProvider.register(this)
+        PluginProvider.set(this)
     }
 
     override fun onEnable() {

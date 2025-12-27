@@ -42,6 +42,6 @@ class BungeeCordProxyServerSwitcher : ProxyServerSwitcher {
         val out = DataOutputStream(pluginMessage)
         out.writeUTF("Connect")
         out.writeUTF(targetServer)
-        player.sendPluginMessage(PluginProvider.instance, "BungeeCord", pluginMessage.toByteArray())
+        player.sendPluginMessage(PluginProvider.get(), "BungeeCord", pluginMessage.toByteArray())
     }
 }
