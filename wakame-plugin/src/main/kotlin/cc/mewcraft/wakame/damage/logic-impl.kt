@@ -3,7 +3,6 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.node
@@ -42,6 +41,7 @@ import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.LinearComponents
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.TextDecoration
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.damage.DamageSource
 import org.bukkit.damage.DamageType
@@ -652,7 +652,7 @@ internal object DamageManagerImpl : DamageManagerApi {
             text(")")
         )
 
-        SERVER.filterAudience { it is Player }.sendMessage(message)
+        Bukkit.getServer().filterAudience { it is Player }.sendMessage(message)
     }
 
     private enum class Mapping {

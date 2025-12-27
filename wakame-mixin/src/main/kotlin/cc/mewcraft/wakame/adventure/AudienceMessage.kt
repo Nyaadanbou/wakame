@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.adventure
 
-import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
@@ -10,6 +9,7 @@ import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.sound.Sound.Emitter
 import net.kyori.adventure.sound.Sound.Source
 import net.kyori.adventure.sound.SoundStop
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.adventure.title.Title
 import net.kyori.adventure.title.Title.Times
@@ -74,7 +74,7 @@ internal class ChatAudienceMessage(
     private val text: String,
 ) : AudienceMessage {
     override fun send(audience: Audience, tagResolver: TagResolver) {
-        val component = MM.deserialize(text, tagResolver)
+        val component = MiniMessage.miniMessage().deserialize(text, tagResolver)
         audience.sendMessage(component)
     }
 }
@@ -83,7 +83,7 @@ internal class ActionbarAudienceMessage(
     private val text: String,
 ) : AudienceMessage {
     override fun send(audience: Audience, tagResolver: TagResolver) {
-        val component = MM.deserialize(text, tagResolver)
+        val component = MiniMessage.miniMessage().deserialize(text, tagResolver)
         audience.sendActionBar(component)
     }
 }
@@ -94,8 +94,8 @@ internal class TitleAudienceMessage(
     private val times: Times,
 ) : AudienceMessage {
     override fun send(audience: Audience, tagResolver: TagResolver) {
-        val titleComponent = MM.deserialize(title, tagResolver)
-        val subtitleComponent = MM.deserialize(subtitle, tagResolver)
+        val titleComponent = MiniMessage.miniMessage().deserialize(title, tagResolver)
+        val subtitleComponent = MiniMessage.miniMessage().deserialize(subtitle, tagResolver)
         audience.showTitle(Title.title(titleComponent, subtitleComponent, times))
     }
 }

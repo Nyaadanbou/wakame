@@ -2,12 +2,12 @@ package cc.mewcraft.wakame.craftingstation
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
+import cc.mewcraft.wakame.util.IdePauser
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.yamlLoader
@@ -70,7 +70,7 @@ internal object CraftingStationRegistry {
                     stations[stationId] = station
 
                 } catch (e: Throwable) {
-                    Util.pauseInIde(IllegalStateException("Can't register station: '${file.relativeTo(stationDir)}'", e))
+                    IdePauser.pauseInIde(IllegalStateException("Can't register station: '${file.relativeTo(stationDir)}'", e))
                 }
             }
 

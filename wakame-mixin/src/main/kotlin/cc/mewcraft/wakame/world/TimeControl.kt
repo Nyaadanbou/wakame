@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.world
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.util.cooldown.Cooldown
 import cc.mewcraft.wakame.world.TimeControl.addTime
 import cc.mewcraft.wakame.world.TimeControl.setTime
+import org.bukkit.Bukkit
 import xyz.xenondevs.commons.provider.map
 
 /**
@@ -31,7 +31,7 @@ object TimeControl {
     }
 
     fun setTime(time: Long) {
-        for (world in SERVER.worlds) {
+        for (world in Bukkit.getServer().worlds) {
             LOGGER.info("Setting time for all worlds: $time")
             var time2 = world.time
             time2 -= time2 % 24000
@@ -41,7 +41,7 @@ object TimeControl {
     }
 
     fun addTime(time: Long) {
-        for (world in SERVER.worlds) {
+        for (world in Bukkit.getServer().worlds) {
             LOGGER.info("Adding time for all worlds: $time")
             var time2 = world.time
             world.time = time2 + time

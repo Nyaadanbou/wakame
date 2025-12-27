@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.integration.economy.EconomyManager
+import cc.mewcraft.wakame.integration.economy.EconomyIntegration2
 import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.item.datagen.ItemMetaTypes
@@ -266,11 +266,11 @@ internal object ReforgeCost {
 
     private class Simple(viewer: Player, val amount: Double) : RerollingSession.ReforgeCost {
         override fun take(viewer: Player) {
-            EconomyManager.take(viewer.uniqueId, amount)
+            EconomyIntegration2.take(viewer.uniqueId, amount)
         }
 
         override fun test(viewer: Player): Boolean {
-            return EconomyManager.has(viewer.uniqueId, amount).getOrDefault(false)
+            return EconomyIntegration2.has(viewer.uniqueId, amount).getOrDefault(false)
         }
 
         override val description: List<Component> = listOf(TranslatableMessages.MSG_REROLLING_COST_SIMPLE.arguments(TranslationArgument.numeric(amount)).translate(viewer))

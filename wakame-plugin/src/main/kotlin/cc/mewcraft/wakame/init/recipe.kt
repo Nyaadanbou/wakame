@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.init
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.event.map.MinecraftRecipeRegistrationDoneEvent
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -86,7 +85,7 @@ object RecipeInitializer {
             uncheckedRecipes[recipeId] = minecraftRecipe
 
         } catch (e: Throwable) {
-            Util.pauseInIde(IllegalStateException("Can't load vanilla recipe: '${path.relativeTo(recipeDirectory)}'", e))
+            IdePauser.pauseInIde(IllegalStateException("Can't load vanilla recipe: '${path.relativeTo(recipeDirectory)}'", e))
         }
     }
 
@@ -98,7 +97,7 @@ object RecipeInitializer {
                 recipe.addToManager()
                 checkedRecipes[key] = recipe
             } catch (e: Throwable) {
-                Util.pauseInIde(IllegalStateException("Can't register vanilla recipe: '$key'", e))
+                IdePauser.pauseInIde(IllegalStateException("Can't register vanilla recipe: '$key'", e))
             }
         }
 

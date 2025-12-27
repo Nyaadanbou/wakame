@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.reforge.mod
 
-import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
@@ -195,7 +194,7 @@ interface ModdingTable : Examinable {
 
 private object EmptyItemRule : ModdingTable.ItemRule {
     override val itemId: Key
-        get() = GenericKeys.EMPTY
+        get() = Key.key("internal", "empty")
     override val modLimit: Int
         get() = 0
     override val coreRuleMap: ModdingTable.CoreRuleMap

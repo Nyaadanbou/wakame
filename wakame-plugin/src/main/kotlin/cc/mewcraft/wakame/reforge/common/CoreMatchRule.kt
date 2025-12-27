@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.reforge.common
 
-import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.bundle.element
@@ -91,7 +90,7 @@ internal object CoreMatchRuleSerializer : TypeSerializer2<CoreMatchRule> {
         }
 
         when (namespace) {
-            Namespaces.ATTRIBUTE -> {
+            "attribute" -> {
                 val operation = node.node("operation").get<AttributeModifier.Operation>()
                 val element = node.node("element").get<RegistryEntry<Element>>()
                 return CoreMatchRuleAttribute(pattern, operation, element)

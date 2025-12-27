@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.adventure
 
 import cc.mewcraft.wakame.BootstrapContexts
-import cc.mewcraft.wakame.SERVER
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.join
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.format.TextColor
+import org.bukkit.Bukkit
 
 
 /**
@@ -30,9 +30,9 @@ object BuiltInMessages {
         val infoLine2: Component = Component.text()
             .color(INFO_COLOR)  // 使用辅助色
             .append(Component.text("Running on "))
-            .append(Component.text(SERVER.name, INFO_COLOR))  // 统一使用辅助色
+            .append(Component.text(Bukkit.getServer().name, INFO_COLOR))  // 统一使用辅助色
             .append(Component.text(" - "))
-            .append(Component.text(SERVER.version, INFO_COLOR))  // 统一使用辅助色
+            .append(Component.text(Bukkit.getServer().version, INFO_COLOR))  // 统一使用辅助色
             .build()
 
         // 插入 ASCII Logo 和其他信息

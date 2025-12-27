@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.behavior.impl
 
-import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.behavior.InteractionResult
@@ -18,6 +17,7 @@ import cc.mewcraft.wakame.util.metadata.MetadataKey
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.CustomModelData
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
@@ -155,7 +155,7 @@ object EntityBucket : ItemBehavior {
             // 储存 itemstack 当前的 `minecraft:item_name` 组件 - 用于将生物放生时, 恢复物品原本的 `minecraft:item_name`
             itemstack.setData(ItemDataTypes.PREVIOUS_ITEM_NAME, oldItemName)
         }
-        val newItemName = MM.deserialize(entityBucket.itemNameFormat, Placeholder.component("entity_type", Component.translatable(clicked.type)))
+        val newItemName = MiniMessage.miniMessage().deserialize(entityBucket.itemNameFormat, Placeholder.component("entity_type", Component.translatable(clicked.type)))
         itemstack.setData(DataComponentTypes.ITEM_NAME, newItemName)
 
         // 播放一点音效和动画效果

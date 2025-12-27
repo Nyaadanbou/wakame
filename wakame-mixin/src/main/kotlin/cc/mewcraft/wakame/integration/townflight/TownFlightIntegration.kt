@@ -72,4 +72,48 @@ interface TownFlightIntegration {
      * @param player the {@link Player} to get the remaining flight time for
      */
     fun getFlightSecondsRemainingPrettified(player: Player): String
+
+    /**
+     * This companion object is used to hold the [TownFlightIntegration] implementation.
+     */
+    companion object : TownFlightIntegration {
+
+        private var implementation: TownFlightIntegration? = null
+
+        fun setImplementation(impl: TownFlightIntegration) {
+            implementation = impl
+        }
+
+        override fun canFly(player: Player, silent: Boolean): Boolean {
+            return implementation?.canFly(player, silent) ?: false
+        }
+
+        override fun allowedLocation(player: Player, location: Location): Boolean {
+            return implementation?.allowedLocation(player, location) ?: false
+        }
+
+        override fun removeFlight(player: Player, silent: Boolean, forced: Boolean, cause: String) {
+            implementation?.removeFlight(player, silent, forced, cause)
+        }
+
+        override fun addFlight(player: Player, silent: Boolean) {
+            implementation?.addFlight(player, silent)
+        }
+
+        override fun addTempFlight(player: Player, seconds: Long, silent: Boolean) {
+            implementation?.addTempFlight(player, seconds, silent)
+        }
+
+        override fun testForFlight(player: Player, silent: Boolean) {
+            implementation?.testForFlight(player, silent)
+        }
+
+        override fun getFlightSecondsRemaining(player: Player): Long {
+            return implementation?.getFlightSecondsRemaining(player) ?: 0L
+        }
+
+        override fun getFlightSecondsRemainingPrettified(player: Player): String {
+            return implementation?.getFlightSecondsRemainingPrettified(player) ?: "0s"
+        }
+    }
 }

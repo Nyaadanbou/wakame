@@ -28,24 +28,22 @@ messaging:
 
 # Koish 所使用的经济系统
 # 可用选项:
+#   vanilla: Minecraft 原版经验等级
 #   economy: Economy 插件的账户余额
-#   vanilla: Minecraft 的原版经验等级
-#   zero: 无经济系统 (永远为 0)
-economy_provider: zero
+economy_provider: vanilla
 
 # Koish 如何计算玩家的等级
 # 可用选项:
+#   vanilla: Minecraft 的原版经验等级
 #   aura_skills: AuraSkills 插件的技能等级
 #   adventure: AdventureLevel 插件的冒险等级
-#   vanilla: Minecraft 的原版经验等级
-#   zero: 无等级 (永远为 0)
-player_level_provider: zero
+player_level_provider: vanilla
 
 # Koish 如何计算玩家的魔法值
 # 可用选项:
+#   infinity: 无限魔法值
 #   aura_skills: AuraSkills 插件的魔法值
-#   zero: 无魔法值 (永远为 0)
-player_mana_provider: zero
+player_mana_provider: infinity
 
 # 只有物品的所有者可以拾起死亡掉落的物品
 only_owner_can_pickup_death_drops: false

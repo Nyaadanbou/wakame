@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundleTrait
-import cc.mewcraft.wakame.integration.economy.EconomyManager
+import cc.mewcraft.wakame.integration.economy.EconomyIntegration2
 import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.data.impl.AttributeCore
 import cc.mewcraft.wakame.item.getData
@@ -316,11 +316,11 @@ internal object ReforgeCost {
         val amount: Double,
     ) : Base() {
         override fun take(viewer: Player) {
-            EconomyManager.take(viewer.uniqueId, amount)
+            EconomyIntegration2.take(viewer.uniqueId, amount)
         }
 
         override fun test(viewer: Player): Boolean {
-            return EconomyManager.has(viewer.uniqueId, amount).getOrDefault(false)
+            return EconomyIntegration2.has(viewer.uniqueId, amount).getOrDefault(false)
         }
 
         override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_COST_SUCCESS.arguments(TranslationArgument.numeric(amount)).translate(viewer))

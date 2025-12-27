@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.party
 
-import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.integration.party.PartyIntegration
 import cc.mewcraft.wakame.util.adventure.plain
 import net.kyori.adventure.text.Component
@@ -16,6 +15,7 @@ import org.betonquest.betonquest.api.quest.event.PlayerEvent
 import org.betonquest.betonquest.api.quest.event.PlayerEventFactory
 import org.betonquest.betonquest.api.quest.event.online.OnlineEvent
 import org.betonquest.betonquest.api.quest.event.online.OnlineEventAdapter
+import org.bukkit.Bukkit
 import org.bukkit.Location
 
 
@@ -64,7 +64,7 @@ class CreatePartyEvent(
             newParty.addMember(memberProfile.playerUUID)
         }
 
-        logger.info("Created new party \"$partyName\" with members: [ ${newParty.members.joinToString { SERVER.getPlayer(it)?.name ?: "<Not Online>" }} ]")
+        logger.info("Created new party \"$partyName\" with members: [ ${newParty.members.joinToString { Bukkit.getServer().getPlayer(it)?.name ?: "<Not Online>" }} ]")
     }
 
     private fun getMemberList(profile: OnlineProfile): Set<OnlineProfile> {

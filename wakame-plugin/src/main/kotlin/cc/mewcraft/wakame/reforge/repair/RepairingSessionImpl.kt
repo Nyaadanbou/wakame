@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.reforge.repair
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.integration.economy.EconomyManager
+import cc.mewcraft.wakame.integration.economy.EconomyIntegration2
 import cc.mewcraft.wakame.item.koishTypeId
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
@@ -138,11 +138,11 @@ internal class SimpleRepairingSession(
         override val value: Double,
     ) : RepairingSession.RepairCost {
         override fun test(player: Player): Boolean {
-            return EconomyManager.has(player.uniqueId, value).getOrDefault(false)
+            return EconomyIntegration2.has(player.uniqueId, value).getOrDefault(false)
         }
 
         override fun take(player: Player) {
-            EconomyManager.take(player.uniqueId, value).getOrDefault(false)
+            EconomyIntegration2.take(player.uniqueId, value).getOrDefault(false)
         }
     }
 }

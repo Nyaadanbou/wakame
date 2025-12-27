@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.item.property.impl
 
-import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.EnumLookup
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
@@ -116,7 +114,7 @@ sealed interface ItemSlot : Examinable {
      * 对玩家没有任何效果的物品 (例如材料) 应该使用这个 [ItemSlot].
      */
     private data object Empty : ItemSlot {
-        override val id: Key = GenericKeys.NOOP
+        override val id: Key = Key.key("internal", "empty")
         override val index: Int = -99
 
         override fun getItem(player: Player): ItemStack? {
@@ -132,7 +130,7 @@ sealed interface ItemSlot : Examinable {
      * 代表一个虚拟的 [ItemSlot].
      */
     private data object Imaginary : ItemSlot {
-        override val id: Key = Key.key(Namespaces.GENERIC, "imaginary")
+        override val id: Key = Key.key("internal", "imaginary")
         override val index: Int = 99
 
         override fun getItem(player: Player): ItemStack? {

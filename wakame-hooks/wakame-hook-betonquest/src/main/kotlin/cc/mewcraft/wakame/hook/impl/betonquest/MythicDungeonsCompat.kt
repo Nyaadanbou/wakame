@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.util.registerEvents
 import org.betonquest.betonquest.BetonQuest
 
-@Hook(plugins = ["BetonQuest", "MythicDungeons"])
+@Hook(plugins = ["BetonQuest", "MythicDungeons"], requireAll = true)
 object MythicDungeonsCompat {
 
     init {

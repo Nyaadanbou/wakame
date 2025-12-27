@@ -60,7 +60,7 @@ object KoishStackGenerator {
 
         // 写入基础信息, 每个自定义物品都有
         dataContainer[ItemDataTypes.ID] = ItemId.of(type.id)
-        dataContainer[ItemDataTypes.VERSION] = SharedConstants.DATA_VERSION
+        dataContainer[ItemDataTypes.VERSION] = SharedConstants.ITEM_STACK_DATA_VERSION
         dataContainer[ItemDataTypes.VARIANT] = 0
 
         // 直接操作 MojangStack 以提高生成物品的速度

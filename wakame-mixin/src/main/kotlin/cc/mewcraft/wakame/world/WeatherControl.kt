@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.world
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
@@ -9,6 +8,7 @@ import cc.mewcraft.wakame.util.cooldown.Cooldown
 import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.world.WeatherControl.execute
+import org.bukkit.Bukkit
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
@@ -96,7 +96,7 @@ internal data class SetStorm(
 ) : WeatherControl.Action {
     override val type = WeatherControl.ActionType.SET_STORM
     override fun execute() {
-        for (world in SERVER.worlds) {
+        for (world in Bukkit.getServer().worlds) {
             world.setStorm(flag)
         }
     }
@@ -109,7 +109,7 @@ internal data class SetWeatherDuration(
 ) : WeatherControl.Action {
     override val type = WeatherControl.ActionType.SET_WEATHER_DURATION
     override fun execute() {
-        for (world in SERVER.worlds) {
+        for (world in Bukkit.getServer().worlds) {
             world.weatherDuration = duration
         }
     }
@@ -122,7 +122,7 @@ internal data class SetClearWeatherDuration(
 ) : WeatherControl.Action {
     override val type = WeatherControl.ActionType.SET_CLEAR_WEATHER_DURATION
     override fun execute() {
-        for (world in SERVER.worlds) {
+        for (world in Bukkit.getServer().worlds) {
             world.clearWeatherDuration = duration
         }
     }
@@ -135,7 +135,7 @@ internal data class SetThundering(
 ) : WeatherControl.Action {
     override val type = WeatherControl.ActionType.SET_THUNDERING
     override fun execute() {
-        for (world in SERVER.worlds) {
+        for (world in Bukkit.getServer().worlds) {
             world.isThundering = flag
         }
     }
@@ -148,7 +148,7 @@ internal data class SetThunderDuration(
 ) : WeatherControl.Action {
     override val type = WeatherControl.ActionType.SET_THUNDER_DURATION
     override fun execute() {
-        for (world in SERVER.worlds) {
+        for (world in Bukkit.getServer().worlds) {
             world.thunderDuration = duration
         }
     }

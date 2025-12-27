@@ -2,19 +2,10 @@
 
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.SERVER
 import com.google.common.collect.MapMaker
 import io.netty.buffer.Unpooled
 import net.kyori.adventure.key.Key
-import net.minecraft.core.DefaultedRegistry
-import net.minecraft.core.Holder
-import net.minecraft.core.HolderGetter
-import net.minecraft.core.MappedRegistry
-import net.minecraft.core.NonNullList
-import net.minecraft.core.RegistrationInfo
-import net.minecraft.core.Registry
-import net.minecraft.core.RegistryAccess
-import net.minecraft.core.WritableRegistry
+import net.minecraft.core.*
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.resources.RegistryOps.RegistryInfoLookup
@@ -323,7 +314,7 @@ object NMSUtils {
         if (world != null) {
             return world.serverLevel.`moonrise$getEntityLookup`().get(entityId)?.bukkitEntity
         }
-        for (world in SERVER.worlds) {
+        for (world in Bukkit.getServer().worlds) {
             val entity = world.serverLevel.`moonrise$getEntityLookup`().get(entityId)?.bukkitEntity
             if (entity != null) {
                 return entity

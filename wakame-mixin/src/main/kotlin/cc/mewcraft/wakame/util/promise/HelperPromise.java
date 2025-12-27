@@ -25,7 +25,7 @@
 
 package cc.mewcraft.wakame.util.promise;
 
-import cc.mewcraft.wakame.PluginHolder;
+import cc.mewcraft.wakame.PluginProvider;
 import cc.mewcraft.wakame.util.exception.HelperExceptions;
 import cc.mewcraft.wakame.util.interfaces.Delegate;
 import cc.mewcraft.wakame.util.scheduler.HelperExecutors;
@@ -159,7 +159,7 @@ final class HelperPromise<V> implements Promise<V> {
         if (delayTicks <= 0) {
             executeSync(runnable);
         } else {
-            Bukkit.getScheduler().runTaskLater(PluginHolder.getInstance(), HelperExceptions.wrapSchedulerTask(runnable), delayTicks);
+            Bukkit.getScheduler().runTaskLater(PluginProvider.getInstance(), HelperExceptions.wrapSchedulerTask(runnable), delayTicks);
         }
     }
 
@@ -167,7 +167,7 @@ final class HelperPromise<V> implements Promise<V> {
         if (delayTicks <= 0) {
             executeAsync(runnable);
         } else {
-            Bukkit.getScheduler().runTaskLaterAsynchronously(PluginHolder.getInstance(), HelperExceptions.wrapSchedulerTask(runnable), delayTicks);
+            Bukkit.getScheduler().runTaskLaterAsynchronously(PluginProvider.getInstance(), HelperExceptions.wrapSchedulerTask(runnable), delayTicks);
         }
     }
 
@@ -175,7 +175,7 @@ final class HelperPromise<V> implements Promise<V> {
         if (delay <= 0) {
             executeSync(runnable);
         } else {
-            Bukkit.getScheduler().runTaskLater(PluginHolder.getInstance(), HelperExceptions.wrapSchedulerTask(runnable), Ticks.from(delay, unit));
+            Bukkit.getScheduler().runTaskLater(PluginProvider.getInstance(), HelperExceptions.wrapSchedulerTask(runnable), Ticks.from(delay, unit));
         }
     }
 

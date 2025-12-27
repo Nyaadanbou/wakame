@@ -25,7 +25,7 @@
 
 package cc.mewcraft.wakame.util.scheduler;
 
-import cc.mewcraft.wakame.PluginHolder;
+import cc.mewcraft.wakame.PluginProvider;
 import cc.mewcraft.wakame.util.exception.HelperExceptions;
 import org.bukkit.Bukkit;
 
@@ -59,14 +59,14 @@ public final class HelperExecutors {
     private static final class BukkitSyncExecutor implements Executor {
         @Override
         public void execute(Runnable runnable) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(PluginHolder.getInstance(), HelperExceptions.wrapSchedulerTask(runnable));
+            Bukkit.getScheduler().scheduleSyncDelayedTask(PluginProvider.getInstance(), HelperExceptions.wrapSchedulerTask(runnable));
         }
     }
 
     private static final class BukkitAsyncExecutor implements Executor {
         @Override
         public void execute(Runnable runnable) {
-            Bukkit.getScheduler().runTaskAsynchronously(PluginHolder.getInstance(), HelperExceptions.wrapSchedulerTask(runnable));
+            Bukkit.getScheduler().runTaskAsynchronously(PluginProvider.getInstance(), HelperExceptions.wrapSchedulerTask(runnable));
         }
     }
 

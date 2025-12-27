@@ -25,7 +25,7 @@
 
 package cc.mewcraft.wakame.util.event.functional.merged;
 
-import cc.mewcraft.wakame.PluginHolder;
+import cc.mewcraft.wakame.PluginProvider;
 import cc.mewcraft.wakame.util.event.MergedSubscription;
 import org.jspecify.annotations.NullMarked;
 
@@ -57,7 +57,7 @@ class MergedHandlerListImpl<T> implements MergedHandlerList<T> {
         }
 
         HelperMergedEventListener<T> listener = new HelperMergedEventListener<>(this.builder, this.handlers);
-        listener.register(PluginHolder.getInstance());
+        listener.register(PluginProvider.getInstance());
         return listener;
     }
 }

@@ -2,7 +2,6 @@
 
 package cc.mewcraft.wakame.entity.attribute
 
-import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.key.Identified
 import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.optionalEntry
@@ -141,7 +140,7 @@ protected constructor(
         return value
     }
 
-    override val identifier: Identifier = Key.key(Namespaces.ATTRIBUTE, id)
+    override val identifier: Identifier = Key.key("attribute", id)
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(

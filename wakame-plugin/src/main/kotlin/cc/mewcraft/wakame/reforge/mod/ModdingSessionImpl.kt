@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.reforge.mod
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.entity.attribute.bundle.element
-import cc.mewcraft.wakame.integration.economy.EconomyManager
+import cc.mewcraft.wakame.integration.economy.EconomyIntegration2
 import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.data.impl.*
 import cc.mewcraft.wakame.item.getData
@@ -361,11 +361,11 @@ internal object ReforgeCost {
 
     private class Simple(viewer: Player, val currencyAmount: Double) : ModdingSession.ReforgeCost {
         override fun take(viewer: Player) {
-            EconomyManager.take(viewer.uniqueId, currencyAmount)
+            EconomyIntegration2.take(viewer.uniqueId, currencyAmount)
         }
 
         override fun test(viewer: Player): Boolean {
-            return EconomyManager.has(viewer.uniqueId, currencyAmount).getOrDefault(false)
+            return EconomyIntegration2.has(viewer.uniqueId, currencyAmount).getOrDefault(false)
         }
 
         override val description: List<Component> = listOf(

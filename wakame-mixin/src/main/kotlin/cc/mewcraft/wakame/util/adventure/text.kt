@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.util.adventure
 
-import cc.mewcraft.wakame.MM
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.BuildableComponent
 import net.kyori.adventure.text.Component
@@ -57,7 +56,7 @@ private val legacyMiniMessage: MiniMessage = MiniMessage.builder()
     .preProcessor { input ->
         val input2: String = ChatColor.translateAlternateColorCodes('&', input).replace(newlineRegex, "\n")
         val input3: TextComponent = legacyComponentSerializer.deserialize(input2)
-        val input4: String = MM.serialize(input3)
+        val input4: String = MiniMessage.miniMessage().serialize(input3)
         input4.replace(escapedAngleBracketRegex, "<")
     }
     .build()

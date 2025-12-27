@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -95,7 +94,7 @@ internal object CatalogItemLootTableRecipeRegistryLoader : RegistryLoader {
                         }
                     }
                 } catch (e: Throwable) {
-                    Util.pauseInIde(IllegalStateException("Can't load catalog loot table recipes in file: '${file.relativeTo(lootTableDir)}'", e))
+                    IdePauser.pauseInIde(IllegalStateException("Can't load catalog loot table recipes in file: '${file.relativeTo(lootTableDir)}'", e))
                 }
             }
 

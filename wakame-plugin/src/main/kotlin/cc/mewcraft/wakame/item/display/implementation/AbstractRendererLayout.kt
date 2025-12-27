@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.display.implementation
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.item.display.*
 import cc.mewcraft.wakame.util.argument.StringArgumentQueue
 import cc.mewcraft.wakame.util.yamlLoader
@@ -11,6 +10,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.spongepowered.configurate.kotlin.extensions.getList
 import java.nio.file.Path
 import kotlin.io.path.readText
@@ -198,7 +198,7 @@ internal abstract class AbstractRendererLayout(
     }
 
     private fun deserializeToComponents(text: String): List<Component> {
-        return text.split("\\r").map(MM::deserialize)
+        return text.split("\\r").map(MiniMessage.miniMessage()::deserialize)
     }
 
     override fun getOrdinal(index: DerivedIndex): DerivedOrdinal {
