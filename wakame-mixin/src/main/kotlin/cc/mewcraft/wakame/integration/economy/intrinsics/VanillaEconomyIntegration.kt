@@ -26,6 +26,10 @@ internal object VanillaEconomyIntegration : EconomyIntegration2 {
         return Result.success(value)
     }
 
+    override fun hasAcc(user: UUID, amount: Double, currency: String?): Result<Boolean> {
+        return Result.failure(UnsupportedOperationException())
+    }
+
     override fun take(user: UUID, amount: Double, currency: String?): Result<Boolean> {
         val player = getPlayer(user)
         if (player.level < amount.toInt()) {

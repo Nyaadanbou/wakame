@@ -11,6 +11,8 @@ interface EconomyIntegration2 {
 
     fun has(user: UUID, amount: Double, currency: String? = null): Result<Boolean>
 
+    fun hasAcc(user: UUID, amount: Double, currency: String? = null): Result<Boolean>
+
     fun take(user: UUID, amount: Double, currency: String? = null): Result<Boolean>
 
     fun give(user: UUID, amount: Double, currency: String? = null): Result<Boolean>
@@ -25,8 +27,9 @@ interface EconomyIntegration2 {
 
         override val type: EconomyType get() = implementation.type
         override val defaultCurrency: String? get() = implementation.defaultCurrency
-        override fun has(user: UUID, amount: Double, currency: String?): Result<Boolean> = implementation.has(user, amount, currency) ?: Result.success(false)
-        override fun take(user: UUID, amount: Double, currency: String?): Result<Boolean> = implementation.take(user, amount, currency) ?: Result.success(false)
-        override fun give(user: UUID, amount: Double, currency: String?): Result<Boolean> = implementation.give(user, amount, currency) ?: Result.success(false)
+        override fun has(user: UUID, amount: Double, currency: String?): Result<Boolean> = implementation.has(user, amount, currency)
+        override fun hasAcc(user: UUID, amount: Double, currency: String?): Result<Boolean> = implementation.hasAcc(user, amount, currency)
+        override fun take(user: UUID, amount: Double, currency: String?): Result<Boolean> = implementation.take(user, amount, currency)
+        override fun give(user: UUID, amount: Double, currency: String?): Result<Boolean> = implementation.give(user, amount, currency)
     }
 }

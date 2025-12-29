@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.economy
 
+import cc.mewcraft.economy.api.Currency
 import cc.mewcraft.economy.api.EconomyProvider
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
@@ -22,10 +23,16 @@ object EconomyHook {
 
 private class EconomyIntegrationImpl : EconomyIntegration2 {
 
-    override val type: EconomyType = EconomyType.ECONOMY
+    private val defaultCurrencyObject: Currency
+        get() = EconomyProvider.get().defaultCurrency
+
+    ////
+
+    override val type: EconomyType
+        get() = EconomyType.ECONOMY
 
     override val defaultCurrency: String
-        get() = EconomyProvider.get().defaultCurrency.name
+        get() = defaultCurrencyObject.name
 
     override fun has(user: UUID, amount: Double, currency: String?): Result<Boolean> {
         return runCatching {
@@ -34,6 +41,20 @@ private class EconomyIntegrationImpl : EconomyIntegration2 {
                 economy.getBalance(user)
             } else {
                 economy.getBalance(user, economy.getCurrency(currency) ?: throw IllegalArgumentException("Currency $currency not found"))
+            }
+            val result = balance >= amount
+            result
+        }
+    }
+
+    override fun hasAcc(user: UUID, amount: Double, currency: String?): Result<Boolean> {
+        return runCatching {
+            val economy = EconomyProvider.get()
+            val account = economy.getAccount(user) ?: return Result.failure(IllegalArgumentException("Account $user not found"))
+            val balance = if (currency == null) {
+                account.getHeapBalance(currency ?: defaultCurrencyObject)
+            } else {
+                account.getHeapBalance(currency)
             }
             val result = balance >= amount
             result
