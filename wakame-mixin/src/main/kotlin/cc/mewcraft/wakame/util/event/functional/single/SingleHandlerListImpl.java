@@ -25,7 +25,7 @@
 
 package cc.mewcraft.wakame.util.event.functional.single;
 
-import cc.mewcraft.wakame.PluginHolder;
+import cc.mewcraft.wakame.PluginProvider;
 import cc.mewcraft.wakame.util.event.SingleSubscription;
 import org.bukkit.event.Event;
 import org.jspecify.annotations.NullMarked;
@@ -58,7 +58,7 @@ class SingleHandlerListImpl<T extends Event> implements SingleHandlerList<T> {
         }
 
         HelperEventListener<T> listener = new HelperEventListener<>(this.builder, this.handlers);
-        listener.register(PluginHolder.getInstance());
+        listener.register(PluginProvider.get());
         return listener;
     }
 }

@@ -22,7 +22,7 @@ import cc.mewcraft.wakame.api.Koish as IKoish
 internal object KoishPlugin : JavaPlugin(), IKoish {
 
     override fun onLoad() {
-        PluginHolder.register(this)
+        PluginProvider.set(this)
     }
 
     override fun onEnable() {
@@ -94,7 +94,7 @@ internal object KoishPlugin : JavaPlugin(), IKoish {
     override fun getItemRegistry(): KoishItemRegistry = ApiItemRegistry
 
     override fun registerProtectionIntegration(integration: ProtectionIntegration) {
-        ProtectionManager.integrations += integration
+        ProtectionManager.addImplementation(integration)
     }
     //</editor-fold>
 }

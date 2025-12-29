@@ -7,7 +7,7 @@ import org.bukkit.entity.Player
  */
 interface PlayerManaIntegration {
 
-    val manaType: PlayerManaType
+    val type: PlayerManaType
 
     /**
      * Gets the current mana of the player.
@@ -44,11 +44,13 @@ interface PlayerManaIntegration {
 
     companion object : PlayerManaIntegration {
 
-        override val manaType: PlayerManaType get() = implementation.manaType
-        override fun getMana(player: Player): Double = implementation.getMana(player)
-        override fun setMana(player: Player, amount: Double) = implementation.setMana(player, amount)
-        override fun getMaxMana(player: Player): Double = implementation.getMaxMana(player)
-        override fun consumeMana(player: Player, amount: Double): Boolean = implementation.consumeMana(player, amount)
+        private var implementation: PlayerManaIntegration = object : PlayerManaIntegration {
+            override val type: PlayerManaType = PlayerManaType.INFINITY
+            override fun getMana(player: Player): Double = Double.MAX_VALUE
+            override fun setMana(player: Player, amount: Double) {}
+            override fun getMaxMana(player: Player): Double = Double.MAX_VALUE
+            override fun consumeMana(player: Player, amount: Double): Boolean = true
+        }
 
         /**
          * 设置当前的实现.
@@ -57,21 +59,10 @@ interface PlayerManaIntegration {
             implementation = impl
         }
 
-        /**
-         * 无限魔法实现.
-         */
-        private val INFINITE = object : PlayerManaIntegration {
-            override val manaType: PlayerManaType = PlayerManaType.ZERO
-            override fun getMana(player: Player): Double = Double.MAX_VALUE
-            override fun setMana(player: Player, amount: Double) {}
-            override fun getMaxMana(player: Player): Double = Double.MAX_VALUE
-            override fun consumeMana(player: Player, amount: Double): Boolean = true
-        }
-
-        /**
-         * 当前实现.
-         */
-        private var implementation: PlayerManaIntegration = INFINITE
+        override val type: PlayerManaType get() = implementation.type
+        override fun getMana(player: Player): Double = implementation.getMana(player)
+        override fun setMana(player: Player, amount: Double) = implementation.setMana(player, amount)
+        override fun getMaxMana(player: Player): Double = implementation.getMaxMana(player)
+        override fun consumeMana(player: Player, amount: Double): Boolean = implementation.consumeMana(player, amount)
     }
-
 }

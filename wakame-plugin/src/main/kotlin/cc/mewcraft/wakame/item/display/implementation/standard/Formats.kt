@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.display.implementation.standard
 
-import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item.data.impl.*
 import cc.mewcraft.wakame.item.display.*
@@ -12,6 +11,7 @@ import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.entity.EntityType
@@ -69,7 +69,7 @@ internal data class AttackSpeedRendererFormat(
 
     fun render(data: RegistryEntry<AttackSpeed>): IndexedText {
         val resolver = Placeholder.component("value", data.unwrap().displayName)
-        return SimpleIndexedText(index, listOf(MM.deserialize(tooltip.line, resolver)))
+        return SimpleIndexedText(index, listOf(MiniMessage.miniMessage().deserialize(tooltip.line, resolver)))
     }
 
     @ConfigSerializable
@@ -94,36 +94,36 @@ internal data class EntityBucketInfoRendererFormat(
         val lines = arrayListOf<Component>()
 
         // 内容物加上
-        lines += content.map { MM.deserialize(it, Placeholder.component("entity_type", info.typeName)) }
+        lines += content.map { MiniMessage.miniMessage().deserialize(it, Placeholder.component("entity_type", info.typeName)) }
 
         // 先把抽象的部分加上
         if (info is EntityBucketInfo.Ageable) {
             val unparsed = abstract[AbstractType.AGEABLE] ?: emptyList()
             val resolver = Placeholder.unparsed("is_adult", if (info.isAdult) "是" else "否")
-            lines += unparsed.map { MM.deserialize(it, resolver) }
+            lines += unparsed.map { MiniMessage.miniMessage().deserialize(it, resolver) }
         }
         if (info is EntityBucketInfo.CollarColorable) {
             val unparsed = abstract[AbstractType.COLLAR_COLORABLE] ?: emptyList()
             val resolver = Placeholder.unparsed("collar_color", info.collarColor)
-            lines += unparsed.map { MM.deserialize(it, resolver) }
+            lines += unparsed.map { MiniMessage.miniMessage().deserialize(it, resolver) }
         }
         if (info is EntityBucketInfo.Shearable) {
             val unparsed = abstract[AbstractType.SHEARABLE] ?: emptyList()
             val resolver = Placeholder.unparsed("ready_to_be_sheared", if (info.readyToBeSheared) "是" else "否")
-            lines += unparsed.map { MM.deserialize(it, resolver) }
+            lines += unparsed.map { MiniMessage.miniMessage().deserialize(it, resolver) }
         }
         if (info is EntityBucketInfo.Tameable) {
             val ownerName = info.ownerName
             if (ownerName != null) {
                 val unparsed = abstract[AbstractType.TAMEABLE] ?: emptyList()
                 val resolver = Placeholder.unparsed("owner_name", ownerName)
-                lines += unparsed.map { MM.deserialize(it, resolver) }
+                lines += unparsed.map { MiniMessage.miniMessage().deserialize(it, resolver) }
             }
         }
         if (info is EntityBucketInfo.Variable) {
             val unparsed = abstract[AbstractType.VARIABLE] ?: emptyList()
             val resolver = Placeholder.unparsed("variant", info.variant)
-            lines += unparsed.map { MM.deserialize(it, resolver) }
+            lines += unparsed.map { MiniMessage.miniMessage().deserialize(it, resolver) }
         }
 
         // 再把具体的部分加上
@@ -131,7 +131,7 @@ internal data class EntityBucketInfoRendererFormat(
             is ArmadilloEntityBucketInfo -> {
                 val unparsed = specific[EntityType.ARMADILLO] ?: emptyList()
                 val resolver = Placeholder.component("state", Component.text(info.state))
-                lines += unparsed.map { MM.deserialize(it, resolver) }
+                lines += unparsed.map { MiniMessage.miniMessage().deserialize(it, resolver) }
             }
 
             is GoatEntityBucketInfo -> {
@@ -140,19 +140,19 @@ internal data class EntityBucketInfoRendererFormat(
                     .resolver(Placeholder.unparsed("has_left_horn", if (info.hasLeftHorn) "有" else "无"))
                     .resolver(Placeholder.unparsed("has_right_horn", if (info.hasRightHorn) "有" else "无"))
                     .build()
-                lines += unparsed.map { MM.deserialize(it, resolver) }
+                lines += unparsed.map { MiniMessage.miniMessage().deserialize(it, resolver) }
             }
 
             is OcelotEntityBucketInfo -> {
                 val unparsed = specific[EntityType.OCELOT] ?: emptyList()
                 val resolver = Placeholder.unparsed("trusting", if (info.trusting) "是" else "否")
-                lines += unparsed.map { MM.deserialize(it, resolver) }
+                lines += unparsed.map { MiniMessage.miniMessage().deserialize(it, resolver) }
             }
 
             is TurtleEntityBucketInfo -> {
                 val unparsed = specific[EntityType.TURTLE] ?: emptyList()
                 val resolver = Placeholder.unparsed("has_egg", if (info.hasEgg) "是" else "否")
-                lines += unparsed.map { MM.deserialize(it, resolver) }
+                lines += unparsed.map { MiniMessage.miniMessage().deserialize(it, resolver) }
             }
 
             is AllayEntityBucketInfo -> {
@@ -161,19 +161,19 @@ internal data class EntityBucketInfoRendererFormat(
                     .resolver(Placeholder.unparsed("item_in_mainhand", info.itemInMainhand ?: "无"))
                     .resolver(Placeholder.unparsed("item_in_offhand", info.itemInOffhand ?: "无"))
                     .build()
-                lines += unparsed.map { MM.deserialize(it, resolver) }
+                lines += unparsed.map { MiniMessage.miniMessage().deserialize(it, resolver) }
             }
 
             is IronGolemEntityBucketInfo -> {
                 val unparsed = specific[EntityType.IRON_GOLEM] ?: emptyList()
                 val resolver = Placeholder.unparsed("player_created", if (info.isPlayerCreated) "是" else "否")
-                lines += unparsed.map { MM.deserialize(it, resolver) }
+                lines += unparsed.map { MiniMessage.miniMessage().deserialize(it, resolver) }
             }
 
             is SnowGolemEntityBucketInfo -> {
                 val unparsed = specific[EntityType.SNOW_GOLEM] ?: emptyList()
                 val resolver = Placeholder.unparsed("pumpkin_type", if (info.hasPumpkin) "有" else "无")
-                lines += unparsed.map { MM.deserialize(it, resolver) }
+                lines += unparsed.map { MiniMessage.miniMessage().deserialize(it, resolver) }
             }
 
             is VillagerEntityBucketInfo -> {
@@ -183,7 +183,7 @@ internal data class EntityBucketInfoRendererFormat(
                     .resolver(Placeholder.unparsed("region", info.region))
                     .resolver(Placeholder.unparsed("profession", info.profession))
                     .build()
-                lines += unparsed.map { MM.deserialize(it, resolver) }
+                lines += unparsed.map { MiniMessage.miniMessage().deserialize(it, resolver) }
             }
 
             is WanderingTraderEntityBucketInfo -> {
@@ -196,7 +196,7 @@ internal data class EntityBucketInfoRendererFormat(
                     .resolver(Placeholder.unparsed("region", info.region))
                     .resolver(Placeholder.unparsed("profession", info.profession))
                     .build()
-                lines += unparsed.map { MM.deserialize(it, resolver) }
+                lines += unparsed.map { MiniMessage.miniMessage().deserialize(it, resolver) }
             }
 
             else -> {}
@@ -239,22 +239,22 @@ internal data class CastableRendererFormat(
         val lines = when (skillTrigger) {
             is SpecialCastableTrigger -> {
                 val line = triggerConfig.special.generate(skillTrigger)
-                content.map { MM.deserialize(it, Placeholder.component("trigger", line)) }
+                content.map { MiniMessage.miniMessage().deserialize(it, Placeholder.component("trigger", line)) }
             }
 
             is GenericCastableTrigger -> {
                 val line = triggerConfig.generic.generate(skillTrigger)
-                content.map { MM.deserialize(it, Placeholder.component("trigger", line)) }
+                content.map { MiniMessage.miniMessage().deserialize(it, Placeholder.component("trigger", line)) }
             }
 
             is SequenceCastableTrigger -> {
                 val line = triggerConfig.sequence.generate(skillTrigger)
-                content.map { MM.deserialize(it, Placeholder.component("trigger", line)) }
+                content.map { MiniMessage.miniMessage().deserialize(it, Placeholder.component("trigger", line)) }
             }
 
             is InputCastableTrigger -> {
                 val line = triggerConfig.input.generate(skillTrigger)
-                content.map { MM.deserialize(it, Placeholder.component("trigger", line)) }
+                content.map { MiniMessage.miniMessage().deserialize(it, Placeholder.component("trigger", line)) }
             }
         }
         return lines

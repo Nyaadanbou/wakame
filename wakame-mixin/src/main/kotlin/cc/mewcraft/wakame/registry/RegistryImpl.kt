@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SharedConstants
-import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
+import cc.mewcraft.wakame.util.IdePauser
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import it.unimi.dsi.fastutil.objects.*
@@ -49,17 +49,17 @@ open class SimpleRegistry<T>(
 
             return entry
         } else {
-            throw Util.pauseInIde(IllegalStateException("Trying to update unregistered key '$key' in registry ${this.key}"))
+            throw IdePauser.pauseInIde(IllegalStateException("Trying to update unregistered key '$key' in registry ${this.key}"))
         }
     }
 
     override fun add(key: RegistryKey<T>, value: T): RegistryEntry.Reference<T> {
         if (frozen) {
-            throw Util.pauseInIde(IllegalStateException("Adding new entry to frozen registry '${this.key}'"))
+            throw IdePauser.pauseInIde(IllegalStateException("Adding new entry to frozen registry '${this.key}'"))
         } else if (this.idToEntry.containsKey(key.value)) {
-            throw Util.pauseInIde(IllegalStateException("Adding duplicate key '$key' to registry '${this.key}'"))
+            throw IdePauser.pauseInIde(IllegalStateException("Adding duplicate key '$key' to registry '${this.key}'"))
         } else if (this.valueToEntry.containsKey(value)) {
-            throw Util.pauseInIde(IllegalStateException("Adding duplicate value '$value' to registry '${this.key}'"))
+            throw IdePauser.pauseInIde(IllegalStateException("Adding duplicate value '$value' to registry '${this.key}'"))
         } else {
             // 如果已经存在 intrusiveReferenceEntry, 就不再创建新的 entry,
             // 而是把函数传递进来的数据绑定到它上面, 并且将这个 entry 储存在注册表当中.
@@ -138,7 +138,7 @@ open class SimpleRegistry<T>(
         }
 
         if (frozen) {
-            throw Util.pauseInIde(IllegalStateException("Trying to create intrusive entry for '$id' in frozen registry '${this.key}'"))
+            throw IdePauser.pauseInIde(IllegalStateException("Trying to create intrusive entry for '$id' in frozen registry '${this.key}'"))
         }
 
         // 序列化可能会在该注册表未加载数据时, 多次使用同一个 id 创建 intrusive entry.

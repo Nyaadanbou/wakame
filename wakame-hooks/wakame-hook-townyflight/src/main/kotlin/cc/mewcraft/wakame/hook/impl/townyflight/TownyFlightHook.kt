@@ -12,8 +12,15 @@ import com.palmergames.util.TimeMgmt
 import org.bukkit.Location
 import org.bukkit.entity.Player
 
-@Hook(plugins = ["TownyFlight"])
-object TownyFlightHook : TownFlightIntegration {
+@Hook(plugins = ["Towny", "TownyFlight"], requireAll = true)
+object TownyFlightHook {
+
+    init {
+        TownFlightIntegration.setImplementation(TownFlightIntegrationImpl())
+    }
+}
+
+private class TownFlightIntegrationImpl : TownFlightIntegration {
 
     override fun canFly(player: Player, silent: Boolean): Boolean {
         return TownyFlightAPI.getInstance().canFly(player, silent)
@@ -35,10 +42,10 @@ object TownyFlightHook : TownFlightIntegration {
     override fun addTempFlight(player: Player, seconds: Long, silent: Boolean) {
         val uuid = player.uniqueId
         val formattedTimeValue = TimeMgmt.getFormattedTimeValue(seconds * 1000.0)
-        MetaData.addTempFlight(uuid, seconds.toLong())
+        MetaData.addTempFlight(uuid, seconds)
 
         if (player.isOnline) {
-            TempFlightTask.addPlayerTempFlightSeconds(uuid, seconds.toLong())
+            TempFlightTask.addPlayerTempFlightSeconds(uuid, seconds)
             Message.of(String.format(Message.getLangString("youHaveReceivedTempFlight"), formattedTimeValue)).to(player)
 
             if (Settings.autoEnableFlight && TownyFlightAPI.getInstance().canFly(player, true)) {

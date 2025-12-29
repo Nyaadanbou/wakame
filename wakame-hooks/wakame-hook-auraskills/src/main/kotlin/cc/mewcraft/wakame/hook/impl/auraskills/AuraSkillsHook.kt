@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.hook.impl.auraskills
 
 import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.config.MAIN_CONFIG
+import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.entity.player.PlayerDataLoadingCoordinator
 import cc.mewcraft.wakame.entity.player.ResourceLoadingFixHandler
 import cc.mewcraft.wakame.integration.Hook
@@ -16,13 +18,21 @@ import org.bukkit.entity.Player
 import java.util.*
 
 @Hook(plugins = ["AuraSkills"])
-object AuraSkillsHook :
-    ResourceLoadingFixHandler by AuraResourceLoadingFixHandler,
-    PlayerLevelIntegration by AuraPlayerLevelIntegration,
-    PlayerManaIntegration by AuraPlayerManaIntegration {
+object AuraSkillsHook : PlayerManaIntegration by AuraPlayerManaIntegration {
+
+    private val PLAYER_LEVEL_PROVIDER by MAIN_CONFIG.entry<PlayerLevelType>("player_level_provider")
+    private val PLAYER_MANA_PROVIDER by MAIN_CONFIG.entry<PlayerManaType>("player_mana_provider")
 
     init {
-        PlayerDataLoadingCoordinator.registerExternalStage2Handler("AuraSkills")
+        if (PLAYER_LEVEL_PROVIDER == PlayerLevelType.AURA_SKILLS) {
+            PlayerLevelIntegration.setImplementation(AuraPlayerLevelIntegration)
+            PlayerDataLoadingCoordinator.registerExternalStage2Handler("AuraSkills")
+            ResourceLoadingFixHandler.setImplementation(AuraResourceLoadingFixHandler)
+        }
+
+        if (PLAYER_MANA_PROVIDER == PlayerManaType.AURA_SKILLS) {
+            PlayerManaIntegration.setImplementation(AuraPlayerManaIntegration)
+        }
 
         registerTraits()
         registerTraitHandlers()
@@ -72,7 +82,6 @@ object AuraSkillsHook :
 private object AuraResourceLoadingFixHandler : ResourceLoadingFixHandler {
 
     override fun fix() {
-
         event<UserLoadEvent> { event ->
             val player = event.player
             PlayerDataLoadingCoordinator.getOrCreateSession(player).completeStage2()
@@ -84,7 +93,7 @@ private object AuraPlayerLevelIntegration : PlayerLevelIntegration {
 
     private val auraApi: AuraSkillsApi by lazy { AuraSkillsApi.get() }
 
-    override val levelType: PlayerLevelType = PlayerLevelType.AURA_SKILLS
+    override val type: PlayerLevelType = PlayerLevelType.AURA_SKILLS
 
     override fun get(uuid: UUID): Int? {
         val user = auraApi.getUser(uuid)
@@ -101,7 +110,7 @@ private object AuraPlayerManaIntegration : PlayerManaIntegration {
 
     private val auraApi: AuraSkillsApi by lazy { AuraSkillsApi.get() }
 
-    override val manaType: PlayerManaType = PlayerManaType.AURA_SKILLS
+    override val type: PlayerManaType = PlayerManaType.AURA_SKILLS
 
     override fun getMana(player: Player): Double {
         return getAuraUser(player).mana

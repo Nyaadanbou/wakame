@@ -3,7 +3,6 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorContainer
 import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
@@ -85,7 +84,7 @@ internal object CustomItemRegistryLoader : RegistryLoader {
                 consumer(itemId, itemValue)
             } catch (e: Exception) {
                 LOGGER.error("Failed to load custom item config: {}", f.path)
-                Util.pauseInIde(e)
+                IdePauser.pauseInIde(e)
             }
         }
     }
@@ -142,7 +141,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
                 consumer(itemId, itemValue)
             } catch (e: Exception) {
                 LOGGER.error("Failed to load item proxy config: {}", f.path)
-                Util.pauseInIde(e)
+                IdePauser.pauseInIde(e)
             }
         }
     }

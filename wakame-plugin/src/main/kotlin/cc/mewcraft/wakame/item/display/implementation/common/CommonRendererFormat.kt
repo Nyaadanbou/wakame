@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.display.implementation.common
 
-import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.item.data.impl.AttributeCore
 import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.item.display.*
@@ -11,6 +10,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectImmutableList
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.component
 import org.bukkit.enchantments.Enchantment
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -40,9 +40,9 @@ internal data class ExtraLoreRendererFormat(
      */
     fun render(data: List<Component>): IndexedText {
         val size = tooltip.header.size + data.size + tooltip.bottom.size
-        val lines = data.mapTo(ObjectArrayList(size)) { MM.deserialize(tooltip.line, component("line", it)) }
-        val header: List<Component> = tooltip.header.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.header.size), MM::deserialize) ?: ObjectImmutableList.of()
-        val bottom: List<Component> = tooltip.bottom.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.bottom.size), MM::deserialize) ?: ObjectImmutableList.of()
+        val lines = data.mapTo(ObjectArrayList(size)) { MiniMessage.miniMessage().deserialize(tooltip.line, component("line", it)) }
+        val header: List<Component> = tooltip.header.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.header.size), MiniMessage.miniMessage()::deserialize) ?: ObjectImmutableList.of()
+        val bottom: List<Component> = tooltip.bottom.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.bottom.size), MiniMessage.miniMessage()::deserialize) ?: ObjectImmutableList.of()
         lines.addAll(0, header)
         lines.addAll(bottom)
         return SimpleIndexedText(index, lines)
@@ -97,7 +97,7 @@ internal data class RarityRendererFormat(
     fun renderSimple(rarity: RegistryEntry<Rarity>): IndexedText {
         return SimpleIndexedText(
             index, listOf(
-                MM.deserialize(
+                MiniMessage.miniMessage().deserialize(
                     simple,
                     component("rarity_display_name", rarity.unwrap().displayName)
                 )
@@ -108,7 +108,7 @@ internal data class RarityRendererFormat(
     fun renderComplex(rarity: RegistryEntry<Rarity>, modCount: Int): IndexedText {
         return SimpleIndexedText(
             index, listOf(
-                MM.deserialize(
+                MiniMessage.miniMessage().deserialize(
                     complex,
                     component("rarity_display_name", rarity.unwrap().displayName),
                     component("reforge_mod_count", Component.text(modCount.toString()))

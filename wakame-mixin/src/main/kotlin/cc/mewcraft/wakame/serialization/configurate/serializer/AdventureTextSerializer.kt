@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.serialization.configurate.serializer
 
-import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import org.spongepowered.configurate.serialize.ScalarSerializer
 import java.lang.reflect.Type
@@ -63,11 +63,11 @@ object JsonStyleBuilderApplicableSerializer : ScalarSerializer<Array<StyleBuilde
 //region MiniMessage <-> Component
 object MiniMessageComponentSerializer : ScalarSerializer<Component>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Component {
-        return MM.deserialize(obj.toString().replace("§", ""))
+        return MiniMessage.miniMessage().deserialize(obj.toString().replace("§", ""))
     }
 
     override fun serialize(item: Component, typeSupported: Predicate<Class<*>>?): Any {
-        return MM.serialize(item)
+        return MiniMessage.miniMessage().serialize(item)
     }
 }
 
@@ -78,7 +78,7 @@ object MiniMessageStyleSerializer : ScalarSerializer<Style>(typeTokenOf()) {
 
     override fun serialize(item: Style, typeSupported: Predicate<Class<*>>?): Any {
         val component = Component.text().style(item).build()
-        return MM.serialize(component)
+        return MiniMessage.miniMessage().serialize(component)
     }
 }
 
@@ -103,7 +103,7 @@ object MiniMessageStyleBuilderApplicableSerializer : ScalarSerializer<Array<Styl
 
     override fun serialize(item: Array<StyleBuilderApplicable>, typeSupported: Predicate<Class<*>>?): Any {
         val component = Component.text().style { builder -> item.forEach(builder::apply) }.build()
-        return MM.serialize(component)
+        return MiniMessage.miniMessage().serialize(component)
     }
 }
 //endregion

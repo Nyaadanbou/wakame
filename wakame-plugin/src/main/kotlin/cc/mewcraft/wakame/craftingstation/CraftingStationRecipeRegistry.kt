@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.craftingstation
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.craftingstation.recipe.RecipeChoice
 import cc.mewcraft.wakame.craftingstation.recipe.RecipeResult
@@ -75,7 +74,7 @@ internal object CraftingStationRecipeRegistry {
 
             } catch (e: Throwable) {
                 val message = "Can't load station recipe: '${file.relativeTo(recipeDir)}'"
-                Util.pauseInIde(IllegalArgumentException(message, e))
+                IdePauser.pauseInIde(IllegalArgumentException(message, e))
                 LOGGER.warn(message, e)
             }
         }

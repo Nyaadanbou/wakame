@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.integration.playerlevel
 
-import cc.mewcraft.wakame.SERVER
+import org.bukkit.Bukkit
 import java.util.*
 
 /**
@@ -12,7 +12,7 @@ interface PlayerLevelIntegration {
      * 当前钩子的类型.
      * 允许在多个钩子存在的情况下, 让用户选择指定的等级系统.
      */
-    val levelType: PlayerLevelType
+    val type: PlayerLevelType
 
     /**
      * Gets the player's level from the player's UUID.
@@ -33,32 +33,17 @@ interface PlayerLevelIntegration {
      * 该伴生类持有了 [PlayerLevelIntegration] 的当前实现.
      */
     companion object : PlayerLevelIntegration {
-        private var currImpl: PlayerLevelIntegration = ZeroLevelIntegration
+
+        private var implementation: PlayerLevelIntegration = VanillaLevelIntegration
 
         fun setImplementation(impl: PlayerLevelIntegration) {
-            currImpl = impl
+            implementation = impl
         }
 
-        override val levelType: PlayerLevelType
-            get() = currImpl.levelType
-
-        override fun get(uuid: UUID): Int? {
-            return currImpl.get(uuid)
-        }
-
-        override fun getOrDefault(uuid: UUID, def: Int): Int {
-            return get(uuid) ?: def
-        }
+        override val type: PlayerLevelType get() = implementation.type
+        override fun get(uuid: UUID): Int? = implementation.get(uuid)
+        override fun getOrDefault(uuid: UUID, def: Int): Int = get(uuid) ?: def
     }
-}
-
-/**
- * A [player level integration][PlayerLevelIntegration] that always returns 0.
- * It can be used when requested implementation is not available at runtime.
- */
-private object ZeroLevelIntegration : PlayerLevelIntegration {
-    override val levelType: PlayerLevelType = PlayerLevelType.ZERO
-    override fun get(uuid: UUID): Int = 0
 }
 
 /**
@@ -66,6 +51,6 @@ private object ZeroLevelIntegration : PlayerLevelIntegration {
  * [vanilla experience level](https://minecraft.wiki/w/Experience).
  */
 private object VanillaLevelIntegration : PlayerLevelIntegration {
-    override val levelType: PlayerLevelType = PlayerLevelType.VANILLA
-    override fun get(uuid: UUID): Int? = SERVER.getPlayer(uuid)?.level
+    override val type: PlayerLevelType = PlayerLevelType.VANILLA
+    override fun get(uuid: UUID): Int? = Bukkit.getServer().getPlayer(uuid)?.level
 }

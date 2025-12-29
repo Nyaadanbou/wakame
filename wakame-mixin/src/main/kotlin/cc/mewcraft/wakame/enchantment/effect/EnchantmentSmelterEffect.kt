@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.enchantment.effect
 
-import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.ecs.configure
 import cc.mewcraft.wakame.enchantment.component.Smelter
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
@@ -12,6 +11,7 @@ import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityComponentContext
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.RecipeChoice
@@ -47,7 +47,7 @@ data class EnchantmentSmelterEffect(
 
     // 可用于魔咒效果的烧炼配方
     val registeredFurnaceRecipes: HashSet<FurnaceRecipe> by lazy {
-        SERVER.recipeIterator().asSequence()
+        Bukkit.getServer().recipeIterator().asSequence()
             .filterIsInstance<FurnaceRecipe>()
             .filterTo(HashSet()) {
                 val choice = it.inputChoice

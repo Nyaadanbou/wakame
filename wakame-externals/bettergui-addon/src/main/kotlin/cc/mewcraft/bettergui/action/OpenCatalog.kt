@@ -11,6 +11,16 @@ import me.hsgamer.hscore.task.element.TaskProcess
 import org.bukkit.Bukkit
 import java.util.*
 
+
+/**
+ * 打开图鉴.
+ *
+ * 格式:
+ *
+ * ```yaml
+ * open-catalog: <type>
+ * ```
+ */
 class OpenCatalog : Action {
 
     private val catalogType: CatalogType

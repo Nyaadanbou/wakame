@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.entity.attribute
 
-import cc.mewcraft.wakame.MM
-import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.config.optionalEntry
@@ -24,6 +22,7 @@ import com.google.common.collect.ImmutableMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -208,7 +207,7 @@ private class AttributeFacadeImpl<T : ConstantAttributeBundle, S : VariableAttri
     override val createTooltipName: (T) -> Component,
     override val createTooltipLore: (T) -> List<Component>,
 ) : AttributeFacade<T, S> {
-    override fun key(): Key = Key.key(Namespaces.ATTRIBUTE, id)
+    override fun key(): Key = Key.key("attribute", id)
 }
 
 private object AttributeConfigFallback {
@@ -372,13 +371,13 @@ private class SingleSelectionImpl(
                 ConstantAttributeBundleS(id, operation, value)
             },
             createTooltipName = {
-                MM.deserialize(displayName)
+                MiniMessage.miniMessage().deserialize(displayName)
             },
         ) { data ->
             val input = tooltips.line(data.operation)
             val resolver1 = tooltips.number("value", scaling.scale(data.operation, data.value))
             val resolver2 = tooltips.component("quality", quality.translate(data.quality))
-            listOf(MM.deserialize(input, resolver1, resolver2))
+            listOf(MiniMessage.miniMessage().deserialize(input, resolver1, resolver2))
         }
     }
 }
@@ -430,14 +429,14 @@ private class RangedSelectionImpl(
                 ConstantAttributeBundleR(id, operation, lower, upper)
             },
             createTooltipName = {
-                MM.deserialize(displayName)
+                MiniMessage.miniMessage().deserialize(displayName)
             },
         ) { data ->
             val lines = tooltips.line(data.operation)
             val resolver1 = tooltips.number("min", scaling.scale(data.operation, data.lower))
             val resolver2 = tooltips.number("max", scaling.scale(data.operation, data.upper))
             val resolver3 = tooltips.component("quality", quality.translate(data.quality))
-            listOf(MM.deserialize(lines, resolver1, resolver2, resolver3))
+            listOf(MiniMessage.miniMessage().deserialize(lines, resolver1, resolver2, resolver3))
         }
     }
 }
@@ -482,14 +481,14 @@ private class AttributeBinderSEImpl(
             },
             createTooltipName = {
                 val resolver = Placeholder.component("element", it.element.unwrap().displayName)
-                MM.deserialize(displayName, resolver)
+                MiniMessage.miniMessage().deserialize(displayName, resolver)
             },
         ) { data ->
             val input = tooltips.line(data.operation)
             val resolver1 = tooltips.number("value", scaling.scale(data.operation, data.value))
             val resolver2 = tooltips.component("element", data.element.unwrap().displayName)
             val resolver3 = tooltips.component("quality", quality.translate(data.quality))
-            listOf(MM.deserialize(input, resolver1, resolver2, resolver3))
+            listOf(MiniMessage.miniMessage().deserialize(input, resolver1, resolver2, resolver3))
         }
     }
 }
@@ -540,7 +539,7 @@ private class AttributeBinderREImpl(
             },
             createTooltipName = {
                 val resolver = Placeholder.component("element", it.element.unwrap().displayName)
-                MM.deserialize(displayName, resolver)
+                MiniMessage.miniMessage().deserialize(displayName, resolver)
             },
         ) { data ->
             val input = tooltips.line(data.operation)
@@ -548,7 +547,7 @@ private class AttributeBinderREImpl(
             val resolver2 = tooltips.number("max", scaling.scale(data.operation, data.upper))
             val resolver3 = tooltips.component("element", data.element.unwrap().displayName)
             val resolver4 = tooltips.component("quality", quality.translate(data.quality))
-            listOf(MM.deserialize(input, resolver1, resolver2, resolver3, resolver4))
+            listOf(MiniMessage.miniMessage().deserialize(input, resolver1, resolver2, resolver3, resolver4))
         }
     }
 }

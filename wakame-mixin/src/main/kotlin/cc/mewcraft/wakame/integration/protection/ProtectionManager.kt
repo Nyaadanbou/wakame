@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.integration.protection
 
-import cc.mewcraft.wakame.PluginHolder
+import cc.mewcraft.wakame.PluginProvider
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.api.tileentity.TileEntity
 import cc.mewcraft.wakame.context.Context
@@ -15,7 +15,6 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.jetbrains.annotations.ApiStatus
 
 //<editor-fold desc="ProtectionArgs classes", defaultstate="collapsed">
 private interface ProtectionArgs {
@@ -82,8 +81,11 @@ private data class CanHurtEntityTileArgs(override val tileEntity: TileEntity, va
  */
 object ProtectionManager {
 
-    @ApiStatus.Internal
-    val integrations = ArrayList<ProtectionIntegration>()
+    private val integrations: ArrayList<ProtectionIntegration> = ArrayList()
+
+    fun addImplementation(integration: ProtectionIntegration) {
+        integrations.add(integration)
+    }
 
     /**
      * Checks whether the given [ctx] passes place permission checks.
@@ -112,14 +114,14 @@ object ProtectionManager {
         if (tileEntity.owner == null) {
             return true
         }
-        return check0(CanPlaceTileArgs(tileEntity, item.clone(), pos.location)) { canPlace(tileEntity, item, pos.location) }
+        return check(CanPlaceTileArgs(tileEntity, item.clone(), pos.location)) { canPlace(tileEntity, item, pos.location) }
     }
 
     /**
      * Checks if the [player] can place that [item] at that [pos].
      */
     fun canPlace(player: OfflinePlayer, item: ItemStack, pos: BlockPos): Boolean {
-        return check0(CanPlaceUserArgs(player, item.clone(), pos.location)) { canPlace(player, item, pos.location) }
+        return check(CanPlaceUserArgs(player, item.clone(), pos.location)) { canPlace(player, item, pos.location) }
     }
 
 
@@ -127,7 +129,7 @@ object ProtectionManager {
      * Checks if the [player] can place that [item] at that [pos].
      */
     fun canPlace(player: Player, item: ItemStack, pos: BlockPos): Boolean {
-        return check0(CanPlaceUserArgs(player, item.clone(), pos.location)) { canPlace(player, item, pos.location) }
+        return check(CanPlaceUserArgs(player, item.clone(), pos.location)) { canPlace(player, item, pos.location) }
     }
 
     /**
@@ -157,21 +159,21 @@ object ProtectionManager {
         if (tileEntity.owner == null) {
             return true
         }
-        return check0(CanBreakTileArgs(tileEntity, item?.clone(), pos.location)) { canBreak(tileEntity, item, pos.location) }
+        return check(CanBreakTileArgs(tileEntity, item?.clone(), pos.location)) { canBreak(tileEntity, item, pos.location) }
     }
 
     /**
      * Checks if that [player] can break a block at that [pos] using that [item].
      */
     fun canBreak(player: OfflinePlayer, item: ItemStack?, pos: BlockPos): Boolean {
-        return check0(CanBreakUserArgs(player, item?.clone(), pos.location)) { canBreak(player, item, pos.location) }
+        return check(CanBreakUserArgs(player, item?.clone(), pos.location)) { canBreak(player, item, pos.location) }
     }
 
     /**
      * Checks if that [player] can break a block at that [pos] using that [item].
      */
     fun canBreak(player: Player, item: ItemStack?, pos: BlockPos): Boolean {
-        return check0(CanBreakUserArgs(player, item?.clone(), pos.location)) { canBreak(player, item, pos.location) }
+        return check(CanBreakUserArgs(player, item?.clone(), pos.location)) { canBreak(player, item, pos.location) }
     }
 
     /**
@@ -201,21 +203,21 @@ object ProtectionManager {
         if (tileEntity.owner == null) {
             return true
         }
-        return check0(CanUseBlockTileArgs(tileEntity, item?.clone(), pos.location)) { canUseBlock(tileEntity, item, pos.location) }
+        return check(CanUseBlockTileArgs(tileEntity, item?.clone(), pos.location)) { canUseBlock(tileEntity, item, pos.location) }
     }
 
     /**
      * Checks if the [player] can interact with a block at that [pos] using that [item].
      */
     fun canUseBlock(player: OfflinePlayer, item: ItemStack?, pos: BlockPos): Boolean {
-        return check0(CanUseBlockUserArgs(player, item?.clone(), pos.location)) { canUseBlock(player, item, pos.location) }
+        return check(CanUseBlockUserArgs(player, item?.clone(), pos.location)) { canUseBlock(player, item, pos.location) }
     }
 
     /**
      * Checks if the [player] can interact with a block at that [pos] using that [item].
      */
     fun canUseBlock(player: Player, item: ItemStack?, pos: BlockPos): Boolean {
-        return check0(CanUseBlockUserArgs(player, item?.clone(), pos.location)) { canUseBlock(player, item, pos.location) }
+        return check(CanUseBlockUserArgs(player, item?.clone(), pos.location)) { canUseBlock(player, item, pos.location) }
     }
 
     /**
@@ -225,21 +227,21 @@ object ProtectionManager {
         if (tileEntity.owner == null) {
             return true
         }
-        return check0(CanUseItemTileArgs(tileEntity, item.clone(), location)) { canUseItem(tileEntity, item, location) }
+        return check(CanUseItemTileArgs(tileEntity, item.clone(), location)) { canUseItem(tileEntity, item, location) }
     }
 
     /**
      * Checks if the [player] can use that [item] at that [location].
      */
     fun canUseItem(player: OfflinePlayer, item: ItemStack, location: Location): Boolean {
-        return check0(CanUseItemUserArgs(player, item.clone(), location)) { canUseItem(player, item, location) }
+        return check(CanUseItemUserArgs(player, item.clone(), location)) { canUseItem(player, item, location) }
     }
 
     /**
      * Checks if the [player] can use that [item] at that [location].
      */
     fun canUseItem(player: Player, item: ItemStack, location: Location): Boolean {
-        return check0(CanUseItemUserArgs(player, item.clone(), location)) { canUseItem(player, item, location) }
+        return check(CanUseItemUserArgs(player, item.clone(), location)) { canUseItem(player, item, location) }
     }
 
     /**
@@ -249,21 +251,21 @@ object ProtectionManager {
         if (tileEntity.owner == null) {
             return true
         }
-        return check0(CanInteractWithEntityTileArgs(tileEntity, entity, item?.clone())) { canInteractWithEntity(tileEntity, entity, item) }
+        return check(CanInteractWithEntityTileArgs(tileEntity, entity, item?.clone())) { canInteractWithEntity(tileEntity, entity, item) }
     }
 
     /**
      * Checks if the [player] can interact with the [entity] while holding that [item].
      */
     fun canInteractWithEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?): Boolean {
-        return check0(CanInteractWithEntityUserArgs(player, entity, item?.clone())) { canInteractWithEntity(player, entity, item) }
+        return check(CanInteractWithEntityUserArgs(player, entity, item?.clone())) { canInteractWithEntity(player, entity, item) }
     }
 
     /**
      * Checks if the [player] can interact with the [entity] while holding that [item].
      */
     fun canInteractWithEntity(player: Player, entity: Entity, item: ItemStack?): Boolean {
-        return check0(CanInteractWithEntityUserArgs(player, entity, item?.clone())) { canInteractWithEntity(player, entity, item) }
+        return check(CanInteractWithEntityUserArgs(player, entity, item?.clone())) { canInteractWithEntity(player, entity, item) }
     }
 
     /**
@@ -273,28 +275,28 @@ object ProtectionManager {
         if (tileEntity.owner == null) {
             return true
         }
-        return check0(CanHurtEntityTileArgs(tileEntity, entity, item?.clone())) { canHurtEntity(tileEntity, entity, item) }
+        return check(CanHurtEntityTileArgs(tileEntity, entity, item?.clone())) { canHurtEntity(tileEntity, entity, item) }
     }
 
     /**
      * Checks if the [player] can hurt the [entity] with this [item].
      */
     fun canHurtEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?): Boolean {
-        return check0(CanHurtEntityUserArgs(player, entity, item?.clone())) { canHurtEntity(player, entity, item) }
+        return check(CanHurtEntityUserArgs(player, entity, item?.clone())) { canHurtEntity(player, entity, item) }
     }
 
     /**
      * Checks if the [player] can hurt the [entity] with this [item].
      */
     fun canHurtEntity(player: Player, entity: Entity, item: ItemStack?): Boolean {
-        return check0(CanHurtEntityUserArgs(player, entity, item?.clone())) { canHurtEntity(player, entity, item) }
+        return check(CanHurtEntityUserArgs(player, entity, item?.clone())) { canHurtEntity(player, entity, item) }
     }
 
-    private fun check0(
+    private fun check(
         args: ProtectionArgs,
         check: ProtectionIntegration.() -> Boolean,
     ): Boolean {
-        if (!PluginHolder.INSTANCE.isEnabled) {
+        if (!PluginProvider.get().isEnabled) {
             return false
         }
 

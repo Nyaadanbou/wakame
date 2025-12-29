@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.integration.economy.intrinsics
 
-import cc.mewcraft.wakame.SERVER
-import cc.mewcraft.wakame.integration.economy.EconomyIntegration
+import cc.mewcraft.wakame.integration.economy.EconomyIntegration2
 import cc.mewcraft.wakame.integration.economy.EconomyType
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -14,18 +14,24 @@ import java.util.*
  *
  * 仅用于开发与测试, 勿用于生产环境!
  */
-internal object VanillaEconomyIntegration : EconomyIntegration {
+internal object VanillaEconomyIntegration : EconomyIntegration2 {
 
     override val type: EconomyType = EconomyType.VANILLA
 
-    override fun has(uuid: UUID, amount: Double): Result<Boolean> {
-        val player = getPlayer(uuid)
+    override val defaultCurrency: String? = null
+
+    override fun has(user: UUID, amount: Double, currency: String?): Result<Boolean> {
+        val player = getPlayer(user)
         val value = player.level >= amount.toInt()
         return Result.success(value)
     }
 
-    override fun take(uuid: UUID, amount: Double): Result<Boolean> {
-        val player = getPlayer(uuid)
+    override fun hasAcc(user: UUID, amount: Double, currency: String?): Result<Boolean> {
+        return Result.failure(UnsupportedOperationException())
+    }
+
+    override fun take(user: UUID, amount: Double, currency: String?): Result<Boolean> {
+        val player = getPlayer(user)
         if (player.level < amount.toInt()) {
             return Result.success(false)
         }
@@ -34,14 +40,13 @@ internal object VanillaEconomyIntegration : EconomyIntegration {
         return Result.success(true)
     }
 
-    override fun give(uuid: UUID, amount: Double): Result<Boolean> {
-        val player = getPlayer(uuid)
+    override fun give(user: UUID, amount: Double, currency: String?): Result<Boolean> {
+        val player = getPlayer(user)
         player.level += amount.toInt()
         return Result.success(true)
     }
 
     private fun getPlayer(uuid: UUID): Player {
-        return SERVER.getPlayer(uuid) ?: error("Player is not online")
+        return Bukkit.getServer().getPlayer(uuid) ?: error("Player is not online")
     }
-
 }

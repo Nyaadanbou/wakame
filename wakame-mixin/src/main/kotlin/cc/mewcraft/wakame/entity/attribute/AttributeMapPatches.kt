@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.registerEvents
 import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -46,7 +46,7 @@ object AttributeMapPatches : Listener {
 
     @ApiStatus.Internal
     fun close() {
-        SERVER.worlds.flatMap(World::getEntities).forEach(::onEntityUnload)
+        Bukkit.getServer().worlds.flatMap(World::getEntities).forEach(::onEntityUnload)
     }
 
     // 当实体加载时, 读取 PDC 中的 AttributeMapPatch

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.reforge.recycle
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.integration.economy.EconomyManager
+import cc.mewcraft.wakame.integration.economy.EconomyIntegration2
 import cc.mewcraft.wakame.item.koishTypeId
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
@@ -96,7 +96,7 @@ internal class SimpleRecyclingSession(
 
             // logger.info("Sold for $totalPoint in total.")
 
-            val result = EconomyManager.give(viewer.uniqueId, totalPoint)
+            val result = EconomyIntegration2.give(viewer.uniqueId, totalPoint)
             if (result.isFailure) {
                 logger.error("Failed to give money to ${viewer.name}.")
                 return PurchaseResult.failure(

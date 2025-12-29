@@ -25,7 +25,7 @@
 
 package cc.mewcraft.wakame.util.metadata;
 
-import cc.mewcraft.wakame.PluginHolder;
+import cc.mewcraft.wakame.PluginProvider;
 import cc.mewcraft.wakame.util.event.Events;
 import cc.mewcraft.wakame.util.metadata.type.BlockMetadataRegistry;
 import cc.mewcraft.wakame.util.metadata.type.EntityMetadataRegistry;
@@ -70,7 +70,7 @@ public final class Metadata {
                     .handler(e -> StandardMetadataRegistries.PLAYER.remove(e.getPlayer().getUniqueId()));
 
             // cache housekeeping task
-            Bukkit.getScheduler().runTaskTimer(PluginHolder.getInstance(), () -> {
+            Bukkit.getScheduler().runTaskTimer(PluginProvider.get(), () -> {
                 for (MetadataRegistry<?> registry : StandardMetadataRegistries.values()) {
                     registry.cleanup();
                 }
