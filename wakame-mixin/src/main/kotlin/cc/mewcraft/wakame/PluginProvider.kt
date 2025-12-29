@@ -11,11 +11,13 @@ object PluginProvider {
     @JvmStatic
     private lateinit var instance: JavaPlugin
 
+    @JvmStatic
     @ApiStatus.Internal
     fun set(plugin: JavaPlugin) {
         this.instance = plugin
     }
 
+    @JvmStatic
     fun get(): JavaPlugin {
         return instance
     }

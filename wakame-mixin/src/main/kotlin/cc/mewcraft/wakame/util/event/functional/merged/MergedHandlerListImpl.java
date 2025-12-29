@@ -57,7 +57,7 @@ class MergedHandlerListImpl<T> implements MergedHandlerList<T> {
         }
 
         HelperMergedEventListener<T> listener = new HelperMergedEventListener<>(this.builder, this.handlers);
-        listener.register(PluginProvider.getInstance());
+        listener.register(PluginProvider.get());
         return listener;
     }
 }

@@ -58,7 +58,7 @@ class SingleHandlerListImpl<T extends Event> implements SingleHandlerList<T> {
         }
 
         HelperEventListener<T> listener = new HelperEventListener<>(this.builder, this.handlers);
-        listener.register(PluginProvider.getInstance());
+        listener.register(PluginProvider.get());
         return listener;
     }
 }

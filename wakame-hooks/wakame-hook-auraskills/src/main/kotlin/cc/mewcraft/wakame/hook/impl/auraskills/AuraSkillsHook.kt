@@ -27,6 +27,7 @@ object AuraSkillsHook : PlayerManaIntegration by AuraPlayerManaIntegration {
         if (PLAYER_LEVEL_PROVIDER == PlayerLevelType.AURA_SKILLS) {
             PlayerLevelIntegration.setImplementation(AuraPlayerLevelIntegration)
             PlayerDataLoadingCoordinator.registerExternalStage2Handler("AuraSkills")
+            ResourceLoadingFixHandler.setImplementation(AuraResourceLoadingFixHandler)
         }
 
         if (PLAYER_MANA_PROVIDER == PlayerManaType.AURA_SKILLS) {

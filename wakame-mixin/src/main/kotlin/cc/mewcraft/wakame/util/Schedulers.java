@@ -123,7 +123,7 @@ public final class Schedulers {
         public Task runRepeating(Consumer<Task> consumer, long delayTicks, long intervalTicks) {
             Objects.requireNonNull(consumer, "consumer");
             HelperTask task = new HelperTask(consumer);
-            task.runTaskTimer(PluginProvider.getInstance(), delayTicks, intervalTicks);
+            task.runTaskTimer(PluginProvider.get(), delayTicks, intervalTicks);
             return task;
         }
 
@@ -149,7 +149,7 @@ public final class Schedulers {
         public Task runRepeating(Consumer<Task> consumer, long delayTicks, long intervalTicks) {
             Objects.requireNonNull(consumer, "consumer");
             HelperTask task = new HelperTask(consumer);
-            task.runTaskTimerAsynchronously(PluginProvider.getInstance(), delayTicks, intervalTicks);
+            task.runTaskTimerAsynchronously(PluginProvider.get(), delayTicks, intervalTicks);
             return task;
         }
 

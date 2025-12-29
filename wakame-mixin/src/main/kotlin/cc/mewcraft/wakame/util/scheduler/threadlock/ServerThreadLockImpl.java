@@ -47,7 +47,7 @@ final class ServerThreadLockImpl implements ServerThreadLock {
         }
 
         // synchronize with the main thread, then countdown
-        Bukkit.getScheduler().scheduleSyncDelayedTask(PluginProvider.getInstance(), this::signal);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(PluginProvider.get(), this::signal);
 
         // wait for the main thread to become synchronized
         await();

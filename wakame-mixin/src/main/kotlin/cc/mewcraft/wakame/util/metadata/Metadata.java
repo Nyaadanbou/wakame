@@ -70,7 +70,7 @@ public final class Metadata {
                     .handler(e -> StandardMetadataRegistries.PLAYER.remove(e.getPlayer().getUniqueId()));
 
             // cache housekeeping task
-            Bukkit.getScheduler().runTaskTimer(PluginProvider.getInstance(), () -> {
+            Bukkit.getScheduler().runTaskTimer(PluginProvider.get(), () -> {
                 for (MetadataRegistry<?> registry : StandardMetadataRegistries.values()) {
                     registry.cleanup();
                 }

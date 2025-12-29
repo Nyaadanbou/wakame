@@ -28,6 +28,7 @@ object AdventureLevelHook {
         if (PLAYER_LEVEL_PROVIDER == PlayerLevelType.ADVENTURE) {
             PlayerLevelIntegration.setImplementation(AdventurePlayerLevelIntegration)
             PlayerDataLoadingCoordinator.registerExternalStage2Handler("AdventureLevel")
+            ResourceLoadingFixHandler.setImplementation(AdventureResourceLoadingFixHandler)
         }
     }
 }

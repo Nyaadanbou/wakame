@@ -59,14 +59,14 @@ public final class HelperExecutors {
     private static final class BukkitSyncExecutor implements Executor {
         @Override
         public void execute(Runnable runnable) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(PluginProvider.getInstance(), HelperExceptions.wrapSchedulerTask(runnable));
+            Bukkit.getScheduler().scheduleSyncDelayedTask(PluginProvider.get(), HelperExceptions.wrapSchedulerTask(runnable));
         }
     }
 
     private static final class BukkitAsyncExecutor implements Executor {
         @Override
         public void execute(Runnable runnable) {
-            Bukkit.getScheduler().runTaskAsynchronously(PluginProvider.getInstance(), HelperExceptions.wrapSchedulerTask(runnable));
+            Bukkit.getScheduler().runTaskAsynchronously(PluginProvider.get(), HelperExceptions.wrapSchedulerTask(runnable));
         }
     }
 
