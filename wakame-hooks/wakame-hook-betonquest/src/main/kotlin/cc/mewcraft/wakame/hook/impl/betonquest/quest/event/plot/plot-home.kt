@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.plot
 import com.plotsquared.bukkit.util.BukkitUtil
 import com.plotsquared.core.PlotSquared
 import com.plotsquared.core.events.TeleportCause
+import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
@@ -12,6 +12,7 @@ import org.betonquest.betonquest.api.quest.event.PlayerEvent
 import org.betonquest.betonquest.api.quest.event.PlayerEventFactory
 import org.betonquest.betonquest.api.quest.event.online.OnlineEvent
 import org.betonquest.betonquest.api.quest.event.online.OnlineEventAdapter
+import kotlin.jvm.optionals.getOrNull
 
 
 /**
@@ -22,8 +23,8 @@ import org.betonquest.betonquest.api.quest.event.online.OnlineEventAdapter
  * @param logger BetonQuest 的日志记录器
  */
 class PlotHomeEvent(
-    private val order: Variable<Number>?,
-    private val dimension: Variable<String>?,
+    private val order: Argument<Number>?,
+    private val dimension: Argument<String>?,
     private val logger: BetonQuestLogger,
 ) : OnlineEvent {
 
@@ -70,11 +71,12 @@ class PlotHomeEventFactory(
 ) : PlayerEventFactory {
 
     override fun parsePlayer(instruction: Instruction): PlayerEvent {
-        val order = instruction.getValue("order", instruction.parsers.number().atLeast(1))
-        val dimension = instruction.getValue("dimension", instruction.parsers.string())
+        val order = instruction.number().atLeast(1).get("order").getOrNull()
+        val dimension = instruction.string().get("dimension").getOrNull()
         val logger = loggerFactory.create(PlotHomeEvent::class.java)
         val questPackage = instruction.getPackage()
-        val plotHomeEvent = PlotHomeEvent(order, dimension, logger)
-        return OnlineEventAdapter(plotHomeEvent, logger, questPackage)
+        val event = PlotHomeEvent(order, dimension, logger)
+        val adapter = OnlineEventAdapter(event, logger, questPackage)
+        return adapter
     }
 }

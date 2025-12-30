@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.plot
 
 import com.plotsquared.bukkit.util.BukkitUtil
 import com.plotsquared.core.PlotSquared
+import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
@@ -11,6 +11,7 @@ import org.betonquest.betonquest.api.quest.event.PlayerEvent
 import org.betonquest.betonquest.api.quest.event.PlayerEventFactory
 import org.betonquest.betonquest.api.quest.event.online.OnlineEvent
 import org.betonquest.betonquest.api.quest.event.online.OnlineEventAdapter
+import kotlin.jvm.optionals.getOrNull
 
 
 /**
@@ -22,7 +23,7 @@ import org.betonquest.betonquest.api.quest.event.online.OnlineEventAdapter
  */
 class PlotClaimEvent(
     private val skipIfExists: Boolean,
-    private val dimension: Variable<String>?,
+    private val dimension: Argument<String>?,
     private val logger: BetonQuestLogger,
 ) : OnlineEvent {
 
@@ -66,11 +67,12 @@ class PlotClaimEventFactory(
 ) : PlayerEventFactory {
 
     override fun parsePlayer(instruction: Instruction): PlayerEvent {
-        val skipIfExists = instruction.hasArgument("skipIfExists")
-        val dimension = instruction.getValue("dimension", instruction.parsers.string())
+        val skipIfExists = instruction.bool().getFlag("skipIfExists", true).getValue(null).orElse(false)
+        val dimension = instruction.string().get("dimension").getOrNull()
         val logger = loggerFactory.create(PlotClaimEvent::class.java)
         val questPackage = instruction.getPackage()
-        val plotClaimEvent = PlotClaimEvent(skipIfExists, dimension, logger)
-        return OnlineEventAdapter(plotClaimEvent, logger, questPackage)
+        val event = PlotClaimEvent(skipIfExists, dimension, logger)
+        val adapter = OnlineEventAdapter(event, logger, questPackage)
+        return adapter
     }
 }

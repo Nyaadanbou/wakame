@@ -2,23 +2,21 @@ package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.dungeon
 
 import cc.mewcraft.wakame.hook.impl.betonquest.util.MythicDungeonsBridge
 import cc.mewcraft.wakame.integration.party.PartyIntegration
+import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
-import org.betonquest.betonquest.api.quest.PrimaryServerThreadData
 import org.betonquest.betonquest.api.quest.event.PlayerEvent
 import org.betonquest.betonquest.api.quest.event.PlayerEventFactory
 import org.betonquest.betonquest.api.quest.event.online.OnlineEvent
 import org.betonquest.betonquest.api.quest.event.online.OnlineEventAdapter
-import org.betonquest.betonquest.api.quest.event.thread.PrimaryServerThreadEvent
 import org.bukkit.Bukkit
 
 
 class EnterDungeonEvent(
-    private val dungeon: Variable<String>,
-    private val useParty: Variable<Boolean>,
+    private val dungeon: Argument<String>,
+    private val useParty: Argument<Boolean>,
     private val logger: BetonQuestLogger,
 ) : OnlineEvent {
 
@@ -81,20 +79,15 @@ class EnterDungeonEvent(
 
 class EnterDungeonEventFactory(
     private val loggerFactory: BetonQuestLoggerFactory,
-    private val threadData: PrimaryServerThreadData,
 ) : PlayerEventFactory {
 
     override fun parsePlayer(instruction: Instruction): PlayerEvent {
         val logger = loggerFactory.create(EnterDungeonEvent::class.java)
-        val dungeon = instruction.get(instruction.parsers.string())
-
-        // 使用 Instruction#getValue 可以使该事件支持按玩家独立计算的变量
-        val useParty = instruction.getValue("party", instruction.parsers.bool(), false)
-            ?: error("Failed to get 'party' argument")
-
+        val dungeon = instruction.string().get()
+        val useParty = instruction.bool().get("party", false)
         val onlineEvent = EnterDungeonEvent(dungeon, useParty, logger)
         val questPackage = instruction.getPackage()
-        val onlineEventAdapter = OnlineEventAdapter(onlineEvent, logger, questPackage)
-        return PrimaryServerThreadEvent(onlineEventAdapter, threadData)
+        val adapter = OnlineEventAdapter(onlineEvent, logger, questPackage)
+        return adapter
     }
 }

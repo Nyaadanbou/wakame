@@ -2,16 +2,14 @@ package cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.koish
 
 import cc.mewcraft.wakame.hook.impl.betonquest.util.ComparisonOp
 import cc.mewcraft.wakame.hook.impl.betonquest.util.FriendlyEnumParser
+import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
-import org.betonquest.betonquest.api.quest.PrimaryServerThreadData
 import org.betonquest.betonquest.api.quest.condition.PlayerCondition
 import org.betonquest.betonquest.api.quest.condition.PlayerConditionFactory
 import org.betonquest.betonquest.api.quest.condition.online.OnlineCondition
 import org.betonquest.betonquest.api.quest.condition.online.OnlineConditionAdapter
-import org.betonquest.betonquest.api.quest.condition.thread.PrimaryServerThreadPlayerCondition
 
 /**
  * 检测玩家所在位置的光照强度是否满足条件.
@@ -21,9 +19,9 @@ import org.betonquest.betonquest.api.quest.condition.thread.PrimaryServerThreadP
  * - light sky < 5
  */
 class Light(
-    private val type: Variable<Type>,
-    private val operation: Variable<ComparisonOp>,
-    private val value: Variable<Number>,
+    private val type: Argument<Type>,
+    private val operation: Argument<ComparisonOp>,
+    private val value: Argument<Number>,
 ) : OnlineCondition {
 
     override fun check(profile: OnlineProfile): Boolean {
@@ -77,17 +75,16 @@ class Light(
  */
 class LightFactory(
     private val loggerFactory: BetonQuestLoggerFactory,
-    private val data: PrimaryServerThreadData,
 ) : PlayerConditionFactory {
 
     override fun parsePlayer(instruction: Instruction): PlayerCondition {
-        val type = instruction.get(instruction.parsers.forEnum(Light.Type::class.java))
-        val operation = instruction.get(FriendlyEnumParser<ComparisonOp>())
-        val value = instruction.get(instruction.parsers.number())
+        val type = instruction.enumeration(Light.Type::class.java).get()
+        val operation = instruction.parse(FriendlyEnumParser<ComparisonOp>()).get()
+        val value = instruction.number().get()
         val logger = loggerFactory.create(Light::class.java)
         val condition = Light(type, operation, value)
         val questPackage = instruction.getPackage()
-        val conditionAdapter = OnlineConditionAdapter(condition, logger, questPackage)
-        return PrimaryServerThreadPlayerCondition(conditionAdapter, data)
+        val adapter = OnlineConditionAdapter(condition, logger, questPackage)
+        return adapter
     }
 }

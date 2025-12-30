@@ -9,11 +9,11 @@ import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import net.kyori.adventure.text.Component
 import org.betonquest.betonquest.api.QuestException
+import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.variable.Variable
+import org.betonquest.betonquest.api.item.QuestItem
 import org.betonquest.betonquest.api.kernel.TypeFactory
 import org.betonquest.betonquest.api.profile.Profile
-import org.betonquest.betonquest.item.QuestItem
 import org.betonquest.betonquest.item.QuestItemSerializer
 import org.betonquest.betonquest.item.QuestItemTagAdapterWrapper
 import org.betonquest.betonquest.item.QuestItemWrapper
@@ -52,9 +52,9 @@ class KoishQuestItem(
 class KoishQuestItemFactory : TypeFactory<QuestItemWrapper> {
 
     override fun parseInstruction(instruction: Instruction): QuestItemWrapper {
-        val itemType = instruction.get<KoishItem> { BuiltInRegistries.ITEM[it] }
+        val itemType = instruction.parse<KoishItem> { BuiltInRegistries.ITEM[it] }.get()
         val itemWrapper = KoishQuestItemWrapper(itemType)
-        if (instruction.hasArgument("quest-item")) {
+        if (instruction.bool().getFlag("quest-item", false).getValue(null).orElse(false)) {
             return QuestItemTagAdapterWrapper(itemWrapper)
         }
         return itemWrapper
@@ -70,7 +70,7 @@ class KoishQuestItemSerializer : QuestItemSerializer {
 }
 
 class KoishQuestItemWrapper(
-    private val itemType: Variable<KoishItem>,
+    private val itemType: Argument<KoishItem>,
 ) : QuestItemWrapper {
 
     override fun getItem(profile: Profile?): QuestItem {

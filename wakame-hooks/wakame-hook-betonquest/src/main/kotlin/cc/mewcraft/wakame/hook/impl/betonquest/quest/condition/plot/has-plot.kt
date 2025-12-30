@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.plot
 
 import com.plotsquared.core.PlotSquared
+import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
@@ -10,6 +10,7 @@ import org.betonquest.betonquest.api.quest.condition.PlayerCondition
 import org.betonquest.betonquest.api.quest.condition.PlayerConditionFactory
 import org.betonquest.betonquest.api.quest.condition.online.OnlineCondition
 import org.betonquest.betonquest.api.quest.condition.online.OnlineConditionAdapter
+import kotlin.jvm.optionals.getOrNull
 
 
 /**
@@ -20,8 +21,8 @@ import org.betonquest.betonquest.api.quest.condition.online.OnlineConditionAdapt
  * @param logger BetonQuest 的日志记录器
  */
 class HasPlot(
-    private val amount: Variable<Number>?,
-    private val dimension: Variable<String>?,
+    private val amount: Argument<Number>?,
+    private val dimension: Argument<String>?,
     private val logger: BetonQuestLogger,
 ) : OnlineCondition {
 
@@ -54,11 +55,12 @@ class HasPlotFactory(
 ) : PlayerConditionFactory {
 
     override fun parsePlayer(instruction: Instruction): PlayerCondition {
-        val amount = instruction.getValue("amount", instruction.parsers.number().atLeast(1))
-        val dimension = instruction.getValue("dimension", instruction.parsers.string())
+        val amount = instruction.number().atLeast(0).get("amount").getOrNull()
+        val dimension = instruction.string().get("dimension").getOrNull()
         val logger = loggerFactory.create(HasPlot::class.java)
         val hasPlot = HasPlot(amount, dimension, logger)
         val questPackage = instruction.getPackage()
-        return OnlineConditionAdapter(hasPlot, logger, questPackage)
+        val adapter = OnlineConditionAdapter(hasPlot, logger, questPackage)
+        return adapter
     }
 }

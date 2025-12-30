@@ -14,7 +14,6 @@ object PlotSquaredCompat {
         val questTypeApi = plugin.questTypeApi
         val profileProvider = plugin.profileProvider
         val loggerFactory = plugin.loggerFactory
-        val data = plugin.primaryServerThreadData
 
         /* Quest Type Registries */
 

@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.party
 
 import cc.mewcraft.wakame.integration.party.PartyIntegration
+import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
@@ -10,6 +10,7 @@ import org.betonquest.betonquest.api.quest.condition.PlayerCondition
 import org.betonquest.betonquest.api.quest.condition.PlayerConditionFactory
 import org.betonquest.betonquest.api.quest.condition.online.OnlineCondition
 import org.betonquest.betonquest.api.quest.condition.online.OnlineConditionAdapter
+import kotlin.jvm.optionals.getOrNull
 
 
 /**
@@ -18,7 +19,7 @@ import org.betonquest.betonquest.api.quest.condition.online.OnlineConditionAdapt
  * @param amount 小队成员的最小数量
  */
 class HasParty(
-    private val amount: Variable<Number>?,
+    private val amount: Argument<Number>?,
     private val logger: BetonQuestLogger,
 ) : OnlineCondition {
 
@@ -35,7 +36,7 @@ class HasPartyFactory(
 ) : PlayerConditionFactory {
 
     override fun parsePlayer(instruction: Instruction): PlayerCondition {
-        val amount = instruction.getValue("amount", instruction.parsers.number().atLeast(0))
+        val amount = instruction.number().atLeast(0).get("amount").getOrNull()
         val logger = loggerFactory.create(HasParty::class.java)
         val hasParty = HasParty(amount, logger)
         val questPackage = instruction.getPackage()
