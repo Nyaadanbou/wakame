@@ -27,6 +27,7 @@
     "MixinItemStack$2",
     "MixinLivingEntity",
     "MixinLootPoolEntries",
+    "MixinMinecraftServer",
     "MixinRegistryDataLoader",
     "MixinRepairItemRecipe",
     "MixinServerPlayer",
