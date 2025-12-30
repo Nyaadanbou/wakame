@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.party
 import cc.mewcraft.wakame.integration.party.PartyIntegration
 import cc.mewcraft.wakame.util.adventure.plain
 import net.kyori.adventure.text.Component
+import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
@@ -17,6 +17,7 @@ import org.betonquest.betonquest.api.quest.event.online.OnlineEvent
 import org.betonquest.betonquest.api.quest.event.online.OnlineEventAdapter
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import kotlin.jvm.optionals.getOrNull
 
 
 /**
@@ -29,9 +30,9 @@ import org.bukkit.Location
 class CreatePartyEvent(
     private val questTypeApi: QuestTypeApi,
     private val profileProvider: ProfileProvider,
-    private val range: Variable<Number>,
-    private val conditions: Variable<List<ConditionID>>,
-    private val amount: Variable<Number>?,
+    private val range: Argument<Number>,
+    private val conditions: Argument<List<ConditionID>>,
+    private val amount: Argument<Number>?,
     private val logger: BetonQuestLogger,
 ) : OnlineEvent {
 
@@ -132,12 +133,13 @@ class CreatePartyEventFactory(
 ) : PlayerEventFactory {
 
     override fun parsePlayer(instruction: Instruction): PlayerEvent {
-        val range = instruction.get(instruction.parsers.number())
-        val conditions = instruction.getList(::ConditionID)
-        val amount = instruction.getValue("amount", instruction.parsers.number())
+        val range = instruction.number().get()
+        val conditions = instruction.parse(::ConditionID).list().get()
+        val amount = instruction.number().get("amount").getOrNull()
         val logger = loggerFactory.create(CreatePartyEvent::class.java)
         val questPackage = instruction.getPackage()
-        val createPartyEvent = CreatePartyEvent(questTypeApi, profileProvider, range, conditions, amount, logger)
-        return OnlineEventAdapter(createPartyEvent, logger, questPackage)
+        val event = CreatePartyEvent(questTypeApi, profileProvider, range, conditions, amount, logger)
+        val adapter = OnlineEventAdapter(event, logger, questPackage)
+        return adapter
     }
 }

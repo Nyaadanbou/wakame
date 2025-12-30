@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.util
 
 import org.betonquest.betonquest.api.QuestException
-import org.betonquest.betonquest.api.instruction.argument.Argument
+import org.betonquest.betonquest.api.instruction.argument.SimpleArgumentParser
 
 inline fun <reified E> FriendlyEnumParser(): FriendlyEnumParser<E> where E : Enum<E>, E : FriendlyEnum {
     return FriendlyEnumParser(E::class.java)
@@ -9,7 +9,7 @@ inline fun <reified E> FriendlyEnumParser(): FriendlyEnumParser<E> where E : Enu
 
 class FriendlyEnumParser<E>(
     private val enumClass: Class<E>,
-) : Argument<E> where E : Enum<E>, E : FriendlyEnum {
+) : SimpleArgumentParser<E> where E : Enum<E>, E : FriendlyEnum {
 
     override fun apply(string: String): E {
         val input = string.trim()

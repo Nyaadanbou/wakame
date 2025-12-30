@@ -9,11 +9,11 @@ import dev.jsinco.brewery.bukkit.api.TheBrewingProjectApi
 import dev.jsinco.brewery.bukkit.brew.BrewAdapter
 import net.kyori.adventure.text.Component
 import org.betonquest.betonquest.api.QuestException
+import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.variable.Variable
+import org.betonquest.betonquest.api.item.QuestItem
 import org.betonquest.betonquest.api.kernel.TypeFactory
 import org.betonquest.betonquest.api.profile.Profile
-import org.betonquest.betonquest.item.QuestItem
 import org.betonquest.betonquest.item.QuestItemSerializer
 import org.betonquest.betonquest.item.QuestItemTagAdapterWrapper
 import org.betonquest.betonquest.item.QuestItemWrapper
@@ -68,10 +68,10 @@ class BrewQuestItemFactory : TypeFactory<QuestItemWrapper> {
 
     // format: "brew <recipe_name> <quality>"
     override fun parseInstruction(instruction: Instruction): QuestItemWrapper {
-        val recipe = instruction.get<Recipe<ItemStack>> { str -> tbpApi.recipeRegistry.getRecipe(str).getOrNull() }
-        val quality = instruction.getValue("quality", instruction.parsers.forEnum(BrewQuality::class.java))
+        val recipe = instruction.parse<Recipe<ItemStack>> { str -> tbpApi.recipeRegistry.getRecipe(str).getOrNull() }.get()
+        val quality = instruction.enumeration(BrewQuality::class.java).get("quality").getOrNull()
         val wrapper = BrewQuestItemWrapper(recipe, quality)
-        if (instruction.hasArgument("quest-item")) {
+        if (instruction.bool().getFlag("quest-item", false).getValue(null).isPresent) {
             return QuestItemTagAdapterWrapper(wrapper)
         }
         return wrapper
@@ -89,8 +89,8 @@ class BrewQuestItemSerializer : QuestItemSerializer {
 }
 
 class BrewQuestItemWrapper(
-    private val recipe: Variable<Recipe<ItemStack>>,
-    private val quality: Variable<BrewQuality>?,
+    private val recipe: Argument<Recipe<ItemStack>>,
+    private val quality: Argument<BrewQuality>?,
 ) : QuestItemWrapper {
 
     override fun getItem(profile: Profile?): QuestItem? {

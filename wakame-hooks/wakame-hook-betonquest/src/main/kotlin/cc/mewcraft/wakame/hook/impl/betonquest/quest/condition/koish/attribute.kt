@@ -6,25 +6,23 @@ import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.hook.impl.betonquest.util.ComparisonOp
 import cc.mewcraft.wakame.hook.impl.betonquest.util.FriendlyEnumParser
 import org.betonquest.betonquest.api.QuestException
+import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.instruction.variable.Variable
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
-import org.betonquest.betonquest.api.quest.PrimaryServerThreadData
 import org.betonquest.betonquest.api.quest.condition.PlayerCondition
 import org.betonquest.betonquest.api.quest.condition.PlayerConditionFactory
 import org.betonquest.betonquest.api.quest.condition.online.OnlineCondition
 import org.betonquest.betonquest.api.quest.condition.online.OnlineConditionAdapter
-import org.betonquest.betonquest.api.quest.condition.thread.PrimaryServerThreadPlayerCondition
 
 /**
  * 检查玩家的特定 [cc.mewcraft.wakame.entity.attribute.Attribute] 是否满足条件.
  */
 class KoishAttribute(
-    private val attribute: Variable<Attribute>,
-    private val operation: Variable<ComparisonOp>,
-    private val value: Variable<Number>,
+    private val attribute: Argument<Attribute>,
+    private val operation: Argument<ComparisonOp>,
+    private val value: Argument<Number>,
     private val logger: BetonQuestLogger,
 ) : OnlineCondition {
 
@@ -59,17 +57,16 @@ class KoishAttribute(
 
 class AttributeFactory(
     private val loggerFactory: BetonQuestLoggerFactory,
-    private val data: PrimaryServerThreadData,
 ) : PlayerConditionFactory {
 
     override fun parsePlayer(instruction: Instruction): PlayerCondition {
-        val attribute = instruction.get { t -> Attributes.get(t) ?: throw QuestException("Can't find attribute with id: $t") }
-        val operation = instruction.get(FriendlyEnumParser<ComparisonOp>())
-        val value = instruction.get(instruction.parsers.number())
+        val attribute = instruction.parse { t -> Attributes.get(t) ?: throw QuestException("Can't find attribute with id: $t") }.get()
+        val operation = instruction.parse(FriendlyEnumParser<ComparisonOp>()).get()
+        val value = instruction.number().get()
         val logger = loggerFactory.create(KoishAttribute::class.java)
         val condition = KoishAttribute(attribute, operation, value, logger)
         val questPackage = instruction.getPackage()
-        val eventAdapter = OnlineConditionAdapter(condition, logger, questPackage)
-        return PrimaryServerThreadPlayerCondition(eventAdapter, data)
+        val adapter = OnlineConditionAdapter(condition, logger, questPackage)
+        return adapter
     }
 }

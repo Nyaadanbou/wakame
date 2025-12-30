@@ -38,34 +38,8 @@ dependencies {
     // API
     api(project(":wakame-api"))
 
-    // ECS
-    compileOnlyApi(local.fleks)
-
-    // 表达式解析
-    compileOnlyApi(libs.mocha)
-
-    // 反射
-    compileOnlyApi(local.shadow.bukkit)
-
-    // 通用库
-    compileOnlyApi(local.commons.collections)
-    compileOnlyApi(local.commons.gson)
-    compileOnlyApi(local.commons.gson)
-    compileOnlyApi(local.commons.provider)
-    compileOnlyApi(local.commons.reflection)
-    compileOnlyApi(local.commons.tuple)
-
-    // 配置文件
-    compileOnlyApi(platform(libs.bom.configurate.yaml))
-    compileOnlyApi(platform(libs.bom.configurate.gson))
-    compileOnlyApi(platform(libs.bom.configurate.extra.kotlin))
-    compileOnlyApi(platform(libs.bom.configurate.extra.dfu8))
-
-    // 跨进程通讯
-    compileOnlyApi(local.messenger)
-    compileOnlyApi(local.messenger.nats)
-    compileOnlyApi(local.messenger.rabbitmq)
-    compileOnlyApi(local.messenger.redis)
+    // 内部库
+    compileOnlyApi(project(":wakame-mixin-libraries"))
 }
 
 sourceSets {

@@ -26,23 +26,22 @@ object BetonQuestHook {
         val loggerFactory = plugin.loggerFactory
         val variableProcessor = plugin.variableProcessor
         val packManager = plugin.questPackageManager
-        val data = plugin.primaryServerThreadData
 
         /* Quest Type Registries */
 
         // Condition
         val conditionRegistry = plugin.questRegistries.condition()
         conditionRegistry.register("hasparty", HasPartyFactory(loggerFactory))
-        conditionRegistry.register("attribute", AttributeFactory(loggerFactory, data))
-        conditionRegistry.register("outside", OutsideFactory(loggerFactory, data))
-        conditionRegistry.register("light", LightFactory(loggerFactory, data))
+        conditionRegistry.register("attribute", AttributeFactory(loggerFactory))
+        conditionRegistry.register("outside", OutsideFactory(loggerFactory))
+        conditionRegistry.register("light", LightFactory(loggerFactory))
 
         // Event
         val eventRegistry = plugin.questRegistries.event()
         eventRegistry.register("createparty", CreatePartyEventFactory(loggerFactory, questTypeApi, profileProvider))
         eventRegistry.register("leaveparty", LeavePartyEventFactory(loggerFactory))
-        eventRegistry.register("setfreezeticks", SetFreezeTicksFactory(loggerFactory, data))
-        eventRegistry.register("lockfreezeticks", LockFreezeTicksFactory(loggerFactory, data))
+        eventRegistry.register("setfreezeticks", SetFreezeTicksFactory(loggerFactory))
+        eventRegistry.register("lockfreezeticks", LockFreezeTicksFactory(loggerFactory))
 
         // Objective
         val objectiveRegistry = plugin.questRegistries.objective()

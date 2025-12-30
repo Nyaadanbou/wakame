@@ -14,20 +14,18 @@ object MythicDungeonsCompat {
     init {
         val plugin = BetonQuest.getInstance()
         val loggerFactory = BetonQuest.getInstance().loggerFactory
-        val primaryServerThreadData = BetonQuest.getInstance().primaryServerThreadData
         val questRegistries = BetonQuest.getInstance().questRegistries
-        val data = plugin.primaryServerThreadData
 
         /* Quest Type Registries */
 
         // Condition
         val conditionRegistry = plugin.questRegistries.condition()
-        conditionRegistry.register("awaitingdungeon", AwaitingDungeonFactory(loggerFactory, data))
-        conditionRegistry.register("insidedungeon", InsideDungeonFactory(loggerFactory, data))
+        conditionRegistry.register("awaitingdungeon", AwaitingDungeonFactory(loggerFactory))
+        conditionRegistry.register("insidedungeon", InsideDungeonFactory(loggerFactory))
 
         // Event
         val eventRegistry = plugin.questRegistries.event()
-        questRegistries.event().register("playdungeon", EnterDungeonEventFactory(loggerFactory, primaryServerThreadData))
+        questRegistries.event().register("playdungeon", EnterDungeonEventFactory(loggerFactory))
 
         // Objective
         val objectiveRegistry = plugin.questRegistries.objective()
