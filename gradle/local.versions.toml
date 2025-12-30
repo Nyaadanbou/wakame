@@ -4,7 +4,7 @@
 kotlin = "2.3.0"
 kotlinx-coroutines = "1.10.2"
 libraries-repository = "0.0.4-snapshot"
-copy-jar-build = "0.0.1-snapshot"
+copy-jar-build = "0.0.2-snapshot"
 copy-jar-docker = "0.0.1-snapshot"
 paperweight = "2.0.0-beta.17"
 blossom = "2.1.0"
@@ -41,6 +41,7 @@ rabbitmq = "5.27.0"
 nats = "2.23.0"
 
 # synced with version used by lowest supported mc (currently 1.21.4 on paper)
+asm = "9.8"
 gson = "2.11.0"
 guava = "33.3.1-jre"
 log4j = "2.24.1"
@@ -98,6 +99,9 @@ stylecheck = { group = "ca.stellardrift", name = "stylecheck", version.ref = "st
 # Gradle plugin deps
 docker-java = { group = "com.github.docker-java", name = "docker-java", version.ref = "docker-java" }
 apache-commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "apache-commons-compress" }
+
+# synced with version used by lowest supported mc (currently 1.21.4 on paper)
+asm = { group = "org.ow2.asm", name = "asm-commons", version.ref = "asm" }
 
 # Shaded deps
 # 这些依赖属于插件本身, 将打包进插件的 jar

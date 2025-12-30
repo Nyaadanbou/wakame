@@ -1,9 +1,7 @@
 plugins {
     id("koish-conventions.kotlin")
     id("cc.mewcraft.libraries-repository")
-    id("cc.mewcraft.copy-jar-build")
     id("cc.mewcraft.copy-jar-docker")
-    id("io.papermc.paperweight.userdev")
     alias(local.plugins.blossom)
 }
 
@@ -22,55 +20,53 @@ dependencies {
     // 该依赖会直接由服务端的 system classloader 加载,
     // 可以直接被服务端 (nms) 和 *任意插件* 直接访问.
 
-    // Paper API + NMS
-    paperweight.paperDevBundle(local.versions.paper)
+    // ASM (这些依赖运行时由 paper 服务端提供)
+    compileOnly(local.asm)
 
-    // Mixin & Ignite (这些依赖由 ignite 启动器提供)
-    remapper("net.fabricmc", "tiny-remapper", "0.10.4", classifier = "fat")
-    compileOnly(local.ignite)
+    // Mixin (这些依赖运行时由 ignite 启动器提供)
     compileOnly(local.mixin)
     compileOnly(local.mixin.extras)
 
     // ECS
-    implementation(local.fleks) {
+    api(local.fleks) {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
 
     // 表达式解析
-    implementation(libs.mocha)
+    api(libs.mocha)
 
     // 反射
-    implementation(local.shadow.bukkit)
+    api(local.shadow.bukkit)
 
     // 通用库
-    implementation(local.commons.collections)
-    implementation(local.commons.gson) {
+    api(local.commons.collections)
+    api(local.commons.gson) {
         exclude("com.google.code.gson")
     }
-    implementation(local.commons.gson)
-    implementation(local.commons.provider)
-    implementation(local.commons.reflection)
-    implementation(local.commons.tuple)
+    api(local.commons.gson)
+    api(local.commons.provider)
+    api(local.commons.reflection)
+    api(local.commons.tuple)
 
     // 配置文件
-    implementation(platform(libs.bom.configurate.yaml))
-    implementation(platform(libs.bom.configurate.gson))
-    implementation(platform(libs.bom.configurate.extra.kotlin))
-    implementation(platform(libs.bom.configurate.extra.dfu8))
+    api(platform(libs.bom.configurate.yaml))
+    api(platform(libs.bom.configurate.gson))
+    api(platform(libs.bom.configurate.extra.kotlin))
+    api(platform(libs.bom.configurate.extra.dfu8))
 
     // 跨进程通讯
-    implementation(local.messenger)
-    implementation(local.messenger.nats)
-    implementation(local.messenger.rabbitmq)
-    implementation(local.messenger.redis)
-    implementation(local.zstdjni)
-    implementation(local.jedis) {
+    api(local.messenger)
+    api(local.messenger.nats)
+    api(local.messenger.rabbitmq)
+    api(local.messenger.redis)
+    api(local.zstdjni)
+    api(local.jedis) {
         exclude("com.google.code.gson", "gson")
     }
-    implementation(local.rabbitmq)
-    implementation(local.nats)
-    implementation(local.caffeine)
+    api(local.rabbitmq)
+    api(local.nats)
+    api(local.caffeine)
 }
 
 sourceSets {
@@ -83,10 +79,7 @@ sourceSets {
     }
 }
 
-buildCopy {
-    fileName = "wakame-libraries-${project.version}.jar"
-    archiveTask = "shadowJar"
-}
+// 故意不写 builderCopy 因为会导致 gradle 无法执行 copyJarToBuild
 
 dockerCopy {
     containerId = "aether-minecraft-1"
