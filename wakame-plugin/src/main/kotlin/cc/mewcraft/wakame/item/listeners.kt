@@ -36,14 +36,13 @@ internal object ItemBehaviorListener : Listener {
         registerEvents()
     }
 
-    // ------------
-    // Item Behavior
-    // ------------
-
     @JvmStatic
     private val alreadySuccessfulUsePlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
+    @JvmStatic
     private val alreadySuccessfulAttackPlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
+    @JvmStatic
     private val alreadyCallInteractEntityWithMainHandPlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
+    @JvmStatic
     private val alreadyCallInteractEntityWithOffHandPlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
 
     @EventHandler
@@ -54,13 +53,13 @@ internal object ItemBehaviorListener : Listener {
         alreadyCallInteractEntityWithOffHandPlayers.clear()
     }
 
-    // Koish 的交互应该在最后的最后触发
-    // 事件的取消只是为了移除原版交互的影响, 而不是通知其他插件
-    // 故使用 EventPriority.MONITOR, 下同
+    // Koish 的交互应该在最后的最后触发.
+    // 取消事件只是为了移除原版交互的影响, 而不是通知其他插件,
+    // 故使用 EventPriority.MONITOR, 下同.
     @EventHandler(priority = EventPriority.MONITOR)
     fun onRightClickInteract(event: PlayerInteractEvent) {
         // 2025/9/22 芙兰
-        // 吗的Bukkit这交互事件是人啊
+        // 吗的 Bukkit 这交互事件是人啊
 
         // 事件被取消 - 不处理
         // 不能用 isCancelled 或者 ignoreCancelled = true 判定
@@ -72,13 +71,9 @@ internal object ItemBehaviorListener : Listener {
 
         val action = event.action
         val player = event.player
-        // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
-        if (!player.isInventoryListenable) return
-
-        // 玩家处于旁观者模式 - 不处理
-        // 玩家不是右键交互 - 不处理
-        if (player.gameMode == GameMode.SPECTATOR) return
-        if (!action.isRightClick) return
+        if (!player.isInventoryListenable) return // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
+        if (player.gameMode == GameMode.SPECTATOR) return // 玩家处于旁观者模式 - 不处理
+        if (!action.isRightClick) return // 玩家不是右键交互 - 不处理
 
         // 客户端可能会按照自己的想法发送多个交互包, 常见情况为主手与副手各发一次
         // 因此限制每tick只能成功交互一次, 并取消多余的交互事件
@@ -88,20 +83,15 @@ internal object ItemBehaviorListener : Listener {
             event.isCancelled = true
             return
         }
-
         val hand = when (event.hand) {
             EquipmentSlot.HAND -> InteractionHand.MAIN_HAND
             EquipmentSlot.OFF_HAND -> InteractionHand.OFF_HAND
             else -> return
         }
-        // 玩家手中没有物品 - 不处理
-        val itemStack = event.item?.takeUnlessEmpty() ?: return
+        val itemstack = event.item?.takeUnlessEmpty() ?: return // 玩家手中没有物品 - 不处理
 
-        if (action == Action.RIGHT_CLICK_AIR) {
-            // 玩家交互空气
-            // 若玩家已右键交互实体 - 不处理
-            // 避免同时触发 Use 和 UseEntity 行为
-            if (hand == InteractionHand.MAIN_HAND) {
+        if (action == Action.RIGHT_CLICK_AIR) { // 玩家交互空气
+            if (hand == InteractionHand.MAIN_HAND) { // 若玩家已右键交互实体 - 不处理, 避免同时触发 Use 和 UseEntity 行为
                 if (alreadyCallInteractEntityWithMainHandPlayers.contains(player)) {
                     event.isCancelled = true
                     return
@@ -112,8 +102,8 @@ internal object ItemBehaviorListener : Listener {
                     return
                 }
             }
-            val useContext = UseContext(player, itemStack, hand)
-            itemStack.handleBehavior { behavior ->
+            val useContext = UseContext(player, itemstack, hand)
+            itemstack.handleBehavior { behavior ->
                 val result = behavior.handleUse(useContext)
                 if (result.isSuccess()) {
                     alreadySuccessfulUsePlayers.add(player)
@@ -125,28 +115,24 @@ internal object ItemBehaviorListener : Listener {
                     return
                 }
             }
-        } else if (action == Action.RIGHT_CLICK_BLOCK) {
-            // 玩家交互方块
-            // 方块不存在 - 不处理, 但该情况不可能发生
-            val block = event.clickedBlock ?: return
-            // 交互位置不存在 - 不处理, 但该情况不可能发生
-            val interactPoint = event.interactionPoint ?: return
-
+        } else if (action == Action.RIGHT_CLICK_BLOCK) { // 玩家交互方块
+            val block = event.clickedBlock ?: return // 方块不存在 - 不处理, 但该情况不可能发生
+            val interactPoint = event.interactionPoint ?: return // 交互位置不存在 - 不处理, 但该情况不可能发生
             val blockInteractContext = BlockInteractContext(
                 block.location.toVector3d(),
                 event.blockFace,
                 interactPoint.toVector3d()
             )
             // 判定方块是否可以交互
-            val interactable = block.isInteractable(player, itemStack, blockInteractContext)
+            val interactable = block.isInteractable(player, itemstack, blockInteractContext)
             // 方块本身可交互且玩家为非潜行状态 - 不处理
             // 此时应优先触发方块交互, 不执行物品的自定义交互
             // 反过来也就是说, 玩家潜行或是方块本身不可交互时, 才尝试执行物品的交互
             if (!player.isSneaking && interactable) return
             // 遍历物品上的所有行为, 依次执行所有 handleUseOn 逻辑
             // 执行顺序取决于注册顺序, 因此用需要取消后续行为的行为应更早注册
-            val useOnContext = UseOnContext(player, itemStack, hand, blockInteractContext)
-            itemStack.handleBehavior { behavior ->
+            val useOnContext = UseOnContext(player, itemstack, hand, blockInteractContext)
+            itemstack.handleBehavior { behavior ->
                 val result = behavior.handleUseOn(useOnContext)
                 if (result.isSuccess()) {
                     alreadySuccessfulUsePlayers.add(player)
@@ -164,14 +150,9 @@ internal object ItemBehaviorListener : Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onInteractEntity(event: PlayerInteractEntityEvent) {
         val player = event.player
-        // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
-        if (!player.isInventoryListenable) return
-
-        // 玩家处于旁观者模式 - 不处理
-        if (player.gameMode == GameMode.SPECTATOR) return
-
-        // 限制每tick只能成功交互一次, 并取消多余的交互事件
-        if (alreadySuccessfulUsePlayers.contains(player)) {
+        if (!player.isInventoryListenable) return // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
+        if (player.gameMode == GameMode.SPECTATOR) return // 玩家处于旁观者模式 - 不处理
+        if (alreadySuccessfulUsePlayers.contains(player)) { // 限制每 tick 只能成功交互一次, 并取消多余的交互事件
             event.isCancelled = true
             return
         }
@@ -181,21 +162,19 @@ internal object ItemBehaviorListener : Listener {
             EquipmentSlot.OFF_HAND -> InteractionHand.OFF_HAND
             else -> return
         }
-        // 玩家手中没有物品 - 不处理
-        val itemStack = if (hand == InteractionHand.MAIN_HAND) {
+        val itemstack = if (hand == InteractionHand.MAIN_HAND) {
             alreadyCallInteractEntityWithMainHandPlayers.add(player)
             player.inventory.itemInMainHand
         } else {
             alreadyCallInteractEntityWithOffHandPlayers.add(player)
             player.inventory.itemInOffHand
-        }.takeUnlessEmpty() ?: return
+        }.takeUnlessEmpty() ?: return // 玩家手中没有物品 - 不处理
         val entity = event.rightClicked
 
         // 判定玩家手中的物品和实体是否存在原版交互
-        // 实体存在原版交互 - 不处理
-        if (entity.isInteractable(player, itemStack)) return
-        val useEntityContext = UseEntityContext(player, itemStack, hand, entity)
-        itemStack.handleBehavior { behavior ->
+        if (entity.isInteractable(player, itemstack)) return // 实体存在原版交互 - 不处理
+        val useEntityContext = UseEntityContext(player, itemstack, hand, entity)
+        itemstack.handleBehavior { behavior ->
             val result = behavior.handleUseEntity(useEntityContext)
             if (result.isSuccess()) {
                 alreadySuccessfulUsePlayers.add(player)
@@ -219,28 +198,19 @@ internal object ItemBehaviorListener : Listener {
 
         val action = event.action
         val player = event.player
-        // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
-        if (!player.isInventoryListenable) return
-
-        // 玩家处于旁观者模式 - 不处理
-        // 玩家不是左键交互 - 不处理
-        if (player.gameMode == GameMode.SPECTATOR) return
-        if (!action.isLeftClick) return
-
-        // 限制每tick只能成功交互一次, 并取消多余的交互事件
-        if (alreadySuccessfulAttackPlayers.contains(player)) {
+        if (!player.isInventoryListenable) return // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
+        if (player.gameMode == GameMode.SPECTATOR) return // 玩家处于旁观者模式 - 不处理
+        if (!action.isLeftClick) return // 玩家不是左键交互 - 不处理
+        if (alreadySuccessfulAttackPlayers.contains(player)) { // 限制每tick只能成功交互一次, 并取消多余的交互事件
             event.isCancelled = true
             return
         }
+        if (event.hand != EquipmentSlot.HAND) return // 左键交互只可能是主手
+        val itemstack = event.item?.takeUnlessEmpty() ?: return
 
-        // 左键交互只可能是主手
-        if (event.hand != EquipmentSlot.HAND) return
-        val itemStack = event.item?.takeUnlessEmpty() ?: return
-
-        if (action == Action.LEFT_CLICK_AIR) {
-            // 玩家交互空气
-            val attackContext = AttackContext(player, itemStack)
-            itemStack.handleBehavior { behavior ->
+        if (action == Action.LEFT_CLICK_AIR) { // 玩家交互空气
+            val attackContext = AttackContext(player, itemstack)
+            itemstack.handleBehavior { behavior ->
                 val result = behavior.handleAttack(attackContext)
                 if (result.isSuccess()) {
                     alreadySuccessfulAttackPlayers.add(player)
@@ -252,13 +222,11 @@ internal object ItemBehaviorListener : Listener {
                     return
                 }
             }
-        } else if (action == Action.LEFT_CLICK_BLOCK) {
-            // 玩家交互方块
-            // 方块不存在 - 不处理, 但该情况不可能发生
-            val block = event.clickedBlock ?: return
+        } else if (action == Action.LEFT_CLICK_BLOCK) { // 玩家交互方块
+            val block = event.clickedBlock ?: return // 方块不存在 - 不处理, 但该情况不可能发生
 
-            val attackOnContext = AttackOnContext(player, itemStack, block.location.toVector3d(), event.blockFace)
-            itemStack.handleBehavior { behavior ->
+            val attackOnContext = AttackOnContext(player, itemstack, block.location.toVector3d(), event.blockFace)
+            itemstack.handleBehavior { behavior ->
                 val result = behavior.handleAttackOn(attackOnContext)
                 if (result.isSuccess()) {
                     alreadySuccessfulAttackPlayers.add(player)
@@ -276,21 +244,16 @@ internal object ItemBehaviorListener : Listener {
     @EventHandler(priority = EventPriority.LOW)
     fun onPreAttack(event: PrePlayerAttackEntityEvent) {
         val player = event.player
-        // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
-        if (!player.isInventoryListenable) return
-
-        // 玩家处于旁观者模式 - 不处理
-        if (player.gameMode == GameMode.SPECTATOR) return
-
-        // 限制每tick只能成功交互一次, 并取消多余的交互事件
-        if (alreadySuccessfulAttackPlayers.contains(player)) {
+        if (!player.isInventoryListenable) return // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
+        if (player.gameMode == GameMode.SPECTATOR) return // 玩家处于旁观者模式 - 不处理
+        if (alreadySuccessfulAttackPlayers.contains(player)) { // 限制每tick只能成功交互一次, 并取消多余的交互事件
             event.isCancelled = true
             return
         }
 
-        val itemStack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        val attackEntityContext = AttackEntityContext(player, itemStack, event.attacked)
-        itemStack.handleBehavior { behavior ->
+        val itemstack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+        val attackEntityContext = AttackEntityContext(player, itemstack, event.attacked)
+        itemstack.handleBehavior { behavior ->
             val result = behavior.handleAttackEntity(attackEntityContext)
             if (result.isSuccess()) {
                 alreadySuccessfulAttackPlayers.add(player)
@@ -308,17 +271,13 @@ internal object ItemBehaviorListener : Listener {
     fun onPostprocessDamage(event: PostprocessDamageEvent) {
         val causingEntity = event.damageSource.causingEntity
         if (causingEntity is Player) {
-            // 确保此时玩家的背包可以监听
-            if (!causingEntity.isInventoryListenable) return
-            // 遍历所有 Koish 关心的槽位
-            for (slot in ItemSlotRegistry.itemSlots()) {
-                // 该槽位没有物品 - 跳转至下一循环
-                val itemStack = slot.getItem(causingEntity) ?: continue
-                // 该槽位的物品不处于激活状态 - 跳转至下一循环
-                if (!itemStack.isActive(slot, causingEntity)) continue
+            if (!causingEntity.isInventoryListenable) return // 确保此时玩家的背包可以监听
+            for (slot in ItemSlotRegistry.itemSlots()) { // 遍历所有 Koish 关心的槽位
+                val itemstack = slot.getItem(causingEntity) ?: continue // 该槽位没有物品 - 跳转至下一循环
+                if (!itemstack.isActive(slot, causingEntity)) continue // 该槽位的物品不处于激活状态 - 跳转至下一循环
 
-                val context = CauseDamageContext(causingEntity, itemStack, event.damagee, event.finalDamageContext)
-                itemStack.handleBehavior { behavior ->
+                val context = CauseDamageContext(causingEntity, itemstack, event.damagee, event.finalDamageContext)
+                itemstack.handleBehavior { behavior ->
                     val result = behavior.handleCauseDamage(context)
                     if (result == BehaviorResult.FINISH_AND_CANCEL) {
                         event.isCancelled = true
@@ -332,17 +291,13 @@ internal object ItemBehaviorListener : Listener {
 
         val damagee = event.damagee
         if (damagee is Player) {
-            // 确保此时玩家的背包可以监听
-            if (!damagee.isInventoryListenable) return
-            // 遍历所有 Koish 关心的槽位
-            for (slot in ItemSlotRegistry.itemSlots()) {
-                // 该槽位没有物品 - 跳转至下一循环
-                val itemStack = slot.getItem(damagee) ?: continue
-                // 该槽位的物品不处于激活状态 - 跳转至下一循环
-                if (!itemStack.isActive(slot, damagee)) continue
+            if (!damagee.isInventoryListenable) return // 确保此时玩家的背包可以监听
+            for (slot in ItemSlotRegistry.itemSlots()) { // 遍历所有 Koish 关心的槽位
+                val itemstack = slot.getItem(damagee) ?: continue // 该槽位没有物品 - 跳转至下一循环
+                if (!itemstack.isActive(slot, damagee)) continue // 该槽位的物品不处于激活状态 - 跳转至下一循环
 
-                val context = ReceiveDamageContext(damagee, itemStack, event.damageSource, event.finalDamageContext)
-                itemStack.handleBehavior { behavior ->
+                val context = ReceiveDamageContext(damagee, itemstack, event.damageSource, event.finalDamageContext)
+                itemstack.handleBehavior { behavior ->
                     val result = behavior.handleReceiveDamage(context)
                     if (result == BehaviorResult.FINISH_AND_CANCEL) {
                         event.isCancelled = true
@@ -358,12 +313,11 @@ internal object ItemBehaviorListener : Listener {
     @EventHandler(priority = EventPriority.LOW)
     fun on(event: PlayerItemDamageEvent) {
         val player = event.player
-        // 确保此时玩家的背包可以监听
-        if (!player.isInventoryListenable) return
-        val itemStack = event.item
+        if (!player.isInventoryListenable) return // 确保此时玩家的背包可以监听
+        val itemstack = event.item
 
-        val context = DurabilityDecreaseContext(player, itemStack, event.damage, event.originalDamage)
-        itemStack.handleBehavior { behavior ->
+        val context = DurabilityDecreaseContext(player, itemstack, event.damage, event.originalDamage)
+        itemstack.handleBehavior { behavior ->
             val result = behavior.handleDurabilityDecrease(context)
             if (result == BehaviorResult.FINISH_AND_CANCEL) {
                 event.isCancelled = true
@@ -380,12 +334,11 @@ internal object ItemBehaviorListener : Listener {
     @EventHandler(priority = EventPriority.LOW)
     fun on(event: PlayerStopUsingItemEvent) {
         val player = event.player
-        // 确保此时玩家的背包可以监听
-        if (!player.isInventoryListenable) return
-        val itemStack = event.item
+        if (!player.isInventoryListenable) return // 确保此时玩家的背包可以监听
+        val itemstack = event.item
 
-        val context = StopUseContext(player, itemStack, event.ticksHeldFor)
-        itemStack.handleBehavior { behavior ->
+        val context = StopUseContext(player, itemstack, event.ticksHeldFor)
+        itemstack.handleBehavior { behavior ->
             val result = behavior.handleStopUse(context)
             if (result != BehaviorResult.PASS) {
                 return
@@ -396,17 +349,16 @@ internal object ItemBehaviorListener : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(event: PlayerItemConsumeEvent) {
         val player = event.player
-        // 确保此时玩家的背包可以监听
-        if (!player.isInventoryListenable) return
-        val itemStack = event.item
+        if (!player.isInventoryListenable) return // 确保此时玩家的背包可以监听
+        val itemstack = event.item
         val hand = when (event.hand) {
             EquipmentSlot.HAND -> InteractionHand.MAIN_HAND
             EquipmentSlot.OFF_HAND -> InteractionHand.OFF_HAND
             else -> return
         }
 
-        val context = ConsumeContext(player, itemStack, hand, event.replacement)
-        itemStack.handleBehavior { behavior ->
+        val context = ConsumeContext(player, itemstack, hand, event.replacement)
+        itemstack.handleBehavior { behavior ->
             val result = behavior.handleConsume(context)
             if (result == BehaviorResult.FINISH_AND_CANCEL) {
                 event.isCancelled = true
@@ -419,6 +371,4 @@ internal object ItemBehaviorListener : Listener {
             }
         }
     }
-
 }
-
