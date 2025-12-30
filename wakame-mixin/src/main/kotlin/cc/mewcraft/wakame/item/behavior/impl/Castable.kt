@@ -24,7 +24,7 @@ object Castable : SimpleInteract {
             handleTrigger(player, entry, GenericCastableTrigger.RIGHT_CLICK)
         }
 
-        return InteractionResult.SUCCESS_AND_CANCEL
+        return InteractionResult.PASS
     }
 
     // Implements the following triggers in castable:
@@ -38,7 +38,7 @@ object Castable : SimpleInteract {
             handleTrigger(player, entry, GenericCastableTrigger.LEFT_CLICK)
         }
 
-        return InteractionResult.SUCCESS_AND_CANCEL
+        return InteractionResult.PASS
     }
 
     // Implements the following triggers in castable:
