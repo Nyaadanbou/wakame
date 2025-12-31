@@ -9,6 +9,7 @@ object CommandPermissions {
 
     // Catalog
     val CATALOG_ITEM = Permission.of("wakame.command.catalog.item")
+    val CATALOG_KIZAMI = Permission.of("wakame.command.catalog.kizami")
 
     // Crafting
     val CRAFT = Permission.of("wakame.command.craft")

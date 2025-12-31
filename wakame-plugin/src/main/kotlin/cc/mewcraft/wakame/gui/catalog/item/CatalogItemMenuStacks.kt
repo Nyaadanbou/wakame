@@ -41,9 +41,9 @@ object CatalogItemMenuStacks {
      *
      * 该函数不会移除位于栈顶部的菜单.
      */
-    fun peek(player: Player): CatalogItemMenu {
+    fun peek(player: Player): CatalogItemMenu? {
         val stack = getStack(player)
-        return stack.last()
+        return stack.lastOrNull()
     }
 
     /**
