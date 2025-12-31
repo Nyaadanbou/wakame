@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.gui.catalog.item
 
 import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.item.resolveToItemWrapper
 import net.kyori.adventure.text.Component
@@ -39,10 +40,13 @@ internal class CatalogItemFocusMenu(
     val guis: List<CatalogRecipeGui>,
 ) : CatalogItemMenu {
 
-    private val settings = CatalogItemMenuSettings.getMenuSettings("paged_catalog_recipes")
+    /**
+     * 菜单的 [BasicMenuSettings].
+     */
+    private val settings: BasicMenuSettings = CatalogItemMenuSettings.getMenuSettings("paged_catalog_recipes")
 
     /**
-     * 菜单的 [Gui].
+     * 菜单的 [PagedGui].
      *
      * - `x`: catalog_recipe_gui
      * - `.`: background
@@ -73,18 +77,29 @@ internal class CatalogItemFocusMenu(
         primaryWindow.open()
     }
 
+    override fun close() {
+        primaryWindow.close()
+    }
+
     /**
      * **背景** 占位的图标.
      */
     inner class BackgroundItem : AbstractItem() {
-        override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("background").resolveToItemWrapper()
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
+
+        override fun getItemProvider(): ItemProvider {
+            return settings.getSlotDisplay("background").resolveToItemWrapper()
+        }
+
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+
+        }
     }
 
     /**
      * **上一页** 的图标.
      */
     inner class PrevItem : PageItem(false) {
+
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             if (!getGui().hasPreviousPage()) {
                 return settings.getSlotDisplay("background").resolveToItemWrapper()
@@ -108,6 +123,7 @@ internal class CatalogItemFocusMenu(
      * **下一页** 的图标.
      */
     inner class NextItem : PageItem(true) {
+
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             if (!getGui().hasNextPage()) {
                 return settings.getSlotDisplay("background").resolveToItemWrapper()
@@ -131,10 +147,13 @@ internal class CatalogItemFocusMenu(
      * **返回** 的图标.
      */
     inner class BackItem : AbstractItem() {
-        override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("back").resolveToItemWrapper()
+
+        override fun getItemProvider(): ItemProvider {
+            return settings.getSlotDisplay("back").resolveToItemWrapper()
+        }
+
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             CatalogItemMenuStacks.pop(player)
         }
     }
-
 }

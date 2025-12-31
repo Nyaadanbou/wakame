@@ -10,14 +10,13 @@ import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.item.SlotDisplay
 import cc.mewcraft.wakame.item.resolveToItemWrapper
 import cc.mewcraft.wakame.util.ReloadableProperty
+import cc.mewcraft.wakame.util.runTaskTimer
 import net.kyori.adventure.text.Component
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.*
 import org.bukkit.scheduler.BukkitTask
-import xyz.xenondevs.invui.InvUI
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.structure.Markers
@@ -58,9 +57,7 @@ internal object CatalogRecipeGuiManager {
         registerGuiCreator<CatalogSmokingRecipe>(::createCookingRecipeGui)
         registerGuiCreator<CatalogStonecuttingRecipe>(::createStonecuttingRecipeGui)
         registerGuiCreator<CatalogItemLootTableRecipe>(::createLootTableRecipeGui)
-    }
 
-    init {
         // TODO 支持配置文件载入优先级
         registerGuiPriority<CatalogBlastingRecipe>(500)
         registerGuiPriority<CatalogCampfireRecipe>(600)
@@ -105,8 +102,10 @@ internal object CatalogRecipeGuiManager {
      *
      * 返回 `null` 意味着 [CatalogRecipe] 可被图鉴检索, 但代码没有指定对应 [CatalogRecipeGui] 创建方法.
      */
-    private fun buildGui(recipe: CatalogRecipe): CatalogRecipeGui? = GUI_CREATORS[recipe::class.java]?.invoke(recipe).also {
-        if (it == null) LOGGER.warn("No gui creator for ${recipe::class.java}")
+    private fun buildGui(recipe: CatalogRecipe): CatalogRecipeGui? {
+        return GUI_CREATORS[recipe::class.java]?.invoke(recipe).also {
+            if (it == null) LOGGER.warn("No gui creator for ${recipe::class.java}")
+        }
     }
 
     /**
@@ -246,8 +245,14 @@ internal object CatalogRecipeGuiManager {
 private class BackgroundItem(
     val settings: BasicMenuSettings,
 ) : AbstractItem() {
-    override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("background").resolveToItemWrapper()
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
+
+    override fun getItemProvider(): ItemProvider {
+        return settings.getSlotDisplay("background").resolveToItemWrapper()
+    }
+
+    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+
+    }
 }
 
 /**
@@ -258,6 +263,7 @@ private class CookingInfoItem(
     val cookingTime: Int,
     val exp: Float,
 ) : AbstractItem() {
+
     override fun getItemProvider(): ItemProvider {
         return settings.getSlotDisplay("cooking_info").resolveToItemWrapper {
             standard {
@@ -267,7 +273,9 @@ private class CookingInfoItem(
         }
     }
 
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
+    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+
+    }
 }
 
 /**
@@ -276,8 +284,14 @@ private class CookingInfoItem(
 private class FuelItem(
     val settings: BasicMenuSettings,
 ) : AbstractItem() {
-    override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("fuel").resolveToItemWrapper()
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
+
+    override fun getItemProvider(): ItemProvider {
+        return settings.getSlotDisplay("fuel").resolveToItemWrapper()
+    }
+
+    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+
+    }
 }
 
 /**
@@ -287,19 +301,32 @@ private class FuelItem(
 private class TrimResultItem(
     val settings: BasicMenuSettings,
 ) : AbstractItem() {
-    override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("trim_result").resolveToItemWrapper()
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
+    override fun getItemProvider(): ItemProvider {
+        return settings.getSlotDisplay("trim_result").resolveToItemWrapper()
+    }
+
+    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+
+    }
 }
 
 /**
  * **战利品表占位输入** 的图标.
  */
 class LootItem(
-    private val lootTableRecipe: CatalogItemLootTableRecipe,
+    private val recipe: CatalogItemLootTableRecipe,
 ) : AbstractItem() {
-    private val itemProvider: ItemProvider = SlotDisplay.get(lootTableRecipe.catalogIcon).resolveToItemWrapper()
-    override fun getItemProvider(): ItemProvider = itemProvider
-    override fun handleClick(p0: ClickType, p1: Player, p2: InventoryClickEvent) = Unit
+
+    private val itemProvider: ItemProvider =
+        SlotDisplay.get(recipe.catalogIcon).resolveToItemWrapper()
+
+    override fun getItemProvider(): ItemProvider {
+        return itemProvider
+    }
+
+    override fun handleClick(p0: ClickType, p1: Player, p2: InventoryClickEvent) {
+
+    }
 }
 
 /**
@@ -308,6 +335,7 @@ class LootItem(
 private class PrevItem(
     val settings: BasicMenuSettings,
 ) : PageItem(false) {
+
     override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
         if (!getGui().hasPreviousPage()) {
             return settings.getSlotDisplay("background").resolveToItemWrapper()
@@ -322,6 +350,7 @@ private class PrevItem(
 private class NextItem(
     val settings: BasicMenuSettings,
 ) : PageItem(true) {
+
     override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
         if (!getGui().hasNextPage()) {
             return settings.getSlotDisplay("background").resolveToItemWrapper()
@@ -339,8 +368,10 @@ private class NextItem(
  * 直接点击 = 查找该物品的获取方式.
  * Shift 点击 = 查找该物品的用途.
  */
+@Suppress("FunctionName")
 private fun DisplayItem(items: List<ItemRef>, amount: Int = 1): AbstractItem {
-    if (items.isEmpty()) return SimpleItem(ItemStack.empty())
+    if (items.isEmpty())
+        return SimpleItem(ItemStack.empty())
     return if (items.size == 1) {
         DisplayItem(items.first(), amount)
     } else {
@@ -353,77 +384,10 @@ private fun DisplayItem(items: ItemRef, amount: Int = 1): AbstractItem {
     return SingleDisplayItem(items, amount)
 }
 
-private class SingleDisplayItem(
-    val item: ItemRef,
-    val amount: Int,
-) : AbstractItem() {
-    override fun getItemProvider(): ItemProvider {
-        // TODO 渲染
-        return ItemWrapper(item.createItemStack(amount))
-    }
-
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        handleClick0(clickType, player, item)
-    }
-}
-
-private class MultiDisplayItem(
-    val items: List<ItemRef>,
-    /**
-     * 对于循环物品, 所有物品数量相同.
-     */
-    val amount: Int,
-) : AbstractItem() {
-    private var task: BukkitTask? = null
-    private var state = 0
-
-    fun start() {
-        task?.cancel()
-        // 物品循环周期固定为 20t
-        task = Bukkit.getScheduler().runTaskTimer(InvUI.getInstance().plugin, ::cycle, 0L, 20L)
-    }
-
-    fun cancel() {
-        task?.cancel()
-        task = null
-    }
-
-    private fun cycle() {
-        ++state
-        if (state == items.size) {
-            state = 0
-        }
-        notifyWindows()
-    }
-
-    override fun getItemProvider(): ItemProvider {
-        // TODO 渲染
-        return ItemWrapper(items[state].createItemStack(amount))
-    }
-
-    override fun addWindow(window: AbstractWindow) {
-        super.addWindow(window)
-        if (task == null) {
-            start()
-        }
-    }
-
-    override fun removeWindow(window: AbstractWindow) {
-        super.removeWindow(window)
-        if (windows.isEmpty() && task != null) {
-            cancel()
-        }
-    }
-
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        handleClick0(clickType, player, items[state])
-    }
-}
-
 /**
  * 方便函数.
  */
-private fun AbstractItem.handleClick0(clickType: ClickType, player: Player, item: ItemRef) {
+private fun handleClickCommons(clickType: ClickType, player: Player, item: ItemRef) {
     val lookupState = when (clickType) {
         ClickType.LEFT, ClickType.RIGHT -> LookupState.SOURCE
         ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> LookupState.USAGE
@@ -450,12 +414,79 @@ private fun AbstractItem.handleClick0(clickType: ClickType, player: Player, item
     CatalogItemMenuStacks.push(player, CatalogItemFocusMenu(item, lookupState, player, catalogRecipeGuis))
 }
 
+private class SingleDisplayItem(
+    val item: ItemRef,
+    val amount: Int,
+) : AbstractItem() {
+
+    override fun getItemProvider(): ItemProvider {
+        // TODO 渲染
+        return ItemWrapper(item.createItemStack(amount))
+    }
+
+    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+        handleClickCommons(clickType, player, item)
+    }
+}
+
+private class MultiDisplayItem(
+    val items: List<ItemRef>,
+    /**
+     * 对于循环物品, 所有物品数量相同.
+     */
+    val amount: Int,
+) : AbstractItem() {
+
+    private var task: BukkitTask? = null
+    private var state = 0
+
+    fun start() {
+        task?.cancel()
+        // 物品循环周期固定为 20t
+        task = runTaskTimer(0L, 20L, ::cycle)
+    }
+
+    fun cancel() {
+        task?.cancel()
+        task = null
+    }
+
+    private fun cycle() {
+        ++state
+        if (state == items.size) {
+            state = 0
+        }
+        notifyWindows()
+    }
+
+    override fun getItemProvider(): ItemProvider {
+        return ItemWrapper(items[state].createItemStack(amount))
+    }
+
+    override fun addWindow(window: AbstractWindow) {
+        super.addWindow(window)
+        if (task == null) {
+            start()
+        }
+    }
+
+    override fun removeWindow(window: AbstractWindow) {
+        super.removeWindow(window)
+        if (windows.isEmpty() && task != null) {
+            cancel()
+        }
+    }
+
+    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+        handleClickCommons(clickType, player, items[state])
+    }
+}
+
 internal enum class LookupState {
     /**
      * 代表检索的是物品的来源.
      */
     SOURCE,
-
     /**
      * 代表检索的是物品的用途.
      */

@@ -22,6 +22,13 @@ object CatalogItemRecipeNetwork {
 
     private lateinit var network: ImmutableNetwork<Optional<ItemRef>, CatalogRecipeEdge>
 
+    @InitFun
+    fun init() {
+
+        // 当原版配方注册完成时 -> 重建网络
+        MapEventBus.subscribe<MinecraftRecipeRegistrationDoneEvent> { rebuildNetwork() }
+    }
+
     /**
      * 获取特定物品的所有获取方式 (来源).
      */
@@ -36,23 +43,6 @@ object CatalogItemRecipeNetwork {
     fun getUsage(node: ItemRef): Set<CatalogRecipe> {
         if (!network.nodes().contains(Optional.of(node))) return emptySet()
         return network.outEdges(Optional.of(node)).map(CatalogRecipeEdge::recipe).toSet()
-    }
-
-    /**
-     * 封装一个 [CatalogRecipe] 作为 [ImmutableNetwork] 的边.
-     */
-    private class CatalogRecipeEdge(
-        val recipe: CatalogRecipe,
-    )
-
-    @InitFun
-    fun init() {
-
-        // 当原版配方注册完成时 -> 重建网络
-        MapEventBus.subscribe<MinecraftRecipeRegistrationDoneEvent> {
-            rebuildNetwork()
-        }
-
     }
 
     private fun rebuildNetwork() {
@@ -143,4 +133,10 @@ object CatalogItemRecipeNetwork {
         }
     }
 
+    /**
+     * 封装一个 [CatalogRecipe] 作为 [ImmutableNetwork] 的边.
+     */
+    private class CatalogRecipeEdge(
+        val recipe: CatalogRecipe,
+    )
 }

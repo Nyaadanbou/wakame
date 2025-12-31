@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.gui.catalog.item
 
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.item.resolveToItemWrapper
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.item.Item
@@ -32,10 +32,14 @@ internal class CatalogItemCategoryMenu(
      */
     val viewer: Player,
 ) : CatalogItemMenu {
-    private val settings = category.menuSettings
 
     /**
-     * 菜单的 [Gui].
+     * 菜单的 [BasicMenuSettings].
+     */
+    private val settings: BasicMenuSettings = category.menuSettings
+
+    /**
+     * 菜单的 [PagedGui].
      *
      * - `.`: background
      * - `<`: prev_page
@@ -52,7 +56,7 @@ internal class CatalogItemCategoryMenu(
         builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         // TODO 可以缓存, 只有重载时会变化
         // 类别菜单所展示的物品
-        builder.setContent(category.items.map { itemX -> DisplayItem(itemX) })
+        builder.setContent(category.items.map { itemRef -> DisplayItem(itemRef) })
     }
 
     /**
@@ -68,21 +72,33 @@ internal class CatalogItemCategoryMenu(
         primaryWindow.open()
     }
 
+    override fun close() {
+        primaryWindow.close()
+    }
+
     /**
      * 背景占位的图标.
      */
     inner class BackgroundItem : AbstractItem() {
-        override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("background").resolveToItemWrapper()
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
+
+        override fun getItemProvider(): ItemProvider {
+            return settings.getSlotDisplay("background").resolveToItemWrapper()
+        }
+
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+
+        }
     }
 
     /**
      * 上一页的图标.
      */
     inner class PrevItem : PageItem(false) {
+
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            if (!getGui().hasPreviousPage())
+            if (!getGui().hasPreviousPage()) {
                 return settings.getSlotDisplay("background").resolveToItemWrapper()
+            }
             return settings.getSlotDisplay("prev_page").resolveToItemWrapper {
                 standard {
                     component("current_page", Component.text(primaryGui.currentPage + 1))
@@ -96,9 +112,11 @@ internal class CatalogItemCategoryMenu(
      * 下一页的图标.
      */
     inner class NextItem : PageItem(true) {
+
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            if (!getGui().hasNextPage())
+            if (!getGui().hasNextPage()) {
                 return settings.getSlotDisplay("background").resolveToItemWrapper()
+            }
             return settings.getSlotDisplay("next_page").resolveToItemWrapper {
                 standard {
                     component("current_page", Component.text(primaryGui.currentPage + 1))
@@ -112,7 +130,11 @@ internal class CatalogItemCategoryMenu(
      * **返回** 的图标.
      */
     inner class BackItem : AbstractItem() {
-        override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("back").resolveToItemWrapper()
+
+        override fun getItemProvider(): ItemProvider {
+            return settings.getSlotDisplay("back").resolveToItemWrapper()
+        }
+
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             CatalogItemMenuStacks.pop(player)
         }
@@ -124,8 +146,8 @@ internal class CatalogItemCategoryMenu(
     inner class DisplayItem(
         val item: ItemRef,
     ) : AbstractItem() {
+
         override fun getItemProvider(): ItemProvider {
-            // TODO 渲染
             return ItemWrapper(item.createItemStack())
         }
 

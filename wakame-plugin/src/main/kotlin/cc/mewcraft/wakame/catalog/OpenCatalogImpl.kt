@@ -33,20 +33,23 @@ object OpenCatalogImpl : SimpleInteract {
         val catalogType = openCatalog.catalogType
         val catalogId = openCatalog.catalogId
         if (catalogId == null) {
+            // 未指定类别, 则优先打开最近一次看过的菜单
+            val last = CatalogItemMenuStacks.peek(player)
+            if (last != null) {
+                last.open()
+                return InteractionResult.PASS
+            }
             val menu = CatalogItemMainMenu(player)
             CatalogItemMenuStacks.rewrite(player, menu)
-
         } else {
             val category = DynamicRegistries.ITEM_CATEGORY[catalogId] ?: run {
                 LOGGER.error("Found an unknown catalog item category id '$catalogId' for type '$catalogType' when opening catalog from item")
                 return InteractionResult.PASS
             }
-
             val parent = CatalogItemMainMenu(player)
             val child = CatalogItemCategoryMenu(category, player)
             CatalogItemMenuStacks.rewrite(player, parent, child)
         }
-
-        return InteractionResult.SUCCESS
+        return InteractionResult.PASS
     }
 }

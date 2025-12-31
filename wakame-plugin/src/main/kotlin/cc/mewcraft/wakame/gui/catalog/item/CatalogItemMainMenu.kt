@@ -2,17 +2,16 @@ package cc.mewcraft.wakame.gui.catalog.item
 
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
 import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.integration.permission.PermissionManager
 import cc.mewcraft.wakame.item.SlotDisplay
 import cc.mewcraft.wakame.item.resolveToItemWrapper
 import cc.mewcraft.wakame.registry.DynamicRegistries
 import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.ReloadableProperty
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.item.Item
@@ -27,21 +26,24 @@ import xyz.xenondevs.invui.window.type.context.setTitle
  * 展示所有的物品类别.
  */
 class CatalogItemMainMenu(
-
     /**
      * 该菜单的用户, 也就是正在查看该菜单的玩家.
      */
     val viewer: Player,
 ) : CatalogItemMenu {
 
-    companion object {
-        private val CATALOG_ITEM_POOL: HashMap<Identifier, CategoryItem> by ReloadableProperty { HashMap(32) }
-    }
-
-    private val settings = CatalogItemMenuSettings.getMenuSettings("main")
+    /**
+     * [CategoryItem] 的缓存.
+     */
+    private val categoryCache: HashMap<Identifier, CategoryItem> = HashMap()
 
     /**
-     * 菜单的 [Gui].
+     * 菜单的 [BasicMenuSettings].
+     */
+    private val settings: BasicMenuSettings = CatalogItemMenuSettings.getMenuSettings("main")
+
+    /**
+     * 菜单的 [PagedGui].
      *
      * - `.`: background
      * - `<`: prev_page
@@ -59,10 +61,12 @@ class CatalogItemMainMenu(
         // 对 CategoryItem 进行缓存
         // TODO 权限检查代码美化
         builder.setContent(DynamicRegistries.ITEM_CATEGORY.filter { category ->
-            if (category.permission == null) return@filter true
-            PermissionManager.hasPermission(viewer.world, viewer.uniqueId, category.permission).get()
+            val permission = category.permission ?: return@filter true
+            val world = viewer.world
+            val player = viewer.uniqueId
+            PermissionManager.hasPermission(world, player, permission).get()
         }.map { category ->
-            CATALOG_ITEM_POOL.getOrPut(category.id) { CategoryItem(category) }
+            categoryCache.getOrPut(category.id) { CategoryItem(category) }
         }.toList())
     }
 
@@ -79,18 +83,29 @@ class CatalogItemMainMenu(
         primaryWindow.open()
     }
 
+    override fun close() {
+        primaryWindow.close()
+    }
+
     /**
      * 背景占位的图标.
      */
     inner class BackgroundItem : AbstractItem() {
-        override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("background").resolveToItemWrapper()
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
+
+        override fun getItemProvider(): ItemProvider {
+            return settings.getSlotDisplay("background").resolveToItemWrapper()
+        }
+
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+
+        }
     }
 
     /**
      * `上一页` 的图标.
      */
     inner class PrevItem : PageItem(false) {
+
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             if (!getGui().hasPreviousPage())
                 return settings.getSlotDisplay("background").resolveToItemWrapper()
@@ -107,6 +122,7 @@ class CatalogItemMainMenu(
      * `下一页` 的图标.
      */
     inner class NextItem : PageItem(true) {
+
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             if (!getGui().hasNextPage())
                 return settings.getSlotDisplay("background").resolveToItemWrapper()
@@ -123,7 +139,11 @@ class CatalogItemMainMenu(
      * `搜索` 的图标.
      */
     inner class SearchItem : AbstractItem() {
-        override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("search").resolveToItemWrapper()
+
+        override fun getItemProvider(): ItemProvider {
+            return settings.getSlotDisplay("search").resolveToItemWrapper()
+        }
+
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             // TODO 物品搜索功能
         }
@@ -137,11 +157,13 @@ class CatalogItemMainMenu(
     ) : AbstractItem() {
 
         private val itemProvider: ItemProvider = SlotDisplay.get(category.icon).resolveToItemWrapper()
-        override fun getItemProvider(): ItemProvider = itemProvider
+
+        override fun getItemProvider(): ItemProvider {
+            return itemProvider
+        }
+
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             CatalogItemMenuStacks.push(viewer, CatalogItemCategoryMenu(category, viewer))
         }
-
     }
-
 }
