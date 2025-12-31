@@ -20,7 +20,7 @@ import java.lang.reflect.Type
  */
 data class CatalogItemCategory(
     val id: Identifier,
-    val icon: Key,
+    val icon: Identifier,
     val menuSettings: BasicMenuSettings,
     val permission: String?,
     val items: List<ItemRef>,
@@ -40,20 +40,19 @@ internal object CategorySerializer : TypeSerializer2<CatalogItemCategory> {
         val permission = node.node("permission").get<String>()
         val settings = node.node("menu_settings").require<BasicMenuSettings>()
 
-        // val itemUids = node.node("items").getList<ItemX>(emptyList())
+        // val itemIds = node.node("items").getList<ItemX>(emptyList())
         // 不像上面这样写的原因: 若列表中的某个 id 有问题, 将跳过这个 id 而不是抛异常
         val itemIds = node.node("items").getList<String>(emptyList())
         val itemList = mutableListOf<ItemRef>()
-        for (uid in itemIds) {
-            val item = ItemRef.create(Identifiers.of(uid))
+        for (itemId in itemIds) {
+            val item = ItemRef.create(Identifiers.of(itemId))
             if (item == null) {
-                LOGGER.warn("Cannot deserialize string '$uid' into ItemX, skipped adding it to category: '$id'")
+                LOGGER.warn("Cannot deserialize string '$itemId' into ItemRef, skipped adding it to category: '$itemId'")
                 continue
             }
             itemList.add(item)
         }
         return CatalogItemCategory(id, icon, settings, permission, itemList)
     }
-
 }
 

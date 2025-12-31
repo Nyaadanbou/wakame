@@ -5,25 +5,24 @@ import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
 import org.bukkit.entity.Player
 import xyz.xenondevs.invui.window.WindowManager
-import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayDeque
-import kotlin.collections.last
 
 object CatalogItemMenuStacks {
 
     // 注意!
     // 由于设置了 expireAfterAccess, 即使玩家退出服务器, 其菜单栈依然会驻留在此一段时间
     // 也就是说菜单栈里面被 CatalogItemMenu 直接持有的 BukkitPlayer 实例也会驻留在此一段时间
-    private val menuStackMap: LoadingCache<UUID, ArrayDeque<CatalogItemMenu>> = CacheBuilder.newBuilder()
+    private val menuStackMap: LoadingCache<Player, ArrayDeque<CatalogItemMenu>> = CacheBuilder.newBuilder()
         .expireAfterAccess(5, TimeUnit.MINUTES)
+        .weakKeys()
         .build(CacheLoader.from { _ -> ArrayDeque() })
 
     /**
      * 获取 [player] 的菜单栈的大小.
      */
     fun size(player: Player): Int {
-        return menuStackMap[player.uniqueId]?.size ?: 0
+        val stack = getStack(player)
+        return stack.size
     }
 
     /**
@@ -32,8 +31,9 @@ object CatalogItemMenuStacks {
      * 此函数会将新的菜单放在栈的顶部.
      */
     fun push(player: Player, menu: CatalogItemMenu) {
-        menuStackMap.get(player.uniqueId).addLast(menu)
-        menu.open()
+        val stack = getStack(player)
+        stack.addLast(menu)
+        stack.last().open()
     }
 
     /**
@@ -41,8 +41,9 @@ object CatalogItemMenuStacks {
      *
      * 该函数不会移除位于栈顶部的菜单.
      */
-    fun peek(player: Player): CatalogItemMenu? {
-        return menuStackMap.get(player.uniqueId)?.last()
+    fun peek(player: Player): CatalogItemMenu {
+        val stack = getStack(player)
+        return stack.last()
     }
 
     /**
@@ -51,25 +52,26 @@ object CatalogItemMenuStacks {
      * 该函数会移除位于栈顶部的菜单.
      */
     fun pop(player: Player) {
-        val stack: ArrayDeque<CatalogItemMenu> = menuStackMap.get(player.uniqueId)
+        val stack = getStack(player)
 
         // 如果栈已经空了, 则仅关闭当前菜单
         if (stack.isEmpty()) {
             WindowManager.getInstance().getOpenWindow(player)?.close()
-            menuStackMap.invalidate(player.uniqueId)
+            removeStack(player)
             return
         }
 
         // 如果栈只有当前菜单, 则关闭当前菜单并从栈移除
         if (stack.size == 1) {
-            stack.removeLast()
             WindowManager.getInstance().getOpenWindow(player)?.close()
-            menuStackMap.invalidate(player.uniqueId)
+            removeStack(player)
+            stack.removeLast()
             return
         }
 
-        // 正常返回上一级菜单
+        // 移除最顶层菜单
         stack.removeLast()
+        // 打开最顶层菜单
         stack.last().open()
     }
 
@@ -80,7 +82,22 @@ object CatalogItemMenuStacks {
      */
     fun rewrite(player: Player, vararg menus: CatalogItemMenu) {
         if (menus.isEmpty()) return
-        menuStackMap.put(player.uniqueId, ArrayDeque(menus.toList()))
-        menus.last().open()
+        val newStack = ArrayDeque(menus.toList())
+        setStack(player, newStack)
+        newStack.last().open()
+    }
+
+    //// 方便函数
+
+    internal fun getStack(player: Player): ArrayDeque<CatalogItemMenu> {
+        return menuStackMap[player]
+    }
+
+    internal fun setStack(player: Player, stack: ArrayDeque<CatalogItemMenu>) {
+        menuStackMap.put(player, stack)
+    }
+
+    internal fun removeStack(player: Player) {
+        menuStackMap.invalidate(player)
     }
 }

@@ -31,8 +31,8 @@ public class KoishLoader implements PluginLoader {
                 new Exclusion("org.jetbrains.kotlin", "*", "*", "*"),
                 new Exclusion("org.jetbrains.kotlinx", "*", "*", "*")
         );
-        resolver.addDependency(new Dependency(new DefaultArtifact("xyz.xenondevs.invui:invui:pom:1.46"), null));
-        resolver.addDependency(new Dependency(new DefaultArtifact("xyz.xenondevs.invui:invui-kotlin:1.46"), null, false, exclusions));
+        resolver.addDependency(new Dependency(new DefaultArtifact("xyz.xenondevs.invui:invui:pom:1.49"), null));
+        resolver.addDependency(new Dependency(new DefaultArtifact("xyz.xenondevs.invui:invui-kotlin:1.49"), null, false, exclusions));
 
         classpathBuilder.addLibrary(resolver);
     }
