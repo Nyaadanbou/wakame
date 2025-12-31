@@ -32,9 +32,10 @@ class CatalogItemMainMenu(
     val viewer: Player,
 ) : CatalogItemMenu {
 
-    companion object {
-        private val CATALOG_ITEM_POOL: HashMap<Identifier, CategoryItem> by ReloadableProperty { HashMap(32) }
-    }
+    /**
+     * [CategoryItem] 的缓存.
+     */
+    private val categoryCache: HashMap<Identifier, CategoryItem> = HashMap()
 
     /**
      * 菜单的 [BasicMenuSettings].
@@ -65,7 +66,7 @@ class CatalogItemMainMenu(
             val player = viewer.uniqueId
             PermissionManager.hasPermission(world, player, permission).get()
         }.map { category ->
-            CATALOG_ITEM_POOL.getOrPut(category.id) { CategoryItem(category) }
+            categoryCache.getOrPut(category.id) { CategoryItem(category) }
         }.toList())
     }
 
