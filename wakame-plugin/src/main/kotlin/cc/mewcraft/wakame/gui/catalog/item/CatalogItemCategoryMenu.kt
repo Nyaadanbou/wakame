@@ -8,7 +8,6 @@ import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.item.Item
@@ -34,10 +33,13 @@ internal class CatalogItemCategoryMenu(
     val viewer: Player,
 ) : CatalogItemMenu {
 
+    /**
+     * 菜单的 [BasicMenuSettings].
+     */
     private val settings: BasicMenuSettings = category.menuSettings
 
     /**
-     * 菜单的 [Gui].
+     * 菜单的 [PagedGui].
      *
      * - `.`: background
      * - `<`: prev_page

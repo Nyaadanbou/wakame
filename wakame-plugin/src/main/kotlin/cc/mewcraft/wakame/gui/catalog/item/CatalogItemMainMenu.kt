@@ -8,12 +8,10 @@ import cc.mewcraft.wakame.item.SlotDisplay
 import cc.mewcraft.wakame.item.resolveToItemWrapper
 import cc.mewcraft.wakame.registry.DynamicRegistries
 import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.ReloadableProperty
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.item.Item
@@ -28,7 +26,6 @@ import xyz.xenondevs.invui.window.type.context.setTitle
  * 展示所有的物品类别.
  */
 class CatalogItemMainMenu(
-
     /**
      * 该菜单的用户, 也就是正在查看该菜单的玩家.
      */
@@ -39,10 +36,13 @@ class CatalogItemMainMenu(
         private val CATALOG_ITEM_POOL: HashMap<Identifier, CategoryItem> by ReloadableProperty { HashMap(32) }
     }
 
+    /**
+     * 菜单的 [BasicMenuSettings].
+     */
     private val settings: BasicMenuSettings = CatalogItemMenuSettings.getMenuSettings("main")
 
     /**
-     * 菜单的 [Gui].
+     * 菜单的 [PagedGui].
      *
      * - `.`: background
      * - `<`: prev_page

@@ -40,10 +40,13 @@ internal class CatalogItemFocusMenu(
     val guis: List<CatalogRecipeGui>,
 ) : CatalogItemMenu {
 
+    /**
+     * 菜单的 [BasicMenuSettings].
+     */
     private val settings: BasicMenuSettings = CatalogItemMenuSettings.getMenuSettings("paged_catalog_recipes")
 
     /**
-     * 菜单的 [Gui].
+     * 菜单的 [PagedGui].
      *
      * - `x`: catalog_recipe_gui
      * - `.`: background
