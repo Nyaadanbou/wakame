@@ -10,7 +10,7 @@ import org.betonquest.betonquest.api.schedule.CatchupStrategy
 import org.betonquest.betonquest.api.schedule.Schedule
 import org.betonquest.betonquest.api.schedule.ScheduleID
 import org.betonquest.betonquest.api.schedule.Scheduler
-import org.betonquest.betonquest.kernel.processor.quest.VariableProcessor
+import org.betonquest.betonquest.kernel.processor.quest.PlaceholderProcessor
 import org.betonquest.betonquest.schedule.impl.BaseScheduleFactory
 import org.bukkit.Bukkit
 import org.bukkit.configuration.ConfigurationSection
@@ -41,7 +41,7 @@ class GameTickSchedule(
  * For example, time: "10" means the schedule runs every 10 ticks.
  */
 class GameTickScheduleFactory(
-    variableProcessor: VariableProcessor,
+    variableProcessor: PlaceholderProcessor,
     packManager: QuestPackageManager,
 ) : BaseScheduleFactory<GameTickSchedule>(variableProcessor, packManager) {
 

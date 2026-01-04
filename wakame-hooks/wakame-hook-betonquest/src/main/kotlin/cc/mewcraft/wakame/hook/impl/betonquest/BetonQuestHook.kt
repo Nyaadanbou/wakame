@@ -24,7 +24,7 @@ object BetonQuestHook {
         val questTypeApi = plugin.questTypeApi
         val profileProvider = plugin.profileProvider
         val loggerFactory = plugin.loggerFactory
-        val variableProcessor = plugin.variableProcessor
+        val variableProcessor = plugin.placeholderProcessor
         val packManager = plugin.questPackageManager
 
         /* Quest Type Registries */
@@ -46,8 +46,8 @@ object BetonQuestHook {
         // Objective
         val objectiveRegistry = plugin.questRegistries.objective()
 
-        // Variable
-        val variableRegistry = plugin.questRegistries.variable()
+        // Placeholder
+        val placeholderRegistry = plugin.questRegistries.placeholder()
 
         /* Feature Registries */
 

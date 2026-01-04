@@ -30,7 +30,7 @@ object PlotSquaredCompat {
         val objectiveRegistry = plugin.questRegistries.objective()
 
         // Variable
-        val variableRegistry = plugin.questRegistries.variable()
+        val placeholderRegistry = plugin.questRegistries.placeholder()
 
         /* Feature Registries */
 
