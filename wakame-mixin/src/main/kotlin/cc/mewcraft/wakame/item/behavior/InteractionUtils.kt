@@ -766,7 +766,7 @@ private object InteractableEntities {
      * 方便函数.
      */
     private fun ItemStack.checkIsCorrespondingFood(entity: Entity): Boolean {
-        val tag = Bukkit.getTag(Tag.REGISTRY_ITEMS, NamespacedKey.minecraft("${entity.type.name}_food"), Material::class.java) ?: return false
+        val tag = Bukkit.getTag(Tag.REGISTRY_ITEMS, NamespacedKey.minecraft("${entity.type.name.lowercase()}_food"), Material::class.java) ?: return false
         return checkItemTag(tag)
     }
 
