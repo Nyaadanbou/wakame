@@ -57,7 +57,7 @@ object EntityBucket : ItemBehavior {
 
         val entityData = itemstack.getData(ItemDataTypes.ENTITY_BUCKET_DATA) ?: return InteractionResult.FAIL
         val deserializedEntity = Bukkit.getUnsafe().deserializeEntity(entityData, player.world)
-        val successfullySpawned = deserializedEntity.spawnAt(context.blockLocation, CreatureSpawnEvent.SpawnReason.BUCKET)
+        val successfullySpawned = deserializedEntity.spawnAt(context.blockLocation.add(.0, 1.0, .0), CreatureSpawnEvent.SpawnReason.BUCKET)
         if (successfullySpawned) {
             // 还原物品状态, 也就是使其变成空桶时的状态
             if (player.gameMode != GameMode.CREATIVE) {
