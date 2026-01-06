@@ -73,3 +73,9 @@ primary:
 # 在发送物品网络包到客户端时, 移除以下物品组件
 remove_components:
   - minecraft:attribute_modifiers
+
+# 注意!!! 该节点仅存在于本地物品渲染配置中
+#
+# 在渲染物品时, 隐藏以下物品组件
+hidden_components:
+  - minecraft:enchantments

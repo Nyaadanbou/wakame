@@ -36,6 +36,9 @@ import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.FoodProperties
 import io.papermc.paper.datacomponent.item.ItemEnchantments
+import io.papermc.paper.datacomponent.item.TooltipDisplay
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -58,7 +61,8 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
     override val formats = StandardRendererFormatRegistry(this)
     override val layout = StandardRendererLayout(this)
     private val textAssembler = TextAssembler(layout)
-    private val removeComponents: ArrayList<DataComponentType> = ArrayList()
+    private val removeComponents: MutableList<DataComponentType> = ObjectArrayList()
+    private val hiddenComponents: MutableSet<DataComponentType> = ObjectArraySet()
 
     @InitFun
     fun init() {
@@ -79,6 +83,9 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         val yaml = yamlLoader { withDefaults() }.buildAndLoadString(layoutPath.readText())
         removeComponents.clear()
         removeComponents += yaml.node("remove_components").getList<DataComponentType>(emptyList())
+        hiddenComponents.clear()
+        hiddenComponents += yaml.node("hidden_components").getList<DataComponentType>(emptyList())
+
     }
 
     override fun initialize(
@@ -147,9 +154,13 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         item.fastLore(resultantLore)
 
         // 移除不需要的物品组件
-        // 注意: 仅在存在需要移除的物品组件时, 才进行移除, 这样可以避免不必要的数据传输
         for (componentType in removeComponents) {
             item.unsetData(componentType)
+        }
+
+        // 隐藏不需要显示的物品组件
+        if (hiddenComponents.isNotEmpty()) {
+            item.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay().hiddenComponents(hiddenComponents))
         }
     }
 
