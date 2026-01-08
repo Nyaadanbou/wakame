@@ -22,6 +22,7 @@ import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.registerExact
 import cc.mewcraft.wakame.util.typeTokenOf
+import cc.mewcraft.wakame.world.WeatherControl
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
@@ -313,6 +314,28 @@ data object ItemPropTypes {
      */
     @JvmField
     val OPEN_CATALOG = typeOf<OpenCatalog>("open_catalog")
+
+    /**
+     * 城镇飞行.
+     */
+    @JvmField
+    val TOWNY_FLIGHT = typeOf<TownyFlight>("towny_flight")
+
+    /**
+     * 世界时间控制.
+     */
+    @JvmField
+    val WORLD_TIME_CONTROL = typeOf<WorldTimeControl>("world_time_control")
+
+    /**
+     * 世界天气控制.
+     */
+    @JvmField
+    val WORLD_WEATHER_CONTROL = typeOf<WorldWeatherControl>("world_weather_control") {
+        serializers {
+            register(WeatherControl.Action.serializer())
+        }
+    }
 
     // ------------
     // 方便函数
