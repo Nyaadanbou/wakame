@@ -58,11 +58,13 @@ interface DamageManagerApi {
     /**
      * 伴生对象, 提供 [DamageManagerApi] 的实例.
      */
-    companion object : DamageManagerApi {
+    companion object Implementation : DamageManagerApi {
+
+        private const val PLACEHOLDER_DAMAGE_VALUE = 4.94f
 
         private var implementation: DamageManagerApi = object : DamageManagerApi {
             override fun hurt(victim: LivingEntity, metadata: DamageMetadata, source: DamageSource, knockback: Boolean): Boolean = false
-            override fun injectDamageLogic(event: EntityDamageEvent, originLastHurt: Float, isDuringInvulnerable: Boolean): Float = 4.94f
+            override fun injectDamageLogic(event: EntityDamageEvent, originLastHurt: Float, isDuringInvulnerable: Boolean): Float = PLACEHOLDER_DAMAGE_VALUE
             override fun bypassesHurtEquipment(damageType: DamageType): Boolean = false
             override fun computeEquipmentHurtAmount(damageAmount: Float): Int = 0
         }

@@ -687,8 +687,8 @@ internal object DamageManagerImpl : DamageManagerApi {
 
             Mapping.ATTACK_CHARACTERISTIC -> {
                 val damageMapper = AttackCharacteristicDamageMappings.get(this)
-                return damageMapper?.generate(this) ?: run {
-                    // 配置文件未指定该情景下生物的伤害映射,
+                val damageMetadata = damageMapper?.generate(this) ?: run {
+                    // 配置文件未指定该情景下生物的伤害映射:
                     // 这种情况返回原版伤害值、默认元素、无防穿、无暴击
                     LOGGER.warn("Cannot find a attack-characteristic mapper for context: $this. Using default damage metadata.")
                     val damage = this.damage
@@ -706,6 +706,7 @@ internal object DamageManagerImpl : DamageManagerApi {
                         criticalStrikeMetadata = CriticalStrikeMetadata.NONE
                     )
                 }
+                return damageMetadata
             }
         }
     }

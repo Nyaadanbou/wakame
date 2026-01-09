@@ -12,6 +12,7 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.NodeKey
 import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.serialize.SerializationException
+import org.spongepowered.configurate.serialize.TypeSerializer
 import team.unnamed.mocha.MochaEngine
 import java.lang.reflect.Type
 import kotlin.reflect.KType
@@ -22,33 +23,26 @@ import kotlin.reflect.typeOf
  */
 internal sealed interface DamageMetadataBuilder<T> {
 
-    companion object {
-        @JvmField
-        val SERIALIZER: TypeSerializer2<DamageMetadataBuilder<*>> = Serializer
-    }
-
     fun build(context: RawDamageContext): DamageMetadata
 
-    //
+    companion object {
+        fun serializer(): TypeSerializer<DamageMetadataBuilder<*>> = object : TypeSerializer2<DamageMetadataBuilder<*>> {
 
-    private object Serializer : TypeSerializer2<DamageMetadataBuilder<*>> {
+            // FIXME 使用 DispatchingSerializer 替代该实现
+            private val TYPE_MAPPING: Map<String, KType> = mapOf(
+                "direct" to typeOf<DirectDamageMetadataBuilder>(),
+                "vanilla" to typeOf<VanillaDamageMetadataBuilder>(),
+                "attribute" to typeOf<AttributeDamageMetadataBuilder>(),
+                "molang" to typeOf<MolangDamageMetadataBuilder>(),
+            )
 
-        // FIXME 使用 DispatchingSerializer 替代该实现
-        private val TYPE_MAPPING: Map<String, KType> = mapOf(
-            "direct" to typeOf<DirectDamageMetadataBuilder>(),
-            "vanilla" to typeOf<VanillaDamageMetadataBuilder>(),
-            "attribute" to typeOf<AttributeDamageMetadataBuilder>(),
-            "molang" to typeOf<MolangDamageMetadataBuilder>(),
-        )
-
-        override fun deserialize(type: Type, node: ConfigurationNode): DamageMetadataBuilder<*> {
-            val dataTypeId = node.node("type").getString("null")
-            val dataType = TYPE_MAPPING[dataTypeId] ?: throw SerializationException("Unknown damage metadata builder type: '$dataTypeId'")
-            return node.require(dataType)
+            override fun deserialize(type: Type, node: ConfigurationNode): DamageMetadataBuilder<*> {
+                val dataTypeId = node.node("type").getString("null")
+                val dataType = TYPE_MAPPING[dataTypeId] ?: throw SerializationException("Unknown damage metadata builder type: '$dataTypeId'")
+                return node.require(dataType)
+            }
         }
-
     }
-
 }
 
 /**

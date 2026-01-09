@@ -9,6 +9,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.craftbukkit.damage.CraftDamageType;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,7 +30,8 @@ public abstract class MixinLivingEntity {
             at = @At(
                     value = "FIELD",
                     target = "Lnet/minecraft/world/entity/LivingEntity;lastHurt:F",
-                    ordinal = 0
+                    ordinal = 0,
+                    opcode = Opcodes.GETFIELD
             )
     )
     private float disableAmountCheckBeforeCallEvent(LivingEntity instance) {
@@ -48,7 +50,7 @@ public abstract class MixinLivingEntity {
             )
     )
     private float redirectComputeAmountDuringInvulnerable(LivingEntity instance, EntityDamageEvent event) {
-        return DamageManagerApi.Companion.injectDamageLogic(event, instance.lastHurt, true);
+        return DamageManagerApi.Implementation.injectDamageLogic(event, instance.lastHurt, true);
     }
 
 
@@ -64,7 +66,7 @@ public abstract class MixinLivingEntity {
             )
     )
     private float redirectComputeAmountDuringNotInvulnerable(LivingEntity instance, EntityDamageEvent event) {
-        return DamageManagerApi.Companion.injectDamageLogic(event, instance.lastHurt, false);
+        return DamageManagerApi.Implementation.injectDamageLogic(event, instance.lastHurt, false);
     }
 
     /**
@@ -95,7 +97,7 @@ public abstract class MixinLivingEntity {
             )
     )
     private boolean redirectIsBypassesArmor(DamageSource instance, TagKey<DamageType> damageTypeKey) {
-        return DamageManagerApi.Companion.bypassesHurtEquipment(CraftDamageType.minecraftHolderToBukkit(instance.typeHolder()));
+        return DamageManagerApi.Implementation.bypassesHurtEquipment(CraftDamageType.minecraftHolderToBukkit(instance.typeHolder()));
     }
 
     /**
@@ -111,8 +113,7 @@ public abstract class MixinLivingEntity {
     private float redirectEquipmentDamageCompute(float a, float b) {
         // a = 1.0f
         // b = damageAmount / 4.0f
-        return DamageManagerApi.Companion.computeEquipmentHurtAmount(b * 4f);
+        return DamageManagerApi.Implementation.computeEquipmentHurtAmount(b * 4f);
     }
-
 }
 
