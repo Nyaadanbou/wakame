@@ -5,7 +5,7 @@ import org.betonquest.betonquest.api.QuestException
 import org.betonquest.betonquest.api.config.quest.QuestPackageManager
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.quest.QuestTypeApi
-import org.betonquest.betonquest.api.quest.event.EventID
+import org.betonquest.betonquest.api.quest.action.ActionID
 import org.betonquest.betonquest.api.schedule.CatchupStrategy
 import org.betonquest.betonquest.api.schedule.Schedule
 import org.betonquest.betonquest.api.schedule.ScheduleID
@@ -20,19 +20,19 @@ import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 
 /**
- * A schedule that runs events every N Minecraft game ticks.
+ * A schedule that runs actions every N Minecraft game ticks.
  *
  * @param scheduleID the unique identifier for this schedule
- * @param events the list of event IDs to execute on each tick interval
+ * @param actions the list of action IDs to execute on each tick interval
  * @param catchup the catchup strategy to use if ticks are missed
  * @param intervalTicks the interval in Minecraft ticks between executions
  */
 class GameTickSchedule(
     scheduleID: ScheduleID,
-    events: List<EventID>,
+    actions: List<ActionID>,
     catchup: CatchupStrategy,
     val intervalTicks: Int,
-) : Schedule(scheduleID, events, catchup)
+) : Schedule(scheduleID, actions, catchup)
 
 /**
  * Factory to create [GameTickSchedule] instances.
@@ -51,7 +51,7 @@ class GameTickScheduleFactory(
         val rawTime = scheduleData.time().trim()
         val interval = rawTime.toIntOrNull() ?: throw QuestException("Unable to parse time '$rawTime' as tick interval")
         require(interval > 0) { "Time must be a positive integer tick interval, got '$rawTime'" }
-        return GameTickSchedule(scheduleID, scheduleData.events(), scheduleData.catchup(), interval)
+        return GameTickSchedule(scheduleID, scheduleData.actions(), scheduleData.catchup(), interval)
     }
 }
 
@@ -146,7 +146,7 @@ class GameTickScheduler(
      * @param schedule the schedule to execute
      */
     private fun executeOnce(schedule: GameTickSchedule) {
-        executeEvents(schedule)
+        executeActions(schedule)
     }
 
     /**

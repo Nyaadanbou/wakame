@@ -1,9 +1,6 @@
 package cc.mewcraft.wakame.item.behavior
 
-import cc.mewcraft.wakame.item.behavior.impl.Castable
-import cc.mewcraft.wakame.item.behavior.impl.EntityBucket
-import cc.mewcraft.wakame.item.behavior.impl.HoldLastDamage
-import cc.mewcraft.wakame.item.behavior.impl.OpenCatalog
+import cc.mewcraft.wakame.item.behavior.impl.*
 import cc.mewcraft.wakame.item.behavior.impl.external.*
 import cc.mewcraft.wakame.item.behavior.impl.test.TestInteract
 import cc.mewcraft.wakame.item.behavior.impl.weapon.*
@@ -161,6 +158,24 @@ object ItemBehaviorTypes {
      */
     @JvmField
     val OPEN_CATALOG = typeOf("open_catalog", OpenCatalog)
+
+    /**
+     * 物品具有该行为时, 可以临时激活城镇飞行.
+     */
+    @JvmField
+    val TOWNY_FLIGHT = typeOf("towny_flight", TownyFlight)
+
+    /**
+     * 物品具有该行为时, 可以使用以控制世界时间.
+     */
+    @JvmField
+    val WORLD_TIME_CONTROL = typeOf("world_time_control", WorldTimeControl)
+
+    /**
+     * 物品具有该行为时, 可以使用以控制世界天气.
+     */
+    @JvmField
+    val WORLD_WEATHER_CONTROL = typeOf("world_weather_control", WorldWeatherControl)
 
     // ------------
     // 方便函数

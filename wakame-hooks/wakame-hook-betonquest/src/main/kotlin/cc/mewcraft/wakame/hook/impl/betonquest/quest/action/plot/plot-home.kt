@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.plot
+package cc.mewcraft.wakame.hook.impl.betonquest.quest.action.plot
 
 import com.plotsquared.bukkit.util.BukkitUtil
 import com.plotsquared.core.PlotSquared
@@ -8,10 +8,10 @@ import org.betonquest.betonquest.api.instruction.Instruction
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
-import org.betonquest.betonquest.api.quest.event.PlayerEvent
-import org.betonquest.betonquest.api.quest.event.PlayerEventFactory
-import org.betonquest.betonquest.api.quest.event.online.OnlineEvent
-import org.betonquest.betonquest.api.quest.event.online.OnlineEventAdapter
+import org.betonquest.betonquest.api.quest.action.PlayerAction
+import org.betonquest.betonquest.api.quest.action.PlayerActionFactory
+import org.betonquest.betonquest.api.quest.action.online.OnlineAction
+import org.betonquest.betonquest.api.quest.action.online.OnlineActionAdapter
 import kotlin.jvm.optionals.getOrNull
 
 
@@ -22,11 +22,11 @@ import kotlin.jvm.optionals.getOrNull
  * @param dimension 指定在哪个维度的地皮区域传送地皮, 未指定则使用第一个地皮区域
  * @param logger BetonQuest 的日志记录器
  */
-class PlotHomeEvent(
+class PlotHomeAction(
     private val order: Argument<Number>?,
     private val dimension: Argument<String>?,
     private val logger: BetonQuestLogger,
-) : OnlineEvent {
+) : OnlineAction {
 
     companion object {
         const val RANDOM_ORDER: Int = -1
@@ -66,17 +66,17 @@ class PlotHomeEvent(
 }
 
 
-class PlotHomeEventFactory(
+class PlotHomeActionFactory(
     private val loggerFactory: BetonQuestLoggerFactory,
-) : PlayerEventFactory {
+) : PlayerActionFactory {
 
-    override fun parsePlayer(instruction: Instruction): PlayerEvent {
+    override fun parsePlayer(instruction: Instruction): PlayerAction {
         val order = instruction.number().atLeast(1).get("order").getOrNull()
         val dimension = instruction.string().get("dimension").getOrNull()
-        val logger = loggerFactory.create(PlotHomeEvent::class.java)
+        val logger = loggerFactory.create(PlotHomeAction::class.java)
         val questPackage = instruction.getPackage()
-        val event = PlotHomeEvent(order, dimension, logger)
-        val adapter = OnlineEventAdapter(event, logger, questPackage)
+        val action = PlotHomeAction(order, dimension, logger)
+        val adapter = OnlineActionAdapter(action, logger, questPackage)
         return adapter
     }
 }

@@ -4,12 +4,14 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 
 interface TownFlightIntegration {
+
     /**
      * Returns true if a player can fly according to TownyFlight's rules.
      *
      * @param player the {@link Player} to test for flight allowance
      * @param silent true will show messages to player
      * @return true if the {@link Player} is allowed to fly
+     * @throws UnsupportedOperationException if Towny is not installed
      **/
     fun canFly(player: Player, silent: Boolean): Boolean
 
@@ -21,6 +23,7 @@ interface TownFlightIntegration {
      * @param player   the {@link Player}
      * @param location the {@link Location} to test for the player
      * @return true if player is allowed to be flying at their present location
+     * @throws UnsupportedOperationException if Towny is not installed
      */
     fun allowedLocation(player: Player, location: Location): Boolean
 
@@ -31,6 +34,7 @@ interface TownFlightIntegration {
      * @param silent true will mean no message is shown to the {@link Player}
      * @param forced true if this is a forced deactivation or not
      * @param cause  String cause of disabling flight ("", "pvp", "console")
+     * @throws UnsupportedOperationException if Towny is not installed
      */
     fun removeFlight(player: Player, silent: Boolean, forced: Boolean, cause: String)
 
@@ -39,6 +43,7 @@ interface TownFlightIntegration {
      *
      * @param player the {@link Player} who receives flight
      * @param silent true will mean no message is shown to the {@link Player}
+     * @throws UnsupportedOperationException if Towny is not installed
      */
     fun addFlight(player: Player, silent: Boolean)
 
@@ -48,6 +53,7 @@ interface TownFlightIntegration {
      * @param player the {@link Player} who receives temporary flight
      * @param silent true will mean no message is shown to the {@link Player}
      * @param seconds the number of seconds to give flight for
+     * @throws UnsupportedOperationException if Towny is not installed
      */
     fun addTempFlight(player: Player, seconds: Long, silent: Boolean)
 
@@ -56,6 +62,7 @@ interface TownFlightIntegration {
      *
      * @param player the {@link Player} who is being tested
      * @param silent true will mean no message is shown to the {@link Player}
+     * @throws UnsupportedOperationException if Towny is not installed
      */
     fun testForFlight(player: Player, silent: Boolean)
 
@@ -63,6 +70,7 @@ interface TownFlightIntegration {
      * Get the number of seconds remaining for a {@link Player} to fly.
      *
      * @param player the {@link Player} to get the remaining flight time for
+     * @throws UnsupportedOperationException if Towny is not installed
      */
     fun getFlightSecondsRemaining(player: Player): Long
 
@@ -70,6 +78,7 @@ interface TownFlightIntegration {
      * Get the number of seconds remaining for a {@link Player} to fly in a pretty format.
      *
      * @param player the {@link Player} to get the remaining flight time for
+     * @throws UnsupportedOperationException if Towny is not installed
      */
     fun getFlightSecondsRemainingPrettified(player: Player): String
 
@@ -78,42 +87,51 @@ interface TownFlightIntegration {
      */
     companion object : TownFlightIntegration {
 
-        private var implementation: TownFlightIntegration? = null
+        private var implementation: TownFlightIntegration = object : TownFlightIntegration {
+            override fun canFly(player: Player, silent: Boolean): Boolean = throw UnsupportedOperationException()
+            override fun allowedLocation(player: Player, location: Location): Boolean = throw UnsupportedOperationException()
+            override fun removeFlight(player: Player, silent: Boolean, forced: Boolean, cause: String) = throw UnsupportedOperationException()
+            override fun addFlight(player: Player, silent: Boolean) = throw UnsupportedOperationException()
+            override fun addTempFlight(player: Player, seconds: Long, silent: Boolean) = throw UnsupportedOperationException()
+            override fun testForFlight(player: Player, silent: Boolean) = throw UnsupportedOperationException()
+            override fun getFlightSecondsRemaining(player: Player): Long = throw UnsupportedOperationException()
+            override fun getFlightSecondsRemainingPrettified(player: Player): String = throw UnsupportedOperationException()
+        }
 
         fun setImplementation(impl: TownFlightIntegration) {
             implementation = impl
         }
 
         override fun canFly(player: Player, silent: Boolean): Boolean {
-            return implementation?.canFly(player, silent) ?: false
+            return implementation.canFly(player, silent)
         }
 
         override fun allowedLocation(player: Player, location: Location): Boolean {
-            return implementation?.allowedLocation(player, location) ?: false
+            return implementation.allowedLocation(player, location)
         }
 
         override fun removeFlight(player: Player, silent: Boolean, forced: Boolean, cause: String) {
-            implementation?.removeFlight(player, silent, forced, cause)
+            implementation.removeFlight(player, silent, forced, cause)
         }
 
         override fun addFlight(player: Player, silent: Boolean) {
-            implementation?.addFlight(player, silent)
+            implementation.addFlight(player, silent)
         }
 
         override fun addTempFlight(player: Player, seconds: Long, silent: Boolean) {
-            implementation?.addTempFlight(player, seconds, silent)
+            implementation.addTempFlight(player, seconds, silent)
         }
 
         override fun testForFlight(player: Player, silent: Boolean) {
-            implementation?.testForFlight(player, silent)
+            implementation.testForFlight(player, silent)
         }
 
         override fun getFlightSecondsRemaining(player: Player): Long {
-            return implementation?.getFlightSecondsRemaining(player) ?: 0L
+            return implementation.getFlightSecondsRemaining(player)
         }
 
         override fun getFlightSecondsRemainingPrettified(player: Player): String {
-            return implementation?.getFlightSecondsRemainingPrettified(player) ?: "0s"
+            return implementation.getFlightSecondsRemainingPrettified(player)
         }
     }
 }

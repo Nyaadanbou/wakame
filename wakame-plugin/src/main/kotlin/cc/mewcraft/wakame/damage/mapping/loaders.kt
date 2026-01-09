@@ -4,6 +4,7 @@
 package cc.mewcraft.wakame.damage.mapping
 
 import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.damage.DamageMetadataBuilder
 import cc.mewcraft.wakame.damage.DirectCriticalStrikeMetadataBuilder
 import cc.mewcraft.wakame.damage.RawDamageContext
@@ -37,19 +38,28 @@ private const val DATA_DIR = "damage"
 @Reload
 internal object DamageTypeDamageMappings {
 
-    private val default: DamageTypeMapper =
-        DamageTypeMapper(
-            VanillaDamageMetadataBuilder(
-                criticalStrikeMetadata = DirectCriticalStrikeMetadataBuilder(),
-                element = BuiltInRegistries.ELEMENT.getDefaultEntry()
-            )
-        )
+    /**
+     * [DamageTypeDamageMappings] 配置文件位置.
+     */
+    private val MAPPING_FILE: File = KoishDataPaths.CONFIGS.resolve(DATA_DIR).resolve("damage_type_mappings.yml").toFile()
 
-    private val file: File = KoishDataPaths.CONFIGS.resolve(DATA_DIR).resolve("damage_type_mappings.yml").toFile()
-    private val mappings: Reference2ObjectOpenHashMap<DamageType, DamageTypeMapper> = Reference2ObjectOpenHashMap()
+    /**
+     * 默认的 [DamageTypeMapper], 当没有为某个伤害类型指定映射时使用.
+     */
+    private val DEFAULT_MAPPER: DamageTypeMapper = DamageTypeMapper(
+        VanillaDamageMetadataBuilder(
+            criticalStrikeMetadata = DirectCriticalStrikeMetadataBuilder(),
+            element = BuiltInRegistries.ELEMENT.getDefaultEntry()
+        )
+    )
+
+    /**
+     * 映射表, 可以动态更新.
+     */
+    private val mapping: Reference2ObjectOpenHashMap<DamageType, DamageTypeMapper> = Reference2ObjectOpenHashMap()
 
     fun get(damageType: DamageType): DamageMapper {
-        return mappings[damageType] ?: default
+        return mapping[damageType] ?: DEFAULT_MAPPER
     }
 
     @InitFun
@@ -63,17 +73,14 @@ internal object DamageTypeDamageMappings {
     }
 
     private fun loadDataIntoRegistry() {
-        mappings.clear()
-
         val rootNode = yamlLoader {
             withDefaults()
             serializers {
-                registerExact<DamageMetadataBuilder<*>>(DamageMetadataBuilder.SERIALIZER)
+                registerExact<DamageMetadataBuilder<*>>(DamageMetadataBuilder.serializer())
             }
-        }.buildAndLoadString(
-            file.readText()
-        )
-        mappings.putAll(
+        }.buildAndLoadString(MAPPING_FILE.readText())
+        mapping.clear()
+        mapping.putAll(
             rootNode.require<Map<DamageType, DamageTypeMapper>>()
         )
     }
@@ -86,8 +93,15 @@ internal object DamageTypeDamageMappings {
 @Reload
 internal object AttackCharacteristicDamageMappings {
 
-    private val file: File = KoishDataPaths.CONFIGS.resolve(DATA_DIR).resolve("attack_characteristics_mappings.yml").toFile()
-    private val mappings: Reference2ObjectOpenHashMap<EntityType, List<DamagePredicateMapper>> = Reference2ObjectOpenHashMap()
+    /**
+     * [AttackCharacteristicDamageMappings] 配置文件位置.
+     */
+    private val MAPPING_FILE: File = KoishDataPaths.CONFIGS.resolve(DATA_DIR).resolve("attack_characteristics_mappings.yml").toFile()
+
+    /**
+     * 映射表, 可以动态更新.
+     */
+    private val mapping: Reference2ObjectOpenHashMap<EntityType, List<DamagePredicateMapper>> = Reference2ObjectOpenHashMap()
 
     @InitFun
     fun init() {
@@ -100,25 +114,23 @@ internal object AttackCharacteristicDamageMappings {
     }
 
     fun get(context: RawDamageContext): DamageMapper? {
-        val entityType = context.damageSource.causingEntity?.type
-            ?: error("Context has no causing entity.")
-        return mappings[entityType]?.first { mapper -> mapper.match(context) }
+        val entityType = context.damageSource.causingEntity?.type ?: error("Context has no causing entity.")
+        val allMappers = mapping[entityType] ?: run { LOGGER.warn("No damage mappers found for entity type $entityType, returning null"); return null }
+        val matchedOne = allMappers.firstOrNull { mapper -> mapper.match(context) }
+        return matchedOne
     }
 
     private fun loadDataIntoRegistry() {
-        mappings.clear()
-
         val rootNode = yamlLoader {
             withDefaults()
             serializers {
-                register<DamagePredicate>(DamagePredicate.SERIALIZER)
-                register<DamagePredicateMapper>(DamagePredicateMapper.SERIALIZER)
-                registerExact<DamageMetadataBuilder<*>>(DamageMetadataBuilder.SERIALIZER)
+                register<DamagePredicate>(DamagePredicate.serializer())
+                register<DamagePredicateMapper>(DamagePredicateMapper.serializer())
+                registerExact<DamageMetadataBuilder<*>>(DamageMetadataBuilder.serializer())
             }
-        }.buildAndLoadString(
-            file.readText()
-        )
-        mappings.putAll(
+        }.buildAndLoadString(MAPPING_FILE.readText())
+        mapping.clear()
+        mapping.putAll(
             rootNode.require<Map<EntityType, Map<String, DamagePredicateMapper>>>()
                 .mapValues { (_, v) -> v.values.toList() }
         )
@@ -132,8 +144,15 @@ internal object AttackCharacteristicDamageMappings {
 @Reload
 internal object NullCausingDamageMappings {
 
-    private val file: File = KoishDataPaths.CONFIGS.resolve(DATA_DIR).resolve("null_causing_mappings.yml").toFile()
-    private val mappings: Reference2ObjectOpenHashMap<EntityType, List<DamagePredicateMapper>> = Reference2ObjectOpenHashMap()
+    /**
+     * [NullCausingDamageMappings] 配置文件位置.
+     */
+    private val MAPPING_FILE: File = KoishDataPaths.CONFIGS.resolve(DATA_DIR).resolve("null_causing_mappings.yml").toFile()
+
+    /**
+     * 映射表, 可以动态更新.
+     */
+    private val mapping: Reference2ObjectOpenHashMap<EntityType, List<DamagePredicateMapper>> = Reference2ObjectOpenHashMap()
 
     @InitFun
     fun init() {
@@ -147,28 +166,24 @@ internal object NullCausingDamageMappings {
 
     fun get(context: RawDamageContext): DamageMapper? {
         val damageSource = context.damageSource
-        val entityType = damageSource.directEntity?.type
-            ?: error("Context has no direct entity. This is a misuse of the mappings.")
-        require(damageSource.causingEntity == null) {
-            "Context *has* causing entity. This is a misuse of the mappings."
-        }
-        return mappings[entityType]?.first { mapper -> mapper.match(context) }
+        val entityType = damageSource.directEntity?.type ?: error("Context has no direct entity. This is a misuse of mappings.")
+        require(damageSource.causingEntity == null) { "Context *has* causing entity. This is a misuse of mappings." }
+        val allMappers = mapping[entityType] ?: run { LOGGER.warn("No damage mappers found for entity type $entityType, returning null."); return null }
+        val matchedOne = allMappers.firstOrNull { mapper -> mapper.match(context) }
+        return matchedOne
     }
 
     private fun loadDataIntoRegistry() {
-        mappings.clear()
-
         val rootNode = yamlLoader {
             withDefaults()
             serializers {
-                register<DamagePredicate>(DamagePredicate.SERIALIZER)
-                register<DamagePredicateMapper>(DamagePredicateMapper.SERIALIZER)
-                registerExact<DamageMetadataBuilder<*>>(DamageMetadataBuilder.SERIALIZER)
+                register<DamagePredicate>(DamagePredicate.serializer())
+                register<DamagePredicateMapper>(DamagePredicateMapper.serializer())
+                registerExact<DamageMetadataBuilder<*>>(DamageMetadataBuilder.serializer())
             }
-        }.buildAndLoadString(
-            file.readText()
-        )
-        mappings.putAll(
+        }.buildAndLoadString(MAPPING_FILE.readText())
+        mapping.clear()
+        mapping.putAll(
             rootNode.require<Map<EntityType, Map<String, DamagePredicateMapper>>>()
                 .mapValues { (_, v) -> v.values.toList() }
         )
@@ -182,8 +197,15 @@ internal object NullCausingDamageMappings {
 @Reload
 internal object PlayerAdhocDamageMappings {
 
-    private val file: File = KoishDataPaths.CONFIGS.resolve(DATA_DIR).resolve("player_adhoc_mappings.yml").toFile()
-    private val mappings: Reference2ObjectOpenHashMap<EntityType, List<DamagePredicateMapper>> = Reference2ObjectOpenHashMap()
+    /**
+     * [PlayerAdhocDamageMappings] 配置文件位置.
+     */
+    private val MAPPING_FILE: File = KoishDataPaths.CONFIGS.resolve(DATA_DIR).resolve("player_adhoc_mappings.yml").toFile()
+
+    /**
+     * 映射表, 可以动态更新.
+     */
+    private val mapping: Reference2ObjectOpenHashMap<EntityType, List<DamagePredicateMapper>> = Reference2ObjectOpenHashMap()
 
     @InitFun
     fun init() {
@@ -197,28 +219,24 @@ internal object PlayerAdhocDamageMappings {
 
     fun get(context: RawDamageContext): DamageMapper? {
         val damageSource = context.damageSource
-        val entityType = damageSource.directEntity?.type
-            ?: error("Context has no direct entity. This is a misuse of the mappings.")
-        require(damageSource.causingEntity is Player) {
-            "Context has no causing *player*. This is a misuse of the mappings."
-        }
-        return mappings[entityType]?.first { mapper -> mapper.match(context) }
+        val entityType = damageSource.directEntity?.type ?: error("Context has no direct entity. This is a misuse of mappings.")
+        require(damageSource.causingEntity is Player) { "Context has no causing *player*. This is a misuse of mappings." }
+        val allMappers = mapping[entityType] ?: run { LOGGER.warn("No damage mappers found for entity type $entityType, returning null."); return null }
+        val matchedOne = allMappers.firstOrNull { mapper -> mapper.match(context) }
+        return matchedOne
     }
 
     private fun loadDataIntoRegistry() {
-        mappings.clear()
-
         val rootNode = yamlLoader {
             withDefaults()
             serializers {
-                register<DamagePredicate>(DamagePredicate.SERIALIZER)
-                register<DamagePredicateMapper>(DamagePredicateMapper.SERIALIZER)
-                registerExact<DamageMetadataBuilder<*>>(DamageMetadataBuilder.SERIALIZER)
+                register<DamagePredicate>(DamagePredicate.serializer())
+                register<DamagePredicateMapper>(DamagePredicateMapper.serializer())
+                registerExact<DamageMetadataBuilder<*>>(DamageMetadataBuilder.serializer())
             }
-        }.buildAndLoadString(
-            file.readText()
-        )
-        mappings.putAll(
+        }.buildAndLoadString(MAPPING_FILE.readText())
+        mapping.clear()
+        mapping.putAll(
             rootNode.require<Map<EntityType, Map<String, DamagePredicateMapper>>>()
                 .mapValues { (_, v) -> v.values.toList() }
         )

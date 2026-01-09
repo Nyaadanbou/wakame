@@ -14,8 +14,8 @@ import kotlin.math.absoluteValue
 import kotlin.random.Random
 
 /**
- * 伤害元数据, 包含了一次伤害中"攻击阶段"的有关信息.
- * 这些信息均由伤害发起者计算而来.
+ * 伤害元数据, 包含了一次伤害中"攻击阶段"的有关信息; 这些信息均由伤害发起者计算而来.
+ *
  * 一旦实例化后, 各种信息就已经确定并不允许修改.
  */
 data class DamageMetadata(

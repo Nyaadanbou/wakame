@@ -9,6 +9,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.objectmapping.meta.Setting
+import org.spongepowered.configurate.serialize.TypeSerializer
 import java.lang.reflect.Type
 
 /**
@@ -48,8 +49,11 @@ internal data class DamagePredicateMapper(
 ) : DamageMapper {
 
     companion object {
-        @JvmField
-        val SERIALIZER: TypeSerializer2<DamagePredicateMapper> = Serializer
+        fun serializer(): TypeSerializer<DamagePredicateMapper> = TypeSerializer2 { _: Type, node: ConfigurationNode ->
+            val tests = node.node("predicates").childrenMap().values.map { it.require<DamagePredicate>() }
+            val builder = node.node("damage_metadata").require<DamageMetadataBuilder<*>>()
+            DamagePredicateMapper(tests, builder)
+        }
     }
 
     /**
@@ -62,17 +66,4 @@ internal data class DamagePredicateMapper(
     override fun generate(context: RawDamageContext): DamageMetadata {
         return builder.build(context)
     }
-
-    //
-
-    private object Serializer : TypeSerializer2<DamagePredicateMapper> {
-
-        override fun deserialize(type: Type, node: ConfigurationNode): DamagePredicateMapper {
-            val tests = node.node("predicates").childrenMap().values.map { it.require<DamagePredicate>() }
-            val builder = node.node("damage_metadata").require<DamageMetadataBuilder<*>>()
-            return DamagePredicateMapper(tests, builder)
-        }
-
-    }
-
 }

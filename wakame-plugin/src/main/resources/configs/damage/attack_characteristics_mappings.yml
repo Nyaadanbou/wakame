@@ -784,7 +784,17 @@ skeleton:
       critical_strike_metadata:
         chance: 0.0
 slime:
-  size_2_melee:
+  small_melee:
+    predicates:
+      entity_data:
+        size: 1
+    damage_metadata:
+      type: direct
+      damage_bundle:
+        neutral: { min: 0.0, max: 0.0 }
+      critical_strike_metadata:
+        chance: 0.0
+  medium_melee:
     predicates:
       entity_data:
         size: 2
@@ -794,7 +804,17 @@ slime:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
-  size_4_melee:
+  semi_large_melee:
+    predicates:
+      entity_data:
+        size: 3
+    damage_metadata:
+      type: direct
+      damage_bundle:
+        neutral: { min: 4.5, max: 4.5 }
+      critical_strike_metadata:
+        chance: 0.0
+  large_melee:
     predicates:
       entity_data:
         size: 4

@@ -8,36 +8,25 @@ import cc.mewcraft.wakame.serialization.configurate.extension.transformKeys
 import cc.mewcraft.wakame.util.require
 import org.bukkit.damage.DamageType
 import org.bukkit.entity.*
-import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
-import java.lang.reflect.Type
+import org.spongepowered.configurate.serialize.TypeSerializer
 
 /**
  * 用于检查 [RawDamageContext] 是否属于一个特定场景的谓词.
  */
 internal sealed interface DamagePredicate {
 
-    companion object {
-        @JvmField
-        val SERIALIZER: TypeSerializer2<DamagePredicate> = Serializer
-    }
-
     fun test(context: RawDamageContext): Boolean
 
-    //
-
-    private object Serializer : TypeSerializer2<DamagePredicate> {
-        override fun deserialize(type: Type, node: ConfigurationNode): DamagePredicate {
-            // FIXME 使用 DispatchingTypeSerializer 替代
+    companion object {
+        fun serializer(): TypeSerializer<DamagePredicate> = TypeSerializer2 { type, node -> // FIXME 使用 DispatchingTypeSerializer 替代
             // FIXME 这里没有使用单独的 Node 来指定 type, 而是用的 Node 本身的 key 来指定 type
             //  截止 1/26 DispatchingTypeSerializer 仅支持在单独的 Node 上指定 type
             //  新的 DispatchingTypeSerializer 实现应该支持这种 “inline” type
-            return when (val key = node.key().toString()) {
+            when (val key = node.key().toString()) {
                 EntityDataPredicate.TYPE_ID -> {
-                    val map = node.childrenMap()
-                        .transformKeys<String>()
-                        .mapValues { (_, nodeValue) -> nodeValue.require<Int>() }
+                    val map = node.childrenMap().transformKeys<String>().mapValues { (_, nodeValue) -> nodeValue.require<Int>() }
                     EntityDataPredicate(map)
                 }
 
@@ -67,7 +56,6 @@ internal sealed interface DamagePredicate {
             }
         }
     }
-
 }
 
 /**
