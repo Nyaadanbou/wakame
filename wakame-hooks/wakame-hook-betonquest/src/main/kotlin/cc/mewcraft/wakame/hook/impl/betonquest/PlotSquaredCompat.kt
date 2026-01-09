@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.hook.impl.betonquest
 
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.plot.PlotClaimActionFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.plot.PlotHomeActionFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.plot.HasPlotFactory
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.plot.PlotClaimEventFactory
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.plot.PlotHomeEventFactory
 import cc.mewcraft.wakame.integration.Hook
 import org.betonquest.betonquest.BetonQuest
 
@@ -21,10 +21,10 @@ object PlotSquaredCompat {
         val conditionRegistry = plugin.questRegistries.condition()
         conditionRegistry.register("p2has", HasPlotFactory(loggerFactory))
 
-        // Event
-        val eventRegistry = plugin.questRegistries.event()
-        eventRegistry.register("p2claim", PlotClaimEventFactory(loggerFactory))
-        eventRegistry.register("p2home", PlotHomeEventFactory(loggerFactory))
+        // Action
+        val actionRegistry = plugin.questRegistries.action()
+        actionRegistry.register("p2claim", PlotClaimActionFactory(loggerFactory))
+        actionRegistry.register("p2home", PlotHomeActionFactory(loggerFactory))
 
         // Objective
         val objectiveRegistry = plugin.questRegistries.objective()
@@ -50,6 +50,6 @@ object PlotSquaredCompat {
         val notifyIORegistry = plugin.featureRegistries.notifyIO()
 
         // Schedule
-        val scheduleRegistry = plugin.featureRegistries.eventScheduling()
+        val scheduleRegistry = plugin.featureRegistries.actionScheduling()
     }
 }

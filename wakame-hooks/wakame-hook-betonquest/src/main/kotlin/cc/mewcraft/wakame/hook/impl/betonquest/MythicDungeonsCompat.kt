@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.hook.impl.betonquest
 
 import cc.mewcraft.wakame.hook.impl.betonquest.listener.MythicDungeonsListener
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.dungeon.EnterDungeonActionFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.dungeon.AwaitingDungeonFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.dungeon.InsideDungeonFactory
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.event.dungeon.EnterDungeonEventFactory
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.util.registerEvents
 import org.betonquest.betonquest.BetonQuest
@@ -23,9 +23,9 @@ object MythicDungeonsCompat {
         conditionRegistry.register("awaitingdungeon", AwaitingDungeonFactory(loggerFactory))
         conditionRegistry.register("insidedungeon", InsideDungeonFactory(loggerFactory))
 
-        // Event
-        val eventRegistry = plugin.questRegistries.event()
-        questRegistries.event().register("playdungeon", EnterDungeonEventFactory(loggerFactory))
+        // Action
+        val eventRegistry = plugin.questRegistries.action()
+        questRegistries.action().register("playdungeon", EnterDungeonActionFactory(loggerFactory))
 
         // Objective
         val objectiveRegistry = plugin.questRegistries.objective()
@@ -51,7 +51,7 @@ object MythicDungeonsCompat {
         val notifyIoRegistry = plugin.featureRegistries.notifyIO()
 
         // Schedule
-        val scheduleRegistry = plugin.featureRegistries.eventScheduling()
+        val scheduleRegistry = plugin.featureRegistries.actionScheduling()
     }
 
     init {

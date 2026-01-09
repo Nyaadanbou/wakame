@@ -21,8 +21,8 @@ object BreweryCompat {
         // Condition
         val conditionRegistry = plugin.questRegistries.condition()
 
-        // Event
-        val eventRegistry = plugin.questRegistries.event()
+        // Action
+        val actionRegistry = plugin.questRegistries.action()
 
         // Objective
         val objectiveRegistry = plugin.questRegistries.objective()
@@ -50,6 +50,6 @@ object BreweryCompat {
         val notifyIORegistry = plugin.featureRegistries.notifyIO()
 
         // Schedule
-        val scheduleRegistry = plugin.featureRegistries.eventScheduling()
+        val scheduleRegistry = plugin.featureRegistries.actionScheduling()
     }
 }

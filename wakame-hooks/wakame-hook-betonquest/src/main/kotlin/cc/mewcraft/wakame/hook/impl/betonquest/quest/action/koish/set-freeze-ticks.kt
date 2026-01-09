@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.koish
+package cc.mewcraft.wakame.hook.impl.betonquest.quest.action.koish
 
 import cc.mewcraft.wakame.hook.impl.betonquest.util.ArithmeticOp
 import cc.mewcraft.wakame.hook.impl.betonquest.util.FriendlyEnumParser
@@ -7,19 +7,19 @@ import org.betonquest.betonquest.api.instruction.Instruction
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
-import org.betonquest.betonquest.api.quest.event.PlayerEvent
-import org.betonquest.betonquest.api.quest.event.PlayerEventFactory
-import org.betonquest.betonquest.api.quest.event.online.OnlineEvent
-import org.betonquest.betonquest.api.quest.event.online.OnlineEventAdapter
+import org.betonquest.betonquest.api.quest.action.PlayerAction
+import org.betonquest.betonquest.api.quest.action.PlayerActionFactory
+import org.betonquest.betonquest.api.quest.action.online.OnlineAction
+import org.betonquest.betonquest.api.quest.action.online.OnlineActionAdapter
 
 /**
  * 修改玩家的 `TicksFrozen` 的数据值.
  */
-class SetFreezeTicks(
+class SetFreezeTicksAction(
     private val operation: Argument<ArithmeticOp>,
     private val amount: Argument<Number>,
     private val logger: BetonQuestLogger,
-) : OnlineEvent {
+) : OnlineAction {
 
     override fun execute(profile: OnlineProfile) {
         val player = profile.player
@@ -56,17 +56,17 @@ class SetFreezeTicks(
     }
 }
 
-class SetFreezeTicksFactory(
+class SetFreezeTicksActionFactory(
     private val loggerFactory: BetonQuestLoggerFactory,
-) : PlayerEventFactory {
+) : PlayerActionFactory {
 
-    override fun parsePlayer(instruction: Instruction): PlayerEvent {
+    override fun parsePlayer(instruction: Instruction): PlayerAction {
         val operation = instruction.parse(FriendlyEnumParser<ArithmeticOp>()).get()
         val amount = instruction.number().get()
-        val logger = loggerFactory.create(SetFreezeTicks::class.java)
-        val event = SetFreezeTicks(operation, amount, logger)
+        val logger = loggerFactory.create(SetFreezeTicksAction::class.java)
+        val action = SetFreezeTicksAction(operation, amount, logger)
         val questPackage = instruction.getPackage()
-        val adapter = OnlineEventAdapter(event, logger, questPackage)
+        val adapter = OnlineActionAdapter(action, logger, questPackage)
         return adapter
     }
 }

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.party
+package cc.mewcraft.wakame.hook.impl.betonquest.quest.action.party
 
 import cc.mewcraft.wakame.integration.party.PartyIntegration
 import cc.mewcraft.wakame.util.adventure.plain
@@ -6,15 +6,15 @@ import org.betonquest.betonquest.api.instruction.Instruction
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
-import org.betonquest.betonquest.api.quest.event.PlayerEvent
-import org.betonquest.betonquest.api.quest.event.PlayerEventFactory
-import org.betonquest.betonquest.api.quest.event.online.OnlineEvent
-import org.betonquest.betonquest.api.quest.event.online.OnlineEventAdapter
+import org.betonquest.betonquest.api.quest.action.PlayerAction
+import org.betonquest.betonquest.api.quest.action.PlayerActionFactory
+import org.betonquest.betonquest.api.quest.action.online.OnlineAction
+import org.betonquest.betonquest.api.quest.action.online.OnlineActionAdapter
 
 
-class LeavePartyEvent(
+class LeavePartyAction(
     private val logger: BetonQuestLogger,
-) : OnlineEvent {
+) : OnlineAction {
 
     override fun execute(profile: OnlineProfile) {
         val party = PartyIntegration.lookupPartyByPlayer(profile.playerUUID).join()
@@ -27,16 +27,17 @@ class LeavePartyEvent(
 
 
 /**
- * @param loggerFactory the logger factory to create a logger for the events
+ * @param loggerFactory the logger factory to create a logger for the actions
  */
-class LeavePartyEventFactory(
+class LeavePartyActionFactory(
     private val loggerFactory: BetonQuestLoggerFactory,
-) : PlayerEventFactory {
+) : PlayerActionFactory {
 
-    override fun parsePlayer(instruction: Instruction): PlayerEvent {
-        val logger = loggerFactory.create(LeavePartyEvent::class.java)
-        val onlineEvent = LeavePartyEvent(logger)
+    override fun parsePlayer(instruction: Instruction): PlayerAction {
+        val logger = loggerFactory.create(LeavePartyAction::class.java)
+        val onlineAction = LeavePartyAction(logger)
         val questPackage = instruction.getPackage()
-        return OnlineEventAdapter(onlineEvent, logger, questPackage)
+        val adapter = OnlineActionAdapter(onlineAction, logger, questPackage)
+        return adapter
     }
 }

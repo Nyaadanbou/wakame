@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.hook.impl.betonquest.quest.event.party
+package cc.mewcraft.wakame.hook.impl.betonquest.quest.action.party
 
 import cc.mewcraft.wakame.integration.party.PartyIntegration
 import cc.mewcraft.wakame.util.adventure.plain
@@ -10,11 +10,11 @@ import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
 import org.betonquest.betonquest.api.profile.ProfileProvider
 import org.betonquest.betonquest.api.quest.QuestTypeApi
+import org.betonquest.betonquest.api.quest.action.PlayerAction
+import org.betonquest.betonquest.api.quest.action.PlayerActionFactory
+import org.betonquest.betonquest.api.quest.action.online.OnlineAction
+import org.betonquest.betonquest.api.quest.action.online.OnlineActionAdapter
 import org.betonquest.betonquest.api.quest.condition.ConditionID
-import org.betonquest.betonquest.api.quest.event.PlayerEvent
-import org.betonquest.betonquest.api.quest.event.PlayerEventFactory
-import org.betonquest.betonquest.api.quest.event.online.OnlineEvent
-import org.betonquest.betonquest.api.quest.event.online.OnlineEventAdapter
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import kotlin.jvm.optionals.getOrNull
@@ -24,17 +24,17 @@ import kotlin.jvm.optionals.getOrNull
  * @param questTypeApi the Quest Type API
  * @param profileProvider the profile provider instance
  * @param range the range of the party
- * @param amount the optional maximum amount of players affected by this event
+ * @param amount the optional maximum amount of players affected by this action
  * @param conditions the conditions that must be met by the party members
  */
-class CreatePartyEvent(
+class CreatePartyAction(
     private val questTypeApi: QuestTypeApi,
     private val profileProvider: ProfileProvider,
     private val range: Argument<Number>,
     private val conditions: Argument<List<ConditionID>>,
     private val amount: Argument<Number>?,
     private val logger: BetonQuestLogger,
-) : OnlineEvent {
+) : OnlineAction {
 
     override fun execute(profile: OnlineProfile) {
         // 使当前玩家离开当前队伍
@@ -122,24 +122,24 @@ class CreatePartyEvent(
 
 
 /**
- * @param loggerFactory the logger factory to create a logger for the events
+ * @param loggerFactory the logger factory to create a logger for the actions
  * @param questTypeApi the Quest Type API
  * @param profileProvider the profile provider instance
  */
-class CreatePartyEventFactory(
+class CreatePartyActionFactory(
     private val loggerFactory: BetonQuestLoggerFactory,
     private val questTypeApi: QuestTypeApi,
     private val profileProvider: ProfileProvider,
-) : PlayerEventFactory {
+) : PlayerActionFactory {
 
-    override fun parsePlayer(instruction: Instruction): PlayerEvent {
+    override fun parsePlayer(instruction: Instruction): PlayerAction {
         val range = instruction.number().get()
         val conditions = instruction.parse(::ConditionID).list().get()
         val amount = instruction.number().get("amount").getOrNull()
-        val logger = loggerFactory.create(CreatePartyEvent::class.java)
+        val logger = loggerFactory.create(CreatePartyAction::class.java)
         val questPackage = instruction.getPackage()
-        val event = CreatePartyEvent(questTypeApi, profileProvider, range, conditions, amount, logger)
-        val adapter = OnlineEventAdapter(event, logger, questPackage)
+        val action = CreatePartyAction(questTypeApi, profileProvider, range, conditions, amount, logger)
+        val adapter = OnlineActionAdapter(action, logger, questPackage)
         return adapter
     }
 }
