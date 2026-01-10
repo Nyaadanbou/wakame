@@ -57,7 +57,7 @@ object KoishStackGenerator {
      * @return 新生成的 [ItemStack]
      */
     fun generate(type: KoishItem, context: ItemGenerationContext): ItemStack {
-        return generate2(type, context)
+        return generate2(type, context).clone()
     }
 
     private fun generate2(type: KoishItem, context: ItemGenerationContext): ItemStack {
