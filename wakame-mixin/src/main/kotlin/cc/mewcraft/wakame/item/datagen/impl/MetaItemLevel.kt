@@ -47,6 +47,10 @@ data class MetaItemLevel(
 
     }
 
+    override fun randomized(): Boolean {
+        return true
+    }
+
     override fun make(context: ItemGenerationContext): ItemMetaResult<ItemLevel> {
         val raw: Int = when (base) {
             is Number -> {

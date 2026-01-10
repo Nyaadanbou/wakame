@@ -41,6 +41,10 @@ sealed interface MetaKizami : ItemMetaEntry<Set<RegistryEntry<Kizami>>> {
         val entries: Set<RegistryEntry<Kizami>>,
     ) : MetaKizami {
 
+        override fun randomized(): Boolean {
+            return false
+        }
+
         override fun make(context: ItemGenerationContext): ItemMetaResult<Set<RegistryEntry<Kizami>>> {
             context.kizami.addAll(entries)
             return ItemMetaResult.of(entries)
@@ -53,6 +57,10 @@ sealed interface MetaKizami : ItemMetaEntry<Set<RegistryEntry<Kizami>>> {
         @Setting("value")
         val selector: LootTable<RegistryEntry<Kizami>>,
     ) : MetaKizami {
+
+        override fun randomized(): Boolean {
+            return true
+        }
 
         override fun make(context: ItemGenerationContext): ItemMetaResult<Set<RegistryEntry<Kizami>>> {
             val result = selector.select(context).toSet()

@@ -13,6 +13,11 @@ import cc.mewcraft.wakame.util.MojangStack
 interface ItemMetaEntry<V> {
 
     /**
+     * 判断生成是否具有随机性.
+     */
+    fun randomized(): Boolean
+
+    /**
      * 根据上下文生成数据 [V].
      */
     fun make(context: ItemGenerationContext): ItemMetaResult<V>
@@ -22,7 +27,7 @@ interface ItemMetaEntry<V> {
      *
      * ### 实现注意事项
      * 如果要写入的数据是自定义数据类型, 而不是 Minecraft 自带的数据类型,
-     * 应该使用函数 [cc.mewcraft.wakame.util.MojangStack.ensureSetData] 来确保数据可以写入成功.
+     * 应该使用函数 [MojangStack.ensureSetData] 来确保数据可以写入成功.
      */
     fun write(value: V, itemstack: MojangStack)
 

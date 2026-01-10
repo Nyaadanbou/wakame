@@ -18,6 +18,10 @@ data class MetaRemovedComponents(
     val removedComponents: Set<Key>,
 ) : ItemMetaEntry<Set<Key>> {
 
+    override fun randomized(): Boolean {
+        return false
+    }
+
     override fun make(context: ItemGenerationContext): ItemMetaResult<Set<Key>> {
         return ItemMetaResult.of(removedComponents)
     }

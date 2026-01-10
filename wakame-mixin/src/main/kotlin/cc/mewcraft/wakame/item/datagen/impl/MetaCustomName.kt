@@ -19,6 +19,10 @@ data class MetaCustomName(
     val customName: String,
 ) : ItemMetaEntry<Component> {
 
+    override fun randomized(): Boolean {
+        return false
+    }
+
     override fun make(context: ItemGenerationContext): ItemMetaResult<Component> {
         val rarity = context.rarity
         val resolver = TagResolver.resolver(Placeholder.styling("rarity_style", *rarity.unwrap().displayStyles))

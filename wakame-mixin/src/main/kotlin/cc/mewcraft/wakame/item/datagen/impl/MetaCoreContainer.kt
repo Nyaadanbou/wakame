@@ -34,6 +34,11 @@ sealed interface MetaCoreContainer : ItemMetaEntry<CoreContainer> {
         @Setting("value")
         val entry: CoreContainer,
     ) : MetaCoreContainer {
+
+        override fun randomized(): Boolean {
+            return false
+        }
+
         override fun make(context: ItemGenerationContext): ItemMetaResult<CoreContainer> {
             return ItemMetaResult.of(entry)
         }
@@ -44,6 +49,11 @@ sealed interface MetaCoreContainer : ItemMetaEntry<CoreContainer> {
         @Setting("value")
         val entry: Map<String, LootTable<Core>>,
     ) : MetaCoreContainer {
+
+        override fun randomized(): Boolean {
+            return true
+        }
+
         override fun make(context: ItemGenerationContext): ItemMetaResult<CoreContainer> {
             val cores = entry.mapValues { (_, table) -> table.select(context).first() }
             return ItemMetaResult.of(CoreContainer.of(cores))

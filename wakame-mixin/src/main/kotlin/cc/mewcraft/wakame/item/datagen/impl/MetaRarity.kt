@@ -38,6 +38,10 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
         val entry: RegistryEntry<Rarity>,
     ) : MetaRarity {
 
+        override fun randomized(): Boolean {
+            return false
+        }
+
         override fun make(context: ItemGenerationContext): ItemMetaResult<RegistryEntry<Rarity>> {
             context.rarity = entry
             return ItemMetaResult.of(entry)
@@ -50,6 +54,10 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
         @Setting("value")
         val entry: RegistryEntry<LevelToRarityMapping>,
     ) : MetaRarity {
+
+        override fun randomized(): Boolean {
+            return true
+        }
 
         override fun make(context: ItemGenerationContext): ItemMetaResult<RegistryEntry<Rarity>> {
             val mapper = entry.unwrap()

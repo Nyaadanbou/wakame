@@ -32,6 +32,10 @@ sealed interface MetaElement : ItemMetaEntry<Set<RegistryEntry<Element>>> {
         val entries: Set<RegistryEntry<Element>>,
     ) : MetaElement {
 
+        override fun randomized(): Boolean {
+            return false
+        }
+
         override fun make(context: ItemGenerationContext): ItemMetaResult<Set<RegistryEntry<Element>>> {
             context.elements.addAll(entries)
             return ItemMetaResult.of(entries)
@@ -43,6 +47,10 @@ sealed interface MetaElement : ItemMetaEntry<Set<RegistryEntry<Element>>> {
     data class Dynamic(
         val entries: LootTable<RegistryEntry<Element>>,
     ) : MetaElement {
+
+        override fun randomized(): Boolean {
+            return true
+        }
 
         override fun make(context: ItemGenerationContext): ItemMetaResult<Set<RegistryEntry<Element>>> {
             val result = entries.select(context).toSet()

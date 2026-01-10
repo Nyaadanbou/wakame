@@ -71,6 +71,11 @@ sealed interface ItemMetaContainer {
     operator fun contains(type: ItemMetaType<*, *>): Boolean = has(type)
 
     /**
+     * 检查是否包含任何具有随机性的配置项.
+     */
+    fun randomized(): Boolean
+
+    /**
      * [ItemMetaContainer] 的生成器.
      */
     sealed interface Builder : ItemMetaContainer {
@@ -103,6 +108,7 @@ sealed interface ItemMetaContainer {
 
 private data object EmptyItemMetaContainer : ItemMetaContainer {
     override fun <U : ItemMetaEntry<V>, V> get(type: ItemMetaType<U, V>): U? = null
+    override fun randomized(): Boolean = false
 }
 
 private class SimpleItemMetaContainer(
@@ -111,6 +117,10 @@ private class SimpleItemMetaContainer(
 
     override fun <U : ItemMetaEntry<V>, V> get(type: ItemMetaType<U, V>): U? {
         return metaMap[type] as U?
+    }
+
+    override fun randomized(): Boolean {
+        return metaMap.values.any { it.randomized() }
     }
 
     override fun <U : ItemMetaEntry<V>, V> set(type: ItemMetaType<U, V>, value: U) {

@@ -19,6 +19,10 @@ data class MetaTooltipDisplay(
     private val hiddenComponents: List<Key> = emptyList(),
 ) : ItemMetaEntry<TooltipDisplay> {
 
+    override fun randomized(): Boolean {
+        return false
+    }
+
     override fun make(context: ItemGenerationContext): ItemMetaResult<TooltipDisplay> {
         val tooltipDisplay = TooltipDisplay.tooltipDisplay()
             .hideTooltip(hideTooltip)
