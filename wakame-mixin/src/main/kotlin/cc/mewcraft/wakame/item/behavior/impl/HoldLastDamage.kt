@@ -4,7 +4,7 @@ package cc.mewcraft.wakame.item.behavior.impl
 
 import cc.mewcraft.wakame.item.behavior.*
 import cc.mewcraft.wakame.item.getProp
-import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.HoldLastDamageAction
 import cc.mewcraft.wakame.item.property.impl.ItemBehaviorHandlerType
 import cc.mewcraft.wakame.util.item.damage
@@ -60,7 +60,7 @@ object HoldLastDamage : SimpleInteract {
         val player = context.player
         if (!itemstack.isBroken()) return InteractionResult.PASS
 
-        val settings = itemstack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE)
+        val settings = itemstack.getProp(ItemPropTypes.HOLD_LAST_DAMAGE)
         val action = settings?.getAction(type) ?: type.defaultAction
         val message = settings?.getMessage(type) ?: type.defaultMessage
 
@@ -84,7 +84,7 @@ object HoldLastDamage : SimpleInteract {
         val player = context.player
         if (!itemstack.isBroken()) return BehaviorResult.PASS
 
-        val settings = itemstack.getProp(ItemPropertyTypes.HOLD_LAST_DAMAGE)
+        val settings = itemstack.getProp(ItemPropTypes.HOLD_LAST_DAMAGE)
         val action = settings?.getAction(type) ?: type.defaultAction
         val message = settings?.getMessage(type) ?: type.defaultMessage
 

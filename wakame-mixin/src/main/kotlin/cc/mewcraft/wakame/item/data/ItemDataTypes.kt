@@ -1,14 +1,7 @@
 package cc.mewcraft.wakame.item.data
 
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.data.impl.Core
-import cc.mewcraft.wakame.item.data.impl.CoreContainer
-import cc.mewcraft.wakame.item.data.impl.EntityBucketInfo
-import cc.mewcraft.wakame.item.data.impl.ItemBrewRecipe
-import cc.mewcraft.wakame.item.data.impl.ItemCrate
-import cc.mewcraft.wakame.item.data.impl.ItemId
-import cc.mewcraft.wakame.item.data.impl.ItemLevel
-import cc.mewcraft.wakame.item.data.impl.ReforgeHistory
+import cc.mewcraft.wakame.item.data.impl.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.BuiltInRegistries
@@ -27,7 +20,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
  * 也就是说, 这些数据将会被持久化, 并且可以在游戏内被(玩家或系统)修改.
  *
  * @see cc.mewcraft.wakame.item.datagen.ItemMetaTypes 用于控制如何生成物品堆叠上的持久化数据类型
- * @see cc.mewcraft.wakame.item.property.ItemPropertyTypes 包含了所有存在于*物品类型*上的数据类型
+ * @see cc.mewcraft.wakame.item.property.ItemPropTypes 包含了所有存在于*物品类型*上的数据类型
  */
 data object ItemDataTypes {
 

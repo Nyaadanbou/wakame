@@ -26,8 +26,6 @@ import cc.mewcraft.wakame.world.WeatherControl
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
-@Deprecated("请使用 ItemPropTypes", ReplaceWith("ItemPropTypes"))
-typealias ItemPropertyTypes = ItemPropTypes
 
 /**
  * 该 `object` 包含了所有可用的 [ItemPropType].
@@ -43,9 +41,9 @@ data object ItemPropTypes {
     // 注册表
     // ------------
 
-    @JvmField
-    val ID: ItemPropType<Identifier> = typeOf("id")
-
+    /**
+     * 物品基底, 即生成自定义物品堆叠时所使用的原版物品堆叠.
+     */
     @JvmField
     val BASE: ItemPropType<ItemBase> = typeOf("base") {
         serializers {
@@ -53,6 +51,9 @@ data object ItemPropTypes {
         }
     }
 
+    /**
+     * 物品名字, 该名字专用与显示在特定 UI 上, 如合成站.
+     */
     @JvmField
     val NAME: ItemPropType<Component> = typeOf("name")
 
@@ -64,21 +65,39 @@ data object ItemPropTypes {
         }
     }
 
+    /**
+     * 使物品隐藏, 不会在大部分 UI 中显示.
+     */
     @JvmField
     val HIDDEN: ItemPropType<Unit> = typeOf("hidden")
 
+    /**
+     * 使物品成为 Koish 系统下的箭矢, 并按照 Koish 的逻辑处理箭矢的各种行为.
+     */
     @JvmField
     val ARROW: ItemPropType<Arrow> = typeOf("arrow")
 
+    /**
+     * 使物品留有最后一点耐久而不损坏.
+     */
     @JvmField
     val HOLD_LAST_DAMAGE: ItemPropType<HoldLastDamage> = typeOf("hold_last_damage")
 
+    /**
+     * 使物品在掉落状态下会发光.
+     */
     @JvmField
     val GLOWABLE: ItemPropType<Unit> = typeOf("glowable")
 
+    /**
+     * 物品的额外描述文本.
+     */
     @JvmField
     val EXTRA_LORE: ItemPropType<ExtraLore> = typeOf("extra_lore")
 
+    /**
+     * 使物品可以释放特殊效果.
+     */
     @JvmField
     val CASTABLE: ItemPropType<Map<String, Castable>> = typeOf("castable") {
         serializers {
@@ -87,12 +106,21 @@ data object ItemPropTypes {
         }
     }
 
+    /**
+     * 箱子菜单相关.
+     */
     @JvmField
     val SLOT_DISPLAY_DICT: ItemPropType<SlotDisplayDictData> = typeOf("slot_display_dict")
 
+    /**
+     * 箱子菜单相关.
+     */
     @JvmField
     val SLOT_DISPLAY_NAME: ItemPropType<SlotDisplayNameData> = typeOf("slot_display_name")
 
+    /**
+     * 箱子菜单相关.
+     */
     @JvmField
     val SLOT_DISPLAY_LORE: ItemPropType<SlotDisplayLoreData> = typeOf("slot_display_lore") {
         serializers {
@@ -100,9 +128,15 @@ data object ItemPropTypes {
         }
     }
 
+    /**
+     * 物品所属的冷却组.
+     */
     @JvmField
     val COOLDOWN_GROUP: ItemPropType<Identifier> = typeOf("cooldown_group")
 
+    /**
+     * 攻击速度.
+     */
     @JvmField
     val ATTACK_SPEED: ItemPropType<RegistryEntry<AttackSpeed>> = typeOf("attack_speed") {
         serializers {
@@ -110,15 +144,27 @@ data object ItemPropTypes {
         }
     }
 
+    /**
+     * 使物品具有太刀行为.
+     */
     @JvmField
     val KATANA: ItemPropType<Katana> = typeOf("katana")
 
+    /**
+     * 使物品具有近战武器行为.
+     */
     @JvmField
     val MELEE: ItemPropType<Melee> = typeOf("melee")
 
+    /**
+     * 使物品具有双手剑行为.
+     */
     @JvmField
     val DUAL_SWORD: ItemPropType<DualSword> = typeOf("dual_sword")
 
+    /**
+     * 使物品具有三叉戟行为.
+     */
     @JvmField
     val TRIDENT: ItemPropType<Unit> = typeOf("trident")
 
@@ -138,6 +184,9 @@ data object ItemPropTypes {
     @JvmField
     val PLAYER_PURCHASABLE: ItemPropType<Unit> = typeOf("player_purchasable")
 
+    /**
+     * 使物品可以作为生物桶使用.
+     */
     @JvmField
     val ENTITY_BUCKET: ItemPropType<EntityBucket> = typeOf("entity_bucket")
 
@@ -196,6 +245,7 @@ data object ItemPropTypes {
 
     /**
      * 该物品类型所属的标签.
+     *
      * 不使用该 Property 直接进行物品标签相关的判定, 而是使用 plugin 包下的 ItemTagManager 中的相关方法.
      *
      * 这并非原版的标签系统, 而是由 Koish 管理的一套标签系统.
@@ -279,7 +329,7 @@ data object ItemPropTypes {
     }
 
     /**
-     * 物品的核心.
+     * 与物品类型绑定的核心.
      *
      * @see cc.mewcraft.wakame.item.data.ItemDataTypes.CORE
      */
@@ -291,7 +341,7 @@ data object ItemPropTypes {
     }
 
     /**
-     * 物品的核心容器.
+     * 与物品类型绑定的核心容器.
      *
      * @see cc.mewcraft.wakame.item.data.ItemDataTypes.CORE_CONTAINER
      */

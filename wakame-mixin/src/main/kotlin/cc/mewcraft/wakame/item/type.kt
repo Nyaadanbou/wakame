@@ -65,12 +65,12 @@ open class KoishItem(
 /**
  * 该物品类型的名字, 可用于展示给玩家.
  *
- * 该物品类型的配置文件必须指定了 [ItemPropertyTypes.NAME], 否则将使用物品 ID 作为返回值.
+ * 该物品类型的配置文件必须指定了 [ItemPropTypes.NAME], 否则将使用物品 ID 作为返回值.
  */
 val KoishItem.name: Component get() = properties.getOrDefault(ItemPropTypes.NAME, Component.text(id.asString()))
-fun <T> KoishItem.hasProperty(type: ItemPropType<T>): Boolean = properties.has(type)
-fun <T> KoishItem.getProperty(type: ItemPropType<out T>): T? = properties[type]
-fun <T> KoishItem.getPropertyOrDefault(type: ItemPropType<T>, default: T): T = properties.getOrDefault(type, default)
+fun <T> KoishItem.hasProp(type: ItemPropType<T>): Boolean = properties.has(type)
+fun <T> KoishItem.getProp(type: ItemPropType<out T>): T? = properties[type]
+fun <T> KoishItem.getPropOrDefault(type: ItemPropType<T>, default: T): T = properties.getOrDefault(type, default)
 
 /**
  * 表示一个套皮物品(由配置文件创建).

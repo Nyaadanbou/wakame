@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item.ItemSlotChanges
-import cc.mewcraft.wakame.item.getProperty
-import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item.getProp
+import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
@@ -34,7 +34,7 @@ object PlayAttackSpeedAnimation : IteratingSystem(
             if (prev != null &&
                 ItemSlotChanges.testSlot(slot, prev)
             ) {
-                val attackspeed = prev.getProperty(ItemPropertyTypes.ATTACK_SPEED)
+                val attackspeed = prev.getProp(ItemPropTypes.ATTACK_SPEED)
                 if (attackspeed != null) {
                     attributeinstance?.removeModifier(MODIFIER_ID)
                 }
@@ -42,7 +42,7 @@ object PlayAttackSpeedAnimation : IteratingSystem(
             if (curr != null &&
                 ItemSlotChanges.testSlot(slot, curr)
             ) {
-                val attackspeed = curr.getProperty(ItemPropertyTypes.ATTACK_SPEED)
+                val attackspeed = curr.getProp(ItemPropTypes.ATTACK_SPEED)
                 if (attackspeed != null) {
                     attributeinstance?.addTransientModifier(computeAttackSpeedModifier(attributeinstance, attackspeed))
                 }

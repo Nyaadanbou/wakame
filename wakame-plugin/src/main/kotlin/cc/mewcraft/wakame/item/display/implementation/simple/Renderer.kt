@@ -10,9 +10,9 @@ import cc.mewcraft.wakame.item.display.implementation.common.CommonRenderingHand
 import cc.mewcraft.wakame.item.display.implementation.common.ExtraLoreRendererFormat
 import cc.mewcraft.wakame.item.display.implementation.common.SingleValueRendererFormat
 import cc.mewcraft.wakame.item.getMeta
-import cc.mewcraft.wakame.item.getProperty
+import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.isNetworkRewrite
-import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.ExtraLore
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -63,7 +63,7 @@ internal object SimpleItemRenderer : AbstractItemRenderer<Nothing>() {
         // ItemMetaTypes
         SimpleRenderingHandlerRegistry.CUSTOM_NAME.process(collector, item.getMeta(ItemMetaTypes.CUSTOM_NAME))
         SimpleRenderingHandlerRegistry.ITEM_NAME.process(collector, item.getMeta(ItemMetaTypes.ITEM_NAME))
-        SimpleRenderingHandlerRegistry.LORE.process(collector, item.getProperty(ItemPropertyTypes.EXTRA_LORE))
+        SimpleRenderingHandlerRegistry.LORE.process(collector, item.getProp(ItemPropTypes.EXTRA_LORE))
 
         val koishLore = textAssembler.assemble(collector)
 

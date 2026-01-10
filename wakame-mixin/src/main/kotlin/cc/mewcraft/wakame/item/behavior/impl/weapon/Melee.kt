@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.item.extension.addCooldown
 import cc.mewcraft.wakame.item.extension.damageItem
 import cc.mewcraft.wakame.item.extension.isOnCooldown
 import cc.mewcraft.wakame.item.getProp
-import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item.property.ItemPropTypes
 import org.bukkit.FluidCollisionMode
 import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.EquipmentSlot
@@ -25,7 +25,7 @@ object Melee : Weapon {
         val itemstack = context.itemstack
         val player = context.player
         if (itemstack.isOnCooldown(player)) return InteractionResult.FAIL
-        val melee = itemstack.getProp(ItemPropertyTypes.MELEE) ?: return InteractionResult.FAIL
+        val melee = itemstack.getProp(ItemPropTypes.MELEE) ?: return InteractionResult.FAIL
 
         val world = player.world
         val attrContainer = player.attributeContainer

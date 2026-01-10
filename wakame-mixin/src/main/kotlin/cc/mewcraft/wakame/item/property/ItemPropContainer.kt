@@ -26,7 +26,7 @@ sealed interface ItemPropContainer {
         fun makeDirectSerializers(): TypeSerializerCollection {
             val collection = TypeSerializerCollection.builder()
             collection.register<ItemPropContainer>(SimpleItemPropContainer.Serializer)
-            collection.registerAll(ItemPropertyTypes.directSerializers())
+            collection.registerAll(ItemPropTypes.directSerializers())
             return collection.build()
         }
 

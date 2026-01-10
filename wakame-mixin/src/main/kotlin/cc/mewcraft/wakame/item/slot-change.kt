@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.entity.player.component.InventoryListenable
 import cc.mewcraft.wakame.entity.player.koishLevel
 import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.item.extension.level
-import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import cc.mewcraft.wakame.item.property.impl.ItemSlotGroup
 import cc.mewcraft.wakame.item.property.impl.ItemSlotRegistry
@@ -80,7 +80,7 @@ data class ItemSlotChanges(
          */
         fun testSlot(slot: ItemSlot, itemstack: ItemStack?): Boolean {
             if (itemstack == null) return false
-            val slotGroup = itemstack.getProperty(ItemPropertyTypes.SLOT) ?: ItemSlotGroup.empty()
+            val slotGroup = itemstack.getProp(ItemPropTypes.SLOT) ?: ItemSlotGroup.empty()
             return slotGroup.contains(slot)
         }
 

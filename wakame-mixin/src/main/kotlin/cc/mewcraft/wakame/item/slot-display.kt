@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item.SlotDisplayLoreData.Companion.SERIALIZER
 import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
-import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
@@ -76,10 +76,10 @@ private constructor(
      */
     fun resolve(dsl: SlotDisplayLoreData.LineConfig.Builder.() -> Unit = {}): Resolved {
         val koishItem = koishItem.unwrap()
-        val dict = koishItem.getPropertyOrDefault(ItemPropertyTypes.SLOT_DISPLAY_DICT, SlotDisplayDictData())
+        val dict = koishItem.getPropOrDefault(ItemPropTypes.SLOT_DISPLAY_DICT, SlotDisplayDictData())
         val conf = SlotDisplayLoreData.LineConfig.Builder(dict).apply(dsl).build()
-        val name = koishItem.getProperty(ItemPropertyTypes.SLOT_DISPLAY_NAME)?.resolve(conf.getPlaceholders())
-        val lore = koishItem.getProperty(ItemPropertyTypes.SLOT_DISPLAY_LORE)?.resolve(conf)
+        val name = koishItem.getProp(ItemPropTypes.SLOT_DISPLAY_NAME)?.resolve(conf.getPlaceholders())
+        val lore = koishItem.getProp(ItemPropTypes.SLOT_DISPLAY_LORE)?.resolve(conf)
         // TODO 还需要解析 item_model, tooltip_style. 等资源包重构完后再写
         return Resolved(name, lore)
     }

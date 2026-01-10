@@ -2,7 +2,9 @@ package cc.mewcraft.wakame.item.behavior.impl.weapon
 
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.damage.KoishDamageSources
+import cc.mewcraft.wakame.damage.PlayerDamageMetadata
+import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.ecs.bridge.EComponent
 import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.ecs.bridge.EWorld
@@ -17,8 +19,8 @@ import cc.mewcraft.wakame.item.behavior.impl.weapon.WeaponUtils.getInputDirectio
 import cc.mewcraft.wakame.item.extension.addCooldown
 import cc.mewcraft.wakame.item.extension.damageItem
 import cc.mewcraft.wakame.item.extension.isOnCooldown
-import cc.mewcraft.wakame.item.getProperty
-import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item.getProp
+import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.weapon.Katana
 import cc.mewcraft.wakame.util.adventure.SoundSource
 import cc.mewcraft.wakame.util.adventure.playSound
@@ -491,7 +493,7 @@ object SwitchKatana : IteratingSystem(
             if (prev != null &&
                 ItemSlotChanges.testSlot(slot, prev)
             ) {
-                val katanaItem = prev.getProperty(ItemPropertyTypes.KATANA)
+                val katanaItem = prev.getProp(ItemPropTypes.KATANA)
                 if (katanaItem != null && katanaState != null) {
                     katanaState.isArmed = false
                 }
@@ -501,7 +503,7 @@ object SwitchKatana : IteratingSystem(
                 ItemSlotChanges.testLevel(player, curr) &&
                 ItemSlotChanges.testDurability(curr)
             ) {
-                val katanaConfig = curr.getProperty(ItemPropertyTypes.KATANA)
+                val katanaConfig = curr.getProp(ItemPropTypes.KATANA)
                 if (katanaConfig != null) {
                     if (katanaState != null) {
                         katanaState.config = katanaConfig // 始终切换至新的太刀配置

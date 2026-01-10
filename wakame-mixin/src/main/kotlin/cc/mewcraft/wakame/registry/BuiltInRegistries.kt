@@ -28,7 +28,7 @@ import cc.mewcraft.wakame.item.data.impl.EntityBucketInfoTypes
 import cc.mewcraft.wakame.item.datagen.ItemMetaType
 import cc.mewcraft.wakame.item.datagen.ItemMetaTypes
 import cc.mewcraft.wakame.item.property.ItemPropType
-import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.*
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.loot.LootTable
@@ -101,7 +101,7 @@ object BuiltInRegistries {
      * "Item Property" 的类型.
      */
     @JvmField
-    val ITEM_PROPERTY_TYPE: WritableRegistry<ItemPropType<*>> = registerSimple(BuiltInRegistryKeys.ITEM_PROPERTY_TYPE) { ItemPropertyTypes }
+    val ITEM_PROPERTY_TYPE: WritableRegistry<ItemPropType<*>> = registerSimple(BuiltInRegistryKeys.ITEM_PROPERTY_TYPE) { ItemPropTypes }
 
     /**
      * "Item Behavior" 的类型.

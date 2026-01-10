@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.hook.impl.chestshop
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.item.ItemRef
-import cc.mewcraft.wakame.item.hasProperty
-import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item.hasProp
+import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import cc.mewcraft.wakame.util.registerEvents
@@ -43,7 +43,7 @@ object ChestShopHook : Listener {
         if (itemRef.id.namespace() == KOISH_NAMESPACE) {
             if (priceLine.contains("S", ignoreCase = true)) {
                 val koishItem = BuiltInRegistries.ITEM[itemId] ?: return
-                val shouldCancel = !koishItem.hasProperty(ItemPropertyTypes.PLAYER_PURCHASABLE)
+                val shouldCancel = !koishItem.hasProp(ItemPropTypes.PLAYER_PURCHASABLE)
                 event.isCancelled = shouldCancel
             }
         }

@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.item.behavior.UseEntityContext
 import cc.mewcraft.wakame.item.behavior.UseOnContext
 import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.data.impl.*
-import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.util.adventure.plain
 import cc.mewcraft.wakame.util.metadata.Empty
 import cc.mewcraft.wakame.util.metadata.ExpiringValue
@@ -86,7 +86,7 @@ object EntityBucket : ItemBehavior {
         val player = context.player
         val itemstack = context.itemstack
         val entity = context.entity
-        val entityBucket = itemstack.getProp(ItemPropertyTypes.ENTITY_BUCKET) ?: return InteractionResult.FAIL
+        val entityBucket = itemstack.getProp(ItemPropTypes.ENTITY_BUCKET) ?: return InteractionResult.FAIL
         val entityBucketData = itemstack.getData(ItemDataTypes.ENTITY_BUCKET_DATA)
 
         if (!ProtectionManager.canInteractWithEntity(player, entity, itemstack)) {
@@ -127,7 +127,7 @@ object EntityBucket : ItemBehavior {
     }
 
     private fun hasEntityBucketBehavior(itemstack: ItemStack): Boolean {
-        return itemstack.hasProp(ItemPropertyTypes.ENTITY_BUCKET)
+        return itemstack.hasProp(ItemPropTypes.ENTITY_BUCKET)
     }
 
     private fun hasEntityBucketData(itemstack: ItemStack): Boolean {
@@ -149,7 +149,7 @@ object EntityBucket : ItemBehavior {
         }
 
         // 设置 itemstack 的 `minecraft:item_name`
-        val entityBucket = itemstack.getProp(ItemPropertyTypes.ENTITY_BUCKET)!!
+        val entityBucket = itemstack.getProp(ItemPropTypes.ENTITY_BUCKET)!!
         val oldItemName = itemstack.getData(DataComponentTypes.ITEM_NAME)
         if (oldItemName != null) {
             // 储存 itemstack 当前的 `minecraft:item_name` 组件 - 用于将生物放生时, 恢复物品原本的 `minecraft:item_name`

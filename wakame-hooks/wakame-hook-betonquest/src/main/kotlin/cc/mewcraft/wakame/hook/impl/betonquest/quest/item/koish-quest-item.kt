@@ -29,7 +29,7 @@ class KoishQuestItem(
     }
 
     override fun getLore(): List<Component> {
-        return itemType.getProperty(ItemPropTypes.EXTRA_LORE)?.lore ?: emptyList()
+        return itemType.getProp(ItemPropTypes.EXTRA_LORE)?.lore ?: emptyList()
     }
 
     override fun generate(stackSize: Int, profile: Profile?): ItemStack {

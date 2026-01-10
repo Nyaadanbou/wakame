@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.entity.player.koishLevel
 import cc.mewcraft.wakame.item.extension.level
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.koishItem
-import cc.mewcraft.wakame.item.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import cc.mewcraft.wakame.item.property.impl.ItemSlotGroup
 import cc.mewcraft.wakame.util.MojangStack
@@ -157,7 +157,7 @@ object ItemStackActivationChecker {
      */
     fun ItemStack.isInValidSlot(slot: ItemSlot): Boolean {
         if (koishItem == null) return false
-        val slotGroup = getProp(ItemPropertyTypes.SLOT) ?: ItemSlotGroup.empty()
+        val slotGroup = getProp(ItemPropTypes.SLOT) ?: ItemSlotGroup.empty()
         return slotGroup.contains(slot)
     }
 

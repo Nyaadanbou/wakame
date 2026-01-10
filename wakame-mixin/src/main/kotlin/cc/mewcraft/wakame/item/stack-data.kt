@@ -203,9 +203,9 @@ fun MojangStack.metaContainer(): ItemMetaContainer? =
  *
  * @return 如果该物品堆叠是 Koish 物品, 则返回其属性数据容器
  *
- * @see hasProperty
- * @see getProperty
- * @see getPropertyOrDefault
+ * @see hasProp
+ * @see getProp
+ * @see getPropOrDefault
  */
 fun MojangStack.propContainer(): ItemPropContainer? =
     koishItem?.properties
@@ -220,18 +220,6 @@ fun <T> MojangStack.hasProp(type: ItemPropType<T>): Boolean =
 
 fun <T> MojangStack.getPropOrDefault(type: ItemPropType<out T>, fallback: T): T? =
     propContainer()?.getOrDefault(type, fallback)
-
-@Deprecated("Use getProp instead", ReplaceWith("getProp(type)"))
-fun <T> MojangStack.getProperty(type: ItemPropType<out T>): T? =
-    getProp(type)
-
-@Deprecated("Use hasProp instead", ReplaceWith("hasProp(type)"))
-fun <T> MojangStack.hasProperty(type: ItemPropType<T>): Boolean =
-    hasProp(type)
-
-@Deprecated("Use getPropOrDefault instead", ReplaceWith("getPropOrDefault(type, fallback)"))
-fun <T> MojangStack.getPropertyOrDefault(type: ItemPropType<out T>, fallback: T): T? =
-    getPropOrDefault(type, fallback)
 
 /* ItemData */
 

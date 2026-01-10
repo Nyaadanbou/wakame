@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.extension.rarity2
 import cc.mewcraft.wakame.item.property.ItemPropTypes
-import cc.mewcraft.wakame.item.property.ItemPropertyTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
@@ -100,7 +99,7 @@ object EnchantSlotFeature : Listener {
     fun getSlotBase(item: ItemStack): Int {
         val amount = when (ENCHANT_SLOT_BASE_PROVIDER) {
             SlotBaseProviderType.NONE -> Int.MIN_VALUE
-            SlotBaseProviderType.PROP -> item.getProp(ItemPropertyTypes.ENCHANT_SLOT_BASE) ?: 0
+            SlotBaseProviderType.PROP -> item.getProp(ItemPropTypes.ENCHANT_SLOT_BASE) ?: 0
             SlotBaseProviderType.RARITY -> item.rarity2?.unwrap()?.enchantSlotBase ?: 0
         }
         return amount
