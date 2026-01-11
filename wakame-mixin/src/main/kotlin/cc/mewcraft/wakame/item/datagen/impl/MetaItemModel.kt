@@ -24,7 +24,6 @@ sealed interface MetaItemModel : ItemMetaEntry<Key> {
                 "custom" to Custom::class, // 使用自定义的 `minecraft:item_model`
             )
         )
-
     }
 
     @ConfigSerializable

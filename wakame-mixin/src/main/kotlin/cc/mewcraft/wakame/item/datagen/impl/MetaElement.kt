@@ -40,7 +40,6 @@ sealed interface MetaElement : ItemMetaEntry<Set<RegistryEntry<Element>>> {
             context.elements.addAll(entries)
             return ItemMetaResult.of(entries)
         }
-
     }
 
     @ConfigSerializable
@@ -57,6 +56,5 @@ sealed interface MetaElement : ItemMetaEntry<Set<RegistryEntry<Element>>> {
             context.elements.addAll(result)
             return ItemMetaResult.of(result)
         }
-
     }
 }

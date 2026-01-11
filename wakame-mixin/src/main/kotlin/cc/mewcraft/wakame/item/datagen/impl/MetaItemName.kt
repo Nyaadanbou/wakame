@@ -33,5 +33,4 @@ data class MetaItemName(
     override fun write(value: Component, itemstack: MojangStack) {
         itemstack.set(DataComponents.ITEM_NAME, value.toNMSComponent())
     }
-
 }

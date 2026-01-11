@@ -25,7 +25,6 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
                 "contextual" to Contextual::class,
             )
         )
-
     }
 
     override fun write(value: RegistryEntry<Rarity>, itemstack: MojangStack) {
@@ -46,7 +45,6 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
             context.rarity = entry
             return ItemMetaResult.of(entry)
         }
-
     }
 
     @ConfigSerializable
@@ -71,7 +69,5 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
                 return ItemMetaResult.empty()
             }
         }
-
     }
-
 }

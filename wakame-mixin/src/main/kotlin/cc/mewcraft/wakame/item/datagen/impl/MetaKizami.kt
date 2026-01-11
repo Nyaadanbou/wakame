@@ -24,7 +24,6 @@ sealed interface MetaKizami : ItemMetaEntry<Set<RegistryEntry<Kizami>>> {
                 "contextual" to Contextual::class,
             )
         )
-
     }
 
     // Hint:
@@ -49,7 +48,6 @@ sealed interface MetaKizami : ItemMetaEntry<Set<RegistryEntry<Kizami>>> {
             context.kizami.addAll(entries)
             return ItemMetaResult.of(entries)
         }
-
     }
 
     @ConfigSerializable
@@ -67,7 +65,5 @@ sealed interface MetaKizami : ItemMetaEntry<Set<RegistryEntry<Kizami>>> {
             context.kizami.addAll(result)
             return ItemMetaResult.of(result)
         }
-
     }
-
 }

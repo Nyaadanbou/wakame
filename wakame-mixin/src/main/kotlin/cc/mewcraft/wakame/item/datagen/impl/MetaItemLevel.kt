@@ -38,7 +38,6 @@ sealed interface MetaItemLevel : ItemMetaEntry<ItemLevel> {
                 "contextual" to Contextual::class,
             )
         )
-
     }
 
     // Hint:
@@ -137,5 +136,4 @@ sealed interface MetaItemLevel : ItemMetaEntry<ItemLevel> {
             return ItemMetaResult.of(ItemLevel(level))
         }
     }
-
 }

@@ -59,5 +59,4 @@ sealed interface MetaCoreContainer : ItemMetaEntry<CoreContainer> {
             return ItemMetaResult.of(CoreContainer.of(cores))
         }
     }
-
 }
