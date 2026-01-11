@@ -19,8 +19,8 @@ sealed interface MetaCoreContainer : ItemMetaEntry<CoreContainer> {
         @JvmField
         val SERIALIZER: TypeSerializer2<MetaCoreContainer> = DispatchingSerializer.createPartial<String, MetaCoreContainer>(
             mapOf(
-                "static" to Static::class,
-                "dynamic" to Dynamic::class,
+                 "constant" to Constant::class,
+                "contextual" to Contextual::class,
             )
         )
     }
@@ -30,7 +30,7 @@ sealed interface MetaCoreContainer : ItemMetaEntry<CoreContainer> {
     }
 
     @ConfigSerializable
-    data class Static(
+    data class Constant(
         @Setting("value")
         val entry: CoreContainer,
     ) : MetaCoreContainer {
@@ -45,7 +45,7 @@ sealed interface MetaCoreContainer : ItemMetaEntry<CoreContainer> {
     }
 
     @ConfigSerializable
-    data class Dynamic(
+    data class Contextual(
         @Setting("value")
         val entry: Map<String, LootTable<Core>>,
     ) : MetaCoreContainer {

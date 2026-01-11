@@ -21,8 +21,8 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
         @JvmField
         val SERIALIZER: TypeSerializer2<MetaRarity> = DispatchingSerializer.createPartial<String, MetaRarity>(
             mapOf(
-                "static" to Static::class,
-                "dynamic" to Dynamic::class,
+                "constant" to Constant::class,
+                "contextual" to Contextual::class,
             )
         )
 
@@ -33,7 +33,7 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
     }
 
     @ConfigSerializable
-    data class Static(
+    data class Constant(
         @Setting("value")
         val entry: RegistryEntry<Rarity>,
     ) : MetaRarity {
@@ -50,7 +50,7 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
     }
 
     @ConfigSerializable
-    data class Dynamic(
+    data class Contextual(
         @Setting("value")
         val entry: RegistryEntry<LevelToRarityMapping>,
     ) : MetaRarity {

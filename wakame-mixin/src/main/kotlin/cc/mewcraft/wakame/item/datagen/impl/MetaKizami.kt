@@ -20,8 +20,8 @@ sealed interface MetaKizami : ItemMetaEntry<Set<RegistryEntry<Kizami>>> {
         @JvmField
         val SERIALIZER: TypeSerializer2<MetaKizami> = DispatchingSerializer.createPartial<String, MetaKizami>(
             mapOf(
-                "static" to Static::class,
-                "dynamic" to Dynamic::class,
+                "constant" to Constant::class,
+                "contextual" to Contextual::class,
             )
         )
 
@@ -36,7 +36,7 @@ sealed interface MetaKizami : ItemMetaEntry<Set<RegistryEntry<Kizami>>> {
     }
 
     @ConfigSerializable
-    data class Static(
+    data class Constant(
         @Setting("value")
         val entries: Set<RegistryEntry<Kizami>>,
     ) : MetaKizami {
@@ -53,7 +53,7 @@ sealed interface MetaKizami : ItemMetaEntry<Set<RegistryEntry<Kizami>>> {
     }
 
     @ConfigSerializable
-    data class Dynamic(
+    data class Contextual(
         @Setting("value")
         val selector: LootTable<RegistryEntry<Kizami>>,
     ) : MetaKizami {

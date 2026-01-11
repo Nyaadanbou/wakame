@@ -17,8 +17,8 @@ sealed interface MetaElement : ItemMetaEntry<Set<RegistryEntry<Element>>> {
         @JvmField
         val SERIALIZER: TypeSerializer2<MetaElement> = DispatchingSerializer.createPartial<String, MetaElement>(
             mapOf(
-                "static" to Static::class,
-                "dynamic" to Dynamic::class,
+                "constant" to Constant::class,
+                "contextual" to Contextual::class,
             )
         )
     }
@@ -28,7 +28,7 @@ sealed interface MetaElement : ItemMetaEntry<Set<RegistryEntry<Element>>> {
     }
 
     @ConfigSerializable
-    data class Static(
+    data class Constant(
         val entries: Set<RegistryEntry<Element>>,
     ) : MetaElement {
 
@@ -44,7 +44,7 @@ sealed interface MetaElement : ItemMetaEntry<Set<RegistryEntry<Element>>> {
     }
 
     @ConfigSerializable
-    data class Dynamic(
+    data class Contextual(
         val entries: LootTable<RegistryEntry<Element>>,
     ) : MetaElement {
 

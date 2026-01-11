@@ -26,7 +26,7 @@ interface MetaBrewRecipe : ItemMetaEntry<String> {
             .registerExact(
                 DispatchingSerializer.createPartial<String, MetaBrewRecipe>(
                     mapOf(
-                        "fixed" to Fixed::class,
+                        "constant" to Constant::class,
                         "random_from_set" to RandomFromSet::class,
                         "random_from_all" to RandomFromAll::class,
                     )
@@ -43,7 +43,7 @@ interface MetaBrewRecipe : ItemMetaEntry<String> {
      * 生成固定配方.
      */
     @ConfigSerializable
-    data class Fixed(
+    data class Constant(
         @Setting("value", true)
         val entry: String,
     ) : MetaBrewRecipe {
