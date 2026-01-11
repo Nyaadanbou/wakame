@@ -67,6 +67,16 @@ sealed interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
     operator fun <T : ItemBehavior> get(type: KClass<T>): T?
 
     /**
+     * 返回该容器中包含的 [ItemBehavior] 数量.
+     */
+    fun size(): Int
+
+    /**
+     * 该容器是否为空.
+     */
+    fun isEmpty(): Boolean
+
+    /**
      * [ItemBehaviorContainer] 的生成器, 用于构建一个 [ItemBehaviorContainer].
      */
     sealed interface Builder {
@@ -85,9 +95,7 @@ sealed interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
          * 构建.
          */
         fun build(): ItemBehaviorContainer
-
     }
-
 }
 
 // ------------
@@ -95,10 +103,13 @@ sealed interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
 // ------------
 
 private data object EmptyItemBehaviorContainer : ItemBehaviorContainer {
-    private val empty: List<ItemBehavior> = emptyList<ItemBehavior>()
+    private val empty: List<ItemBehavior> = emptyList()
     override fun hasExact(type: ItemBehavior): Boolean = false
     override fun has(type: KClass<out ItemBehavior>): Boolean = false
     override fun <T : ItemBehavior> get(type: KClass<T>): T? = null
+    override fun size(): Int = 0
+    override fun isEmpty(): Boolean = true
+
     override fun iterator(): Iterator<ItemBehavior> = empty.iterator()
     override fun toString(): String = toSimpleString()
 }
@@ -117,6 +128,14 @@ private class SimpleItemBehaviorContainer(
 
     override fun <T : ItemBehavior> get(type: KClass<T>): T? {
         return behaviorMap.firstOrNull { type.isInstance(it) } as T?
+    }
+
+    override fun size(): Int {
+        return behaviorMap.size
+    }
+
+    override fun isEmpty(): Boolean {
+        return behaviorMap.isEmpty()
     }
 
     override fun add(behavior: ItemBehavior) {

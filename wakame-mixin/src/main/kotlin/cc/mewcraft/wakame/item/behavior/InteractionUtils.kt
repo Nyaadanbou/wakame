@@ -721,7 +721,7 @@ private object InteractableEntities {
         ) { player, itemStack, entity ->
             player.isOp && player.gameMode == GameMode.CREATIVE
         }
-        // 任何情况下，可交互
+        // 任何情况下, 可交互, *除非物品有 Koish 物品行为*
         createInteractableEntity(
             listOf(
                 EntityType.CAMEL,
@@ -749,7 +749,11 @@ private object InteractableEntities {
                 EntityType.FURNACE_MINECART,
                 EntityType.HOPPER_MINECART
             )
-        ) { player, itemStack, entity -> true }
+        ) { player, itemStack, entity ->
+            // 2026/1/11 开发日记
+            // 之所以有物品行为时返回 false, 是因为有些物品行为可能就是需要和这些实体进行交互, 比如 entity_in_bucket
+            !itemStack.hasBehaviorAny()
+        }
     }
 
     private fun createInteractableEntity(entityType: EntityType, checkLogic: (player: Player, itemStack: ItemStack, entity: Entity) -> Boolean) {
@@ -807,6 +811,7 @@ private object InteractableEntities {
  * 一些原版方块交互需要特定物品才能触发, 如剪刀和玻璃瓶交互蜂巢.
  * 这种情况我们认为原版方块可以交互(实际上nms的代码也是将这些交互写在方块中), 函数返回 true.
  * 这样设计意味着自定义物品的基底若能对特定方块触发方块交互, 则不会再执行自定义行为.
+ *
  * 举例说明:
  * 设计一个"海带球"物品, 使用原版可堆肥的物品作为基底, 并添加使用后投掷出弹射物的自定义行为, 这样"海带球"在玩家右键堆肥桶的时候不会被投掷.
  * 那如果希望堆肥的时候触发自定义行为该怎么办呢? 应该新增一个handlePlayerCompostItem(...), 而不是在交互行为里面去实现.
