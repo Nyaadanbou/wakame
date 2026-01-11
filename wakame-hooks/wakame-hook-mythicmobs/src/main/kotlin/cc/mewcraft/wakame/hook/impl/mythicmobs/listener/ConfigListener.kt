@@ -1,9 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.listener
 
-import cc.mewcraft.wakame.hook.impl.mythicmobs.condition.HasItemCondition
-import cc.mewcraft.wakame.hook.impl.mythicmobs.condition.HoldingCondition
-import cc.mewcraft.wakame.hook.impl.mythicmobs.condition.LevelCondition
-import cc.mewcraft.wakame.hook.impl.mythicmobs.condition.ManaCondition
+import cc.mewcraft.wakame.hook.impl.mythicmobs.condition.*
 import cc.mewcraft.wakame.hook.impl.mythicmobs.drop.NekoItemDrop
 import cc.mewcraft.wakame.hook.impl.mythicmobs.mechanic.*
 import io.lumine.mythic.api.config.MythicLineConfig
@@ -36,6 +33,10 @@ object ConfigListener : Listener {
 
             "koishmana", "mana" -> {
                 e.registerCondition(::ManaCondition)
+            }
+
+            "mainhanditemgrouponcooldown" -> {
+                e.registerCondition(::MainhandItemGroupOnCooldown)
             }
         }
     }
