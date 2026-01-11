@@ -19,8 +19,8 @@ sealed interface MetaCoreContainer : ItemMetaEntry<CoreContainer> {
         @JvmField
         val SERIALIZER: TypeSerializer2<MetaCoreContainer> = DispatchingSerializer.createPartial<String, MetaCoreContainer>(
             mapOf(
-                "static" to Static::class,
-                "dynamic" to Dynamic::class,
+                 "constant" to Constant::class,
+                "contextual" to Contextual::class,
             )
         )
     }
@@ -30,24 +30,33 @@ sealed interface MetaCoreContainer : ItemMetaEntry<CoreContainer> {
     }
 
     @ConfigSerializable
-    data class Static(
+    data class Constant(
         @Setting("value")
         val entry: CoreContainer,
     ) : MetaCoreContainer {
+
+        override fun randomized(): Boolean {
+            return false
+        }
+
         override fun make(context: ItemGenerationContext): ItemMetaResult<CoreContainer> {
             return ItemMetaResult.of(entry)
         }
     }
 
     @ConfigSerializable
-    data class Dynamic(
+    data class Contextual(
         @Setting("value")
         val entry: Map<String, LootTable<Core>>,
     ) : MetaCoreContainer {
+
+        override fun randomized(): Boolean {
+            return true
+        }
+
         override fun make(context: ItemGenerationContext): ItemMetaResult<CoreContainer> {
             val cores = entry.mapValues { (_, table) -> table.select(context).first() }
             return ItemMetaResult.of(CoreContainer.of(cores))
         }
     }
-
 }

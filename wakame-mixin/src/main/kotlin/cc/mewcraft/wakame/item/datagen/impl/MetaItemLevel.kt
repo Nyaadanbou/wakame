@@ -6,100 +6,134 @@ import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
 import cc.mewcraft.wakame.item.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item.datagen.ItemMetaResult
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.util.EnumLookup
+import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.util.MojangStack
-import cc.mewcraft.wakame.util.toKotlinRange
-import com.google.common.collect.Range
-import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
-import org.spongepowered.configurate.serialize.SerializationException
-import java.lang.reflect.Type
+import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import org.spongepowered.configurate.objectmapping.meta.Setting
 import kotlin.random.nextInt
 
 /**
  * 物品的等级(模板).
  *
- * 等级的生成目前有两种模式: 固定等级, 动态等级.
+ * 等级的生成目前有三种模式: 常量等级、浮动等级、上下文等级.
  *
- * ### 固定等级
- * 直接在配置文件中指定好一个常数, 然后每次都按照该常数生成等级.
+ * ### 常量等级 (Constant)
+ * 每次生成都是相同的等级，不会浮动.
  *
- * ### 动态等级
- * 由生成的上下文决定要生成的等级.
+ * ### 浮动等级 (Floating)
+ * 使用配置文件中指定的基础值，可以根据概率进行浮动.
  *
- * @param base 等级的基础值
- * @param floatChance 等级浮动的概率
- * @param floatAmount 等级浮动的范围
- * @param max 等级最终的最大值
+ * ### 上下文等级 (Contextual)
+ * 由生成的上下文决定基础等级，可以根据概率进行浮动.
  */
-data class MetaItemLevel(
-    private val base: Any,
-    private val floatChance: Double,
-    private val floatAmount: IntRange,
-    private val max: Int,
-) : ItemMetaEntry<ItemLevel> {
+sealed interface MetaItemLevel : ItemMetaEntry<ItemLevel> {
 
     companion object {
 
-        // 实现注意事项: 将内部的 TypeSerializer 暴露为一个 val
         @JvmField
-        val SERIALIZER: TypeSerializer2<MetaItemLevel> = Serializer
-
+        val SERIALIZER: TypeSerializer2<MetaItemLevel> = DispatchingSerializer.createPartial<String, MetaItemLevel>(
+            mapOf(
+                "constant" to Constant::class,
+                "floating" to Floating::class,
+                "contextual" to Contextual::class,
+            )
+        )
     }
 
-    override fun make(context: ItemGenerationContext): ItemMetaResult<ItemLevel> {
-        val raw: Int = when (base) {
-            is Number -> {
-                base.toInt() + (if (context.random.nextDouble() < floatChance) context.random.nextInt(floatAmount) else 0)
-            }
-
-            is Option -> {
-                when (base) {
-                    Option.CONTEXT -> context.level + (if (context.random.nextDouble() < floatChance) context.random.nextInt(floatAmount) else 0)
-                }
-            }
-
-            else -> {
-                throw IllegalStateException("Unrecognized base type: ${base::class}")
-            }
-        }
-
-        return raw
-            .coerceIn(ItemLevel.MINIMUM_LEVEL, max)
-            .also { lvl -> context.level = lvl } // populate the context with generated level
-            .let { lvl -> ItemMetaResult.of(ItemLevel(lvl)) }
-    }
-
+    // Hint:
+    // 尽管 MetaItemLevel 有多个实现, 但其 write 函数体都是一样的.
+    // 因此可以直接在接口定义 write 函数的实现,
+    // 其余的实现类只需要重写 make 函数即可.
     override fun write(value: ItemLevel, itemstack: MojangStack) {
         itemstack.ensureSetData(ItemDataTypes.LEVEL, value)
     }
 
-    private enum class Option {
-        CONTEXT
-    }
-
     /**
-     * ## Node structure
-     * ```yaml
-     * <node>:
-     *   base: <int> OR <enum>
-     *   float_chance: <double>
-     *   float_amount: <string>
-     *   max: <int>
-     * ```
+     * 常量等级模式.
+     *
+     * 每次生成都是相同的等级，不会浮动.
+     *
+     * @param value 固定的等级值
      */
-    private object Serializer : TypeSerializer2<MetaItemLevel> {
-        override fun deserialize(type: Type, node: ConfigurationNode): MetaItemLevel {
-            val base = when (val scalar = node.node("base").rawScalar()) {
-                is Number -> scalar
-                is String -> EnumLookup.lookup<Option>(scalar).getOrThrow()
-                else -> throw SerializationException(node, type, "invalid `base`")
-            }
-            val floatChance = node.node("float_chance").get<Double>(.0).takeIf { it in 0.0..1.0 } ?: throw SerializationException(node, type, "invalid `float_chance`")
-            val floatAmount = node.node("float_amount").get<Range<Int>>(Range.closed(0, 0)).toKotlinRange() ?: throw SerializationException(node, type, "invalid `float_amount`")
-            val max = node.node("max").get<Int>() ?: Int.MAX_VALUE
-            return MetaItemLevel(base, floatChance, floatAmount, max)
+    @ConfigSerializable
+    data class Constant(
+        @Setting("value")
+        val value: Int,
+    ) : MetaItemLevel {
+
+        override fun randomized(): Boolean {
+            return false
+        }
+
+        override fun make(context: ItemGenerationContext): ItemMetaResult<ItemLevel> {
+            val level = value.coerceIn(ItemLevel.MINIMUM_LEVEL, Int.MAX_VALUE)
+            context.level = level // populate the context with generated level
+            return ItemMetaResult.of(ItemLevel(level))
         }
     }
 
+    /**
+     * 浮动等级模式.
+     *
+     * 使用配置文件中指定的基础值，可以根据概率进行浮动.
+     *
+     * @param base 等级的基础值
+     * @param floatChance 等级浮动的概率
+     * @param floatAmount 等级浮动的范围
+     * @param max 等级最终的最大值
+     */
+    @ConfigSerializable
+    data class Floating(
+        @Setting("base")
+        val base: Int,
+        @Setting("float_chance")
+        val floatChance: Double = 0.0,
+        @Setting("float_amount")
+        val floatAmount: IntRange = 0..0,
+        @Setting("max")
+        val max: Int = Int.MAX_VALUE,
+    ) : MetaItemLevel {
+
+        override fun randomized(): Boolean {
+            return floatChance > 0.0 && floatAmount != 0..0
+        }
+
+        override fun make(context: ItemGenerationContext): ItemMetaResult<ItemLevel> {
+            val raw = base + (if (context.random.nextDouble() < floatChance) context.random.nextInt(floatAmount) else 0)
+            val level = raw.coerceIn(ItemLevel.MINIMUM_LEVEL, max)
+            context.level = level // populate the context with generated level
+            return ItemMetaResult.of(ItemLevel(level))
+        }
+    }
+
+    /**
+     * 上下文等级模式.
+     *
+     * 由生成的上下文决定基础等级，可以根据概率进行浮动.
+     *
+     * @param floatChance 等级浮动的概率
+     * @param floatAmount 等级浮动的范围
+     * @param max 等级最终的最大值
+     */
+    @ConfigSerializable
+    data class Contextual(
+        @Setting("float_chance")
+        val floatChance: Double = 0.0,
+        @Setting("float_amount")
+        val floatAmount: IntRange = 0..0,
+        @Setting("max")
+        val max: Int = Int.MAX_VALUE,
+    ) : MetaItemLevel {
+
+        override fun randomized(): Boolean {
+            return true
+        }
+
+        override fun make(context: ItemGenerationContext): ItemMetaResult<ItemLevel> {
+            val raw = context.level + (if (context.random.nextDouble() < floatChance) context.random.nextInt(floatAmount) else 0)
+            val level = raw.coerceIn(ItemLevel.MINIMUM_LEVEL, max)
+            context.level = level // populate the context with generated level
+            return ItemMetaResult.of(ItemLevel(level))
+        }
+    }
 }

@@ -21,11 +21,10 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
         @JvmField
         val SERIALIZER: TypeSerializer2<MetaRarity> = DispatchingSerializer.createPartial<String, MetaRarity>(
             mapOf(
-                "static" to Static::class,
-                "dynamic" to Dynamic::class,
+                "constant" to Constant::class,
+                "contextual" to Contextual::class,
             )
         )
-
     }
 
     override fun write(value: RegistryEntry<Rarity>, itemstack: MojangStack) {
@@ -33,23 +32,30 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
     }
 
     @ConfigSerializable
-    data class Static(
+    data class Constant(
         @Setting("value")
         val entry: RegistryEntry<Rarity>,
     ) : MetaRarity {
+
+        override fun randomized(): Boolean {
+            return false
+        }
 
         override fun make(context: ItemGenerationContext): ItemMetaResult<RegistryEntry<Rarity>> {
             context.rarity = entry
             return ItemMetaResult.of(entry)
         }
-
     }
 
     @ConfigSerializable
-    data class Dynamic(
+    data class Contextual(
         @Setting("value")
         val entry: RegistryEntry<LevelToRarityMapping>,
     ) : MetaRarity {
+
+        override fun randomized(): Boolean {
+            return true
+        }
 
         override fun make(context: ItemGenerationContext): ItemMetaResult<RegistryEntry<Rarity>> {
             val mapper = entry.unwrap()
@@ -63,7 +69,5 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
                 return ItemMetaResult.empty()
             }
         }
-
     }
-
 }

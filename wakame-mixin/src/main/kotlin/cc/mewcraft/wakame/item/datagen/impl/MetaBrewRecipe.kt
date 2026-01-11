@@ -26,7 +26,7 @@ interface MetaBrewRecipe : ItemMetaEntry<String> {
             .registerExact(
                 DispatchingSerializer.createPartial<String, MetaBrewRecipe>(
                     mapOf(
-                        "fixed" to Fixed::class,
+                        "constant" to Constant::class,
                         "random_from_set" to RandomFromSet::class,
                         "random_from_all" to RandomFromAll::class,
                     )
@@ -43,10 +43,14 @@ interface MetaBrewRecipe : ItemMetaEntry<String> {
      * 生成固定配方.
      */
     @ConfigSerializable
-    data class Fixed(
+    data class Constant(
         @Setting("value", true)
         val entry: String,
     ) : MetaBrewRecipe {
+
+        override fun randomized(): Boolean {
+            return false
+        }
 
         override fun make(context: ItemGenerationContext): ItemMetaResult<String> {
             return ItemMetaResult.of(entry)
@@ -61,6 +65,10 @@ interface MetaBrewRecipe : ItemMetaEntry<String> {
         @Setting("value")
         val entries: Set<String>,
     ) : MetaBrewRecipe {
+
+        override fun randomized(): Boolean {
+            return true
+        }
 
         override fun make(context: ItemGenerationContext): ItemMetaResult<String> {
             return if (entries.isEmpty()) {
@@ -79,6 +87,10 @@ interface MetaBrewRecipe : ItemMetaEntry<String> {
         @JvmField
         val SERIALIZER: TypeSerializer2<RandomFromAll> = TypeSerializer2<RandomFromAll> { type, node ->
             if (node.virtual()) null else RandomFromAll
+        }
+
+        override fun randomized(): Boolean {
+            return true
         }
 
         override fun make(context: ItemGenerationContext): ItemMetaResult<String> {

@@ -24,11 +24,14 @@ sealed interface MetaItemModel : ItemMetaEntry<Key> {
                 "custom" to Custom::class, // 使用自定义的 `minecraft:item_model`
             )
         )
-
     }
 
     @ConfigSerializable
     data object None : MetaItemModel {
+        override fun randomized(): Boolean {
+            return false
+        }
+
         override fun make(context: ItemGenerationContext): ItemMetaResult<Key> {
             return ItemMetaResult.empty()
         }
@@ -40,6 +43,11 @@ sealed interface MetaItemModel : ItemMetaEntry<Key> {
 
     @ConfigSerializable
     data object Auto : MetaItemModel {
+
+        override fun randomized(): Boolean {
+            return false
+        }
+
         override fun make(context: ItemGenerationContext): ItemMetaResult<Key> {
             val itemModel = context.koishItem.id // 获取当前正在生成的 Koish 物品类型的唯一标识
             return ItemMetaResult.of(itemModel)
@@ -55,6 +63,11 @@ sealed interface MetaItemModel : ItemMetaEntry<Key> {
         @Setting("value")
         val value: Key,
     ) : MetaItemModel {
+
+        override fun randomized(): Boolean {
+            return false
+        }
+
         override fun make(context: ItemGenerationContext): ItemMetaResult<Key> {
             return ItemMetaResult.of(value)
         }

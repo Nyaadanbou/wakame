@@ -16,6 +16,10 @@ data class MetaUseCooldown(
     val cooldownGroup: Identifier?,
 ) : ItemMetaEntry<UseCooldown> {
 
+    override fun randomized(): Boolean {
+        return false
+    }
+
     override fun make(context: ItemGenerationContext): ItemMetaResult<UseCooldown> {
         val useCooldown = UseCooldown.useCooldown(seconds).cooldownGroup(cooldownGroup).build()
         return ItemMetaResult.of(useCooldown)

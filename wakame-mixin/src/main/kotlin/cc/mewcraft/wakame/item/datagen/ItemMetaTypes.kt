@@ -44,7 +44,7 @@ data object ItemMetaTypes {
     val LEVEL: ItemMetaType<MetaItemLevel, ItemLevel> = typeOf("level") {
         // 开发日记: 这里指定的 TypeSerializer 是对于 U 而不是 V
         serializers {
-            register(MetaItemLevel.SERIALIZER)
+            registerExact(MetaItemLevel.SERIALIZER)
         }
     }
 

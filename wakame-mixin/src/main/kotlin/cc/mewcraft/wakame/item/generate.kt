@@ -2,6 +2,7 @@
 
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.item.data.ItemDataContainer
 import cc.mewcraft.wakame.item.data.ItemDataTypes
@@ -15,8 +16,12 @@ import cc.mewcraft.wakame.item.property.impl.ItemBase
 import cc.mewcraft.wakame.mixin.support.ExtraDataComponents
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.MojangStack
+import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
 import cc.mewcraft.wakame.util.item.toBukkit
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.inventory.ItemStack
+import java.util.*
 import kotlin.time.measureTimedValue
 
 
@@ -41,6 +46,9 @@ import kotlin.time.measureTimedValue
  */
 object KoishStackGenerator {
 
+    // 用 WeakHashMap 应该就够了, KoishItem 仅长期存在于 Registry 中
+    private val ITEM_STACK_CACHE: WeakHashMap<KoishItem, ItemStack> = WeakHashMap()
+
     /**
      * 基于上下文 [ItemGenerationContext] 从物品类型 [KoishItem] 生成一个新的 [ItemStack] 实例.
      *
@@ -49,10 +57,21 @@ object KoishStackGenerator {
      * @return 新生成的 [ItemStack]
      */
     fun generate(type: KoishItem, context: ItemGenerationContext): ItemStack {
-        val result = measureTimedValue { generate0(type, context) }
-        // TODO 紧急!! 尽可能的缓存或 clone 需要的 ItemStack
-        //LOGGER.info(Component.text("Generated item ${context.koishItem.id.asMinimalStringKoish()} in ${result.duration.inWholeMilliseconds}ms").color(NamedTextColor.DARK_GRAY))
-        return result.value
+        return generate2(type, context).clone()
+    }
+
+    private fun generate2(type: KoishItem, context: ItemGenerationContext): ItemStack {
+        return if (type.dataConfig.randomized()) {
+            generate1(type, context)
+        } else {
+            ITEM_STACK_CACHE.computeIfAbsent(type) { generate1(type, context) }
+        }
+    }
+
+    private fun generate1(type: KoishItem, context: ItemGenerationContext): ItemStack {
+        val timedValue = measureTimedValue { generate0(type, context) }
+        LOGGER.info(Component.text("Generated item ${context.koishItem.id.asMinimalStringKoish()} in ${timedValue.duration.inWholeMilliseconds}ms").color(NamedTextColor.DARK_GRAY))
+        return timedValue.value
     }
 
     private fun generate0(type: KoishItem, context: ItemGenerationContext): ItemStack {
@@ -98,5 +117,4 @@ object KoishStackGenerator {
             }
         }
     }
-
 }

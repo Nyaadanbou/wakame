@@ -17,8 +17,8 @@ sealed interface MetaElement : ItemMetaEntry<Set<RegistryEntry<Element>>> {
         @JvmField
         val SERIALIZER: TypeSerializer2<MetaElement> = DispatchingSerializer.createPartial<String, MetaElement>(
             mapOf(
-                "static" to Static::class,
-                "dynamic" to Dynamic::class,
+                "constant" to Constant::class,
+                "contextual" to Contextual::class,
             )
         )
     }
@@ -28,27 +28,33 @@ sealed interface MetaElement : ItemMetaEntry<Set<RegistryEntry<Element>>> {
     }
 
     @ConfigSerializable
-    data class Static(
+    data class Constant(
         val entries: Set<RegistryEntry<Element>>,
     ) : MetaElement {
+
+        override fun randomized(): Boolean {
+            return false
+        }
 
         override fun make(context: ItemGenerationContext): ItemMetaResult<Set<RegistryEntry<Element>>> {
             context.elements.addAll(entries)
             return ItemMetaResult.of(entries)
         }
-
     }
 
     @ConfigSerializable
-    data class Dynamic(
+    data class Contextual(
         val entries: LootTable<RegistryEntry<Element>>,
     ) : MetaElement {
+
+        override fun randomized(): Boolean {
+            return true
+        }
 
         override fun make(context: ItemGenerationContext): ItemMetaResult<Set<RegistryEntry<Element>>> {
             val result = entries.select(context).toSet()
             context.elements.addAll(result)
             return ItemMetaResult.of(result)
         }
-
     }
 }

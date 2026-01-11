@@ -19,6 +19,10 @@ data class MetaItemName(
     val itemName: String,
 ) : ItemMetaEntry<Component> {
 
+    override fun randomized(): Boolean {
+        return false
+    }
+
     override fun make(context: ItemGenerationContext): ItemMetaResult<Component> {
         val rarity = context.rarity
         val resolver = TagResolver.resolver(Placeholder.styling("rarity_style", *rarity.unwrap().displayStyles))
@@ -29,5 +33,4 @@ data class MetaItemName(
     override fun write(value: Component, itemstack: MojangStack) {
         itemstack.set(DataComponents.ITEM_NAME, value.toNMSComponent())
     }
-
 }

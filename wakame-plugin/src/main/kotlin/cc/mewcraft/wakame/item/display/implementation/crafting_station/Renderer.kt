@@ -121,11 +121,11 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
     @JvmField
     val CORE_CONTAINER: RenderingHandler<MetaCoreContainer, SingleValueRendererFormat> = configure("core_container") { data, format ->
         when (data) {
-            is MetaCoreContainer.Static -> {
+            is MetaCoreContainer.Constant -> {
                 format.render(Placeholder.component("count", Component.text(data.entry.size)))
             }
 
-            is MetaCoreContainer.Dynamic -> {
+            is MetaCoreContainer.Contextual -> {
                 // TODO #373: 实现动态生成
                 IndexedText.NOP
             }
@@ -143,11 +143,11 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
     @JvmField
     val ELEMENT: RenderingHandler<MetaElement, AggregateValueRendererFormat> = configure("element") { data, format ->
         when (data) {
-            is MetaElement.Static -> {
+            is MetaElement.Constant -> {
                 format.render(data.entries) { it.unwrap().displayName }
             }
 
-            is MetaElement.Dynamic -> {
+            is MetaElement.Contextual -> {
                 val selector = data.entries
                 val context = LootContext.default().apply { selectEverything = true }
                 val allPossibleElements = selector.select(context)
@@ -182,11 +182,11 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
 
     val KIZAMI: RenderingHandler<MetaKizami, AggregateValueRendererFormat> = configure("kizami") { data, format ->
         when (data) {
-            is MetaKizami.Static -> {
+            is MetaKizami.Constant -> {
                 format.render(data.entries, { it.unwrap().displayName })
             }
 
-            is MetaKizami.Dynamic -> {
+            is MetaKizami.Contextual -> {
                 val selector = data.selector
                 val allPossibleKizami = selector.select(LootContext.default()) // 进行一次随机的选择, 来向玩家展示可能出现的 Kizami
                 format.render(allPossibleKizami, { it.unwrap().displayName })

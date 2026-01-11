@@ -17,6 +17,10 @@ data class MetaCooldownGroup(
     val id: Identifier,
 ) : ItemMetaEntry<Identifier> {
 
+    override fun randomized(): Boolean {
+        return false
+    }
+
     override fun make(context: ItemGenerationContext): ItemMetaResult<Identifier> {
         return ItemMetaResult.of(id)
     }
