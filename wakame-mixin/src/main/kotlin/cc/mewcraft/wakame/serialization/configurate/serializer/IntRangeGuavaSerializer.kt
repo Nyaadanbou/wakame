@@ -7,7 +7,7 @@ import org.spongepowered.configurate.serialize.ScalarSerializer
 import java.lang.reflect.Type
 import java.util.function.Predicate
 
-/*internal*/ object IntRangeSerializer : ScalarSerializer<Range<Int>>(typeTokenOf()) {
+/*internal*/ object IntRangeGuavaSerializer : ScalarSerializer<Range<Int>>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Range<Int> {
         return RangeParser.parseIntRange(obj.toString())
     }
