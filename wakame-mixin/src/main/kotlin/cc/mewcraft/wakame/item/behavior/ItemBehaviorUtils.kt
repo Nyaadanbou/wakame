@@ -204,6 +204,8 @@ inline fun <reified T : ItemBehavior> ItemStack.getBehavior(): T? = toNMS().getB
 
 inline fun ItemStack.handleBehavior(action: (ItemBehavior) -> Unit) = toNMS().handleBehavior(action)
 
+fun ItemStack.hasBehaviorAny(): Boolean = toNMS().hasBehaviorAny()
+
 // ------------
 // 用于访问 `net.minecraft.world.item.ItemStack` 上的 ItemBehavior
 // ------------
@@ -220,3 +222,6 @@ inline fun <reified T : ItemBehavior> MojangStack.getBehavior(): T? =
 inline fun MojangStack.handleBehavior(action: (ItemBehavior) -> Unit) {
     koishItem?.behaviors?.forEach(action)
 }
+
+fun MojangStack.hasBehaviorAny(): Boolean =
+    koishItem?.behaviors?.isEmpty() == false
