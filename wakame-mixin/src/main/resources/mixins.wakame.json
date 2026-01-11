@@ -11,6 +11,7 @@
     "InvokerEnchantmentEffectComponents",
     "InvokerLootPoolEntries",
     "InvokerRegistryData",
+    "MixinBaseFireBlock",
     "MixinCraftEntityType",
     "MixinCraftingRecipe",
     "MixinCriteriaTriggers",
