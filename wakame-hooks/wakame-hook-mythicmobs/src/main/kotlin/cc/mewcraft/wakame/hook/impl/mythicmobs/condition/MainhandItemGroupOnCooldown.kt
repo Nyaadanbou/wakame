@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.condition
 
 import cc.mewcraft.wakame.item.extension.isOnCooldown
+import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.ThreadSafetyLevel
@@ -23,8 +24,8 @@ class MainhandItemGroupOnCooldown(
             return false
         }
 
-        val equipment = bukkitEntity.equipment ?: return false
-        val itemInMainHand = equipment.itemInMainHand
+        val equipment = bukkitEntity.equipment
+        val itemInMainHand = equipment.itemInMainHand.takeUnlessEmpty() ?: return false
 
         return itemInMainHand.isOnCooldown(bukkitEntity)
     }
