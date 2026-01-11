@@ -118,7 +118,7 @@ internal class SimpleRerollingSession(
         }
     }
 
-    private inner class UsableInputDelegate(private var backing: ItemStack?) : ReadWriteProperty<RerollingSession, ItemStack?> {
+    private class UsableInputDelegate(private var backing: ItemStack?) : ReadWriteProperty<RerollingSession, ItemStack?> {
         override fun getValue(thisRef: RerollingSession, property: KProperty<*>): ItemStack? {
             return backing?.clone()
         }
@@ -374,7 +374,7 @@ internal object SelectionMap {
         }
 
         // 如果源物品的核孔模板不是动态的, 则判定整个物品不支持重造
-        if (metaCoreContainer !is MetaCoreContainer.Dynamic) {
+        if (metaCoreContainer !is MetaCoreContainer.Contextual) {
             return empty(session)
         }
 
