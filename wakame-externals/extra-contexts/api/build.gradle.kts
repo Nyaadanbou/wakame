@@ -1,20 +1,24 @@
 plugins {
-    id("koish.core-conventions")
+    id("koish.extracontexts-conventions")
     id("cc.mewcraft.libraries-repository")
     `maven-publish`
 }
 
-group = "cc.mewcraft.koish"
+group = "cc.mewcraft.extracontexts"
 version = "0.0.1-snapshot"
-description = "The API of the core gameplay implementation"
+
+repositories {
+    nyaadanbouReleases()
+    nyaadanbouPrivate()
+}
 
 dependencies {
-    compileOnly(local.paper)
+    compileOnly(local.luckperms)
 }
 
 publishing {
     repositories {
-        nyaadanbouReleases().credentials(PasswordCredentials::class)
+        nyaadanbouPrivate().credentials(PasswordCredentials::class)
     }
     publications {
         create<MavenPublication>("maven") {

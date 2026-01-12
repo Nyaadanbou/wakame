@@ -1,5 +1,5 @@
 plugins {
-    id("koish-conventions.bettergui-addon")
+    id("koish.bettergui-addon")
     id("cc.mewcraft.libraries-repository")
 }
 
