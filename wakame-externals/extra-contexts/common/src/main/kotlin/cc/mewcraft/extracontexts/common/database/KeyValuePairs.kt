@@ -3,6 +3,7 @@ package cc.mewcraft.extracontexts.common.database
 import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.like
 import org.jetbrains.exposed.v1.jdbc.Query
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.select
@@ -104,5 +105,28 @@ object KeyValuePairsQueries {
         return findByPlayerAndKey(playerId, key)
             .empty()
             .not()
+    }
+
+    /**
+     * Find all entries for a specific player with keys starting with a given prefix.
+     */
+    fun findByPlayerAndKeyPrefix(playerId: UUID, prefix: String): Query {
+        return KeyValuePairs
+            .select(KeyValuePairs.key, KeyValuePairs.value)
+            .where {
+                (KeyValuePairs.id eq idOf(playerId)) and
+                (KeyValuePairs.key like "$prefix%")
+            }
+    }
+
+    /**
+     * Delete all entries for a specific player with keys starting with a given prefix.
+     */
+    fun deleteByPlayerAndKeyPrefix(playerId: UUID, prefix: String): Int {
+        return KeyValuePairs
+            .deleteWhere {
+                (KeyValuePairs.id eq idOf(playerId)) and
+                (KeyValuePairs.key like "$prefix%")
+            }
     }
 }

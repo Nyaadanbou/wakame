@@ -37,6 +37,16 @@ object SimpleKeyValueStoreManager : KeyValueStoreManager {
         }
     }
 
+    override fun getWithPrefix(id: UUID, prefix: String): List<Pair<String, String>> {
+        return transaction(DatabaseManager.database()) {
+            addLogger(StdOutSqlLogger)
+            KeyValuePairsQueries
+                .findByPlayerAndKeyPrefix(id, prefix)
+                .map { row -> row[KeyValuePairs.key] to row[KeyValuePairs.value] }
+                .toList()
+        }
+    }
+
     override fun set(id: UUID, key: String, value: String) {
         transaction(DatabaseManager.database()) {
             addLogger(StdOutSqlLogger)
@@ -58,6 +68,14 @@ object SimpleKeyValueStoreManager : KeyValueStoreManager {
             addLogger(StdOutSqlLogger)
             KeyValuePairsQueries
                 .deleteByPlayerAndKey(id, key)
+        }
+    }
+
+    override fun deleteWithPrefix(id: UUID, prefix: String) {
+        transaction(DatabaseManager.database()) unit@{
+            addLogger(StdOutSqlLogger)
+            KeyValuePairsQueries
+                .deleteByPlayerAndKeyPrefix(id, prefix)
         }
     }
 

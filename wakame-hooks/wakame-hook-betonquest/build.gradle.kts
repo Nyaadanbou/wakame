@@ -60,4 +60,7 @@ dependencies {
     implementation(platform("com.intellectualsites.bom:bom-newest:1.47"))
     compileOnly("com.intellectualsites.plotsquared:plotsquared-core")
     compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit") { isTransitive = false }
+
+    // plugin: ExtraContexts
+    compileOnly(project(":wakame-externals:extra-contexts:api"))
 }

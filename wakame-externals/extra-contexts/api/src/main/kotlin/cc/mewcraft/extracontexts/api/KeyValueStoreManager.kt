@@ -27,6 +27,15 @@ interface KeyValueStoreManager {
     fun get(id: UUID, key: String): String?
 
     /**
+     * Get all key-value pairs with a given prefix for a player.
+     *
+     * @param id The UUID of the player
+     * @param prefix The prefix of keys to retrieve
+     * @return A set of all keys matching the prefix
+     */
+    fun getWithPrefix(id: UUID, prefix: String): List<Pair<String, String>>
+
+    /**
      * Set a value in the key-value manager.
      *
      * @param id The UUID of the player
@@ -51,6 +60,14 @@ interface KeyValueStoreManager {
     fun delete(id: UUID, key: String)
 
     /**
+     * Delete all keys with a given prefix from the key-value manager.
+     *
+     * @param id The UUID of the player
+     * @param prefix The prefix of keys to delete
+     */
+    fun deleteWithPrefix(id: UUID, prefix: String)
+
+    /**
      * Check if a key exists in the key-value manager.
      *
      * @param id The UUID of the player
@@ -72,9 +89,11 @@ interface KeyValueStoreManager {
         private var implementation: KeyValueStoreManager = object : KeyValueStoreManager {
             override fun get(id: UUID): List<Pair<String, String>> = emptyList()
             override fun get(id: UUID, key: String): String? = null
+            override fun getWithPrefix(id: UUID, prefix: String): List<Pair<String, String>> = emptyList()
             override fun set(id: UUID, key: String, value: String) = Unit
             override fun delete(id: UUID) = Unit
             override fun delete(id: UUID, key: String) = Unit
+            override fun deleteWithPrefix(id: UUID, prefix: String) = Unit
             override fun exists(id: UUID, key: String): Boolean = false
             override fun clear() = Unit
         }
@@ -91,6 +110,10 @@ interface KeyValueStoreManager {
             return implementation.get(id, key)
         }
 
+        override fun getWithPrefix(id: UUID, prefix: String): List<Pair<String, String>> {
+            return implementation.getWithPrefix(id, prefix)
+        }
+
         override fun set(id: UUID, key: String, value: String) {
             implementation.set(id, key, value)
         }
@@ -101,6 +124,10 @@ interface KeyValueStoreManager {
 
         override fun delete(id: UUID, key: String) {
             implementation.delete(id, key)
+        }
+
+        override fun deleteWithPrefix(id: UUID, prefix: String) {
+            implementation.deleteWithPrefix(id, prefix)
         }
 
         override fun exists(id: UUID, key: String): Boolean {
