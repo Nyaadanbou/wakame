@@ -1,0 +1,20 @@
+# Database settings
+database:
+  # Type of database to use (SQLITE, H2, MYSQL, MARIADB, or POSTGRESQL)
+  type: MARIADB
+  # Specify credentials here if you are using MYSQL, MARIADB, or POSTGRESQL
+  credentials:
+    host: localhost
+    port: 3306
+    database: database
+    username: username
+    password: ""
+    parameters: ?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+  # MYSQL / MARIADB / POSTGRESQL database Hikari connection pool properties
+  # Don't modify this unless you know what you're doing!
+  pool_options:
+    size: 10
+    idle: 5
+    lifetime: 1800000
+    keep_alive: 30000
+    timeout: 30000
