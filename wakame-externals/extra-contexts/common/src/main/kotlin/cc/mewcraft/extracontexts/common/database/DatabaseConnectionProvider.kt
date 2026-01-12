@@ -36,7 +36,9 @@ object H2ConnectionProvider : DatabaseConnectionProvider {
     override fun createHikariConfig(config: DatabaseConfiguration): HikariConfig {
         return HikariConfig().apply {
             driverClassName = "org.h2.Driver"
-            jdbcUrl = "jdbc:h2:${config.filePath ?: "extracontexts"}"
+            // DB_CLOSE_DELAY=-1 keeps the database open and prevents data loss when transactions close
+            // This is especially important for in-memory databases (mem:) to persist data across multiple transactions
+            jdbcUrl = "jdbc:h2:${config.filePath ?: "h2"};DB_CLOSE_DELAY=-1"
             maximumPoolSize = config.maximumPoolSize
             minimumIdle = config.minimumIdle
             connectionTimeout = config.connectionTimeout
