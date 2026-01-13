@@ -44,7 +44,6 @@ dependencies {
     api(local.commons.gson) {
         exclude("com.google.code.gson")
     }
-    api(local.commons.gson)
     api(local.commons.provider)
     api(local.commons.reflection)
     api(local.commons.tuple)
