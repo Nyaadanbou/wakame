@@ -1,15 +1,8 @@
-@file:JvmName("MessagingJVM")
+package cc.mewcraft.messaging2
 
-package cc.mewcraft.wakame.messaging
-
-import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.messaging.packet.NationSpawnRequestPacket
-import cc.mewcraft.wakame.messaging.packet.NationSpawnResponsePacket
-import cc.mewcraft.wakame.messaging.packet.TownSpawnRequestPacket
-import cc.mewcraft.wakame.messaging.packet.TownSpawnResponsePacket
-import cc.mewcraft.wakame.util.ExceptionLoggingScheduledThreadPoolExecutor
-import cc.mewcraft.wakame.util.Exceptions
-import cc.mewcraft.wakame.util.concurrent.ConcurrentUtil
+import cc.mewcraft.messaging2.util.ConcurrentUtil
+import cc.mewcraft.messaging2.util.ExceptionLoggingScheduledThreadPoolExecutor
+import cc.mewcraft.messaging2.util.Exceptions
 import ninja.egg82.messenger.*
 import ninja.egg82.messenger.handler.AbstractServerMessagingHandler
 import ninja.egg82.messenger.handler.MessagingHandler
@@ -19,6 +12,7 @@ import ninja.egg82.messenger.packets.MultiPacket
 import ninja.egg82.messenger.packets.Packet
 import ninja.egg82.messenger.packets.server.*
 import ninja.egg82.messenger.services.PacketService
+import org.slf4j.Logger
 import java.io.File
 import java.util.*
 import java.util.concurrent.ScheduledExecutorService
@@ -26,80 +20,68 @@ import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 import java.util.function.Supplier
 
-class MessagingManager(
-    private val config: MessagingConfig,
-) {
+
+interface StaticAccessApi {
+
+    fun init(config: MessagingConfig)
+    fun start()
+    fun shutdown()
+    fun queuePacketAndFlush(makePacket: Supplier<out AbstractPacket>)
+    fun queuePacket(makePacket: Supplier<out AbstractPacket>)
 
     companion object {
-
-        private const val PROTOCOL_VERSION: Byte = 1
-
-        private lateinit var instance: MessagingManager
-
-        /**
-         * 初始化全局 [MessagingManager] 实例.
-         */
-        fun init(config: MessagingConfig) {
-            instance = MessagingManager(config)
-        }
-
-        /**
-         * 初始化消息服务.
-         */
-        fun start() = instance.start()
-
-        /**
-         * 关闭消息服务.
-         */
-        fun shutdown() = instance.shutdown()
-
-        /**
-         * 获取 serverId.
-         */
-        val serverId: UUID get() = instance.serverId
-
-        /**
-         * 获取 serverKey.
-         */
-        val serverKey: String get() = instance.serverKey
-
-        /**
-         * 获取 serverGroup.
-         */
-        val serverGroup: String get() = instance.serverGroup
-
-        /**
-         * 队列数据包.
-         */
-        fun queuePacketAndFlush(makePacket: Supplier<out AbstractPacket>) {
-            instance.queuePacketAndFlush(makePacket)
-        }
-
-        /**
-         * 队列数据包.
-         */
-        fun queuePacket(makePacket: Supplier<out AbstractPacket>) {
-            instance.queuePacket(makePacket)
+        fun of(factory: (MessagingConfig) -> AbstractMessagingManager): StaticAccessApi {
+            return StaticAccessApiImpl(factory)
         }
     }
+}
 
-    /**
-     * @see ServerInfoProvider.serverId
-     */
-    val serverId: UUID
+private class StaticAccessApiImpl(
+    private val factory: (MessagingConfig) -> AbstractMessagingManager,
+) : StaticAccessApi {
+
+    private lateinit var instance: AbstractMessagingManager
+
+    override fun init(config: MessagingConfig) {
+        instance = factory(config)
+    }
+
+    override fun start() {
+        instance.start()
+    }
+
+    override fun shutdown() {
+        instance.shutdown()
+    }
+
+    override fun queuePacketAndFlush(makePacket: Supplier<out AbstractPacket>) {
+        instance.queuePacketAndFlush(makePacket)
+    }
+
+    override fun queuePacket(makePacket: Supplier<out AbstractPacket>) {
+        instance.queuePacket(makePacket)
+    }
+}
+
+abstract class AbstractMessagingManager(
+    private val config: MessagingConfig,
+) {
+    abstract val logger: Logger
+    abstract val protocolVersion: Byte
+
+    abstract fun registerPackets()
+    abstract fun registerMessagingHandlers(handler: MessagingHandlerImpl)
+
+    //
+
+    private val serverId: UUID
         get() = ServerInfoProvider.serverId
-
-    /**
-     * @see ServerInfoProvider.serverKey
-     */
-    val serverKey: String
+    private val serverKey: String
         get() = ServerInfoProvider.serverKey
-
-    /**
-     * @see ServerInfoProvider.serverGroup
-     */
-    val serverGroup: String
+    private val serverGroup: String
         get() = ServerInfoProvider.serverGroup
+
+    //
 
     private lateinit var scheduledExecutor: ScheduledExecutorService
     private lateinit var messagingService: MessagingService
@@ -112,9 +94,9 @@ class MessagingManager(
      */
     fun start() {
         if (config.enabled) {
-            LOGGER.info("Initializing messaging service...")
+            logger.info("Initializing messaging service...")
         } else {
-            LOGGER.info("Messaging service disabled in config.")
+            logger.info("Messaging service disabled in config.")
             return
         }
 
@@ -129,19 +111,16 @@ class MessagingManager(
         registerPacket(::ShutdownPacket)
 
         // 自定义封包类型, 每个都得注册, 按需更新这里
-        registerPacket(::TownSpawnRequestPacket)
-        registerPacket(::TownSpawnResponsePacket)
-        registerPacket(::NationSpawnRequestPacket)
-        registerPacket(::NationSpawnResponsePacket)
+        registerPackets()
 
-        this.packetService = PacketService(4, false, PROTOCOL_VERSION)
-        this.scheduledExecutor = ExceptionLoggingScheduledThreadPoolExecutor(4, ConcurrentUtil.koishThreadFactory(LOGGER, "MessagingManager"), LOGGER)
+        this.packetService = PacketService(4, false, protocolVersion)
+        this.scheduledExecutor = ExceptionLoggingScheduledThreadPoolExecutor(4, ConcurrentUtil.koishThreadFactory(logger, "MessagingManager"), logger)
 
         val handler = MessagingHandlerImpl(this.packetService)
 
         // 添加消息处理器
-        handler.addHandler(KoishServerMessagingHandler(this.serverId, this.packetService, handler))
-        handler.addHandler(MessagingHandler(this.serverId, this.packetService))
+        handler.addHandler(ServerMessagingHandler(this.serverId, this.packetService, handler))
+        registerMessagingHandlers(handler)
 
         this.messagingService = try {
             initMessagingService(this.packetService, handler, File("/"))
@@ -151,12 +130,12 @@ class MessagingManager(
 
         this.packetService.addMessenger(this.messagingService)
 
-        this.packetService.queuePacket(InitializationPacket(serverId, PROTOCOL_VERSION))
+        this.packetService.queuePacket(InitializationPacket(this.serverId, protocolVersion))
         this.packetService.flushQueue()
 
         // 开始固定频率广播心跳包
         this.scheduledExecutor.scheduleAtFixedRate({
-            this.packetService.queuePacket(KeepAlivePacket(serverId))
+            this.packetService.queuePacket(KeepAlivePacket(this.serverId))
             this.packetService.flushQueue()
         }, 5, 5, TimeUnit.SECONDS)
 
@@ -196,6 +175,13 @@ class MessagingManager(
         this.withPacketService { service: PacketService -> service.queuePacket(makePacket.get()) }
     }
 
+    /**
+     * 子类使用这个来注册新的封包类型.
+     */
+    protected inline fun <reified T : Packet> registerPacket(supplier: PacketSupplier<T>) {
+        PacketManager.register(T::class.java, supplier)
+    }
+
     private fun initMessagingService(
         packetService: PacketService,
         handlerImpl: MessagingHandlerImpl,
@@ -210,12 +196,12 @@ class MessagingManager(
             }
 
             MessagingConfig.BrokerType.NATS -> {
-                LOGGER.info("Initializing NATS messaging service...")
+                logger.info("Initializing NATS messaging service...")
 
                 val host = config.NATS().host
                 val port = config.NATS().port
                 val credentialsFile = config.NATS().credentialsFile
-                val builder = NATSMessagingService.builder(packetService, name, channelName, this.serverId, handlerImpl, 0L, false, packetDir)
+                val builder = NATSMessagingService.builder(packetService, name, channelName, serverId, handlerImpl, 0L, false, packetDir)
                     .url(host, port)
                     .life(5000)
                 if (credentialsFile != null && credentialsFile.isNotBlank()) {
@@ -225,7 +211,7 @@ class MessagingManager(
             }
 
             MessagingConfig.BrokerType.RABBITMQ -> {
-                LOGGER.info("Initializing RABBITMQ messaging service...")
+                logger.info("Initializing RABBITMQ messaging service...")
 
                 val host = config.RabbitMQ().host
                 val port = config.RabbitMQ().port
@@ -233,7 +219,7 @@ class MessagingManager(
                 val username = config.RabbitMQ().username
                 val password = config.RabbitMQ().password
                 val builder = RabbitMQMessagingService
-                    .builder(packetService, name, channelName, this.serverId, handlerImpl, 0L, false, packetDir)
+                    .builder(packetService, name, channelName, serverId, handlerImpl, 0L, false, packetDir)
                     .url(host, port, vhost)
                 if (password != null && password.isNotBlank()) {
                     builder.credentials(username, password)
@@ -242,13 +228,13 @@ class MessagingManager(
             }
 
             MessagingConfig.BrokerType.REDIS -> {
-                LOGGER.info("Initializing REDIS messaging service...")
+                logger.info("Initializing REDIS messaging service...")
 
                 val host = config.Redis().host
                 val port = config.Redis().port
                 val password = config.Redis().password
                 val builder = RedisMessagingService
-                    .builder(packetService, name, channelName, this.serverId, handlerImpl, 0L, false, packetDir)
+                    .builder(packetService, name, channelName, serverId, handlerImpl, 0L, false, packetDir)
                     .url(host, port)
                 if (password != null && password.isNotBlank()) {
                     builder.credentials(password)
@@ -260,17 +246,13 @@ class MessagingManager(
         return messagingService
     }
 
-    private inline fun <reified T : Packet> registerPacket(supplier: PacketSupplier<T>) {
-        PacketManager.register(T::class.java, supplier)
-    }
-
     private fun withPacketService(consumer: Consumer<PacketService>) {
         if (this::packetService.isInitialized) {
             consumer.accept(this.packetService)
         }
     }
 
-    private class KoishServerMessagingHandler(
+    private class ServerMessagingHandler(
         serverId: UUID,
         packetService: PacketService,
         messagingHandler: MessagingHandler,
@@ -278,7 +260,7 @@ class MessagingManager(
 
         override fun handleInitialization(packet: InitializationPacket) {
             super.handleInitialization(packet)
-            LOGGER.info("Received initialization packet from server ${packet.server}")
+            logger.info("Received initialization packet from server ${packet.server}")
         }
     }
 }
