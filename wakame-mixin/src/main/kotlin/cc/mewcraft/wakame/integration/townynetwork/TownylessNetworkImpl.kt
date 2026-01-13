@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.integration.townynetwork
 
+import cc.mewcraft.messaging2.ServerInfoProvider
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.messaging.KoishMessagingManager
 import cc.mewcraft.wakame.messaging.handler.TownyNetworkPacketHandler
@@ -42,7 +43,7 @@ internal object TownylessNetworkImpl : TownyNetworkIntegration, TownyNetworkPack
 // 跨服传送部分的实现
 private object TownylessTeleportImpl {
     private val serverId: UUID
-        get() = KoishMessagingManager.serverId
+        get() = ServerInfoProvider.serverId
 
     // expireAfterAccess 设置为 5 秒可以让玩家在请求传送后的一段时间内不能重复请求传送
     private val sessions: Cache<UUID, Session> = CacheBuilder.newBuilder()

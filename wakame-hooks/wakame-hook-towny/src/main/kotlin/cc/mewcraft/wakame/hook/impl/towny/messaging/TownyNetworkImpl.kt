@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.towny.messaging
 
+import cc.mewcraft.messaging2.ServerInfoProvider
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.townynetwork.TownyNetworkIntegration
 import cc.mewcraft.wakame.messaging.KoishMessagingManager
@@ -28,11 +29,11 @@ import java.util.*
 private val townyApi: TownyAPI
     get() = TownyAPI.getInstance()
 private val serverId: UUID
-    get() = KoishMessagingManager.serverId
+    get() = ServerInfoProvider.serverId
 private val serverKey: String
-    get() = KoishMessagingManager.serverKey
+    get() = ServerInfoProvider.serverKey
 private val serverGroup: String
-    get() = KoishMessagingManager.serverGroup
+    get() = ServerInfoProvider.serverGroup
 
 /**
  * 服务器上有安装 Towny 时的实现.

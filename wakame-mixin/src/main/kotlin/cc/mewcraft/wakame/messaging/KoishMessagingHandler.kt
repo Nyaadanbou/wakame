@@ -8,20 +8,18 @@ import cc.mewcraft.wakame.messaging.packet.TownSpawnResponsePacket
 import ninja.egg82.messenger.handler.AbstractMessagingHandler
 import ninja.egg82.messenger.packets.Packet
 import ninja.egg82.messenger.services.PacketService
-import java.util.*
 
 
-// Copilot: 这是用于 wakame-mixin 内部的总线. 对于其他模块, 应该实现自己的 AbstractMessagingHandler
 /**
  * 总线.
  */
 class KoishMessagingHandler(
-    private val serverId: UUID,
     packetService: PacketService,
 ) : AbstractMessagingHandler(packetService) {
 
     override fun handlePacket(packet: Packet): Boolean {
         when (packet) {
+
             /* Towny */
 
             is TownSpawnRequestPacket -> {

@@ -4,6 +4,7 @@ import cc.mewcraft.messaging2.util.ConcurrentUtil
 import cc.mewcraft.messaging2.util.ExceptionLoggingScheduledThreadPoolExecutor
 import cc.mewcraft.messaging2.util.Exceptions
 import ninja.egg82.messenger.*
+import ninja.egg82.messenger.handler.AbstractMessagingHandler
 import ninja.egg82.messenger.handler.AbstractServerMessagingHandler
 import ninja.egg82.messenger.handler.MessagingHandler
 import ninja.egg82.messenger.handler.MessagingHandlerImpl
@@ -30,17 +31,17 @@ interface StaticAccessApi {
     fun queuePacket(makePacket: Supplier<out AbstractPacket>)
 
     companion object {
-        fun of(factory: (MessagingConfig) -> AbstractMessagingManager): StaticAccessApi {
+        fun of(factory: (MessagingConfig) -> MessagingManager): StaticAccessApi {
             return StaticAccessApiImpl(factory)
         }
     }
 }
 
 private class StaticAccessApiImpl(
-    private val factory: (MessagingConfig) -> AbstractMessagingManager,
+    private val factory: (MessagingConfig) -> MessagingManager,
 ) : StaticAccessApi {
 
-    private lateinit var instance: AbstractMessagingManager
+    private lateinit var instance: MessagingManager
 
     override fun init(config: MessagingConfig) {
         instance = factory(config)
@@ -63,31 +64,28 @@ private class StaticAccessApiImpl(
     }
 }
 
-abstract class AbstractMessagingManager(
+abstract class MessagingManager(
     private val config: MessagingConfig,
 ) {
-    abstract val logger: Logger
-    abstract val protocolVersion: Byte
 
-    abstract fun registerPackets()
-    abstract fun registerMessagingHandlers(handler: MessagingHandlerImpl)
-
-    //
-
-    private val serverId: UUID
+    val serverId: UUID
         get() = ServerInfoProvider.serverId
-    private val serverKey: String
+    val serverKey: String
         get() = ServerInfoProvider.serverKey
-    private val serverGroup: String
+    val serverGroup: String
         get() = ServerInfoProvider.serverGroup
 
-    //
+    protected abstract val logger: Logger
+    protected abstract val channelName: String
+    protected abstract val protocolVersion: Byte
 
-    private lateinit var scheduledExecutor: ScheduledExecutorService
-    private lateinit var messagingService: MessagingService
+    protected abstract fun registerPackets()
+    protected abstract fun registerMessagingHandlers(addHandler: (AbstractMessagingHandler) -> Unit)
 
+    protected lateinit var scheduledExecutor: ScheduledExecutorService
+    protected lateinit var messagingService: MessagingService
     @Volatile
-    private lateinit var packetService: PacketService
+    protected lateinit var packetService: PacketService
 
     /**
      * 启动消息服务.
@@ -113,14 +111,17 @@ abstract class AbstractMessagingManager(
         // 自定义封包类型, 每个都得注册, 按需更新这里
         registerPackets()
 
-        this.packetService = PacketService(4, false, protocolVersion)
+        this.packetService = PacketService(4, false, this.protocolVersion)
         this.scheduledExecutor = ExceptionLoggingScheduledThreadPoolExecutor(4, ConcurrentUtil.koishThreadFactory(logger, "MessagingManager"), logger)
 
         val handler = MessagingHandlerImpl(this.packetService)
 
-        // 添加消息处理器
+        /* 添加消息处理器 */
+
+        // 核心消息处理器
         handler.addHandler(ServerMessagingHandler(this.serverId, this.packetService, handler))
-        registerMessagingHandlers(handler)
+        // 自定义消息处理器
+        registerMessagingHandlers(handler::addHandler)
 
         this.messagingService = try {
             initMessagingService(this.packetService, handler, File("/"))
@@ -130,7 +131,7 @@ abstract class AbstractMessagingManager(
 
         this.packetService.addMessenger(this.messagingService)
 
-        this.packetService.queuePacket(InitializationPacket(this.serverId, protocolVersion))
+        this.packetService.queuePacket(InitializationPacket(this.serverId, this.protocolVersion))
         this.packetService.flushQueue()
 
         // 开始固定频率广播心跳包
@@ -188,7 +189,6 @@ abstract class AbstractMessagingManager(
         packetDir: File,
     ): MessagingService {
         val name = "engine1"
-        val channelName = "koish-core"
 
         val messagingService = when (config.brokerType) {
             MessagingConfig.BrokerType.NONE -> {
@@ -201,7 +201,7 @@ abstract class AbstractMessagingManager(
                 val host = config.NATS().host
                 val port = config.NATS().port
                 val credentialsFile = config.NATS().credentialsFile
-                val builder = NATSMessagingService.builder(packetService, name, channelName, serverId, handlerImpl, 0L, false, packetDir)
+                val builder = NATSMessagingService.builder(packetService, name, this.channelName, this.serverId, handlerImpl, 0L, false, packetDir)
                     .url(host, port)
                     .life(5000)
                 if (credentialsFile != null && credentialsFile.isNotBlank()) {
@@ -219,7 +219,7 @@ abstract class AbstractMessagingManager(
                 val username = config.RabbitMQ().username
                 val password = config.RabbitMQ().password
                 val builder = RabbitMQMessagingService
-                    .builder(packetService, name, channelName, serverId, handlerImpl, 0L, false, packetDir)
+                    .builder(packetService, name, this.channelName, this.serverId, handlerImpl, 0L, false, packetDir)
                     .url(host, port, vhost)
                 if (password != null && password.isNotBlank()) {
                     builder.credentials(username, password)
@@ -234,7 +234,7 @@ abstract class AbstractMessagingManager(
                 val port = config.Redis().port
                 val password = config.Redis().password
                 val builder = RedisMessagingService
-                    .builder(packetService, name, channelName, serverId, handlerImpl, 0L, false, packetDir)
+                    .builder(packetService, name, this.channelName, this.serverId, handlerImpl, 0L, false, packetDir)
                     .url(host, port)
                 if (password != null && password.isNotBlank()) {
                     builder.credentials(password)
