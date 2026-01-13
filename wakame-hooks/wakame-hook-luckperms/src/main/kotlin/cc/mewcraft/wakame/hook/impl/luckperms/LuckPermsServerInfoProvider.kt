@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.luckperms
 
-import cc.mewcraft.wakame.messaging.ServerInfoProvider
+import cc.mewcraft.messaging2.ServerInfoProvider
 import net.luckperms.api.LuckPerms
 import net.luckperms.api.LuckPermsProvider
 import java.util.*

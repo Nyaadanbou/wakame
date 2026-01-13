@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.messaging
+package cc.mewcraft.messaging2
 
 import cc.mewcraft.lazyconfig.access.entryOrElse
 import org.spongepowered.configurate.CommentedConfigurationNode

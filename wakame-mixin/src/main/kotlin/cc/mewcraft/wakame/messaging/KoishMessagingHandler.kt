@@ -15,7 +15,7 @@ import java.util.*
 /**
  * 总线.
  */
-class MessagingHandler(
+class KoishMessagingHandler(
     private val serverId: UUID,
     packetService: PacketService,
 ) : AbstractMessagingHandler(packetService) {

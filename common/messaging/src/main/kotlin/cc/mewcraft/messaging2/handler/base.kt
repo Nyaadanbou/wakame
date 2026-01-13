@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.messaging.packet
+package cc.mewcraft.messaging2.handler
 
 import io.netty.buffer.ByteBuf
 import net.kyori.adventure.key.Key
@@ -9,7 +9,7 @@ import java.util.*
 import java.util.function.BiConsumer
 import java.util.function.Function
 
-abstract class KoishPacket(sender: UUID) : AbstractPacket(sender) {
+abstract class SimplePacket(sender: UUID) : AbstractPacket(sender) {
 
     private val componentSerializer = GsonComponentSerializer.gson()
 

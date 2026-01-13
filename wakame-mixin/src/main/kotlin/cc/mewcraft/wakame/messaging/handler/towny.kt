@@ -19,6 +19,7 @@
  */
 package cc.mewcraft.wakame.messaging.handler
 
+import cc.mewcraft.messaging2.packet.SimplePacketHandler
 import cc.mewcraft.wakame.integration.townynetwork.TownylessNetworkImpl
 import cc.mewcraft.wakame.messaging.packet.NationSpawnRequestPacket
 import cc.mewcraft.wakame.messaging.packet.NationSpawnResponsePacket
@@ -26,14 +27,14 @@ import cc.mewcraft.wakame.messaging.packet.TownSpawnRequestPacket
 import cc.mewcraft.wakame.messaging.packet.TownSpawnResponsePacket
 
 /**
- * 该 [KoishPacketHandler] 负责处理以下封包:
+ * 该 [SimplePacketHandler] 负责处理以下封包:
  *
  * - [TownSpawnRequestPacket]
  * - [TownSpawnResponsePacket]
  * - [NationSpawnRequestPacket]
  * - [NationSpawnResponsePacket]
  */
-interface TownyNetworkPacketHandler : KoishPacketHandler {
+interface TownyNetworkPacketHandler : SimplePacketHandler {
     fun handle(packet: TownSpawnRequestPacket)
     fun handle(packet: TownSpawnResponsePacket)
     fun handle(packet: NationSpawnRequestPacket)

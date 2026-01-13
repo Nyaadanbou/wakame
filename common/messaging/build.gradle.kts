@@ -14,6 +14,14 @@ repositories {
 dependencies {
     api(project(":common:lazyconfig"))
 
+    // Guava
+    compileOnly(local.guava)
+
+    // 冒险库
+    compileOnly(local.adventure.api)
+    compileOnly(local.adventure.key)
+    compileOnly(local.adventure.text.serializer.gson)
+
     // 跨进程通讯
     api(local.messenger)
     api(local.messenger.nats)

@@ -163,6 +163,7 @@ adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-s
 adventure-text-serializer-json = { group = "net.kyori", name = "adventure-text-serializer-json", version.ref = "adventure" }
 adventure-text-serializer-legacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
 adventure-text-serializer-plain = { group = "net.kyori", name = "adventure-text-serializer-plain", version.ref = "adventure" }
+guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 mixin = { group = "org.spongepowered", name = "mixin", version.ref = "mixin" }
 mixin-extras = { group = "io.github.llamalad7", name = "mixinextras-common", version.ref = "mixin-extras" }
 ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }

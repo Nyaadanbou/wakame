@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.messaging
+package cc.mewcraft.messaging2
 
 import java.util.*
 
@@ -55,3 +55,4 @@ interface ServerInfoProvider {
             get() = implementation.serverName
     }
 }
+
