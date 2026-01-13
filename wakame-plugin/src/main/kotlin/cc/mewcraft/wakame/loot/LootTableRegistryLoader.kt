@@ -16,7 +16,7 @@ import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
-import cc.mewcraft.wakame.util.yamlLoader
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import io.leangen.geantyref.TypeFactory
 import io.leangen.geantyref.TypeToken
 

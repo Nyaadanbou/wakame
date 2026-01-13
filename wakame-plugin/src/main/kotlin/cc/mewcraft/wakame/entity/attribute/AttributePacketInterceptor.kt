@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.entity.attribute
 
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entryOrElse
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.entryOrElse
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame
 
+import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.wakame.command.KoishCommandManager
-import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.PermanentStorage
 import cc.mewcraft.wakame.lang.LanguageExtractor
@@ -31,7 +31,7 @@ internal class KoishBootstrap : PluginBootstrap {
     // 2) 创建 JavaPlugin 实例 (因此可以直接用 object 来实现 JavaPlugin)
     override fun bootstrap(context: BootstrapContext) {
         LoggerProvider.set(context.logger)
-        ConfigAccess.register(Configs) // 配置文件 API 实例趁早注册
+        ConfigAccess.setImplementation(Configs) // 配置文件 API 实例趁早注册
 
         BootstrapContexts.registerLifecycleManagerOwnedByBootstrap(context.lifecycleManager)
         BootstrapContexts.registerAuthors(context.pluginMeta.authors)

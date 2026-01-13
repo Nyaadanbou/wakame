@@ -1,6 +1,6 @@
-package cc.mewcraft.wakame.serialization.configurate.serializer
+package cc.mewcraft.lazyconfig.configurate.serializer
 
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.set
@@ -23,7 +23,7 @@ private constructor(
     private val typeInfoLookup: (V) -> K,
     private val decodingLookup: (K) -> KType, // (K) -> KType<out V>
     private val encodingLookup: (V) -> KType, // (V) -> KType<out V>
-) : TypeSerializer2<V> {
+) : SimpleSerializer<V> {
 
     constructor(
         typeKey: String,
@@ -44,21 +44,21 @@ private constructor(
     companion object {
 
         /**
-         * 创建一个 [TypeSerializer2] 用于处理多态类型的反序列化.
+         * 创建一个 [SimpleSerializer] 用于处理多态类型的反序列化.
          */
         inline fun <reified K : Any, reified V : Any> createPartial(
             decodingMap: Map<K, KClass<out V>>,
-        ): TypeSerializer2<V> {
+        ): SimpleSerializer<V> {
             return createPartial("type", decodingMap)
         }
 
         /**
-         * 创建一个 [TypeSerializer2] 用于处理多态类型的反序列化.
+         * 创建一个 [SimpleSerializer] 用于处理多态类型的反序列化.
          */
         inline fun <reified K : Any, reified V : Any> createPartial(
             typeKey: String,
             decodingMap: Map<K, KClass<out V>>,
-        ): TypeSerializer2<V> {
+        ): SimpleSerializer<V> {
             return createPartial<K, V>(typeKey) { key ->
                 decodingMap[key]?.starProjectedType // 使用该函数意味着 V 没有任何参数
                     ?: throw SerializationException("No type mapping found for key: $key (type: ${key::class})")
@@ -66,21 +66,21 @@ private constructor(
         }
 
         /**
-         * 创建一个 [TypeSerializer2] 用于处理多态类型的反序列化.
+         * 创建一个 [SimpleSerializer] 用于处理多态类型的反序列化.
          */
         inline fun <reified K : Any, reified V : Any> createPartial(
             noinline decodingMap: (K) -> KType, // KType<V>
-        ): TypeSerializer2<V> {
+        ): SimpleSerializer<V> {
             return createPartial("type", decodingMap)
         }
 
         /**
-         * 创建一个 [TypeSerializer2] 用于处理多态类型的反序列化.
+         * 创建一个 [SimpleSerializer] 用于处理多态类型的反序列化.
          */
         inline fun <reified K : Any, reified V : Any> createPartial(
             typeKey: String,
             noinline decodingMap: (K) -> KType,
-        ): TypeSerializer2<V> {
+        ): SimpleSerializer<V> {
             return DispatchingSerializer(
                 typeKey,
                 typeOf<K>(),
@@ -90,13 +90,13 @@ private constructor(
         }
 
         /**
-         * 创建一个 [TypeSerializer2] 用于处理多态类型的序列化/反序列化.
+         * 创建一个 [SimpleSerializer] 用于处理多态类型的序列化/反序列化.
          */
         inline fun <reified K : Any, reified V : Any> create(
             typeKey: String,
             noinline encodingMap: (V) -> K,
             noinline decodingMap: (K) -> KType, // KType<V>
-        ): TypeSerializer2<V> {
+        ): SimpleSerializer<V> {
             return DispatchingSerializer(
                 typeKey,
                 typeOf<K>(),
@@ -106,12 +106,12 @@ private constructor(
         }
 
         /**
-         * 创建一个 [TypeSerializer2] 用于处理多态类型的序列化/反序列化.
+         * 创建一个 [SimpleSerializer] 用于处理多态类型的序列化/反序列化.
          */
         inline fun <reified K : Any, reified V : Any> create(
             noinline encodingMap: (V) -> K,
             noinline decodingMap: (K) -> KType, // KType<V>
-        ): TypeSerializer2<V> {
+        ): SimpleSerializer<V> {
             return create("type", encodingMap, decodingMap)
         }
 

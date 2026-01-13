@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.kizami
 
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -8,11 +10,9 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
-import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.yamlLoader
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 import org.spongepowered.configurate.ConfigurationNode

@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.loot.entry
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.loot.context.LootContext
 import cc.mewcraft.wakame.loot.predicate.LootPredicate
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 
 class EmptyLoot(weight: Int, quality: Int, conditions: List<LootPredicate>) : LootPoolSingletonContainer<Nothing>(weight, quality, conditions) {
     companion object {
-        val SERIALIZER: TypeSerializer2<EmptyLoot> = TypeSerializer2 { type, node ->
+        val SERIALIZER: SimpleSerializer<EmptyLoot> = SimpleSerializer { type, node ->
             val (weight, quality, conditions) = commonFields(node)
             EmptyLoot(weight, quality, conditions)
         }

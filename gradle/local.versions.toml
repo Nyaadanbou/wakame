@@ -45,12 +45,13 @@ postgresql = "42.7.8"
 rabbitmq = "5.27.0"
 nats = "2.23.0"
 
-# synced with version used by lowest supported mc (currently 1.21.4 on paper)
+# synced with version used by lowest supported mc
 asm = "9.8"
 gson = "2.11.0"
 guava = "33.3.1-jre"
 log4j = "2.24.1"
 netty = "4.1.115.Final"
+adventure = "4.24.0"  # synced with version used by lowest supported mc
 
 # Test deps
 datafixerupper = "8.0.16"
@@ -131,7 +132,7 @@ h2 = { module = "com.h2database:h2", version.ref = "h2" }
 mariadb-jdbc = { group = "org.mariadb.jdbc", name = "mariadb-java-client", version.ref = "mariadb-jdbc" }
 mysql-jdbc = { group = "com.mysql", name = "mysql-connector-j", version.ref = "mysql-jdbc" }
 postgresql-jdbc = { group = "org.postgresql", name = "postgresql", version.ref = "postgresql-jdbc" }
-hikaricp = {group = "com.zaxxer", name = "HikariCP", version = "5.1.0" }
+hikaricp = { group = "com.zaxxer", name = "HikariCP", version = "5.1.0" }
 snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version.ref = "snakeyaml-engine" }
 messenger = { group = "de.hexaoxi", name = "messenger-api", version.ref = "messenger" }
 messenger-nats = { group = "de.hexaoxi", name = "messenger-nats", version.ref = "messenger" }
@@ -151,6 +152,17 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 kotlinx-coroutines-debug = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-debug", version.ref = "kotlinx-coroutines" }
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 velocity-api = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
+adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
+adventure-extra-kotlin = { group = "net.kyori", name = "adventure-extra-kotlin", version.ref = "adventure" }
+adventure-key = { group = "net.kyori", name = "adventure-key", version.ref = "adventure" }
+adventure-nbt = { group = "net.kyori", name = "adventure-nbt", version.ref = "adventure" }
+adventure-text-logger-slf4j = { group = "net.kyori", name = "adventure-text-logger-slf4j", version.ref = "adventure" }
+adventure-text-minimessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
+adventure-text-serializer-ansi = { group = "net.kyori", name = "adventure-text-serializer-ansi", version.ref = "adventure" }
+adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version.ref = "adventure" }
+adventure-text-serializer-json = { group = "net.kyori", name = "adventure-text-serializer-json", version.ref = "adventure" }
+adventure-text-serializer-legacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
+adventure-text-serializer-plain = { group = "net.kyori", name = "adventure-text-serializer-plain", version.ref = "adventure" }
 mixin = { group = "org.spongepowered", name = "mixin", version.ref = "mixin" }
 mixin-extras = { group = "io.github.llamalad7", name = "mixinextras-common", version.ref = "mixin-extras" }
 ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }

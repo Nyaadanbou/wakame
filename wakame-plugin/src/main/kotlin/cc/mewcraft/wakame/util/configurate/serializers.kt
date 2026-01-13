@@ -1,7 +1,8 @@
-@file:Suppress("UnstableApiUsage")
+@file:JvmName("Serializers")
 
-package cc.mewcraft.wakame.serialization.configurate.typeserializer
+package cc.mewcraft.wakame.util.configurate
 
+import cc.mewcraft.lazyconfig.configurate.register
 import cc.mewcraft.wakame.loot.LootPool
 import cc.mewcraft.wakame.loot.LootTable
 import cc.mewcraft.wakame.loot.entry.ComposableEntryContainer
@@ -10,9 +11,9 @@ import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.DynamicRegistries
 import cc.mewcraft.wakame.serialization.configurate.serializer.*
 import cc.mewcraft.wakame.util.RandomizedValueSerializer
-import cc.mewcraft.wakame.util.register
 import io.papermc.paper.registry.RegistryKey
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
+
 
 // FIXME #350: 迁移到 wakame-mixin
 /**

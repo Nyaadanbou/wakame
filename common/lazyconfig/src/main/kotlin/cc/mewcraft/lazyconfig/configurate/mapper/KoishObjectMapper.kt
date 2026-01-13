@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.serialization.configurate.mapper
+package cc.mewcraft.lazyconfig.configurate.mapper
 
 import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
 import org.spongepowered.configurate.objectmapping.FieldDiscoverer
@@ -7,24 +7,24 @@ import org.spongepowered.configurate.objectmapping.meta.*
 import org.spongepowered.configurate.util.NamingSchemes
 
 /**
- * @see org.spongepowered.configurate.objectmapping.ObjectMapper.Factory
+ * @see ObjectMapper.Factory
  */
 object KoishObjectMapper {
 
     @JvmField
     val INSTANCE: ObjectMapper.Factory = ObjectMapper.emptyFactoryBuilder()
         .defaultNamingScheme(NamingSchemes.SNAKE_CASE)
-        // Resolvers //
+        // Resolvers
         .addNodeResolver(NodeResolver.nodeKey())
         .addNodeResolver(NodeResolver.keyFromSetting())
         .addNodeResolver(NodeResolver.nodeFromParent())
-        // Constraints and processors //
+        // Constraints and processors
         .addProcessor(Comment::class.java, Processor.comments())
         .addConstraint(Matches::class.java, String::class.java, Constraint.pattern())
         .addConstraint(Required::class.java, Constraint.required())
-        // Post-processors //
+        // Post-processors
         .addPostProcessor(PostProcessor.methodsAnnotatedPostProcess())
-        // Field discovers //
+        // Field discovers
         .addDiscoverer(FieldDiscoverer.emptyConstructorObject())
         .addDiscoverer(FieldDiscoverer.record())
         .addDiscoverer(dataClassFieldDiscoverer())

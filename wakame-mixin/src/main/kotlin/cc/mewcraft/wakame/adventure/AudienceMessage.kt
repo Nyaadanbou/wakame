@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.adventure
 
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.require
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.require
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.sound.Sound
@@ -149,7 +149,7 @@ internal class SoundStopAudienceMessage(
  * (相关设置 ...)
  * ```
  */
-private object CombinedAudienceMessageSerializer : TypeSerializer2<AudienceMessage> {
+private object CombinedAudienceMessageSerializer : SimpleSerializer<AudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): AudienceMessage {
         if (node.rawScalar() != null) {
             return ChatAudienceMessageSerializer.deserialize(type, node)
@@ -174,7 +174,7 @@ private object CombinedAudienceMessageSerializer : TypeSerializer2<AudienceMessa
     }
 }
 
-private object AudienceMessageGroupSerializer : TypeSerializer2<AudienceMessageGroup> {
+private object AudienceMessageGroupSerializer : SimpleSerializer<AudienceMessageGroup> {
     override fun deserialize(type: Type, node: ConfigurationNode): AudienceMessageGroup {
         if (node.rawScalar() != null) {
             return AudienceMessageGroupImpl(listOf(node.require<AudienceMessage>()))
@@ -201,7 +201,7 @@ private object AudienceMessageGroupSerializer : TypeSerializer2<AudienceMessageG
  * "foo"
  * ```
  */
-private object ChatAudienceMessageSerializer : TypeSerializer2<ChatAudienceMessage> {
+private object ChatAudienceMessageSerializer : SimpleSerializer<ChatAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): ChatAudienceMessage {
         if (node.rawScalar() != null) {
             return ChatAudienceMessage(node.require<String>())
@@ -218,7 +218,7 @@ private object ChatAudienceMessageSerializer : TypeSerializer2<ChatAudienceMessa
  * text: "foo"
  * ```
  */
-private object ActionbarAudienceMessageSerializer : TypeSerializer2<ActionbarAudienceMessage> {
+private object ActionbarAudienceMessageSerializer : SimpleSerializer<ActionbarAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): ActionbarAudienceMessage {
         val text = node.node("text").require<String>()
         return ActionbarAudienceMessage(text)
@@ -236,7 +236,7 @@ private object ActionbarAudienceMessageSerializer : TypeSerializer2<ActionbarAud
  * fade_out: # 单位: 刻
  * ```
  */
-private object TitleAudienceMessageSerializer : TypeSerializer2<TitleAudienceMessage> {
+private object TitleAudienceMessageSerializer : SimpleSerializer<TitleAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): TitleAudienceMessage {
         val title = node.node("title").require<String>()
         val subtitle = node.node("subtitle").require<String>()
@@ -259,7 +259,7 @@ private object TitleAudienceMessageSerializer : TypeSerializer2<TitleAudienceMes
  * emitter: self # 可选, 默认: 'recipient_location', 可用值: 'self', 'recipient_location'
  * ```
  */
-private object SoundAudienceMessageSerializer : TypeSerializer2<SoundAudienceMessage> {
+private object SoundAudienceMessageSerializer : SimpleSerializer<SoundAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): SoundAudienceMessage {
         // read name
         val name = node.node("name").require<Key>()
@@ -301,7 +301,7 @@ private object SoundAudienceMessageSerializer : TypeSerializer2<SoundAudienceMes
  * source: "master" # 可选, 默认: MASTER, 可用: https://minecraft.wiki/w/Sound#Categories
  * ```
  */
-private object SoundStopAudienceMessageSerializer : TypeSerializer2<SoundStopAudienceMessage> {
+private object SoundStopAudienceMessageSerializer : SimpleSerializer<SoundStopAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): SoundStopAudienceMessage {
         // read name
         val name = node.node("name").require<Key>()

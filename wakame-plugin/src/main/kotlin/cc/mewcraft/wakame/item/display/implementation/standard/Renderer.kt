@@ -27,9 +27,9 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import cc.mewcraft.wakame.util.item.fastLore
 import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
-import cc.mewcraft.wakame.util.yamlLoader
 import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.FoodProperties

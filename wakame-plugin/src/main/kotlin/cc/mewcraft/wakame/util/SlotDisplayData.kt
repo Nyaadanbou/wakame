@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.util
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -430,7 +430,7 @@ data class SlotDisplayLoreData(
     }
 }
 
-internal object SlotDisplayLoreDataSerializer : TypeSerializer2<SlotDisplayLoreData> {
+internal object SlotDisplayLoreDataSerializer : SimpleSerializer<SlotDisplayLoreData> {
 
     override fun deserialize(type: Type, node: ConfigurationNode): SlotDisplayLoreData {
         val rawTextList = node.getList<String>(emptyList())

@@ -1,19 +1,6 @@
-package cc.mewcraft.wakame.serialization.configurate
+package cc.mewcraft.wakame.serialization.configurate.adapter
 
-import net.minecraft.nbt.ByteArrayTag
-import net.minecraft.nbt.ByteTag
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.DoubleTag
-import net.minecraft.nbt.EndTag
-import net.minecraft.nbt.FloatTag
-import net.minecraft.nbt.IntArrayTag
-import net.minecraft.nbt.IntTag
-import net.minecraft.nbt.ListTag
-import net.minecraft.nbt.LongArrayTag
-import net.minecraft.nbt.LongTag
-import net.minecraft.nbt.ShortTag
-import net.minecraft.nbt.StringTag
-import net.minecraft.nbt.Tag
+import net.minecraft.nbt.*
 import org.spongepowered.configurate.BasicConfigurationNode
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationNodeFactory
@@ -21,7 +8,7 @@ import org.spongepowered.configurate.ConfigurationOptions
 import java.io.IOException
 
 /**
- * A conNbtfiguration adapter that converts Minecraft NBT data into a [ConfigurationNode].
+ * A configuration adapter that converts Minecraft NBT data into a [org.spongepowered.configurate.ConfigurationNode].
  */
 object NbtNodeAdapter {
 
@@ -47,7 +34,7 @@ object NbtNodeAdapter {
      *
      * @param tag the tag to convert
      * @param node the node to populate
-     * @throws IOException if invalid tags are provided
+     * @throws java.io.IOException if invalid tags are provided
      */
     fun nbtToNode(tag: Tag?, node: ConfigurationNode) {
         when (tag) {

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.mewcraft.wakame.serialization.configurate.serializer;
+package cc.mewcraft.lazyconfig.configurate.serializer;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;

@@ -1,9 +1,9 @@
-package cc.mewcraft.wakame.serialization.configurate.serializer;
+package cc.mewcraft.lazyconfig.configurate.serializer;
 
-import cc.mewcraft.wakame.LoggerProviderKt;
 import io.leangen.geantyref.TypeToken;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.BasicConfigurationNode;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.ConfigurationOptions;
@@ -23,14 +23,12 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Map serializer that does not throw errors on individual entry serialization failures.
- * <p>
- * Source: {@link io.papermc.paper.configuration.serializer.collection.map.MapSerializer}
  */
 public class MapSerializer implements TypeSerializer.Annotated<Map<?, ?>> {
 
     public static final TypeToken<Map<?, ?>> TYPE = new TypeToken<>() {};
 
-    private static final Logger LOGGER = LoggerProviderKt.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(MapSerializer.class);
 
     private final boolean clearInvalids;
     private final TypeSerializer<Map<?, ?>> fallback;

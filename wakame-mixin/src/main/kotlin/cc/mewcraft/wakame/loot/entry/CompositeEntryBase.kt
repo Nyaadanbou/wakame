@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.loot.entry
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.loot.context.LootContext
 import cc.mewcraft.wakame.loot.predicate.LootPredicate
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import io.leangen.geantyref.TypeFactory
 import io.leangen.geantyref.TypeToken
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -24,8 +24,8 @@ abstract class CompositeEntryBase<S>(
 ) : LootPoolEntryContainer<S>(conditions) {
 
     companion object {
-        protected fun <T : CompositeEntryBase<*>> makeSerializer(factory: (List<LootPoolEntryContainer<Any>>, List<LootPredicate>) -> T): TypeSerializer2<T> {
-            return TypeSerializer2 { type, node ->
+        protected fun <T : CompositeEntryBase<*>> makeSerializer(factory: (List<LootPoolEntryContainer<Any>>, List<LootPredicate>) -> T): SimpleSerializer<T> {
+            return SimpleSerializer { type, node ->
                 val sType = (type as ParameterizedType).actualTypeArguments[0]
                 val entryType = TypeFactory.parameterizedClass(LootPoolEntryContainer::class.java, sType) // LootPoolEntryContainer<S>
                 val childListType = TypeFactory.parameterizedClass(List::class.java, entryType) // List<LootPoolEntryContainer<S>>

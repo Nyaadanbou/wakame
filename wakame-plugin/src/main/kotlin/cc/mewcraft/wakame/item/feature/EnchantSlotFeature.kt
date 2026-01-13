@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.feature
 
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.entryOrElse
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entryOrElse
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.extension.rarity2

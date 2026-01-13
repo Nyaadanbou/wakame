@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.reforge.merge
 
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.*
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.yamlLoader
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import java.io.File
 
 internal object MergingTableSerializer {

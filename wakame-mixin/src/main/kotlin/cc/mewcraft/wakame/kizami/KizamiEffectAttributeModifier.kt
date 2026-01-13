@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.kizami
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.util.require
 import org.bukkit.entity.Player
 import org.spongepowered.configurate.serialize.SerializationException
 
@@ -19,7 +19,7 @@ class KizamiEffectAttributeModifier(
 
     companion object {
         @JvmField
-        val SERIALIZER: TypeSerializer2<KizamiEffectAttributeModifier> = TypeSerializer2 { type, node ->
+        val SERIALIZER: SimpleSerializer<KizamiEffectAttributeModifier> = SimpleSerializer { type, node ->
             val attrId = node.node("id").require<String>()
             val attr = ConstantAttributeBundle(attrId, node)
             val kizamiId = node.hint(RepresentationHints.KIZAMI_ID)

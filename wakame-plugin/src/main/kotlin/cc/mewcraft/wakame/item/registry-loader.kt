@@ -2,6 +2,8 @@
 
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorContainer
@@ -14,7 +16,11 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.loot.LootTableRegistryLoader
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.IdePauser
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.configurate.yamlLoader
+import cc.mewcraft.wakame.util.runTask
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import org.spongepowered.configurate.ConfigurationNode

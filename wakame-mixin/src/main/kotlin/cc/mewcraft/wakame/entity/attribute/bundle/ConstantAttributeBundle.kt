@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.entity.attribute.bundle
 
+import cc.mewcraft.lazyconfig.configurate.registerExact
+import cc.mewcraft.lazyconfig.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
@@ -7,8 +9,6 @@ import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.entity.attribute.AttributeModifierSource
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
-import cc.mewcraft.wakame.util.registerExact
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.ConfigurationNode

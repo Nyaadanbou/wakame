@@ -51,6 +51,8 @@ tasks {
             relocate(pattern, "cc.mewcraft.extracontexts.shaded.$result")
         }
 
+        // lazyconfig
+        relocate0("cc.mewcraft.lazyconfig", "lazyconfig")
         // configurate
         relocate0("org.spongepowered.configurate", "configurate")
         // cloud
@@ -70,7 +72,8 @@ tasks {
         // json (used by rabbitmq)
         relocate0("org.json", "json")
         // zstd (used by messenger-redis)
-        //relocate0("com.github.luben.zstd", "zstd") // FIXME https://pastes.dev/qEtUHGgkNT
+        //FIXME https://pastes.dev/qEtUHGgkNT
+        //relocate0("com.github.luben.zstd", "zstd")
         // caffeine (used by messenger)
         relocate0("com.github.benmanes.caffeine", "caffeine")
         // apache commons pool 2 (used by rabbitmq and jedis)

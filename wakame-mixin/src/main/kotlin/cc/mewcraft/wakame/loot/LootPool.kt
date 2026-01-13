@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.loot
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.loot.context.LootContext
 import cc.mewcraft.wakame.loot.entry.ComposableEntryContainer
 import cc.mewcraft.wakame.loot.entry.LootPoolEntry
 import cc.mewcraft.wakame.loot.predicate.LootPredicate
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.util.require
 import io.leangen.geantyref.TypeFactory
 import io.leangen.geantyref.TypeToken
 import org.spongepowered.configurate.ConfigurationNode
@@ -28,7 +28,7 @@ fun <S> LootPool(
 interface LootPool<S> {
 
     companion object {
-        val SERIALIZER: TypeSerializer2<LootPool<*>> = Serializer
+        val SERIALIZER: SimpleSerializer<LootPool<*>> = Serializer
     }
 
     /**
@@ -54,7 +54,7 @@ interface LootPool<S> {
      */
     fun select(context: LootContext): List<S>
 
-    private object Serializer : TypeSerializer2<LootPool<*>> {
+    private object Serializer : SimpleSerializer<LootPool<*>> {
         override fun deserialize(type: Type, node: ConfigurationNode): LootPool<*> {
             val type = type as ParameterizedType
             val rolls = node.node("rolls").require<Int>()
@@ -69,7 +69,7 @@ interface LootPool<S> {
 
         private fun getEntries(
             node: ConfigurationNode,
-            entryType: ParameterizedType
+            entryType: ParameterizedType,
         ): List<ComposableEntryContainer<Any>> {
             val sType = entryType.actualTypeArguments[0]
             val entryContainerType: Type = TypeFactory.parameterizedClass(ComposableEntryContainer::class.java, sType) // ComposableEntryContainer<S>

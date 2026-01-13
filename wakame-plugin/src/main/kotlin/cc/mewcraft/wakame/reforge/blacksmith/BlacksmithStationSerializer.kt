@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.reforge.blacksmith
 
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.reforge.recycle.RecyclingStationRegistry
 import cc.mewcraft.wakame.reforge.repair.RepairingTableRegistry
-import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.yamlLoader
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 
 internal object BlacksmithStationSerializer {
     private const val DATA_DIR = "blacksmith"

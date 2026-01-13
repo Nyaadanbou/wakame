@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.property.impl
 
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.REGISTRY_ACCESS
 import cc.mewcraft.wakame.util.item.toBukkit
@@ -28,7 +28,7 @@ interface ItemBase {
         val EMPTY: ItemBase = EmptyItemBase
 
         @JvmField
-        val SERIALIZER: TypeSerializer2<ItemBase> = SimpleItemBase.Serializer
+        val SERIALIZER: SimpleSerializer<ItemBase> = SimpleItemBase.Serializer
 
     }
 
@@ -109,7 +109,7 @@ private data class SimpleItemBase(
         return createMojang().toBukkit()
     }
 
-    object Serializer : TypeSerializer2<ItemBase> {
+    object Serializer : SimpleSerializer<ItemBase> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemBase {
             val arguments = node.string ?: throw SerializationException(node, type, "Expected a string, got ${node.raw()}")
             if (arguments.isEmpty()) {

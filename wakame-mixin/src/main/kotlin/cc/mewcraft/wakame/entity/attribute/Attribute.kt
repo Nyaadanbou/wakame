@@ -2,9 +2,9 @@
 
 package cc.mewcraft.wakame.entity.attribute
 
+import cc.mewcraft.lazyconfig.access.ConfigAccess
+import cc.mewcraft.lazyconfig.access.optionalEntry
 import cc.mewcraft.wakame.adventure.key.Identified
-import cc.mewcraft.wakame.config.ConfigAccess
-import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
@@ -21,7 +21,7 @@ import java.util.stream.Stream
 
 const val ATTRIBUTE_ID_PATTERN_STRING = "[a-z0-9_./]+"
 
-val GLOBAL_ATTRIBUTE_CONFIG = ConfigAccess.INSTANCE["attributes"]
+val GLOBAL_ATTRIBUTE_CONFIG = ConfigAccess["attributes"]
 
 /**
  * 代表一种 *属性*. 一般作为静态常量使用.

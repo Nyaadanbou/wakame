@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.behavior.impl.weapon
 
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.optionalEntry
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.optionalEntry
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.util.collision.OBB

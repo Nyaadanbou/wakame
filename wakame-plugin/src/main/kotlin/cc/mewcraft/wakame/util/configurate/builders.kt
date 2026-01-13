@@ -1,18 +1,14 @@
-@file:JvmName("Configurtes")
+@file:JvmName("Builders")
 
-package cc.mewcraft.wakame.util
+package cc.mewcraft.wakame.util.configurate
 
-import cc.mewcraft.wakame.serialization.configurate.STANDARD_SERIALIZERS
-import cc.mewcraft.wakame.serialization.configurate.typeserializer.KOISH_SERIALIZERS
+import cc.mewcraft.lazyconfig.configurate.STANDARD_SERIALIZERS
 import org.spongepowered.configurate.gson.GsonConfigurationLoader
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.BufferedReader
 import java.io.BufferedWriter
-
-
-// Builder extensions
 
 
 internal fun yamlLoader(block: YamlLoaderDsl.() -> Unit): YamlConfigurationLoader.Builder {
@@ -107,9 +103,6 @@ internal fun YamlConfigurationLoader.Builder.withDefaultSerializers(): YamlConfi
     }
 }
 
-/**
- * Apply all default settings to the builder.
- */
 internal fun YamlConfigurationLoader.Builder.withDefaultEverything(): YamlConfigurationLoader.Builder {
     return withDefaultYamlConfigs().withDefaultConfigOptions().withDefaultSerializers()
 }

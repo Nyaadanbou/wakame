@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.entity.player
 
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.entry
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage

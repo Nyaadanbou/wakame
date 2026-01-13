@@ -61,6 +61,8 @@ tasks {
             relocate(pattern, "cc.mewcraft.wakame.shaded.$result")
         }
 
+        // lazyconfig
+        relocate0("cc.mewcraft.lazyconfig", "lazyconfig")
         // shadow
         relocate0("me.lucko.shadow", "shadow")
         // mocha
@@ -96,7 +98,8 @@ tasks {
         // json (used by rabbitmq)
         relocate0("org.json", "json")
         // zstd (used by messenger-redis)
-        //relocate0("com.github.luben.zstd", "zstd") // FIXME https://pastes.dev/qEtUHGgkNT
+        //FIXME https://pastes.dev/qEtUHGgkNT
+        //relocate0("com.github.luben.zstd", "zstd")
         // caffeine (used by messenger)
         relocate0("com.github.benmanes.caffeine", "caffeine")
         // apache commons pool 2 (used by rabbitmq and jedis)

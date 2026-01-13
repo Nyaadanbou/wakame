@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.loot.predicate
 
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import io.leangen.geantyref.TypeToken
 
 /**
@@ -12,7 +12,7 @@ sealed interface LootPredicateType<out T : LootPredicate> {
     companion object {
         fun <T : LootPredicate> create(
             token: TypeToken<T>,
-            serializer: TypeSerializer2<T>,
+            serializer: SimpleSerializer<T>,
         ): LootPredicateType<T> = Simple(token, serializer)
     }
 
@@ -24,11 +24,11 @@ sealed interface LootPredicateType<out T : LootPredicate> {
     /**
      * [T] 的序列化器.
      */
-    val serializer: TypeSerializer2<out T>
+    val serializer: SimpleSerializer<out T>
 
     private class Simple<T : LootPredicate>(
         override val typeToken: TypeToken<out T>,
-        override val serializer: TypeSerializer2<out T>,
+        override val serializer: SimpleSerializer<out T>,
     ) : LootPredicateType<T> {
         override fun toString(): String = "SimpleLootPredicateType(typeToken=$typeToken, serializer=$serializer)"
     }

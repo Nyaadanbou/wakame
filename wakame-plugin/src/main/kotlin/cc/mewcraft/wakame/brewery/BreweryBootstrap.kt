@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.brewery
 
-import cc.mewcraft.wakame.config.ConfigAccess
-import cc.mewcraft.wakame.config.registerSerializer
+import cc.mewcraft.lazyconfig.access.ConfigAccess
+import cc.mewcraft.lazyconfig.access.registerSerializer
 import cc.mewcraft.wakame.item.SlotDisplayLoreData
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -13,6 +13,6 @@ object BreweryBootstrap {
 
     @InitFun
     fun init() {
-        ConfigAccess.INSTANCE.registerSerializer(KOISH_NAMESPACE, SlotDisplayLoreData.SERIALIZER)
+        ConfigAccess.registerSerializer(KOISH_NAMESPACE, SlotDisplayLoreData.SERIALIZER)
     }
 }

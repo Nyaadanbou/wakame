@@ -1,5 +1,8 @@
 package cc.mewcraft.wakame.craftingstation
 
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.registerExact
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
@@ -9,7 +12,9 @@ import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.IdePauser
+import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
 

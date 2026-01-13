@@ -3,9 +3,9 @@ package cc.mewcraft.wakame.hook.impl.adventurelevel
 import cc.mewcraft.adventurelevel.event.AdventureLevelDataLoadEvent
 import cc.mewcraft.adventurelevel.level.category.LevelCategory
 import cc.mewcraft.adventurelevel.plugin.AdventureLevelProvider
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.entry
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.entity.player.PlayerDataLoadingCoordinator
 import cc.mewcraft.wakame.entity.player.ResourceLoadingFixHandler
 import cc.mewcraft.wakame.integration.Hook

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.serialization.configurate
+package cc.mewcraft.lazyconfig.configurate
 
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
@@ -6,10 +6,7 @@ import org.spongepowered.configurate.serialize.TypeSerializer
 import java.lang.reflect.AnnotatedType
 import java.lang.reflect.Type
 
-@Deprecated("Use TypeSerializer2 instead", ReplaceWith("TypeSerializer2<T>", "cc.mewcraft.wakame.serialization.configurate.TypeSerializer2"))
-typealias TypeSerializer<T> = TypeSerializer2<T>
-
-fun interface TypeSerializer2<T> : TypeSerializer<T> {
+fun interface SimpleSerializer<T> : TypeSerializer<T> {
 
     override fun deserialize(type: Type, node: ConfigurationNode): T?
     override fun deserialize(type: AnnotatedType, node: ConfigurationNode): T? = super.deserialize(type, node)

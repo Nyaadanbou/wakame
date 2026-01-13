@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.init
 
-import cc.mewcraft.wakame.config.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun

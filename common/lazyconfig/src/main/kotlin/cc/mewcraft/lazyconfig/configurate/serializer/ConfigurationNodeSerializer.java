@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.serialization.configurate.serializer;
+package cc.mewcraft.lazyconfig.configurate.serializer;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.BasicConfigurationNode;

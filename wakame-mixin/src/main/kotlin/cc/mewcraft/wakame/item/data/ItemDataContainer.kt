@@ -1,14 +1,14 @@
 package cc.mewcraft.wakame.item.data
 
+import cc.mewcraft.lazyconfig.configurate.STANDARD_SERIALIZERS
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.register
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.datafix.ItemDataFixer
 import cc.mewcraft.wakame.item.data.ItemDataContainer.Companion.build
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.serialization.configurate.STANDARD_SERIALIZERS
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.serialization.configurate.serializer.CompressedEnumValueSerializer
 import cc.mewcraft.wakame.serialization.configurate.serializer.IdentifierSerializer
-import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
 import com.mojang.serialization.Codec
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -304,7 +304,7 @@ private open class SimpleItemDataContainer(
         }}"
     }
 
-    object Serializer : TypeSerializer2<ItemDataContainer> {
+    object Serializer : SimpleSerializer<ItemDataContainer> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemDataContainer {
             // 修复过期的数据格式
             if (ItemDataFixer.needFix(node)) {

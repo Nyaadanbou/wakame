@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.behavior.impl.weapon
 
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.optionalEntry
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.optionalEntry
 import cc.mewcraft.wakame.damage.KoishDamageSources
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.hurt

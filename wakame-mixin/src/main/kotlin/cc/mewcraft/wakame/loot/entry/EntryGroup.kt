@@ -1,15 +1,15 @@
 package cc.mewcraft.wakame.loot.entry
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.loot.context.LootContext
 import cc.mewcraft.wakame.loot.predicate.LootPredicate
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 
 class EntryGroup<S>(
     children: List<LootPoolEntryContainer<S>>,
     conditions: List<LootPredicate>,
 ) : CompositeEntryBase<S>(children, conditions) {
     companion object {
-        val SERIALIZER: TypeSerializer2<EntryGroup<*>> = makeSerializer(::EntryGroup)
+        val SERIALIZER: SimpleSerializer<EntryGroup<*>> = makeSerializer(::EntryGroup)
     }
 
     override fun compose(children: List<ComposableEntryContainer<S>>): ComposableEntryContainer<S> {

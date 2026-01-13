@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.world
 
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.entry
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.cooldown.Cooldown
 import cc.mewcraft.wakame.util.javaTypeOf
-import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.world.WeatherControl.execute
 import org.bukkit.Bukkit
 import org.spongepowered.configurate.ConfigurationNode
@@ -75,7 +75,7 @@ object WeatherControl {
 
 // type serializer
 
-object WeatherControlActionSerializer : TypeSerializer2<WeatherControl.Action> {
+object WeatherControlActionSerializer : SimpleSerializer<WeatherControl.Action> {
     private val TYPE_MAPPINGS: Map<WeatherControl.ActionType, KType> = mapOf(
         WeatherControl.ActionType.SET_STORM to typeOf<SetStorm>(),
         WeatherControl.ActionType.SET_WEATHER_DURATION to typeOf<SetWeatherDuration>(),

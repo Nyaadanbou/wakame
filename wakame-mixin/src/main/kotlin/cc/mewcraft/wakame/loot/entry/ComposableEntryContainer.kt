@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.loot.entry
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.loot.context.LootContext
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.util.require
 import io.leangen.geantyref.GenericTypeReflector
 import io.leangen.geantyref.TypeFactory
 import org.spongepowered.configurate.ConfigurationNode
@@ -22,7 +22,7 @@ import java.lang.reflect.Type
 fun interface ComposableEntryContainer<S> {
 
     companion object {
-        val SERIALIZER: TypeSerializer2<ComposableEntryContainer<*>> = Serializer
+        val SERIALIZER: SimpleSerializer<ComposableEntryContainer<*>> = Serializer
 
         /**
          * 返回一个始终返回 `true` 的 [ComposableEntryContainer] 实例。
@@ -88,7 +88,7 @@ fun interface ComposableEntryContainer<S> {
         }
     }
 
-    private object Serializer : TypeSerializer2<ComposableEntryContainer<*>> {
+    private object Serializer : SimpleSerializer<ComposableEntryContainer<*>> {
         override fun deserialize(type: Type, node: ConfigurationNode): ComposableEntryContainer<*> {
             val id = node.node("type").require<String>()
             val dataType = BuiltInRegistries.LOOT_POOL_ENTRY_TYPE[id] ?: throw SerializationException(node, type, "Unknown loot pool entry type: $type")

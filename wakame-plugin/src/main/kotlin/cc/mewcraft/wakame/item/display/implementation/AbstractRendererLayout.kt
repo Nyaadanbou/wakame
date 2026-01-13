@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.display.implementation
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item.display.*
 import cc.mewcraft.wakame.util.argument.StringArgumentQueue
-import cc.mewcraft.wakame.util.yamlLoader
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet

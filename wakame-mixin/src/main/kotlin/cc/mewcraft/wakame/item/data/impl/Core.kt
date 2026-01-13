@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.item.data.impl
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.registerExact
+import cc.mewcraft.lazyconfig.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.Registry
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.registerExact
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -90,7 +90,7 @@ object CoreTypes {
  */
 data object VirtualCore : Core {
     @JvmField
-    val SERIALIZER: TypeSerializer2<VirtualCore> = object : TypeSerializer2<VirtualCore> {
+    val SERIALIZER: SimpleSerializer<VirtualCore> = object : SimpleSerializer<VirtualCore> {
         override fun deserialize(type: Type, node: ConfigurationNode): VirtualCore? {
             return if (!node.virtual()) VirtualCore else null
         }
@@ -115,7 +115,7 @@ data object VirtualCore : Core {
  */
 data object EmptyCore : Core {
     @JvmField
-    val SERIALIZER: TypeSerializer2<EmptyCore> = object : TypeSerializer2<EmptyCore> {
+    val SERIALIZER: SimpleSerializer<EmptyCore> = object : SimpleSerializer<EmptyCore> {
         override fun deserialize(type: Type, node: ConfigurationNode): EmptyCore? {
             return if (!node.virtual()) EmptyCore else null
         }

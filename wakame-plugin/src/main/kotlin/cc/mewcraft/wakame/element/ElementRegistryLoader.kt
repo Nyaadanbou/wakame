@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
-import cc.mewcraft.wakame.util.yamlLoader
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable

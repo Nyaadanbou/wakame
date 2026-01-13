@@ -1,23 +1,15 @@
 @file:JvmName("SerializerCollections")
 
-package cc.mewcraft.wakame.serialization.configurate
+package cc.mewcraft.lazyconfig.configurate
 
-import cc.mewcraft.wakame.serialization.configurate.mapper.KoishObjectMapper
-import cc.mewcraft.wakame.serialization.configurate.serializer.ArraySerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.ConfigurationNodeSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.ListSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.MapSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.PathSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.SetSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.UnitSerializer
-import cc.mewcraft.wakame.util.register
+import cc.mewcraft.lazyconfig.configurate.mapper.KoishObjectMapper
+import cc.mewcraft.lazyconfig.configurate.serializer.*
 import org.spongepowered.configurate.serialize.Scalars
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 /**
  * 这些序列化器可以处理 Java/Kotlin 标准库里的数据类型.
  */
-@JvmField
 val STANDARD_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
     .registerExact(Scalars.STRING)
     .registerExact(Scalars.BOOLEAN)

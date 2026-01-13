@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.hook.impl.papi
 
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.entry
 import cc.mewcraft.wakame.BootstrapContexts
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.integration.Hook

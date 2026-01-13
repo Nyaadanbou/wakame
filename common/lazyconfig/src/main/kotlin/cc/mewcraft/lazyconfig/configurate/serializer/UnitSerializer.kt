@@ -1,6 +1,6 @@
-package cc.mewcraft.wakame.serialization.configurate.serializer
+package cc.mewcraft.lazyconfig.configurate.serializer
 
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.SerializationException
@@ -13,7 +13,7 @@ import java.lang.reflect.Type
 // FIXME #350: 暂时用值为 0 Byte 来表示 Unit.
 //  正经做法是用空 Map 来表示 Unit, 但 ConfigurateOps
 //  在 decode 时无法读取到 NbtOps 的空 CompoundTag.
-/*internal*/ object UnitSerializer : TypeSerializer2<Unit> {
+/*internal*/ object UnitSerializer : SimpleSerializer<Unit> {
     const val ZERO_BYTE: Byte = 0
 
     override fun deserialize(type: Type, node: ConfigurationNode): Unit {

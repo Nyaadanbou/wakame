@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.datagen.impl
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
 import cc.mewcraft.wakame.item.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item.datagen.ItemMetaResult
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.util.MojangStack
 import io.papermc.paper.adventure.PaperAdventure
 import net.kyori.adventure.key.Key
@@ -17,7 +17,7 @@ sealed interface MetaItemModel : ItemMetaEntry<Key> {
     companion object {
 
         @JvmField
-        val SERIALIZER: TypeSerializer2<MetaItemModel> = DispatchingSerializer.createPartial<String, MetaItemModel>(
+        val SERIALIZER: SimpleSerializer<MetaItemModel> = DispatchingSerializer.createPartial<String, MetaItemModel>(
             mapOf(
                 "none" to None::class, // 其实完全不写 item_model 的话和这个效果一样
                 "auto" to Auto::class, // 自动使用物品类型的唯一标识作为 `minecraft:item_model`

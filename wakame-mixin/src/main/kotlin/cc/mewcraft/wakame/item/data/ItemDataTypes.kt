@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.data
 
+import cc.mewcraft.lazyconfig.configurate.register
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.data.impl.*
 import cc.mewcraft.wakame.kizami.Kizami
@@ -8,7 +9,6 @@ import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.JsonComponentSerializer
 import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
-import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.serialize.TypeSerializerCollection

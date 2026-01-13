@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.serialization.configurate.serializer;
+package cc.mewcraft.lazyconfig.configurate.serializer;
 
 import io.leangen.geantyref.GenericTypeReflector;
 import org.checkerframework.checker.nullness.qual.Nullable;

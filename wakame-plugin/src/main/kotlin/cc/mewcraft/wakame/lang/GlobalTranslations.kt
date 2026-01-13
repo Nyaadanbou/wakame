@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.lang
 
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.adventure.translator.MiniMessageTranslationRegistry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.RegistryLoader
-import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.yamlLoader
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.key.Key

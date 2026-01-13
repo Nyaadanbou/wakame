@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item.SlotDisplayLoreData.Companion.SERIALIZER
 import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import io.papermc.paper.datacomponent.DataComponentTypes
@@ -228,7 +228,7 @@ data class SlotDisplayLoreData(
     companion object {
 
         @JvmField
-        val SERIALIZER: TypeSerializer2<SlotDisplayLoreData> = Serializer
+        val SERIALIZER: SimpleSerializer<SlotDisplayLoreData> = Serializer
 
         /**
          * 配置并创建一个 [SlotDisplayLoreData] 实例.
@@ -238,7 +238,7 @@ data class SlotDisplayLoreData(
         }
     }
 
-    private object Serializer : TypeSerializer2<SlotDisplayLoreData> {
+    private object Serializer : SimpleSerializer<SlotDisplayLoreData> {
 
         override fun deserialize(type: Type, node: ConfigurationNode): SlotDisplayLoreData {
             val rawTextList = node.getList<String>(emptyList())

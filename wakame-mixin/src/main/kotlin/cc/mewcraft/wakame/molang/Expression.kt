@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.molang
 
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -30,7 +30,7 @@ interface Expression {
     fun evaluate(): Double
 }
 
-object ExpressionSerializer : TypeSerializer2<Expression> {
+object ExpressionSerializer : SimpleSerializer<Expression> {
     override fun deserialize(type: Type, node: ConfigurationNode): Expression {
         val string = node.get<String>()
         val evalNumber = string?.toDoubleOrNull()

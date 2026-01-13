@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.loot.entry
 
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import io.leangen.geantyref.TypeToken
 
 /**
@@ -12,7 +12,7 @@ sealed interface LootPoolEntryType<out T : ComposableEntryContainer<*>> {
     companion object {
         fun <T : ComposableEntryContainer<*>> create(
             token: TypeToken<T>,
-            serializer: TypeSerializer2<T>,
+            serializer: SimpleSerializer<T>,
         ): LootPoolEntryType<T> = Simple(token, serializer)
     }
 
@@ -24,11 +24,11 @@ sealed interface LootPoolEntryType<out T : ComposableEntryContainer<*>> {
     /**
      * [T] 的序列化器.
      */
-    val serializer: TypeSerializer2<out T>
+    val serializer: SimpleSerializer<out T>
 
     private class Simple<T : ComposableEntryContainer<*>>(
         override val typeToken: TypeToken<out T>,
-        override val serializer: TypeSerializer2<out T>,
+        override val serializer: SimpleSerializer<out T>,
     ) : LootPoolEntryType<T> {
         override fun toString(): String = "SimpleLootPoolEntryType(typeToken=$typeToken, serializer=$serializer)"
     }

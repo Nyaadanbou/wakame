@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.command.command
 
+import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategoryRegistryLoader
 import cc.mewcraft.wakame.catalog.item.CatalogItemLootTableRecipeRegistryLoader
 import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
-import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.craftingstation.CraftingStationRecipeRegistry
 import cc.mewcraft.wakame.craftingstation.CraftingStationRegistry
 import cc.mewcraft.wakame.damage.mapping.AttackCharacteristicDamageMappings
@@ -98,7 +98,7 @@ internal object PluginCommand : KoishCommandFactory<Source> {
 private object ReloadProcess {
 
     fun all() {
-        ConfigAccess.INSTANCE.reload()
+        ConfigAccess.reload()
 
         GlobalTranslations.reload()
 

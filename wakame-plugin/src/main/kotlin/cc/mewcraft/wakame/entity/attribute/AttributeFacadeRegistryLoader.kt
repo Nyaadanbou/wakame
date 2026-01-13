@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.entity.attribute
 
-import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.config.node
-import cc.mewcraft.wakame.config.optionalEntry
+import cc.mewcraft.lazyconfig.access.entry
+import cc.mewcraft.lazyconfig.access.node
+import cc.mewcraft.lazyconfig.access.optionalEntry
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.entity.attribute.bundle.*
@@ -17,7 +18,6 @@ import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.ReloadableProperty
 import cc.mewcraft.wakame.util.adventure.toSimpleString
-import cc.mewcraft.wakame.util.require
 import com.google.common.collect.ImmutableMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key

@@ -2,9 +2,9 @@
 
 package cc.mewcraft.wakame.lifecycle
 
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.optionalEntry
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.lifecycle.initializer.InitializerRunnable
 import com.google.common.graph.Graph
 import com.google.common.graph.MutableGraph

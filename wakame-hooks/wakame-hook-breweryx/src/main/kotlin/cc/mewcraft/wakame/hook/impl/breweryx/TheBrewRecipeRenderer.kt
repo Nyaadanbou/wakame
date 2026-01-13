@@ -1,14 +1,14 @@
 package cc.mewcraft.wakame.hook.impl.breweryx
 
+import cc.mewcraft.lazyconfig.access.ConfigAccess
+import cc.mewcraft.lazyconfig.access.entry
 import cc.mewcraft.wakame.brewery.BrewRecipe
 import cc.mewcraft.wakame.brewery.BrewRecipeRenderer
-import cc.mewcraft.wakame.config.ConfigAccess
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.item.SlotDisplayLoreData
 import cc.mewcraft.wakame.util.adventure.legacy
 import net.kyori.adventure.text.Component
 
-private val CONFIG = ConfigAccess.INSTANCE["brewery/config"]
+private val CONFIG = ConfigAccess["brewery/config"]
 
 /**
  * 一般的 [BrewRecipeRenderer] 实现.

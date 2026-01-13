@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.util
 
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.require
 import net.kyori.adventure.text.Component.text
 import org.spongepowered.configurate.BasicConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.messaging
 
-import cc.mewcraft.wakame.config.entryOrElse
+import cc.mewcraft.lazyconfig.access.entryOrElse
 import org.spongepowered.configurate.CommentedConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 

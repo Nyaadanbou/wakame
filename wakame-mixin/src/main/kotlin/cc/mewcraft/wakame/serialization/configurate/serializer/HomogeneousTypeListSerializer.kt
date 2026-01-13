@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.serialization.configurate.serializer
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.applyIfNull
 import io.papermc.paper.registry.RegistryAccess
@@ -21,7 +21,7 @@ object ItemTypeListSerializer : HomogeneousTypeListSerializer<ItemType>(Registry
 
 sealed class HomogeneousTypeListSerializer<T : Keyed>(
     private val registryKey: RegistryKey<T>,
-) : TypeSerializer2<List<T>> { // 修改泛型为 List<T>
+) : SimpleSerializer<List<T>> { // 修改泛型为 List<T>
 
     final override fun deserialize(type: Type, node: ConfigurationNode): List<T> {
         return node.getList<String>(emptyList())

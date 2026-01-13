@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.property.impl
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.EnumLookup
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
-import cc.mewcraft.wakame.util.require
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.*
 import net.kyori.adventure.key.InvalidKeyException
@@ -36,7 +36,7 @@ sealed interface ItemSlot : Examinable {
     companion object {
 
         @JvmField
-        val SERIALIZER: TypeSerializer2<ItemSlot> = ItemSlotSerializer
+        val SERIALIZER: SimpleSerializer<ItemSlot> = ItemSlotSerializer
 
         /**
          * 获取一个不存在的 [ItemSlot] 实例.
@@ -160,7 +160,7 @@ sealed interface ItemSlotGroup {
     companion object {
 
         @JvmField
-        val SERIALIZER: TypeSerializer2<ItemSlotGroup> = ItemSlotGroupSerializer
+        val SERIALIZER: SimpleSerializer<ItemSlotGroup> = ItemSlotGroupSerializer
 
         /**
          * 获取一个空的 [ItemSlotGroup] 实例.
@@ -391,7 +391,7 @@ private data class ExtraItemSlot(
     }
 }
 
-private object ItemSlotSerializer : TypeSerializer2<ItemSlot> {
+private object ItemSlotSerializer : SimpleSerializer<ItemSlot> {
     override fun emptyValue(specificType: Type, options: ConfigurationOptions): ItemSlot {
         return ItemSlot.empty()
     }
@@ -473,7 +473,7 @@ private class SimpleItemSlotGroup(
     }
 }
 
-private object ItemSlotGroupSerializer : TypeSerializer2<ItemSlotGroup> {
+private object ItemSlotGroupSerializer : SimpleSerializer<ItemSlotGroup> {
     override fun emptyValue(specificType: Type, options: ConfigurationOptions): ItemSlotGroup? {
         return ItemSlotGroup.empty()
     }

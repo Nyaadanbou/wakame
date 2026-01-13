@@ -3,6 +3,9 @@
 
 package cc.mewcraft.wakame.damage.mapping
 
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.registerExact
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.damage.DamageMetadataBuilder
@@ -13,10 +16,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.registerExact
-import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.yamlLoader
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.bukkit.damage.DamageType
 import org.bukkit.entity.EntityType

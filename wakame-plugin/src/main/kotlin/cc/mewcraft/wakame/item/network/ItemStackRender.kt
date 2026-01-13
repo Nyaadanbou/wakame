@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.network
 
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.optionalEntry
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.item.display.ItemRenderers
 import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.item.koishTypeId

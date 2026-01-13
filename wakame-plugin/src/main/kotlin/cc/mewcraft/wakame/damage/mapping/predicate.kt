@@ -2,10 +2,10 @@
 
 package cc.mewcraft.wakame.damage.mapping
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.damage.RawDamageContext
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.serialization.configurate.extension.transformKeys
-import cc.mewcraft.wakame.util.require
 import org.bukkit.damage.DamageType
 import org.bukkit.entity.*
 import org.spongepowered.configurate.kotlin.extensions.getList
@@ -20,7 +20,7 @@ internal sealed interface DamagePredicate {
     fun test(context: RawDamageContext): Boolean
 
     companion object {
-        fun serializer(): TypeSerializer<DamagePredicate> = TypeSerializer2 { type, node -> // FIXME 使用 DispatchingTypeSerializer 替代
+        fun serializer(): TypeSerializer<DamagePredicate> = SimpleSerializer { type, node -> // FIXME 使用 DispatchingTypeSerializer 替代
             // FIXME 这里没有使用单独的 Node 来指定 type, 而是用的 Node 本身的 key 来指定 type
             //  截止 1/26 DispatchingTypeSerializer 仅支持在单独的 Node 上指定 type
             //  新的 DispatchingTypeSerializer 实现应该支持这种 “inline” type

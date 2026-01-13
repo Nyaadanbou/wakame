@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.loot
 
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.loot.context.LootContext
 import cc.mewcraft.wakame.loot.entry.ComposableEntryContainer
 import cc.mewcraft.wakame.loot.predicate.LootPredicate
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.yamlLoader
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import kotlin.test.Test

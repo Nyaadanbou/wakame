@@ -48,11 +48,8 @@ dependencies {
     api(local.commons.reflection)
     api(local.commons.tuple)
 
-    // 配置文件
-    api(platform(libs.bom.configurate.yaml))
-    api(platform(libs.bom.configurate.gson))
-    api(platform(libs.bom.configurate.extra.kotlin))
-    api(platform(libs.bom.configurate.extra.dfu8))
+    // 配置
+    api(project(":common:lazyconfig"))
 
     // 跨进程通讯
     api(local.messenger)

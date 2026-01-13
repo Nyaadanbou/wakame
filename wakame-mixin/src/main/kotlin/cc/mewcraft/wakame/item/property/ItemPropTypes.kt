@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.property
 
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.registerExact
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.integration.skill.SkillWrapper
@@ -19,8 +21,6 @@ import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
 import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.registerExact
 import cc.mewcraft.wakame.util.typeTokenOf
 import cc.mewcraft.wakame.world.WeatherControl
 import net.kyori.adventure.text.Component
