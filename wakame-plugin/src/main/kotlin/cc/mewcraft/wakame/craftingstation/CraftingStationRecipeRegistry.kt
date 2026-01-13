@@ -9,16 +9,11 @@ import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
 
-@Init(
-    stage = InitStage.POST_WORLD,
-)
-@Reload
+@Init(InitStage.POST_WORLD)
 internal object CraftingStationRecipeRegistry {
 
     @VisibleForTesting
@@ -36,7 +31,6 @@ internal object CraftingStationRecipeRegistry {
         registerStationRecipes()
     }
 
-    @ReloadFun
     fun reload() {
         loadDataIntoRegistry()
         registerStationRecipes()

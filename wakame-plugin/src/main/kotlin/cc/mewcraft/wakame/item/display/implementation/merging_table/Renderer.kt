@@ -19,8 +19,6 @@ import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.reforge.merge.MergingSession
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
@@ -39,10 +37,7 @@ internal sealed interface MergingTableContext {
     data class MergeOutputSlot(val session: MergingSession) : MergingTableContext
 }
 
-@Init(
-    stage = InitStage.POST_WORLD
-)
-@Reload
+@Init(InitStage.POST_WORLD)
 internal object MergingTableItemRenderer : AbstractItemRenderer<MergingTableContext>() {
     override val name: String = "merging_table"
     override val formats = MergingTableRendererFormatRegistry(this)
@@ -54,7 +49,6 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<MergingTableCont
         loadDataFromConfigs()
     }
 
-    @ReloadFun
     fun reload() {
         loadDataFromConfigs()
     }

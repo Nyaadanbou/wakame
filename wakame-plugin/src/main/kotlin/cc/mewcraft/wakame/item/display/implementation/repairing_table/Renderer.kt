@@ -8,8 +8,6 @@ import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.util.item.fastLore
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component.text
@@ -25,10 +23,7 @@ internal class RepairingTableItemRendererLayout : AbstractRendererLayout(Repairi
 
 internal data class RepairingTableItemRendererContext(val damage: Int, val maxDamage: Int, val repairCost: Double)
 
-@Init(
-    stage = InitStage.POST_WORLD
-)
-@Reload
+@Init(InitStage.POST_WORLD)
 internal object RepairingTableItemRenderer : AbstractItemRenderer<RepairingTableItemRendererContext>() {
     override val name: String = "repairing_table"
     override val formats: AbstractRendererFormatRegistry = RepairingTableRendererFormatRegistry()
@@ -40,7 +35,6 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<RepairingTable
         loadDataFromConfigs()
     }
 
-    @ReloadFun
     fun reload() {
         loadDataFromConfigs()
     }

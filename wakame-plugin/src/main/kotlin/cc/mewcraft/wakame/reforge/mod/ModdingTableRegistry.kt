@@ -3,16 +3,11 @@ package cc.mewcraft.wakame.reforge.mod
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 
 /**
  * 定制台的注册表.
  */
-@Init(
-    stage = InitStage.POST_WORLD
-)
-@Reload()
+@Init(InitStage.POST_WORLD)
 object ModdingTableRegistry {
     private val tables = HashMap<String, ModdingTable>()
 
@@ -27,7 +22,6 @@ object ModdingTableRegistry {
         load()
     }
 
-    @ReloadFun
     fun reload() {
         load()
     }

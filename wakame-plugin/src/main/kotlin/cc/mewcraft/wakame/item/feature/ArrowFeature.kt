@@ -16,7 +16,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent
 /**
  * 实现了自定义箭矢.
  */
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 object ArrowFeature : Listener {
 
     init {

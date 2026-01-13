@@ -19,7 +19,7 @@ import org.incendo.cloud.paper.util.sender.PaperSimpleSenderMapper
 import org.incendo.cloud.paper.util.sender.Source
 import org.incendo.cloud.setting.ManagerSetting
 
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 internal object KoishCommandManager {
 
     private lateinit var manager: PaperCommandManager.Bootstrapped<Source>

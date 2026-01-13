@@ -12,7 +12,7 @@ import org.bukkit.event.inventory.FurnaceBurnEvent
 /**
  * 实现了自定义燃料.
  */
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 object FuelFeature : Listener {
 
     init {

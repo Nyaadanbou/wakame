@@ -49,6 +49,8 @@ interface ConfigAccess {
 
     }
 
+    fun reload(): List<Identifier>
+
     /**
      * 返回指定配置文件的 [Provider].
      *

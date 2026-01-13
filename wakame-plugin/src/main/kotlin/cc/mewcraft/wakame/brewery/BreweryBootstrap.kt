@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 
-@Init(stage = InitStage.PRE_CONFIG)
+@Init(InitStage.PRE_CONFIG)
 object BreweryBootstrap {
 
     @InitFun

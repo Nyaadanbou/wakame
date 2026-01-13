@@ -2,9 +2,6 @@ package cc.mewcraft.wakame.config
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.feature.Feature
-import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
-import cc.mewcraft.wakame.lifecycle.initializer.InternalInitStage
-import cc.mewcraft.wakame.lifecycle.reloader.InternalReload
 import cc.mewcraft.wakame.serialization.configurate.STANDARD_SERIALIZERS
 import cc.mewcraft.wakame.serialization.configurate.typeserializer.KOISH_SERIALIZERS
 import cc.mewcraft.wakame.util.Identifier
@@ -13,7 +10,6 @@ import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import io.leangen.geantyref.TypeToken
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.jetbrains.annotations.VisibleForTesting
 import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -24,21 +20,19 @@ import java.nio.file.Path
 import kotlin.io.path.exists
 import kotlin.io.path.getLastModifiedTime
 
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
-@InternalReload
 internal object Configs : ConfigAccess {
+
+    private const val UNINITIALIZED_LAST_RELOAD = -1L
 
     private val customSerializers = HashMap<String, TypeSerializerCollection.Builder>()
     private val configProviders = HashMap<Identifier, RootConfigProvider>()
-
-    private const val UNINITIALIZED_LAST_RELOAD = -1L
 
     /**
      * 最后一次重新加载的时间戳.
      */
     private var lastReload = UNINITIALIZED_LAST_RELOAD
 
-    fun initialize() {
+    internal fun initialize() {
         // 先提取必要的文件到插件数据目录, 否则接下来 reload 会读取到空文件
         ConfigsExtractor.extractDefaults()
 
@@ -51,20 +45,11 @@ internal object Configs : ConfigAccess {
             .forEach { it.reload() }
     }
 
-    private fun resolveConfigPath(configId: Identifier): Path {
-        val dataFolder = when (configId.namespace()) {
-            KOISH_NAMESPACE -> KoishDataPaths.ROOT // -> plugins/<data_folder>
-            else -> throw IllegalArgumentException("Only 'koish' namespace is currently supported.")
-        }
-        return dataFolder.resolve("configs").resolve(configId.value() + ".yml")
-    }
-
-    @VisibleForTesting
     internal fun cleanup() {
         configProviders.clear()
     }
 
-    internal fun reload(): List<Identifier> {
+    override fun reload(): List<Identifier> {
         val reloadedConfigs = configProviders
             .asSequence()
             .filter { (_, provider) ->
@@ -152,4 +137,12 @@ internal object Configs : ConfigAccess {
         return createBuilder(namespace).path(path).build()
     }
 
+
+    private fun resolveConfigPath(configId: Identifier): Path {
+        val dataFolder = when (configId.namespace()) {
+            KOISH_NAMESPACE -> KoishDataPaths.ROOT // -> plugins/<data_folder>
+            else -> throw IllegalArgumentException("Only 'koish' namespace is currently supported.")
+        }
+        return dataFolder.resolve("configs").resolve(configId.value() + ".yml")
+    }
 }

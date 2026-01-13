@@ -21,7 +21,7 @@ import org.bukkit.inventory.ItemStack
  * 即可如原版般在配方系统中使用标签, 简化编写配方配置文件的工作量.
  * TODO 自动识别数据包标签并注册替换相应原版配方
  */
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 object ItemTagManager {
 
     /**

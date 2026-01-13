@@ -3,8 +3,6 @@ package cc.mewcraft.wakame.entity.typeref
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
@@ -14,8 +12,7 @@ import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 
-@Init(stage = InitStage.PRE_WORLD)
-@Reload
+@Init(InitStage.PRE_WORLD)
 internal object EntityRefRegistryLoader : RegistryLoader {
     private const val FILE_PATH = "entities.yml"
 
@@ -26,7 +23,6 @@ internal object EntityRefRegistryLoader : RegistryLoader {
         BuiltInRegistries.ENTITY_REF.freeze()
     }
 
-    @ReloadFun
     fun reload() {
         consumeData(BuiltInRegistries.ENTITY_REF::update)
     }

@@ -6,8 +6,6 @@ import cc.mewcraft.wakame.api.element.ElementProvider
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
@@ -20,8 +18,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import cc.mewcraft.wakame.api.element.Element as ApiElement
 
-@Init(stage = InitStage.PRE_WORLD)
-@Reload
+@Init(InitStage.PRE_WORLD)
 internal object ElementRegistryLoader : RegistryLoader {
 
     @InitFun
@@ -30,13 +27,10 @@ internal object ElementRegistryLoader : RegistryLoader {
         consumeData(BuiltInRegistries.ELEMENT::add)
         BuiltInRegistries.ELEMENT.freeze()
 
-        // register the provider
         ElementProvider.register(BuiltInElementProvider)
     }
 
-    @ReloadFun
     fun reload() {
-        // update existing registry
         consumeData(BuiltInRegistries.ELEMENT::update)
     }
 

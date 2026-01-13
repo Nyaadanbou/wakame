@@ -16,7 +16,7 @@ import org.bukkit.Bukkit
 import org.objectweb.asm.Type
 import kotlin.reflect.KClass
 
-@Init(stage = InitStage.PRE_FLEKS)
+@Init(InitStage.PRE_FLEKS)
 internal object HooksLoader {
 
     @InitFun

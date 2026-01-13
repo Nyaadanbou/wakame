@@ -40,7 +40,7 @@ import org.bukkit.inventory.view.AnvilView
 // FIXME 这功能不太能用 ItemBehavior 实现, 因为在一次事件中涉及到多个物品, 具体原因类似我们如何实现属性机制一样
 //  但从包含与否的关系来看, 单独写个监听器(类似这里的 xxxFeature) 实际上是包含了 ItemBehavior 的所有功能的
 //  我在考虑要不要把 ItemBehavior 干掉换成这种实现得了
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 object EnchantSlotFeature : Listener {
 
     private val ENCHANT_SLOT_BASE_PROVIDER: SlotBaseProviderType by MAIN_CONFIG.entryOrElse<SlotBaseProviderType>(SlotBaseProviderType.NONE, "enchant_slot_base_provider")

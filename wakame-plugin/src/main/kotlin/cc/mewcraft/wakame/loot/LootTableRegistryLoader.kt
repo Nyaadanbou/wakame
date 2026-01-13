@@ -2,14 +2,14 @@ package cc.mewcraft.wakame.loot
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.kizami.KizamiRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
@@ -23,10 +23,11 @@ import io.leangen.geantyref.TypeToken
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
+        ElementRegistryLoader::class,
+        KizamiRegistryLoader::class,
         AttributeFacadeRegistryLoader::class
     ]
 )
-@Reload
 internal object LootTableRegistryLoader : RegistryLoader {
 
     @InitFun
@@ -36,7 +37,6 @@ internal object LootTableRegistryLoader : RegistryLoader {
         BuiltInRegistries.LOOT_TABLE.freeze()
     }
 
-    @ReloadFun
     fun reload() {
         consumeData(BuiltInRegistries.LOOT_TABLE::update)
     }
@@ -46,7 +46,6 @@ internal object LootTableRegistryLoader : RegistryLoader {
 
         val loader = yamlLoader {
             withDefaults()
-
             serializers {
                 registerAll(Core.serializers())
             }

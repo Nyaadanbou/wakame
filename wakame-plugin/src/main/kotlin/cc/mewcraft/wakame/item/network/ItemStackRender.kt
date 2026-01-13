@@ -44,7 +44,7 @@ private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "r
 /**
  * 修改 [net.minecraft.world.item.ItemStack].
  */
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 internal object ItemStackRender : PacketListener, Listener {
 
     @InitFun

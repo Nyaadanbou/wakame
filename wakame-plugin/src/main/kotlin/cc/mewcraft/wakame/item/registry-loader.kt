@@ -11,8 +11,6 @@ import cc.mewcraft.wakame.item.property.ItemPropContainer
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.loot.LootTableRegistryLoader
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
@@ -39,13 +37,8 @@ private val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.bui
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
+        LootTableRegistryLoader::class, // deps: 需要直接的数据
         AttributeFacadeRegistryLoader::class, // deps: 需要直接的数据
-        LootTableRegistryLoader::class
-    ]
-)
-@Reload(
-    runAfter = [
-        LootTableRegistryLoader::class // 需要在掉落表加载后加载物品
     ]
 )
 internal object CustomItemRegistryLoader : RegistryLoader {
@@ -62,7 +55,6 @@ internal object CustomItemRegistryLoader : RegistryLoader {
         BuiltInRegistries.ITEM.freeze()
     }
 
-    @ReloadFun
     fun reload() {
         consumeData(BuiltInRegistries.ITEM::update)
     }
@@ -101,12 +93,9 @@ internal object CustomItemRegistryLoader : RegistryLoader {
 /**
  * 加载 *原版套皮物品类型*.
  *
- * 命名空间 `minecraft` 下的物品仅用于实现原版套皮物品,
- * 在游戏内不允许通过指令/后台指令, 图鉴等手段获取.
- * 代码上仍然可以直接访问该命名空间下的物品.
+ * 在游戏内不允许通过指令/后台指令, 图鉴等手段获取. 代码上仍然可以直接访问该命名空间下的物品.
  */
-@Init(stage = InitStage.POST_WORLD) // 套皮物品的初始化需要生成 NMS ItemStack, 而此时会调用一些 Paper 的实例但这些实例并未初始化完毕, 因此 POST_WORLD
-@Reload
+@Init(InitStage.POST_WORLD) // 套皮物品的初始化需要生成 NMS ItemStack, 而此时会调用一些 Paper 的实例但这些实例并未初始化完毕, 因此 POST_WORLD
 internal object ItemProxyRegistryLoader : RegistryLoader {
 
     @InitFun
@@ -119,7 +108,6 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         runTask(::validateItemProxies)
     }
 
-    @ReloadFun
     fun reload() {
         consumeData(BuiltInRegistries.ITEM_PROXY::update)
     }

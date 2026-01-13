@@ -5,8 +5,6 @@ import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
@@ -26,7 +24,6 @@ import org.spongepowered.configurate.kotlin.extensions.get
         AttributeFacadeRegistryLoader::class, // deps: 需要直接的数据, 必须在其之后
     ]
 )
-@Reload
 internal object KizamiRegistryLoader : RegistryLoader {
 
     @InitFun
@@ -36,7 +33,6 @@ internal object KizamiRegistryLoader : RegistryLoader {
         BuiltInRegistries.KIZAMI.freeze()
     }
 
-    @ReloadFun
     fun reload() {
         consumeData(BuiltInRegistries.KIZAMI::update)
     }

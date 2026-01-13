@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
 // 临时修复 FancyDrops 产生的物品实体依然会被其他玩家拾取的问题
 // 如果 MM 修复了这个问题那么这个 object 就不需要了
 
-//@Init(stage = InitStage.POST_WORLD)
+//@Init(InitStage.POST_WORLD)
 object MobDropListener {
 
     //@InitFun

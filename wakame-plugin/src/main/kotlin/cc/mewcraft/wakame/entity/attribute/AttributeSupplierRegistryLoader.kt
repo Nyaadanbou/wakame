@@ -4,8 +4,6 @@ import cc.mewcraft.wakame.element.ElementRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.extension.transformKeys
@@ -16,11 +14,11 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 
 @Init(
-    stage = InitStage.PRE_WORLD, runAfter = [
+    stage = InitStage.PRE_WORLD,
+    runAfter = [
         ElementRegistryLoader::class, // deps: 反序列化时必须知道所有已知的元素类型
     ]
 )
-@Reload
 internal object AttributeSupplierRegistryLoader : RegistryLoader {
     const val FILE_PATH = "entities.yml"
 
@@ -31,7 +29,6 @@ internal object AttributeSupplierRegistryLoader : RegistryLoader {
         BuiltInRegistries.ATTRIBUTE_SUPPLIER.freeze()
     }
 
-    @ReloadFun
     fun reload() {
         consumeData(BuiltInRegistries.ATTRIBUTE_SUPPLIER::update)
     }

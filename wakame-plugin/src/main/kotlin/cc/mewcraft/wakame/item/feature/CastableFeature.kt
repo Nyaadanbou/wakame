@@ -16,7 +16,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInputEvent
 
 
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 object CastableFeature : Listener {
 
     init {

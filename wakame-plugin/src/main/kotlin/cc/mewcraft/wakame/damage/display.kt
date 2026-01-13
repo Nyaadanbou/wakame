@@ -46,7 +46,7 @@ private val SEPARATED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("separated")
 /**
  * 该 object 实现了元素伤害显示的功能.
  */
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 internal object DamageDisplay : Listener {
 
     // 这些 Vector3f 实例都是可变的, 请注意副作用 !!!
@@ -381,7 +381,7 @@ internal data class DamageDisplayAnimation(
     val negativeData: AnimationData,
 )
 
-@Init(stage = InitStage.PRE_CONFIG)
+@Init(InitStage.PRE_CONFIG)
 internal object DamageDisplayAnimationSerializer : TypeSerializer2<DamageDisplayAnimation> {
     override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplayAnimation {
         val delay = node.node("delay").require<Long>()
@@ -414,7 +414,7 @@ internal enum class DamageDisplayMode {
     MERGED, SEPARATED
 }
 
-@Init(stage = InitStage.PRE_CONFIG)
+@Init(InitStage.PRE_CONFIG)
 internal object DamageDisplaySettingsSerializer : TypeSerializer2<DamageDisplaySettings> {
 
     override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplaySettings = when (node.require<DamageDisplayMode>()) {

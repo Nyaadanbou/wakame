@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.lifecycle.initializer.InitializerRunnable
-import cc.mewcraft.wakame.lifecycle.reloader.ReloaderRunnable
 import com.google.common.graph.Graph
 import com.google.common.graph.MutableGraph
 import kotlinx.coroutines.*
@@ -39,18 +38,11 @@ internal object LifecycleUtils {
             override fun dispatcher(): CoroutineDispatcher? = value.dispatcher
             override suspend fun execute() = value.run()
         }
-
-        class Reload(override val value: ReloaderRunnable<*>) : TaskWrapper<ReloaderRunnable<*>> {
-            override fun completion(): Deferred<Unit> = value.completion
-            override fun dispatcher(): CoroutineDispatcher? = value.dispatcher
-            override suspend fun execute() = value.run()
-        }
     }
 
     private fun wrapTask(task: Any): TaskWrapper<*> {
         return when (task) {
             is InitializerRunnable<*> -> TaskWrapper.Init(task)
-            is ReloaderRunnable<*> -> TaskWrapper.Reload(task)
             else -> error("Unhandled task type: $task")
         }
     }

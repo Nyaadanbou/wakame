@@ -5,8 +5,6 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry.DynamicRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
@@ -14,8 +12,7 @@ import cc.mewcraft.wakame.util.*
 import kotlin.io.path.*
 
 
-@Init(stage = InitStage.POST_WORLD)
-@Reload
+@Init(InitStage.POST_WORLD)
 internal object CatalogItemCategoryRegistryLoader : RegistryLoader {
 
     @InitFun
@@ -25,7 +22,6 @@ internal object CatalogItemCategoryRegistryLoader : RegistryLoader {
         DynamicRegistries.ITEM_CATEGORY.freeze()
     }
 
-    @ReloadFun
     fun reload() {
         applyDataToRegistry(DynamicRegistries.ITEM_CATEGORY::update)
     }

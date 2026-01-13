@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 
 // TODO 迁移逻辑
 
-@Init(stage = InitStage.PRE_WORLD)
+@Init(InitStage.PRE_WORLD)
 object ItemInitializer {
 
     @InitFun
@@ -27,7 +27,7 @@ object ItemInitializer {
     }
 }
 
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 object ItemTagInitializer {
 
     @InitFun

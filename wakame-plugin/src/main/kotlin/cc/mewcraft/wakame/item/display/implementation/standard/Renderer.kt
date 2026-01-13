@@ -25,8 +25,6 @@ import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.item.fastLore
@@ -54,8 +52,7 @@ internal class StandardRendererFormatRegistry(renderer: StandardItemRenderer) : 
 
 internal class StandardRendererLayout(renderer: StandardItemRenderer) : AbstractRendererLayout(renderer)
 
-@Init(stage = InitStage.POST_WORLD)
-@Reload
+@Init(InitStage.POST_WORLD)
 internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
     override val name = "standard"
     override val formats = StandardRendererFormatRegistry(this)
@@ -70,7 +67,6 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         loadExtraDataFromConfigs()
     }
 
-    @ReloadFun
     fun reload() {
         loadDataFromConfigs()
         loadExtraDataFromConfigs()

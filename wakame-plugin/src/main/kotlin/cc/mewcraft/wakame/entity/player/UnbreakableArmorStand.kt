@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
 /**
  * 阻止玩家在非潜行状态下破坏盔甲架.
  */
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 internal object UnbreakableArmorStand : Listener {
 
     @InitFun

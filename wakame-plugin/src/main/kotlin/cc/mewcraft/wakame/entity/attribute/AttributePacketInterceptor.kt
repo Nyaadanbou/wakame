@@ -20,7 +20,7 @@ import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.entity.Player
 
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 internal object AttributePacketInterceptor : PacketListener {
 
     private val SHADOW_PLAYER: ShadowPlayer = BukkitShadowFactory.global().staticShadow()
