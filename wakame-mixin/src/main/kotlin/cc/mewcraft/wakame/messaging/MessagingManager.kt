@@ -26,9 +26,62 @@ import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 import java.util.function.Supplier
 
-object MessagingManager {
+class MessagingManager(
+    private val config: MessagingConfig,
+) {
 
-    private const val PROTOCOL_VERSION: Byte = 1
+    companion object {
+
+        private const val PROTOCOL_VERSION: Byte = 1
+
+        private lateinit var instance: MessagingManager
+
+        /**
+         * 初始化全局 [MessagingManager] 实例.
+         */
+        fun init(config: MessagingConfig) {
+            instance = MessagingManager(config)
+        }
+
+        /**
+         * 初始化消息服务.
+         */
+        fun start() = instance.start()
+
+        /**
+         * 关闭消息服务.
+         */
+        fun shutdown() = instance.shutdown()
+
+        /**
+         * 获取 serverId.
+         */
+        val serverId: UUID get() = instance.serverId
+
+        /**
+         * 获取 serverKey.
+         */
+        val serverKey: String get() = instance.serverKey
+
+        /**
+         * 获取 serverGroup.
+         */
+        val serverGroup: String get() = instance.serverGroup
+
+        /**
+         * 队列数据包.
+         */
+        fun queuePacketAndFlush(makePacket: Supplier<out AbstractPacket>) {
+            instance.queuePacketAndFlush(makePacket)
+        }
+
+        /**
+         * 队列数据包.
+         */
+        fun queuePacket(makePacket: Supplier<out AbstractPacket>) {
+            instance.queuePacket(makePacket)
+        }
+    }
 
     /**
      * @see ServerInfoProvider.serverId
@@ -55,10 +108,10 @@ object MessagingManager {
     private lateinit var packetService: PacketService
 
     /**
-     * 初始化消息服务.
+     * 启动消息服务.
      */
-    fun init() {
-        if (MessagingConfig.enabled) {
+    fun start() {
+        if (config.enabled) {
             LOGGER.info("Initializing messaging service...")
         } else {
             LOGGER.info("Messaging service disabled in config.")
@@ -87,8 +140,8 @@ object MessagingManager {
         val handler = MessagingHandlerImpl(this.packetService)
 
         // 添加消息处理器
-        handler.addHandler(KoishServerHandler(this.serverId, this.packetService, handler))
-        handler.addHandler(KoishPacketHandler(this.serverId, this.packetService))
+        handler.addHandler(KoishServerMessagingHandler(this.serverId, this.packetService, handler))
+        handler.addHandler(MessagingHandler(this.serverId, this.packetService))
 
         this.messagingService = try {
             initMessagingService(this.packetService, handler, File("/"))
@@ -117,7 +170,7 @@ object MessagingManager {
     }
 
     /**
-     * 关闭消息服务并施放资源.
+     * 关闭消息服务并释放资源.
      */
     fun shutdown() {
         if (this::scheduledExecutor.isInitialized) {
@@ -149,9 +202,9 @@ object MessagingManager {
         packetDir: File,
     ): MessagingService {
         val name = "engine1"
-        val channelName = "koish-data"
+        val channelName = "koish-core"
 
-        val messagingService = when (MessagingConfig.brokerType) {
+        val messagingService = when (config.brokerType) {
             MessagingConfig.BrokerType.NONE -> {
                 throw IllegalStateException("MessagingManager initialized with no messaging broker selected!")
             }
@@ -159,9 +212,9 @@ object MessagingManager {
             MessagingConfig.BrokerType.NATS -> {
                 LOGGER.info("Initializing NATS messaging service...")
 
-                val host = MessagingConfig.NATS.host
-                val port = MessagingConfig.NATS.port
-                val credentialsFile = MessagingConfig.NATS.credentialsFile
+                val host = config.NATS().host
+                val port = config.NATS().port
+                val credentialsFile = config.NATS().credentialsFile
                 val builder = NATSMessagingService.builder(packetService, name, channelName, this.serverId, handlerImpl, 0L, false, packetDir)
                     .url(host, port)
                     .life(5000)
@@ -174,12 +227,13 @@ object MessagingManager {
             MessagingConfig.BrokerType.RABBITMQ -> {
                 LOGGER.info("Initializing RABBITMQ messaging service...")
 
-                val host = MessagingConfig.RabbitMQ.host
-                val port = MessagingConfig.RabbitMQ.port
-                val vhost = MessagingConfig.RabbitMQ.vhost
-                val username = MessagingConfig.RabbitMQ.username
-                val password = MessagingConfig.RabbitMQ.password
-                val builder = RabbitMQMessagingService.builder(packetService, name, channelName, this.serverId, handlerImpl, 0L, false, packetDir)
+                val host = config.RabbitMQ().host
+                val port = config.RabbitMQ().port
+                val vhost = config.RabbitMQ().vhost
+                val username = config.RabbitMQ().username
+                val password = config.RabbitMQ().password
+                val builder = RabbitMQMessagingService
+                    .builder(packetService, name, channelName, this.serverId, handlerImpl, 0L, false, packetDir)
                     .url(host, port, vhost)
                 if (password != null && password.isNotBlank()) {
                     builder.credentials(username, password)
@@ -190,10 +244,11 @@ object MessagingManager {
             MessagingConfig.BrokerType.REDIS -> {
                 LOGGER.info("Initializing REDIS messaging service...")
 
-                val host = MessagingConfig.Redis.host
-                val port = MessagingConfig.Redis.port
-                val password = MessagingConfig.Redis.password
-                val builder = RedisMessagingService.builder(packetService, name, channelName, this.serverId, handlerImpl, 0L, false, packetDir)
+                val host = config.Redis().host
+                val port = config.Redis().port
+                val password = config.Redis().password
+                val builder = RedisMessagingService
+                    .builder(packetService, name, channelName, this.serverId, handlerImpl, 0L, false, packetDir)
                     .url(host, port)
                 if (password != null && password.isNotBlank()) {
                     builder.credentials(password)
@@ -215,7 +270,7 @@ object MessagingManager {
         }
     }
 
-    private class KoishServerHandler(
+    private class KoishServerMessagingHandler(
         serverId: UUID,
         packetService: PacketService,
         messagingHandler: MessagingHandler,

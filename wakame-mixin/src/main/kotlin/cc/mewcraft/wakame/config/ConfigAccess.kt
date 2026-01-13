@@ -18,20 +18,6 @@ import java.nio.file.Path
 val MAIN_CONFIG: Provider<CommentedConfigurationNode> = ConfigAccess.INSTANCE["config"]
 
 /**
- * 注册自定义 [serializer] 用于 [feature] 的配置文件.
- */
-inline fun <reified T> ConfigAccess.registerSerializer(feature: Feature, serializer: TypeSerializer<T>) {
-    ConfigAccess.INSTANCE.registerSerializer(feature, typeTokenOf(), serializer)
-}
-
-/**
- * 注册自定义 [serializer] 用于 [namespace] 的配置文件.
- */
-inline fun <reified T> ConfigAccess.registerSerializer(namespace: String, serializer: TypeSerializer<T>) {
-    ConfigAccess.INSTANCE.registerSerializer(namespace, typeTokenOf(), serializer)
-}
-
-/**
  * 用于访问配置文件的 [Provider].
  */
 interface ConfigAccess {
@@ -40,16 +26,14 @@ interface ConfigAccess {
 
         @get:JvmStatic
         @get:JvmName("getInstance")
-        lateinit var INSTANCE: ConfigAccess private set
+        lateinit var INSTANCE: ConfigAccess
+            private set
 
         @ApiStatus.Internal
         fun register(instance: ConfigAccess) {
             this.INSTANCE = instance
         }
-
     }
-
-    fun reload(): List<Identifier>
 
     /**
      * 返回指定配置文件的 [Provider].
@@ -127,9 +111,25 @@ interface ConfigAccess {
     // ------------
 
     @ApiStatus.Internal
+    fun reload(): List<Identifier>
+
+    @ApiStatus.Internal
     fun createBuilder(namespace: String): YamlConfigurationLoader.Builder
 
     @ApiStatus.Internal
     fun createLoader(namespace: String, path: Path): YamlConfigurationLoader
+}
 
+/**
+ * 注册自定义 [serializer] 用于 [feature] 的配置文件.
+ */
+inline fun <reified T> ConfigAccess.registerSerializer(feature: Feature, serializer: TypeSerializer<T>) {
+    ConfigAccess.INSTANCE.registerSerializer(feature, typeTokenOf(), serializer)
+}
+
+/**
+ * 注册自定义 [serializer] 用于 [namespace] 的配置文件.
+ */
+inline fun <reified T> ConfigAccess.registerSerializer(namespace: String, serializer: TypeSerializer<T>) {
+    ConfigAccess.INSTANCE.registerSerializer(namespace, typeTokenOf(), serializer)
 }

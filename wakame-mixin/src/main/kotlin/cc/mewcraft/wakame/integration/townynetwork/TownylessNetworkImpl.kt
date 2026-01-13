@@ -2,7 +2,11 @@ package cc.mewcraft.wakame.integration.townynetwork
 
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.messaging.MessagingManager
-import cc.mewcraft.wakame.messaging.packet.*
+import cc.mewcraft.wakame.messaging.handler.TownyNetworkPacketHandler
+import cc.mewcraft.wakame.messaging.packet.NationSpawnRequestPacket
+import cc.mewcraft.wakame.messaging.packet.NationSpawnResponsePacket
+import cc.mewcraft.wakame.messaging.packet.TownSpawnRequestPacket
+import cc.mewcraft.wakame.messaging.packet.TownSpawnResponsePacket
 import cc.mewcraft.wakame.util.ProxyServerSwitcher
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
@@ -14,7 +18,7 @@ import java.util.*
 /**
  * 服务器上没有安装 Towny 时的实现.
  */
-internal object TownylessNetworkImpl : TownyNetworkIntegration, TownyNetworkHandler {
+internal object TownylessNetworkImpl : TownyNetworkIntegration, TownyNetworkPacketHandler {
 
     override suspend fun reqTownSpawn(player: Player, targetServer: String) =
         TownylessTeleportImpl.requestTeleportTown(player, targetServer)

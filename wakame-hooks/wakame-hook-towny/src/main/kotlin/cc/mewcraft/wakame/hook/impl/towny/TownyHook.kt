@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.api.protection.ProtectionIntegration.ExecutionMode
 import cc.mewcraft.wakame.hook.impl.towny.messaging.TownyNetworkImpl
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.integration.townynetwork.TownyNetworkIntegration
-import cc.mewcraft.wakame.messaging.packet.TownyNetworkHandler
+import cc.mewcraft.wakame.messaging.handler.TownyNetworkPacketHandler
 import cc.mewcraft.wakame.util.registerEvents
 import com.palmergames.bukkit.towny.TownyAPI
 import com.palmergames.bukkit.towny.`object`.TownyPermission
@@ -29,7 +29,7 @@ object TownyHook : ProtectionIntegration by TownyProtectionIntegration {
         with(TownyNetworkImpl) {
             registerEvents()
             TownyNetworkIntegration.setImplementation(this)
-            TownyNetworkHandler.setImplementation(this)
+            TownyNetworkPacketHandler.setImplementation(this)
         }
     }
 }
