@@ -13,6 +13,7 @@ repositories {
 dependencies {
     api(project(":wakame-externals:extra-contexts:api"))
     compileOnly(local.luckperms)
+    implementation(local.caffeine)
     implementation(local.exposed.core)
     implementation(local.exposed.dao)
     implementation(local.exposed.jdbc)
