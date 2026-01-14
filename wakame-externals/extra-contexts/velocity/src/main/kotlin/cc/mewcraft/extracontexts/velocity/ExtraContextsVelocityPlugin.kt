@@ -91,4 +91,3 @@ class ExtraContextsVelocityPlugin @Inject constructor(
         }
     }
 }
-

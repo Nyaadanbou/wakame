@@ -21,4 +21,3 @@ class VelocityKeyValueStoreContextCalculator(
         return ImmutableContextSet.empty()
     }
 }
-

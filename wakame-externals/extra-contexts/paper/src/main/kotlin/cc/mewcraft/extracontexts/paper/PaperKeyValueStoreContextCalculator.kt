@@ -21,4 +21,3 @@ class PaperKeyValueStoreContextCalculator(
         return ImmutableContextSet.empty()
     }
 }
-

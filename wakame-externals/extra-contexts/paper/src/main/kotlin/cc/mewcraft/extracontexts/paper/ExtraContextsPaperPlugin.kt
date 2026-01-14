@@ -46,6 +46,7 @@ class ExtraContextsPaperPlugin : JavaPlugin() {
 
         // Register context calculator with LuckPerms
         luckPerms.contextManager.registerCalculator(keyValueStoreContextCalculator)
+        luckPerms.contextManager.registerCalculator(OpCalculator())
 
         // Register some dummy data
         registerDummyKeyValuePairs(slF4JLogger)
@@ -55,4 +56,3 @@ class ExtraContextsPaperPlugin : JavaPlugin() {
         luckPerms.contextManager.unregisterCalculator(keyValueStoreContextCalculator)
     }
 }
-
