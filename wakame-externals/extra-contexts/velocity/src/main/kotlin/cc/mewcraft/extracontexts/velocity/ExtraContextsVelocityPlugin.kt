@@ -1,11 +1,13 @@
 package cc.mewcraft.extracontexts.velocity
 
-import cc.mewcraft.extracontexts.api.KeyValueStoreContextProvider
 import cc.mewcraft.extracontexts.api.KeyValueStoreManager
-import cc.mewcraft.extracontexts.common.context.SimpleKeyValueStoreContextProvider
 import cc.mewcraft.extracontexts.common.database.DatabaseManager
+import cc.mewcraft.extracontexts.common.database.ReactiveDatabaseConfiguration
 import cc.mewcraft.extracontexts.common.example.registerDummyKeyValuePairs
+import cc.mewcraft.extracontexts.common.messaging.MessagingInitializer
 import cc.mewcraft.extracontexts.common.storage.SimpleKeyValueStoreManager
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.messaging2.ReactiveMessagingConfiguration
 import com.google.inject.Inject
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent
@@ -18,6 +20,9 @@ import org.slf4j.Logger
 import java.nio.file.Path
 import kotlin.io.path.outputStream
 
+
+const val PLUGIN_NAMESPACE = "extracontexts"
+
 @Plugin(
     id = "extracontexts",
     name = "ExtraContexts",
@@ -26,39 +31,34 @@ import kotlin.io.path.outputStream
     description = "Adds key-value pair context support to LuckPerms"
 )
 class ExtraContextsVelocityPlugin @Inject constructor(
+    val logger: Logger,
     @param:DataDirectory
-    private val dataDirectory: Path,
-    private val logger: Logger,
+    val dataDirectory: Path,
 ) {
     private val luckPerms: LuckPerms
         get() = LuckPermsProvider.get()
 
+    private lateinit var pluginConfigs: VelocityPluginConfigs
     private lateinit var keyValueStoreManager: KeyValueStoreManager
-    private lateinit var keyValueStoreContextProvider: KeyValueStoreContextProvider
     private lateinit var keyValueStoreContextCalculator: VelocityKeyValueStoreContextCalculator
 
     @Subscribe
     fun onProxyInitialize(event: ProxyInitializeEvent) {
-        val configName = "config.yml"
-
-        // Save default config.yml from resources to plugin directory if not exists
-        saveResource(configName)
-
-        // Load database configuration from file
-        val configPath = dataDirectory.resolve(configName)
-        val databaseConfig = ConfigurationLoader.loadConfiguration(configPath)
+        pluginConfigs = VelocityPluginConfigs(this)
+        pluginConfigs.initialize()
 
         // Initialize database
-        DatabaseManager.initialize(databaseConfig)
+        DatabaseManager.initialize(ReactiveDatabaseConfiguration(MAIN_CONFIG))
+
+        // Initialize messaging
+        MessagingInitializer.initialize(ReactiveMessagingConfiguration(MAIN_CONFIG))
 
         // Initialize managers
         keyValueStoreManager = SimpleKeyValueStoreManager
-        keyValueStoreContextProvider = SimpleKeyValueStoreContextProvider()
-        keyValueStoreContextCalculator = VelocityKeyValueStoreContextCalculator(keyValueStoreContextProvider)
+        keyValueStoreContextCalculator = VelocityKeyValueStoreContextCalculator(keyValueStoreManager)
 
         // Set implementation for static access
         KeyValueStoreManager.setImplementation(keyValueStoreManager)
-        KeyValueStoreContextProvider.setImplementation(keyValueStoreContextProvider)
 
         // Register context calculator with LuckPerms
         luckPerms.contextManager.registerCalculator(keyValueStoreContextCalculator)
@@ -72,7 +72,7 @@ class ExtraContextsVelocityPlugin @Inject constructor(
         luckPerms.contextManager.unregisterCalculator(keyValueStoreContextCalculator)
     }
 
-    private fun saveResource(resourceName: String, overwrite: Boolean = false) {
+    fun saveResource(resourceName: String, overwrite: Boolean = false) {
         val outputPath = dataDirectory.resolve(resourceName)
         if (!overwrite && outputPath.toFile().exists()) {
             return

@@ -37,7 +37,6 @@ interface ConfigAccess {
         override fun reload(): List<Key> = instance.reload()
         override fun createBuilder(namespace: String): YamlConfigurationLoader.Builder = instance.createBuilder(namespace)
         override fun createLoader(namespace: String, path: Path): YamlConfigurationLoader = instance.createLoader(namespace, path)
-        override fun registerReload(callback: (List<Key>) -> Unit): Unit = instance.registerReload(callback)
     }
 
     /**
@@ -105,9 +104,6 @@ interface ConfigAccess {
 
     @ApiStatus.Internal
     fun createLoader(namespace: String, path: Path): YamlConfigurationLoader
-
-    @ApiStatus.Internal
-    fun registerReload(callback: (List<Key>) -> Unit)
 }
 
 inline fun <reified T> ConfigAccess.registerSerializer(namespace: String, serializer: TypeSerializer<T>) {

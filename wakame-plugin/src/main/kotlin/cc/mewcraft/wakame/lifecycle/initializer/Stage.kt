@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.lifecycle.initializer
 
-import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.ecs.KoishFleks
 import cc.mewcraft.wakame.util.internalName
 import xyz.xenondevs.commons.collections.mapToArray

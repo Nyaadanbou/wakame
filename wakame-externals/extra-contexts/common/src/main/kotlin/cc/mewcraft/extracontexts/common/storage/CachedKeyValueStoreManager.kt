@@ -1,6 +1,9 @@
 package cc.mewcraft.extracontexts.common.storage
 
 import cc.mewcraft.extracontexts.api.KeyValueStoreManager
+import cc.mewcraft.extracontexts.common.messaging.MessagingManager
+import cc.mewcraft.extracontexts.common.messaging.packet.CacheInvalidationPacket
+import cc.mewcraft.messaging2.ServerInfoProvider
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import java.util.*
@@ -18,8 +21,8 @@ import java.util.concurrent.TimeUnit
  */
 class CachedKeyValueStoreManager(
     private val delegate: KeyValueStoreManager,
-    private val expireAfterWriteMinutes: Long = 5,
-    private val maximumSize: Long = 10000,
+    expireAfterWriteMinutes: Long = 5,
+    maximumSize: Long = 10000,
 ) : KeyValueStoreManager {
 
     private val cacheBuilder: Caffeine<Any, Any> = Caffeine.newBuilder()
@@ -55,21 +58,53 @@ class CachedKeyValueStoreManager(
     override fun set(id: UUID, key: String, value: String) {
         delegate.set(id, key, value)
         invalidatePlayerData(id, key)
+        MessagingManager.queuePacketAndFlush {
+            CacheInvalidationPacket(
+                ServerInfoProvider.serverId,
+                id,
+                CacheInvalidationPacket.InvalidationType.SINGLE_KEY,
+                listOf(key)
+            )
+        }
     }
 
     override fun delete(id: UUID) {
         delegate.delete(id)
         invalidateAllForPlayer(id)
+        MessagingManager.queuePacketAndFlush {
+            CacheInvalidationPacket(
+                ServerInfoProvider.serverId,
+                id,
+                CacheInvalidationPacket.InvalidationType.ALL,
+                emptyList()
+            )
+        }
     }
 
     override fun delete(id: UUID, key: String) {
         delegate.delete(id, key)
         invalidatePlayerData(id, key)
+        MessagingManager.queuePacketAndFlush {
+            CacheInvalidationPacket(
+                ServerInfoProvider.serverId,
+                id,
+                CacheInvalidationPacket.InvalidationType.SINGLE_KEY,
+                listOf(key)
+            )
+        }
     }
 
     override fun deleteWithPrefix(id: UUID, prefix: String) {
         delegate.deleteWithPrefix(id, prefix)
         invalidateAllForPlayer(id)
+        MessagingManager.queuePacketAndFlush {
+            CacheInvalidationPacket(
+                ServerInfoProvider.serverId,
+                id,
+                CacheInvalidationPacket.InvalidationType.PREFIX,
+                listOf(prefix)
+            )
+        }
     }
 
     override fun exists(id: UUID, key: String): Boolean {

@@ -24,26 +24,26 @@ import java.util.function.Supplier
 
 interface StaticAccessApi {
 
-    fun init(config: MessagingConfig)
+    fun init(config: MessagingConfiguration)
     fun start()
     fun shutdown()
     fun queuePacketAndFlush(makePacket: Supplier<out AbstractPacket>)
     fun queuePacket(makePacket: Supplier<out AbstractPacket>)
 
     companion object {
-        fun of(factory: (MessagingConfig) -> MessagingManager): StaticAccessApi {
+        fun of(factory: (MessagingConfiguration) -> MessagingManager): StaticAccessApi {
             return StaticAccessApiImpl(factory)
         }
     }
 }
 
 private class StaticAccessApiImpl(
-    private val factory: (MessagingConfig) -> MessagingManager,
+    private val factory: (MessagingConfiguration) -> MessagingManager,
 ) : StaticAccessApi {
 
     private lateinit var instance: MessagingManager
 
-    override fun init(config: MessagingConfig) {
+    override fun init(config: MessagingConfiguration) {
         instance = factory(config)
     }
 
@@ -67,7 +67,7 @@ private class StaticAccessApiImpl(
 typealias AbstractMessagingManager = MessagingManager
 
 abstract class MessagingManager(
-    private val config: MessagingConfig,
+    private val config: MessagingConfiguration,
 ) {
 
     val serverId: UUID
@@ -193,16 +193,16 @@ abstract class MessagingManager(
         val name = "engine1"
 
         val messagingService = when (config.brokerType) {
-            MessagingConfig.BrokerType.NONE -> {
+            BrokerType.NONE -> {
                 throw IllegalStateException("MessagingManager initialized with no messaging broker selected!")
             }
 
-            MessagingConfig.BrokerType.NATS -> {
+            BrokerType.NATS -> {
                 logger.info("Initializing NATS messaging service...")
 
-                val host = config.NATS().host
-                val port = config.NATS().port
-                val credentialsFile = config.NATS().credentialsFile
+                val host = config.nats.host
+                val port = config.nats.port
+                val credentialsFile = config.nats.credentialsFile
                 val builder = NATSMessagingService.builder(packetService, name, this.channelName, this.serverId, handlerImpl, 0L, false, packetDir)
                     .url(host, port)
                     .life(5000)
@@ -212,14 +212,14 @@ abstract class MessagingManager(
                 builder.build()
             }
 
-            MessagingConfig.BrokerType.RABBITMQ -> {
+            BrokerType.RABBITMQ -> {
                 logger.info("Initializing RABBITMQ messaging service...")
 
-                val host = config.RabbitMQ().host
-                val port = config.RabbitMQ().port
-                val vhost = config.RabbitMQ().vhost
-                val username = config.RabbitMQ().username
-                val password = config.RabbitMQ().password
+                val host = config.rabbitmq.host
+                val port = config.rabbitmq.port
+                val vhost = config.rabbitmq.vhost
+                val username = config.rabbitmq.username
+                val password = config.rabbitmq.password
                 val builder = RabbitMQMessagingService
                     .builder(packetService, name, this.channelName, this.serverId, handlerImpl, 0L, false, packetDir)
                     .url(host, port, vhost)
@@ -229,12 +229,12 @@ abstract class MessagingManager(
                 builder.build()
             }
 
-            MessagingConfig.BrokerType.REDIS -> {
+            BrokerType.REDIS -> {
                 logger.info("Initializing REDIS messaging service...")
 
-                val host = config.Redis().host
-                val port = config.Redis().port
-                val password = config.Redis().password
+                val host = config.redis.host
+                val port = config.redis.port
+                val password = config.redis.password
                 val builder = RedisMessagingService
                     .builder(packetService, name, this.channelName, this.serverId, handlerImpl, 0L, false, packetDir)
                     .url(host, port)

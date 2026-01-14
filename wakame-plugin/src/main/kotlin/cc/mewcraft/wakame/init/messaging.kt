@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.init
 
 import cc.mewcraft.lazyconfig.MAIN_CONFIG
-import cc.mewcraft.messaging2.MessagingConfig
+import cc.mewcraft.messaging2.ReactiveMessagingConfiguration
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -13,7 +13,7 @@ internal object MessagingInitializer {
 
     @InitFun
     fun init() {
-        MessagingManager.init(MessagingConfig(MAIN_CONFIG))
+        MessagingManager.init(ReactiveMessagingConfiguration(MAIN_CONFIG))
         MessagingManager.start()
     }
 

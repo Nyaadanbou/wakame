@@ -1,14 +1,18 @@
 package cc.mewcraft.extracontexts.paper
 
-import cc.mewcraft.extracontexts.api.KeyValueStoreContextProvider
 import cc.mewcraft.extracontexts.api.KeyValueStoreManager
-import cc.mewcraft.extracontexts.common.context.SimpleKeyValueStoreContextProvider
 import cc.mewcraft.extracontexts.common.database.DatabaseManager
+import cc.mewcraft.extracontexts.common.database.ReactiveDatabaseConfiguration
 import cc.mewcraft.extracontexts.common.example.registerDummyKeyValuePairs
+import cc.mewcraft.extracontexts.common.messaging.MessagingInitializer
 import cc.mewcraft.extracontexts.common.storage.SimpleKeyValueStoreManager
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.messaging2.ReactiveMessagingConfiguration
 import net.luckperms.api.LuckPerms
 import net.luckperms.api.LuckPermsProvider
 import org.bukkit.plugin.java.JavaPlugin
+
+const val PLUGIN_NAMESPACE = "extracontexts"
 
 /**
  * ExtraContexts plugin for Paper.
@@ -19,28 +23,26 @@ class ExtraContextsPaperPlugin : JavaPlugin() {
     private val luckPerms: LuckPerms
         get() = LuckPermsProvider.get()
 
-    lateinit var keyValueStoreManager: KeyValueStoreManager
-        private set
-    lateinit var keyValueStoreContextProvider: KeyValueStoreContextProvider
-        private set
-
+    private lateinit var pluginConfigs: PaperPluginConfigs
+    private lateinit var keyValueStoreManager: KeyValueStoreManager
     private lateinit var keyValueStoreContextCalculator: PaperKeyValueStoreContextCalculator
 
     override fun onEnable() {
-        // Load database configuration from file
-        val dbConfig = ConfigurationLoader.loadConfiguration(this)
+        pluginConfigs = PaperPluginConfigs(this)
+        pluginConfigs.initialize()
 
         // Initialize database
-        DatabaseManager.initialize(dbConfig)
+        DatabaseManager.initialize(ReactiveDatabaseConfiguration(MAIN_CONFIG))
+
+        // Initialize messaging
+        MessagingInitializer.initialize(ReactiveMessagingConfiguration(MAIN_CONFIG))
 
         // Initialize managers
         keyValueStoreManager = SimpleKeyValueStoreManager
-        keyValueStoreContextProvider = SimpleKeyValueStoreContextProvider()
-        keyValueStoreContextCalculator = PaperKeyValueStoreContextCalculator(keyValueStoreContextProvider)
+        keyValueStoreContextCalculator = PaperKeyValueStoreContextCalculator(keyValueStoreManager)
 
         // Set implementation for static access
         KeyValueStoreManager.setImplementation(keyValueStoreManager)
-        KeyValueStoreContextProvider.setImplementation(keyValueStoreContextProvider)
 
         // Register context calculator with LuckPerms
         luckPerms.contextManager.registerCalculator(keyValueStoreContextCalculator)

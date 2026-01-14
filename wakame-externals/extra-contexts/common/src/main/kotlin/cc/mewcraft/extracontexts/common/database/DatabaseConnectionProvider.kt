@@ -19,12 +19,12 @@ object SqliteConnectionProvider : DatabaseConnectionProvider {
     override fun createHikariConfig(config: DatabaseConfiguration): HikariConfig {
         return HikariConfig().apply {
             driverClassName = "org.sqlite.JDBC"
-            jdbcUrl = "jdbc:sqlite:${config.filePath ?: "sqlite.db"}"
-            maximumPoolSize = config.maximumPoolSize
-            minimumIdle = config.minimumIdle
-            connectionTimeout = config.connectionTimeout
-            idleTimeout = config.idleTimeout
-            maxLifetime = config.maxLifetime
+            jdbcUrl = "jdbc:sqlite:${config.credentials.filePath ?: "sqlite.db"}"
+            maximumPoolSize = config.poolOptions.size
+            minimumIdle = config.poolOptions.idle
+            connectionTimeout = config.poolOptions.timeout
+            idleTimeout = config.poolOptions.keepAlive
+            maxLifetime = config.poolOptions.lifetime
         }
     }
 }
@@ -38,12 +38,12 @@ object H2ConnectionProvider : DatabaseConnectionProvider {
             driverClassName = "org.h2.Driver"
             // DB_CLOSE_DELAY=-1 keeps the database open and prevents data loss when transactions close
             // This is especially important for in-memory databases (mem:) to persist data across multiple transactions
-            jdbcUrl = "jdbc:h2:${config.filePath ?: "h2"};DB_CLOSE_DELAY=-1"
-            maximumPoolSize = config.maximumPoolSize
-            minimumIdle = config.minimumIdle
-            connectionTimeout = config.connectionTimeout
-            idleTimeout = config.idleTimeout
-            maxLifetime = config.maxLifetime
+            jdbcUrl = "jdbc:h2:${config.credentials.filePath ?: "h2"};DB_CLOSE_DELAY=-1"
+            maximumPoolSize = config.poolOptions.size
+            minimumIdle = config.poolOptions.idle
+            connectionTimeout = config.poolOptions.timeout
+            idleTimeout = config.poolOptions.keepAlive
+            maxLifetime = config.poolOptions.lifetime
         }
     }
 }
@@ -55,15 +55,15 @@ object MysqlConnectionProvider : DatabaseConnectionProvider {
     override fun createHikariConfig(config: DatabaseConfiguration): HikariConfig {
         return HikariConfig().apply {
             driverClassName = "com.mysql.cj.jdbc.Driver"
-            val params = config.parameters ?: ""
-            jdbcUrl = "jdbc:mysql://${config.host}:${config.port}/${config.database}$params"
-            username = config.username
-            password = config.password
-            maximumPoolSize = config.maximumPoolSize
-            minimumIdle = config.minimumIdle
-            connectionTimeout = config.connectionTimeout
-            idleTimeout = config.idleTimeout
-            maxLifetime = config.maxLifetime
+            val params = config.credentials.parameters ?: "?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8"
+            jdbcUrl = "jdbc:mysql://${config.credentials.host}:${config.credentials.port}/${config.credentials.database}$params"
+            username = config.credentials.username
+            password = config.credentials.password
+            maximumPoolSize = config.poolOptions.size
+            minimumIdle = config.poolOptions.idle
+            connectionTimeout = config.poolOptions.timeout
+            idleTimeout = config.poolOptions.keepAlive
+            maxLifetime = config.poolOptions.lifetime
         }
     }
 }
@@ -75,15 +75,15 @@ object MariadbConnectionProvider : DatabaseConnectionProvider {
     override fun createHikariConfig(config: DatabaseConfiguration): HikariConfig {
         return HikariConfig().apply {
             driverClassName = "org.mariadb.jdbc.Driver"
-            val params = config.parameters ?: ""
-            jdbcUrl = "jdbc:mariadb://${config.host}:${config.port}/${config.database}$params"
-            username = config.username
-            password = config.password
-            maximumPoolSize = config.maximumPoolSize
-            minimumIdle = config.minimumIdle
-            connectionTimeout = config.connectionTimeout
-            idleTimeout = config.idleTimeout
-            maxLifetime = config.maxLifetime
+            val params = config.credentials.parameters ?: "?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8"
+            jdbcUrl = "jdbc:mariadb://${config.credentials.host}:${config.credentials.port}/${config.credentials.database}$params"
+            username = config.credentials.username
+            password = config.credentials.password
+            maximumPoolSize = config.poolOptions.size
+            minimumIdle = config.poolOptions.idle
+            connectionTimeout = config.poolOptions.timeout
+            idleTimeout = config.poolOptions.keepAlive
+            maxLifetime = config.poolOptions.lifetime
         }
     }
 }
@@ -95,15 +95,15 @@ object PostgresqlConnectionProvider : DatabaseConnectionProvider {
     override fun createHikariConfig(config: DatabaseConfiguration): HikariConfig {
         return HikariConfig().apply {
             driverClassName = "org.postgresql.Driver"
-            val params = config.parameters ?: ""
-            jdbcUrl = "jdbc:postgresql://${config.host}:${config.port}/${config.database}$params"
-            username = config.username
-            password = config.password
-            maximumPoolSize = config.maximumPoolSize
-            minimumIdle = config.minimumIdle
-            connectionTimeout = config.connectionTimeout
-            idleTimeout = config.idleTimeout
-            maxLifetime = config.maxLifetime
+            val params = config.credentials.parameters ?: "?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8"
+            jdbcUrl = "jdbc:postgresql://${config.credentials.host}:${config.credentials.port}/${config.credentials.database}$params"
+            username = config.credentials.username
+            password = config.credentials.password
+            maximumPoolSize = config.poolOptions.size
+            minimumIdle = config.poolOptions.idle
+            connectionTimeout = config.poolOptions.timeout
+            idleTimeout = config.poolOptions.keepAlive
+            maxLifetime = config.poolOptions.lifetime
         }
     }
 }

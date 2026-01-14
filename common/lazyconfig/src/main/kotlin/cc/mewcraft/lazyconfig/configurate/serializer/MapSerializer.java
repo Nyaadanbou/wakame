@@ -1,7 +1,7 @@
 package cc.mewcraft.lazyconfig.configurate.serializer;
 
 import io.leangen.geantyref.TypeToken;
-import org.jspecify.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.BasicConfigurationNode;
