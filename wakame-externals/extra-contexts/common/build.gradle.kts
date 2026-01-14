@@ -12,7 +12,9 @@ repositories {
 
 dependencies {
     api(project(":wakame-externals:extra-contexts:api"))
-    compileOnly(local.luckperms)
+    api(project(":common:messaging"))
+
+    compileOnlyApi(local.luckperms)
     implementation(local.caffeine)
     implementation(local.exposed.core)
     implementation(local.exposed.dao)
@@ -23,4 +25,3 @@ dependencies {
     implementation(local.postgresql.jdbc)
     implementation(local.hikaricp)
 }
-

@@ -6,9 +6,9 @@ plugins {
 version = "0.0.1"
 
 repositories {
-    configure()
     nyaadanbouReleases()
     nyaadanbouPrivate()
+    configure()
 }
 
 dependencies {
@@ -18,7 +18,6 @@ dependencies {
     compileOnly(local.guava)
 
     // 冒险库
-    compileOnly(local.adventure.api)
     compileOnly(local.adventure.key)
     compileOnly(local.adventure.text.serializer.gson)
 

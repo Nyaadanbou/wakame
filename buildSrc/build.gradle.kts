@@ -10,13 +10,13 @@ repositories {
 
 dependencies {
     implementation(local.plugin.kotlin.jvm)
+    implementation(local.plugin.indra.common)
+    implementation(local.plugin.spotless)
+    implementation(local.plugin.shadow)
     implementation(local.plugin.libraries.repository)
     implementation(local.plugin.copy.jar.build)
     implementation(local.plugin.copy.jar.docker)
     implementation(local.plugin.paperweight.userdev)
-    implementation(local.plugin.spotless)
-    implementation(libs.shadow)
-    implementation(libs.indra.common)
 }
 
 dependencies {

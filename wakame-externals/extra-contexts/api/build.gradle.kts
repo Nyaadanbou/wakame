@@ -12,13 +12,11 @@ repositories {
     nyaadanbouPrivate()
 }
 
-dependencies {
-    compileOnly(local.luckperms)
-}
-
 publishing {
     repositories {
-        nyaadanbouPrivate().credentials(PasswordCredentials::class)
+        nyaadanbouPrivate().apply {
+            credentials(PasswordCredentials::class)
+        }
     }
     publications {
         create<MavenPublication>("maven") {

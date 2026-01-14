@@ -12,17 +12,17 @@ repositories {
 
 dependencies {
     // 冒险库
-    compileOnly(local.adventure.api)
-    compileOnly(local.adventure.extra.kotlin)
-    compileOnly(local.adventure.key)
-    compileOnly(local.adventure.nbt)
-    compileOnly(local.adventure.text.logger.slf4j)
-    compileOnly(local.adventure.text.minimessage)
-    compileOnly(local.adventure.text.serializer.ansi)
-    compileOnly(local.adventure.text.serializer.gson)
-    compileOnly(local.adventure.text.serializer.json)
-    compileOnly(local.adventure.text.serializer.legacy)
-    compileOnly(local.adventure.text.serializer.plain)
+    //compileOnlyApi(local.adventure.api)
+    //compileOnlyApi(local.adventure.extra.kotlin)
+    compileOnlyApi(local.adventure.key)
+    //compileOnlyApi(local.adventure.nbt)
+    compileOnlyApi(local.adventure.text.logger.slf4j)
+    //compileOnlyApi(local.adventure.text.minimessage)
+    //compileOnlyApi(local.adventure.text.serializer.ansi)
+    //compileOnlyApi(local.adventure.text.serializer.gson)
+    //compileOnlyApi(local.adventure.text.serializer.json)
+    //compileOnlyApi(local.adventure.text.serializer.legacy)
+    //compileOnlyApi(local.adventure.text.serializer.plain)
 
     // 通用库
     api(local.commons.collections)

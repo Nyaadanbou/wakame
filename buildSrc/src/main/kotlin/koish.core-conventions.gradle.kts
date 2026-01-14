@@ -23,90 +23,39 @@ configurations.runtimeClasspath {
 
 tasks {
     shadowJar {
-        archiveClassifier.set("shaded")
-
-        mergeServiceFiles()
-        // Needed for mergeServiceFiles to work properly in Shadow 9+
-        filesMatching("META-INF/services/**") {
-            duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        val pkg = "cc.mewcraft.wakame"
+        configureForPlatform(pkg, ServerPlatform.PAPER)
+        relocateWithPrefix(pkg) {
+            //move("com.github.luben.zstd", "zstd") // FIXME https://pastes.dev/qEtUHGgkNT
+            move("cc.mewcraft.lazyconfig", "lazyconfig")
+            move("cc.mewcraft.messaging2", "messaging2")
+            move("com.github.benmanes.caffeine", "caffeine")
+            move("com.github.quillraven.fleks", "fleks")
+            move("com.googlecode.javaewah", "javaewah")
+            move("com.googlecode.javaewah32", "javaewah32")
+            move("com.rabbitmq", "rabbitmq")
+            move("com.zaxxer.hikari", "hikari")
+            move("io.leangen.geantyref", "geantyref")
+            move("io.nats", "nats")
+            move("javassist", "javassist")
+            move("me.lucko.shadow", "shadow")
+            move("net.fabricmc.mappingio", "mappingio")
+            move("ninja.egg82.messenger", "messenger")
+            move("org.apache.commons.codec", "apache.commons.codec")
+            move("org.apache.commons.pool2", "apache.commons.pool2")
+            move("org.bouncycastle", "bouncycastle")
+            move("org.eclipse.jgit", "jgit")
+            move("org.incendo.cloud", "cloud")
+            move("org.jetbrains.exposed", "exposed")
+            move("org.json", "json")
+            move("org.mariadb.jdbc", "mariadb.jdbc")
+            move("org.spongepowered.configurate", "configurate")
+            move("redis.clients", "redis.clients")
+            move("team.unnamed.creative", "creative")
+            move("team.unnamed.mocha", "mocha")
+            move("xyz.jpenilla.reflectionremapper", "reflectionremapper")
+            move("xyz.xenondevs.commons", "xenoncommons")
         }
-
-        dependencies {
-            // 没啥用的元数据文件
-            exclude("about.html")
-            exclude("META-INF/maven/**")
-            exclude("META-INF/licenses/**")
-            exclude("META-INF/versions/**")
-            exclude("META-INF/services/**")
-            exclude("META-INF/LICENSE")
-            exclude("META-INF/LICENSE.txt")
-            exclude("META-INF/NOTICE")
-            exclude("META-INF/NOTICE.txt")
-
-            // 运行时由平台提供或根本不需要
-            excludePlatformRuntime(ServerPlatform.PAPER)
-        }
-
-        fun relocate0(pattern: String, result: String) {
-            relocate(pattern, "cc.mewcraft.wakame.shaded.$result")
-        }
-
-        // lazyconfig
-        relocate0("cc.mewcraft.lazyconfig", "lazyconfig")
-        // shadow
-        relocate0("me.lucko.shadow", "shadow")
-        // mocha
-        relocate0("team.unnamed.mocha", "mocha")
-        // fleks
-        relocate0("com.github.quillraven.fleks", "fleks")
-        // configurate
-        relocate0("org.spongepowered.configurate", "configurate")
-        // commons
-        relocate0("xyz.xenondevs.commons", "xenoncommons")
-        // creative
-        relocate0("team.unnamed.creative", "creative")
-        // cloud
-        relocate0("org.incendo.cloud", "cloud")
-        // messenger
-        relocate0("ninja.egg82.messenger", "messenger")
-        // geantyref
-        relocate0("io.leangen.geantyref", "geantyref")
-        // reflection remapper
-        relocate0("xyz.jpenilla.reflectionremapper", "reflectionremapper")
-        // tiny remapper
-        relocate0("net.fabricmc.mappingio", "mappingio")
-        // javassist (used by mocha)
-        relocate0("javassist", "javassist")
-        // nats (used by messenger-nats)
-        relocate0("io.nats", "nats")
-        // bouncy castle (used by nats)
-        relocate0("org.bouncycastle", "bouncycastle")
-        // redis (used by messenger-redis)
-        relocate0("redis.clients", "redis.clients")
-        // rabbitmq (used by messenger-rabbitmq)
-        relocate0("com.rabbitmq", "rabbitmq")
-        // json (used by rabbitmq)
-        relocate0("org.json", "json")
-        // zstd (used by messenger-redis)
-        //FIXME https://pastes.dev/qEtUHGgkNT
-        //relocate0("com.github.luben.zstd", "zstd")
-        // caffeine (used by messenger)
-        relocate0("com.github.benmanes.caffeine", "caffeine")
-        // apache commons pool 2 (used by rabbitmq and jedis)
-        relocate0("org.apache.commons.pool2", "apache.commons.pool2")
-        // apache commons codec
-        relocate0("org.apache.commons.codec", "apache.commons.codec")
-        // jgit
-        relocate0("org.eclipse.jgit", "jgit")
-        // javaewah
-        relocate0("com.googlecode.javaewah", "javaewah")
-        relocate0("com.googlecode.javaewah32", "javaewah32")
-        // exposed
-        relocate0("org.jetbrains.exposed", "exposed")
-        // hikari
-        relocate0("com.zaxxer.hikari", "hikari")
-        // mariadb
-        relocate0("org.mariadb.jdbc", "mariadb.jdbc")
     }
 }
 
