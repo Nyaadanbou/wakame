@@ -5,7 +5,7 @@ import cc.mewcraft.extracontexts.common.database.DatabaseManager
 import cc.mewcraft.extracontexts.common.database.ReactiveDatabaseConfiguration
 import cc.mewcraft.extracontexts.common.example.registerDummyKeyValuePairs
 import cc.mewcraft.extracontexts.common.messaging.MessagingInitializer
-import cc.mewcraft.extracontexts.common.storage.SimpleKeyValueStoreManager
+import cc.mewcraft.extracontexts.common.storage.CachedKeyValueStoreManager
 import cc.mewcraft.lazyconfig.MAIN_CONFIG
 import cc.mewcraft.messaging2.ReactiveMessagingConfiguration
 import com.google.inject.Inject
@@ -54,7 +54,7 @@ class ExtraContextsVelocityPlugin @Inject constructor(
         MessagingInitializer.initialize(ReactiveMessagingConfiguration(MAIN_CONFIG))
 
         // Initialize managers
-        keyValueStoreManager = SimpleKeyValueStoreManager
+        keyValueStoreManager = CachedKeyValueStoreManager
         keyValueStoreContextCalculator = VelocityKeyValueStoreContextCalculator(keyValueStoreManager)
 
         // Set implementation for static access

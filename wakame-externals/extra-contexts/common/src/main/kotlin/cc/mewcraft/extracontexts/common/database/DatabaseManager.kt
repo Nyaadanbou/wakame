@@ -38,11 +38,11 @@ object DatabaseManager {
             val hikariConfig = connectionProvider.createHikariConfig(config)
 
             // Log connection details for debugging (hide password)
-            logger.debug("HikariCP configuration:")
-            logger.debug("  - JDBC URL: ${hikariConfig.jdbcUrl}")
-            logger.debug("  - Username: ${hikariConfig.username}")
-            logger.debug("  - Maximum pool size: ${hikariConfig.maximumPoolSize}")
-            logger.debug("  - Minimum idle: ${hikariConfig.minimumIdle}")
+            logger.info("HikariCP configuration:")
+            logger.info("  - JDBC URL: ${hikariConfig.jdbcUrl}")
+            logger.info("  - Username: ${hikariConfig.username}")
+            logger.info("  - Maximum pool size: ${hikariConfig.maximumPoolSize}")
+            logger.info("  - Minimum idle: ${hikariConfig.minimumIdle}")
 
             val dataSource = HikariDataSource(hikariConfig)
             val databaseConfig = DatabaseConfig.Companion {

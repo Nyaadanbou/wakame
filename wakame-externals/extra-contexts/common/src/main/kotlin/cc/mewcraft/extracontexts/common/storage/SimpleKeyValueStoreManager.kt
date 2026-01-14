@@ -13,7 +13,7 @@ import java.util.*
  * Default implementation of KeyValueStoreManager using Exposed ORM with query helper functions.
  *
  * Uses KeyValuePairsQueries to centralize UUID to String conversion logic.
- * No need for manual .toString() calls in the manager.
+ * No need for manual `.toString()` calls in the manager.
  */
 object SimpleKeyValueStoreManager : KeyValueStoreManager {
 
@@ -80,11 +80,7 @@ object SimpleKeyValueStoreManager : KeyValueStoreManager {
     }
 
     override fun exists(id: UUID, key: String): Boolean {
-        return transaction(DatabaseManager.database()) {
-            addLogger(StdOutSqlLogger)
-            KeyValuePairsQueries
-                .existsEntry(id, key)
-        }
+        return get(id, key) != null
     }
 
     override fun clear() {

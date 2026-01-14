@@ -99,15 +99,6 @@ object KeyValuePairsQueries {
     }
 
     /**
-     * Check if an entry exists.
-     */
-    fun existsEntry(playerId: UUID, key: String): Boolean {
-        return findByPlayerAndKey(playerId, key)
-            .empty()
-            .not()
-    }
-
-    /**
      * Find all entries for a specific player with keys starting with a given prefix.
      */
     fun findByPlayerAndKeyPrefix(playerId: UUID, prefix: String): Query {
