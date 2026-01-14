@@ -64,6 +64,8 @@ private class StaticAccessApiImpl(
     }
 }
 
+typealias AbstractMessagingManager = MessagingManager
+
 abstract class MessagingManager(
     private val config: MessagingConfig,
 ) {

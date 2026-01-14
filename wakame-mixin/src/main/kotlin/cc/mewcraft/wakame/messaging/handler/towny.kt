@@ -35,12 +35,14 @@ import cc.mewcraft.wakame.messaging.packet.TownSpawnResponsePacket
  * - [NationSpawnResponsePacket]
  */
 interface TownyNetworkPacketHandler : SimplePacketHandler {
+
     fun handle(packet: TownSpawnRequestPacket)
     fun handle(packet: TownSpawnResponsePacket)
     fun handle(packet: NationSpawnRequestPacket)
     fun handle(packet: NationSpawnResponsePacket)
 
     companion object : TownyNetworkPacketHandler {
+
         private var implementation: TownyNetworkPacketHandler = TownylessNetworkImpl
 
         fun setImplementation(impl: TownyNetworkPacketHandler) {

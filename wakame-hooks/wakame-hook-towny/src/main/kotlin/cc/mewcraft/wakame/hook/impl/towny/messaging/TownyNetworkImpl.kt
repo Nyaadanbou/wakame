@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.hook.impl.towny.messaging
 import cc.mewcraft.messaging2.ServerInfoProvider
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.townynetwork.TownyNetworkIntegration
-import cc.mewcraft.wakame.messaging.KoishMessagingManager
+import cc.mewcraft.wakame.messaging.MessagingManager
 import cc.mewcraft.wakame.messaging.handler.TownyNetworkPacketHandler
 import cc.mewcraft.wakame.messaging.packet.NationSpawnRequestPacket
 import cc.mewcraft.wakame.messaging.packet.NationSpawnResponsePacket
@@ -94,7 +94,7 @@ private object TownyTeleportImpl {
         this.townSessions.put(playerId, TownSession(TownSession.Stage.AWAITING_RESPONSE, targetServer))
 
         // 广播封包
-        KoishMessagingManager.queuePacket { TownSpawnRequestPacket(serverId, playerId, targetServer) }
+        MessagingManager.queuePacket { TownSpawnRequestPacket(serverId, playerId, targetServer) }
     }
 
     fun reqNationSpawn(player: Player, targetServer: String) {
@@ -116,7 +116,7 @@ private object TownyTeleportImpl {
         this.nationSessions.put(playerId, NationSession(NationSession.Stage.AWAITING_RESPONSE, targetServer))
 
         // 广播封包
-        KoishMessagingManager.queuePacket { NationSpawnRequestPacket(serverId, playerId, targetServer) }
+        MessagingManager.queuePacket { NationSpawnRequestPacket(serverId, playerId, targetServer) }
     }
 
     fun handle(packet: TownSpawnRequestPacket) {
@@ -133,7 +133,7 @@ private object TownyTeleportImpl {
 
         // 如果玩家不属于任何城镇, 则广播“拒绝传送”, 通知请求方无法进行传送
         if (resident == null || town == null) {
-            KoishMessagingManager.queuePacket { TownSpawnResponsePacket(serverId, playerId, TownSpawnResponsePacket.ResponseType.DENY_FOR_NO_TOWN) }
+            MessagingManager.queuePacket { TownSpawnResponsePacket(serverId, playerId, TownSpawnResponsePacket.ResponseType.DENY_FOR_NO_TOWN) }
             return
         }
 
@@ -146,7 +146,7 @@ private object TownyTeleportImpl {
         //  将玩家转移到新的服务器. 不让当前服务器转移玩家是因为当前服务器可能没人,
         //  因此 Plugin Message 也就根本无法使用.
         //  同样的原因适用于跨服国家传送.
-        KoishMessagingManager.queuePacket { TownSpawnResponsePacket(serverId, playerId, TownSpawnResponsePacket.ResponseType.ALLOW) }
+        MessagingManager.queuePacket { TownSpawnResponsePacket(serverId, playerId, TownSpawnResponsePacket.ResponseType.ALLOW) }
     }
 
     fun handle(packet: TownSpawnResponsePacket) {
@@ -166,12 +166,12 @@ private object TownyTeleportImpl {
         val resident = townyApi.getResident(playerId)
         val nation = resident?.nationOrNull
         if (resident == null || nation == null) {
-            KoishMessagingManager.queuePacket { NationSpawnResponsePacket(serverId, playerId, NationSpawnResponsePacket.ResponseType.DENY_FOR_NO_NATION) }
+            MessagingManager.queuePacket { NationSpawnResponsePacket(serverId, playerId, NationSpawnResponsePacket.ResponseType.DENY_FOR_NO_NATION) }
             return
         }
 
         this.nationSessions.put(playerId, NationSession(NationSession.Stage.READY_TO_TELEPORT, targetServer))
-        KoishMessagingManager.queuePacket { TownSpawnResponsePacket(serverId, playerId, TownSpawnResponsePacket.ResponseType.ALLOW) }
+        MessagingManager.queuePacket { TownSpawnResponsePacket(serverId, playerId, TownSpawnResponsePacket.ResponseType.ALLOW) }
     }
 
     fun handle(packet: NationSpawnResponsePacket) {

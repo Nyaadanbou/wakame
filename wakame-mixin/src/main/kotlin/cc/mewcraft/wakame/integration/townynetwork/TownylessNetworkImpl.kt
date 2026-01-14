@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.integration.townynetwork
 
 import cc.mewcraft.messaging2.ServerInfoProvider
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.messaging.KoishMessagingManager
+import cc.mewcraft.wakame.messaging.MessagingManager
 import cc.mewcraft.wakame.messaging.handler.TownyNetworkPacketHandler
 import cc.mewcraft.wakame.messaging.packet.NationSpawnRequestPacket
 import cc.mewcraft.wakame.messaging.packet.NationSpawnResponsePacket
@@ -57,7 +57,7 @@ private object TownylessTeleportImpl {
             return
         }
         this.sessions.put(playerId, Session(targetServer))
-        KoishMessagingManager.queuePacket { TownSpawnRequestPacket(serverId, playerId, targetServer) }
+        MessagingManager.queuePacket { TownSpawnRequestPacket(serverId, playerId, targetServer) }
     }
 
     fun requestTeleportNation(player: Player, targetServer: String) {
@@ -67,7 +67,7 @@ private object TownylessTeleportImpl {
             return
         }
         this.sessions.put(playerId, Session(targetServer))
-        KoishMessagingManager.queuePacket { NationSpawnRequestPacket(serverId, playerId, targetServer) }
+        MessagingManager.queuePacket { NationSpawnRequestPacket(serverId, playerId, targetServer) }
     }
 
     fun handle(packet: TownSpawnRequestPacket) {

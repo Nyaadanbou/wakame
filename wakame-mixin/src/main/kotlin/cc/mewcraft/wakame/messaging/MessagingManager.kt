@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.messaging
 
+import cc.mewcraft.messaging2.AbstractMessagingManager
 import cc.mewcraft.messaging2.MessagingConfig
-import cc.mewcraft.messaging2.MessagingManager
 import cc.mewcraft.messaging2.StaticAccessApi
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.messaging.packet.NationSpawnRequestPacket
@@ -11,11 +11,11 @@ import cc.mewcraft.wakame.messaging.packet.TownSpawnResponsePacket
 import ninja.egg82.messenger.handler.AbstractMessagingHandler
 import org.slf4j.Logger
 
-class KoishMessagingManager(
+class MessagingManager(
     config: MessagingConfig,
-) : MessagingManager(config) {
+) : AbstractMessagingManager(config) {
 
-    companion object : StaticAccessApi by StaticAccessApi.of(::KoishMessagingManager)
+    companion object : StaticAccessApi by StaticAccessApi.of(::MessagingManager)
 
     override val logger: Logger = LOGGER
     override val channelName: String = "koish:main"
@@ -29,6 +29,6 @@ class KoishMessagingManager(
     }
 
     override fun registerMessagingHandlers(addHandler: (AbstractMessagingHandler) -> Unit) {
-        addHandler(KoishMessagingHandler(packetService))
+        addHandler(MessagingHandler(packetService))
     }
 }

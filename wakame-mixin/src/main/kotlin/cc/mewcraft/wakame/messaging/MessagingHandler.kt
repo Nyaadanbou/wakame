@@ -13,7 +13,7 @@ import ninja.egg82.messenger.services.PacketService
 /**
  * 总线.
  */
-class KoishMessagingHandler(
+class MessagingHandler(
     packetService: PacketService,
 ) : AbstractMessagingHandler(packetService) {
 
