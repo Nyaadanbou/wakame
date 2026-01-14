@@ -26,9 +26,12 @@ tasks {
         archiveClassifier.set("shaded")
 
         mergeServiceFiles()
+        // Needed for mergeServiceFiles to work properly in Shadow 9+
+        filesMatching("META-INF/services/**") {
+            duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        }
 
         dependencies {
-
             // 没啥用的元数据文件
             exclude("about.html")
             exclude("META-INF/maven/**")
@@ -41,20 +44,7 @@ tasks {
             exclude("META-INF/NOTICE.txt")
 
             // 运行时由平台提供或根本不需要
-            exclude(dependency("com.google.code.findbugs:jsr305"))
-            exclude(dependency("com.google.errorprone:error_prone_annotations"))
-            exclude { it.moduleGroup == "com.google.code.gson" }
-            exclude { it.moduleGroup == "com.google.guava" }
-            exclude(dependency("com.google.j2objc:j2objc-annotations"))
-            exclude { it.moduleGroup == "io.netty" }
-            //exclude(dependency("io.netty:netty-all"))
-            //exclude(dependency("io.netty:netty-buffer"))
-            //exclude(dependency("io.netty:netty-codec"))
-            //exclude(dependency("io.netty:netty-transport"))
-            exclude(dependency("it.unimi.dsi:fastutil"))
-            exclude(dependency("org.checkerframework:checker-qual"))
-            exclude(dependency("org.jspecify:jspecify"))
-            exclude(dependency("org.slf4j:slf4j-api"))
+            excludePlatformRuntime(ServerPlatform.PAPER)
         }
 
         fun relocate0(pattern: String, result: String) {

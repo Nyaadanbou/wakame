@@ -7,6 +7,8 @@ libraries-repository = "0.0.4-snapshot"
 copy-jar-build = "0.0.2-snapshot"
 copy-jar-docker = "0.0.1-snapshot"
 paperweight = "2.0.0-beta.17"
+shadow = "9.2.1"
+indra = "3.1.3"
 blossom = "2.1.0"
 checkstyle = "10.12.5"
 stylecheck = "0.2.1"
@@ -93,6 +95,8 @@ bettergui = "10.2"
 # Gradle plugins
 
 plugin-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+plugin-shadow = {group = "com.gradleup.shadow", name = "com.gradleup.shadow.gradle.plugin", version.ref = "shadow" }
+plugin-indra-common = {group = "net.kyori", name = "indra-common", version.ref = "indra" }
 plugin-libraries-repository = { group = "cc.mewcraft.gradle", name = "libraries-repository-plugin", version.ref = "libraries-repository" }
 plugin-copy-jar-build = { group = "cc.mewcraft.gradle", name = "copy-jar-build-plugin", version.ref = "copy-jar-build" }
 plugin-copy-jar-docker = { group = "cc.mewcraft.gradle", name = "copy-jar-docker-plugin", version.ref = "copy-jar-docker" }
@@ -216,4 +220,5 @@ bettergui = { group = "me.hsgamer", name = "bettergui", version.ref = "bettergui
 
 [plugins]
 
+shadow = {id = "com.gradleup.shadow", version.ref = "shadow" }
 blossom = { id = "net.kyori.blossom", version.ref = "blossom" }

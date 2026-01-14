@@ -65,8 +65,6 @@ sourceSets {
     }
 }
 
-// 故意不写 builderCopy 因为会导致 gradle 无法执行 copyJarToBuild
-
 dockerCopy {
     containerId = "aether-minecraft-1"
     containerPath = "/minecraft/game1/mods/"
