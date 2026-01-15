@@ -98,12 +98,12 @@ class GameTickScheduler(
         nextExecutionTick.clear()
         val startTick = now
 
-        // For each schedule, the first execution is scheduled at (startTick + interval).
+        // For each schedule, the first execution is scheduled at startTick itself.
         // Subsequent executions are spaced by exactly 'interval' ticks based on that point.
         for (schedule in schedules.values) {
             val interval = schedule.intervalTicks
             if (interval <= 0) continue
-            nextExecutionTick[schedule] = startTick + interval
+            nextExecutionTick[schedule] = startTick
         }
 
         Bukkit.getPluginManager().registerEvents(this, plugin)
@@ -128,15 +128,12 @@ class GameTickScheduler(
             val interval = schedule.intervalTicks
             if (interval <= 0) continue
 
-            val nextTick = nextExecutionTick[schedule]
-            val effectiveNextTick = nextTick ?: (tick + interval)
-            if (tick < effectiveNextTick) {
-                nextExecutionTick[schedule] = effectiveNextTick
-                continue
-            }
+            val nextTick = nextExecutionTick[schedule] ?: continue
 
-            executeOnce(schedule)
-            nextExecutionTick[schedule] = tick + interval
+            if (tick >= nextTick) {
+                executeOnce(schedule)
+                nextExecutionTick[schedule] = nextTick + interval
+            }
         }
     }
 
