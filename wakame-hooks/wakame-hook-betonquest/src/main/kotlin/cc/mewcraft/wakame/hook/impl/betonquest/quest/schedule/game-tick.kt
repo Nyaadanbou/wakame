@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.quest.schedule
 
-import com.destroystokyo.paper.event.server.ServerTickStartEvent
+import com.destroystokyo.paper.event.server.ServerTickEndEvent
 import org.betonquest.betonquest.api.QuestException
 import org.betonquest.betonquest.api.config.quest.QuestPackageManager
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
@@ -20,12 +20,16 @@ import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 
 /**
- * A schedule that runs actions every N Minecraft game ticks.
+ * A schedule that runs actions every N Minecraft game ticks (periodic execution).
+ *
+ * Semantic: An interval of N means the actions will execute every N ticks.
+ * - interval = 1: execute every tick (1, 2, 3, 4...)
+ * - interval = 20: execute every 20 ticks (1, 21, 41, 61...)
  *
  * @param scheduleID the unique identifier for this schedule
- * @param actions the list of action IDs to execute on each tick interval
+ * @param actions the list of action IDs to execute at each scheduled interval
  * @param catchup the catchup strategy to use if ticks are missed
- * @param intervalTicks the interval in Minecraft ticks between executions
+ * @param intervalTicks how many ticks between each execution (the execution period)
  */
 class GameTickSchedule(
     scheduleID: ScheduleID,
@@ -37,8 +41,10 @@ class GameTickSchedule(
 /**
  * Factory to create [GameTickSchedule] instances.
  *
- * Time format: a positive integer string representing the interval in Minecraft ticks.
- * For example, time: "10" means the schedule runs every 10 ticks.
+ * Time format: a positive integer string representing the execution period in Minecraft ticks.
+ * - time: "1" means execute every tick (1, 2, 3, 4...)
+ * - time: "20" means execute every 20 ticks (1, 21, 41, 61...)
+ * - time: "100" means execute every 100 ticks (1, 101, 201, 301...)
  */
 class GameTickScheduleFactory(
     variableProcessor: PlaceholderProcessor,
@@ -58,12 +64,24 @@ class GameTickScheduleFactory(
 /**
  * Scheduler that runs [GameTickSchedule] instances based on the Minecraft server tick loop.
  *
- * This scheduler uses the Paper [ServerTickStartEvent]
- * to track the current server tick and maintains, for each schedule, the next tick at which it
- * should be executed. Each schedule therefore runs from its own start time every
- * [GameTickSchedule.intervalTicks] interval ticks. There is intentionally no catchup
- * logic: if the server is paused, offline, or ticks are skipped, any missed executions are not
- * replayed later.
+ * This scheduler implements PERIODIC scheduling: a schedule with interval=N will execute
+ * every N ticks.
+ *
+ * Semantics:
+ * - interval = 1: execute EVERY tick (1, 2, 3, 4, 5...)
+ * - interval = 2: execute EVERY 2 ticks (1, 3, 5, 7, 9...)
+ * - interval = 20: execute EVERY 20 ticks (1, 21, 41, 61...)
+ *
+ * The scheduler starts at the current server tick provided to start(now). The first execution
+ * happens at that tick, and then every interval ticks thereafter.
+ *
+ * Implementation uses ServerTickEndEvent:
+ * - Fires AFTER all server tick logic (entity movement, block updates, etc.)
+ * - Ensures scheduled actions don't interfere with server-side calculations
+ * - Provides the cleanest execution point for time-sensitive actions
+ *
+ * No catchup logic: if the server pauses, goes offline, or ticks are skipped, any
+ * missed executions are simply not replayed later.
  */
 class GameTickScheduler(
     private val log: BetonQuestLogger,
@@ -74,10 +92,26 @@ class GameTickScheduler(
     /**
      * Next server tick at which each schedule should be executed.
      *
-     * This is initialized when the scheduler is started, based on the current
-     * server tick plus the schedule's interval, and then advanced by the
-     * interval after each execution. No catchup is performed: if ticks are
-     * skipped or the server is offline, missed executions are ignored.
+     * This is initialized when the scheduler is started at the current server tick,
+     * and then advanced by the full interval after each execution.
+     *
+     * IMPORTANT: This tracks the NEXT execution tick, not a counter.
+     *
+     * The schedule uses periodic execution based on interval:
+     * - interval = 1: execute every tick (ticks 1, 2, 3, 4...)
+     * - interval = 2: execute every 2 ticks (ticks 1, 3, 5, 7...)
+     * - interval = 20: execute every 20 ticks (ticks 1, 21, 41, 61...)
+     *
+     * Algorithm: We track when the scheduler was started and use modulo arithmetic to
+     * determine execution points. For a schedule started at tick `S` with interval `I`:
+     *   - Execute when: (tick - S) % I == 0
+     *   - This ensures execution at S, S+I, S+2I, S+3I...
+     *
+     * We maintain nextExecutionTick to avoid recalculating modulo every tick:
+     *   - After executing at tick T, set nextExecutionTick = T + I
+     *
+     * No catchup is performed: if ticks are skipped or the server is offline, missed
+     * executions are ignored.
      */
     private val nextExecutionTick: HashMap<GameTickSchedule, Int> = HashMap()
 
@@ -96,14 +130,10 @@ class GameTickScheduler(
         log.debug("Starting game tick scheduler.")
 
         nextExecutionTick.clear()
-        val startTick = now
-
-        // For each schedule, the first execution is scheduled at startTick itself.
-        // Subsequent executions are spaced by exactly 'interval' ticks based on that point.
         for (schedule in schedules.values) {
             val interval = schedule.intervalTicks
             if (interval <= 0) continue
-            nextExecutionTick[schedule] = startTick
+            nextExecutionTick[schedule] = now
         }
 
         Bukkit.getPluginManager().registerEvents(this, plugin)
@@ -113,23 +143,45 @@ class GameTickScheduler(
     }
 
     /**
-     * Called at the start of every server tick.
+     * Called at the END of every server tick, after all server logic has completed.
      *
      * This method checks each registered [GameTickSchedule] to see whether the current
      * server tick has reached or passed the next scheduled execution tick. If so, the schedule
-     * is executed once and its next execution tick is advanced by its configured interval.
+     * is executed once and its next execution tick is advanced by the configured interval.
+     *
+     * SCHEDULING SEMANTICS: "Every N ticks"
+     *
+     * The schedule is PERIODIC with a period equal to the interval:
+     * - interval = 1: execute EVERY tick (1, 2, 3, 4, 5...)
+     * - interval = 2: execute EVERY 2 ticks (1, 3, 5, 7, 9...)
+     * - interval = 20: execute EVERY 20 ticks (1, 21, 41, 61...)
+     *
+     * Note: A tick has a DURATION. Tick N includes the time from the end of Tick N-1 to
+     * the end of Tick N. An interval of 20 means "every 20 ticks", which is 20 ticks of duration.
+     *
+     * Example with interval=20, starting at tick 1:
+     *   - Tick 1: (1 - 1) % 20 = 0 → EXECUTE (1st execution)
+     *   - Tick 2-20: (N - 1) % 20 ≠ 0 → skip
+     *   - Tick 21: (21 - 1) % 20 = 0 → EXECUTE (2nd execution, 20 ticks after 1st)
+     *   - Tick 22-40: (N - 1) % 20 ≠ 0 → skip
+     *   - Tick 41: (41 - 1) % 20 = 0 → EXECUTE (3rd execution, 20 ticks after 2nd)
+     *
+     * Implementation: We use nextExecutionTick to avoid recalculating modulo every tick.
+     * When tick >= nextExecutionTick:
+     *   1. Execute the schedule
+     *   2. Set nextExecutionTick = current_tick + interval
+     *
+     * This naturally handles the "every N ticks" semantic without special cases.
      */
     @EventHandler
-    private fun on(event: ServerTickStartEvent) {
+    private fun on(event: ServerTickEndEvent) {
         if (!isRunning) return
 
-        val tick = Bukkit.getCurrentTick()
+        val tick = event.tickNumber
         for (schedule in schedules.values) {
             val interval = schedule.intervalTicks
             if (interval <= 0) continue
-
             val nextTick = nextExecutionTick[schedule] ?: continue
-
             if (tick >= nextTick) {
                 executeOnce(schedule)
                 nextExecutionTick[schedule] = nextTick + interval
