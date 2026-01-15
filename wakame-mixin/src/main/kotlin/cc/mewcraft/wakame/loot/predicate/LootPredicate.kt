@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.loot.predicate
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.loot.context.LootContext
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.SerializationException
@@ -12,12 +12,12 @@ typealias LootContextPredicate = (LootContext) -> Boolean
 
 fun interface LootPredicate : LootContextPredicate {
     companion object {
-        val SERIALIZER: TypeSerializer2<LootPredicate> = Serializer
+        val SERIALIZER: SimpleSerializer<LootPredicate> = Serializer
     }
 
     override fun invoke(context: LootContext): Boolean
 
-    private object Serializer : TypeSerializer2<LootPredicate> {
+    private object Serializer : SimpleSerializer<LootPredicate> {
         override fun deserialize(type: Type, node: ConfigurationNode): LootPredicate {
             val typeName = node.node("type").get<String>()
             val lootPredicateType = if (typeName == null) {

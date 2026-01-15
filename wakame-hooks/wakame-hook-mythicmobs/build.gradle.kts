@@ -1,5 +1,5 @@
 plugins {
-    id("koish-conventions.kotlin")
+    id("koish.core-conventions")
     id("cc.mewcraft.libraries-repository")
 }
 

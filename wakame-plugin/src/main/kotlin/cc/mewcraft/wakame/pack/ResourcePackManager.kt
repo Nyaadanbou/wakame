@@ -1,15 +1,11 @@
 package cc.mewcraft.wakame.pack
 
+import cc.mewcraft.lazyconfig.access.ConfigAccess
+import cc.mewcraft.lazyconfig.access.entry
+import cc.mewcraft.lazyconfig.access.node
+import cc.mewcraft.lazyconfig.access.optionalEntry
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.ConfigAccess
-import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.config.node
-import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.pack.generate.ResourcePackGeneration
-import cc.mewcraft.wakame.pack.generate.ResourcePackGenerationContext
-import cc.mewcraft.wakame.pack.generate.ResourcePackIconGeneration
-import cc.mewcraft.wakame.pack.generate.ResourcePackMergePackGeneration
-import cc.mewcraft.wakame.pack.generate.ResourcePackMetaGeneration
+import cc.mewcraft.wakame.pack.generate.*
 import cc.mewcraft.wakame.util.formatSize
 import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
@@ -19,7 +15,7 @@ import xyz.xenondevs.commons.provider.orElse
 import java.io.File
 import java.nio.file.Path
 
-internal val RESOURCE_PACK_CONFIG = ConfigAccess.INSTANCE["resourcepack"]
+internal val RESOURCE_PACK_CONFIG = ConfigAccess["resourcepack"]
 
 private class ResourcePackGenerationSettings {
     private val config = RESOURCE_PACK_CONFIG.node("generation")

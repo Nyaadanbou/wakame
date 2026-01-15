@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.entity.attribute
 
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entryOrElse
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.entryOrElse
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -20,7 +20,7 @@ import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.entity.Player
 
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 internal object AttributePacketInterceptor : PacketListener {
 
     private val SHADOW_PLAYER: ShadowPlayer = BukkitShadowFactory.global().staticShadow()

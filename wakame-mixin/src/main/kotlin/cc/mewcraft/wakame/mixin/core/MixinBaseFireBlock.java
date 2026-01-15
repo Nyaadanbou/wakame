@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.mixin.core;
 
+import cc.mewcraft.wakame.api.config.PrimaryConfig;
+import io.papermc.paper.adventure.PaperAdventure;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,7 +30,9 @@ public abstract class MixinBaseFireBlock {
     /// @reason allow portals to work in custom dimensions
     @Overwrite
     private static boolean inPortalDimension(Level level) {
-        return true;
+        var levelKey = PaperAdventure.asAdventure(level.getTypeKey().location());
+        var testKeys = PrimaryConfig.Impl.getNetherPortalFunctionalDimensions();
+        return testKeys.contains(levelKey);
     }
 }
 

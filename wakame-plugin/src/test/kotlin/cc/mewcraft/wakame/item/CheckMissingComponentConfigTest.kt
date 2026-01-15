@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.lazyconfig.access.ConfigAccess
+import cc.mewcraft.lazyconfig.access.node
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.test.TestOnly
 import cc.mewcraft.wakame.util.test.TestPath
@@ -31,7 +31,7 @@ class CheckMissingComponentConfigTest {
     @Test
     fun `check all item component config's at main`() {
         KoishDataPaths.initializeForTest(TestPath.MAIN)
-        ConfigAccess.register(Configs)
+        ConfigAccess.setImplementation(Configs)
         checkMissingConfigs()
     }
 
@@ -39,7 +39,7 @@ class CheckMissingComponentConfigTest {
     @Test
     fun `check all item component config's at test`() {
         KoishDataPaths.initializeForTest(TestPath.TEST)
-        ConfigAccess.register(Configs)
+        ConfigAccess.setImplementation(Configs)
         checkMissingConfigs()
     }
 

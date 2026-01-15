@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.config.ConfigAccess
-import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.config.node
-import cc.mewcraft.wakame.config.registerSerializer
+import cc.mewcraft.lazyconfig.access.ConfigAccess
+import cc.mewcraft.lazyconfig.access.entry
+import cc.mewcraft.lazyconfig.access.node
+import cc.mewcraft.lazyconfig.access.registerSerializer
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.entity.hologram.AnimationData
 import cc.mewcraft.wakame.entity.hologram.Hologram
 import cc.mewcraft.wakame.entity.hologram.TextHologramData
@@ -12,7 +14,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.text.Component
@@ -38,7 +39,7 @@ import kotlin.math.max
 import kotlin.math.sin
 import kotlin.random.Random
 
-private val DAMAGE_CONFIG = ConfigAccess.INSTANCE["damage/config"]
+private val DAMAGE_CONFIG = ConfigAccess["damage/config"]
 private val DISPLAY_CONFIG = DAMAGE_CONFIG.node("display")
 private val MERGED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("merged")
 private val SEPARATED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("separated")
@@ -46,7 +47,7 @@ private val SEPARATED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("separated")
 /**
  * 该 object 实现了元素伤害显示的功能.
  */
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 internal object DamageDisplay : Listener {
 
     // 这些 Vector3f 实例都是可变的, 请注意副作用 !!!
@@ -381,8 +382,8 @@ internal data class DamageDisplayAnimation(
     val negativeData: AnimationData,
 )
 
-@Init(stage = InitStage.PRE_CONFIG)
-internal object DamageDisplayAnimationSerializer : TypeSerializer2<DamageDisplayAnimation> {
+@Init(InitStage.PRE_CONFIG)
+internal object DamageDisplayAnimationSerializer : SimpleSerializer<DamageDisplayAnimation> {
     override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplayAnimation {
         val delay = node.node("delay").require<Long>()
 
@@ -406,7 +407,7 @@ internal object DamageDisplayAnimationSerializer : TypeSerializer2<DamageDisplay
 
     @InitFun
     fun init() {
-        ConfigAccess.INSTANCE.registerSerializer(KOISH_NAMESPACE, this)
+        ConfigAccess.registerSerializer(KOISH_NAMESPACE, this)
     }
 }
 
@@ -414,8 +415,8 @@ internal enum class DamageDisplayMode {
     MERGED, SEPARATED
 }
 
-@Init(stage = InitStage.PRE_CONFIG)
-internal object DamageDisplaySettingsSerializer : TypeSerializer2<DamageDisplaySettings> {
+@Init(InitStage.PRE_CONFIG)
+internal object DamageDisplaySettingsSerializer : SimpleSerializer<DamageDisplaySettings> {
 
     override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplaySettings = when (node.require<DamageDisplayMode>()) {
         DamageDisplayMode.MERGED -> MergedDamageDisplaySettings
@@ -424,7 +425,7 @@ internal object DamageDisplaySettingsSerializer : TypeSerializer2<DamageDisplayS
 
     @InitFun
     fun init() {
-        ConfigAccess.INSTANCE.registerSerializer(KOISH_NAMESPACE, this)
+        ConfigAccess.registerSerializer(KOISH_NAMESPACE, this)
     }
 
 }

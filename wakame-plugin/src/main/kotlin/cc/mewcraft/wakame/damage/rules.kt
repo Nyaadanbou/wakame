@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.config.ConfigAccess
-import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.config.node
+import cc.mewcraft.lazyconfig.access.ConfigAccess
+import cc.mewcraft.lazyconfig.access.entry
+import cc.mewcraft.lazyconfig.access.node
 import cc.mewcraft.wakame.util.bindInstance
 import team.unnamed.mocha.MochaEngine
 import team.unnamed.mocha.runtime.binding.Binding
 
-private val DAMAGE_CONFIG = ConfigAccess.INSTANCE["damage/config"]
+private val DAMAGE_CONFIG = ConfigAccess["damage/config"]
 private val RULES_CONFIG = DAMAGE_CONFIG.node("rules")
 
 /**
@@ -30,7 +30,7 @@ internal object DamageRules {
         @JvmField @Binding("defense_penetration")
         val defensePenetration: Double,
         @JvmField @Binding("defense_penetration_rate")
-        val defensePenetrationRate: Double
+        val defensePenetrationRate: Double,
     )
 
     @Binding("q")
@@ -71,7 +71,7 @@ internal object DamageRules {
      * - 有效防御值(本元素+通用元素)
      */
     fun calculateDamageAfterDefense(
-        originalDamage: Double, validDefense: Double
+        originalDamage: Double, validDefense: Double,
     ): Double {
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(BindingDamageAfterDefense(originalDamage, validDefense), "q")

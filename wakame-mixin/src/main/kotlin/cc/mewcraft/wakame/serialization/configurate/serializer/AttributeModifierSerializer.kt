@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.serialization.configurate.serializer
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-object AttributeModifierSerializer : TypeSerializer2<AttributeModifier> {
+object AttributeModifierSerializer : SimpleSerializer<AttributeModifier> {
     override fun deserialize(type: Type, node: ConfigurationNode): AttributeModifier {
         val id = node.node("id").require<Identifier>()
         val operation = node.node("operation").require<AttributeModifier.Operation>()

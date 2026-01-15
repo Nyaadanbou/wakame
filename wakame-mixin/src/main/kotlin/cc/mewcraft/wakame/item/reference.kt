@@ -2,11 +2,11 @@
 
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.item.toJsonString
-import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -46,7 +46,7 @@ interface ItemRef {
          * 如果字符串并不对应一个有效的 [ItemRef], 则会抛出异常.
          */
         @JvmField
-        val SERIALIZER: TypeSerializer2<ItemRef> = TypeSerializer2 { type, node ->
+        val SERIALIZER: SimpleSerializer<ItemRef> = SimpleSerializer { type, node ->
             val id = node.require<Identifier>()
             create(id) ?: throw SerializationException(
                 node,

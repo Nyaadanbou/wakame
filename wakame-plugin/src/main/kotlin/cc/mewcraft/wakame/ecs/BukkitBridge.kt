@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerQuitEvent
 /**
  * 负责管理 [org.bukkit.entity.Player] 对应的 [cc.mewcraft.wakame.ecs.bridge.EEntity] 的生命周期
  */
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 object BukkitBridge : Listener {
 
     @InitFun

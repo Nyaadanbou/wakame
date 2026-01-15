@@ -13,7 +13,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 /**
  * 按比例缩放玩家的最大生命值.
  */
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 internal object PlayerMaxHealthScale : Listener {
 
     @InitFun

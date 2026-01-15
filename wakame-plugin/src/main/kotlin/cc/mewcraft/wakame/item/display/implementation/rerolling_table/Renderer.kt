@@ -20,8 +20,6 @@ import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
@@ -43,10 +41,7 @@ internal data class RerollingTableContext(
     }
 }
 
-@Init(
-    stage = InitStage.POST_WORLD
-)
-@Reload
+@Init(InitStage.POST_WORLD)
 internal object RerollingTableItemRenderer : AbstractItemRenderer<RerollingTableContext>() {
     override val name: String = "rerolling_table"
     override val formats = RerollingTableRendererFormatRegistry(this)
@@ -58,7 +53,6 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<RerollingTable
         loadDataFromConfigs()
     }
 
-    @ReloadFun
     fun reload() {
         loadDataFromConfigs()
     }

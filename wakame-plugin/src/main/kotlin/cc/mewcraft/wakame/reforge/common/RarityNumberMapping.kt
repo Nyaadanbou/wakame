@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.reforge.common
 
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -39,7 +39,7 @@ fun interface RarityNumberMapping : Examinable {
 /**
  * [RarityNumberMapping] 的序列化器.
  */
-internal object RarityNumberMappingSerializer : TypeSerializer2<RarityNumberMapping> {
+internal object RarityNumberMappingSerializer : SimpleSerializer<RarityNumberMapping> {
     override fun deserialize(
         type: Type,
         node: ConfigurationNode,

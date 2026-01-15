@@ -2,11 +2,11 @@
 
 package cc.mewcraft.wakame.damage
 
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.ConfigAccess
+import cc.mewcraft.lazyconfig.access.node
+import cc.mewcraft.lazyconfig.access.optionalEntry
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.ConfigAccess
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.node
-import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.damage.DamageManagerImpl.registerExactArrow
 import cc.mewcraft.wakame.damage.DamageManagerImpl.registerTrident
 import cc.mewcraft.wakame.damage.DamageManagerImpl.registeredCustomDamageMap
@@ -65,7 +65,7 @@ import kotlin.math.round
 
 private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "damage").orElse(false)
 
-private val DAMAGE_CONFIG = ConfigAccess.INSTANCE["damage/config"]
+private val DAMAGE_CONFIG = ConfigAccess["damage/config"]
 private val PLAYER_INTRINSIC_ATTACK_COOLDOWN by DAMAGE_CONFIG.optionalEntry<Long>("player_intrinsic_attack_cooldown").orElse(5L).map { it * 50L }
 private val EQUIPMENT_CONFIG = DAMAGE_CONFIG.node("equipment")
 private val EQUIPMENT_NO_DURABILITY_LOSS_DAMAGE_TYPES by EQUIPMENT_CONFIG.optionalEntry<List<DamageType>>("no_durability_loss_damage_types").orElse(emptyList())

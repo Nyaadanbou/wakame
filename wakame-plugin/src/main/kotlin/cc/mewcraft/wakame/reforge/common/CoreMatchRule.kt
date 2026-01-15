@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.reforge.common
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.bundle.element
@@ -7,7 +8,6 @@ import cc.mewcraft.wakame.item.data.impl.AttributeCore
 import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.item.data.impl.EmptyCore
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.javaTypeOf
 import net.kyori.examination.Examinable
@@ -63,7 +63,7 @@ interface CoreMatchRule : Examinable {
 /**
  * [CoreMatchRule] 的序列化器.
  */
-internal object CoreMatchRuleSerializer : TypeSerializer2<CoreMatchRule> {
+internal object CoreMatchRuleSerializer : SimpleSerializer<CoreMatchRule> {
     override fun deserialize(type: Type, node: ConfigurationNode): CoreMatchRule {
         val typeNode = node.node("type")
         val rawType = typeNode.string ?: throw SerializationException(typeNode, javaTypeOf<String>(), "Missing key: 'type'")

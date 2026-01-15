@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.attribute
 
+import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.element.ElementRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
@@ -26,14 +26,14 @@ class CheckMissingAttributeConfigTest {
     @Test
     fun `check all attribute config's at main`() {
         KoishDataPaths.initializeForTest(TestPath.MAIN)
-        ConfigAccess.register(Configs)
+        ConfigAccess.setImplementation(Configs)
         checkMissingConfigs()
     }
 
     @Test
     fun `check all attribute config's at test`() {
         KoishDataPaths.initializeForTest(TestPath.TEST)
-        ConfigAccess.register(Configs)
+        ConfigAccess.setImplementation(Configs)
         checkMissingConfigs()
     }
 

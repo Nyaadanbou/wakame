@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.catalog.item
 
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
@@ -7,12 +8,14 @@ import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.DynamicRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.IdePauser
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.MINECRAFT_SERVER
+import cc.mewcraft.wakame.util.MojangLootTable
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.core.HolderLookup
@@ -22,9 +25,10 @@ import kotlin.streams.asSequence
 
 @Init(
     stage = InitStage.POST_WORLD,
-    runAfter = [CatalogItemMenuSettings::class] // 要等预设菜单布局载入好
+    runAfter = [
+        CatalogItemMenuSettings::class, // 要等预设菜单布局载入好
+    ]
 )
-@Reload
 internal object CatalogItemLootTableRecipeRegistryLoader : RegistryLoader {
 
     // 默认的战利品表数量庞大, 使用较大的容量以减少哈希冲突
@@ -38,7 +42,6 @@ internal object CatalogItemLootTableRecipeRegistryLoader : RegistryLoader {
         DynamicRegistries.LOOT_TABLE_RECIPE.freeze()
     }
 
-    @ReloadFun
     fun reload() {
         reloadMinecraftLootTables()
         applyDataToRegistry(DynamicRegistries.LOOT_TABLE_RECIPE::update)

@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.damage.mapping
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.DamageMetadataBuilder
 import cc.mewcraft.wakame.damage.RawDamageContext
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Required
@@ -49,7 +49,7 @@ internal data class DamagePredicateMapper(
 ) : DamageMapper {
 
     companion object {
-        fun serializer(): TypeSerializer<DamagePredicateMapper> = TypeSerializer2 { _: Type, node: ConfigurationNode ->
+        fun serializer(): TypeSerializer<DamagePredicateMapper> = SimpleSerializer { _: Type, node: ConfigurationNode ->
             val tests = node.node("predicates").childrenMap().values.map { it.require<DamagePredicate>() }
             val builder = node.node("damage_metadata").require<DamageMetadataBuilder<*>>()
             DamagePredicateMapper(tests, builder)

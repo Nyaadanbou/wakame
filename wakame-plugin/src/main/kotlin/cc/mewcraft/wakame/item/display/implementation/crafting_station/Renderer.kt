@@ -20,8 +20,6 @@ import cc.mewcraft.wakame.item.property.impl.ExtraLore
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.loot.context.LootContext
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.item.fastLore
@@ -51,10 +49,7 @@ internal data class CraftingStationContext(
     }
 }
 
-@Init(
-    stage = InitStage.POST_WORLD
-)
-@Reload
+@Init(InitStage.POST_WORLD)
 internal object CraftingStationItemRenderer : AbstractItemRenderer<CraftingStationContext>() {
     override val name: String = "crafting_station"
     override val formats = CraftingStationRendererFormatRegistry(this)
@@ -66,7 +61,6 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<CraftingStati
         loadDataFromConfigs()
     }
 
-    @ReloadFun
     fun reload() {
         loadDataFromConfigs()
     }

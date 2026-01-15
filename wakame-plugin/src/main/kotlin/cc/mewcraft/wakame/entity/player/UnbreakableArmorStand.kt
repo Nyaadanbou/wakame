@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.entity.player
 
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.entry
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
 /**
  * 阻止玩家在非潜行状态下破坏盔甲架.
  */
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 internal object UnbreakableArmorStand : Listener {
 
     @InitFun

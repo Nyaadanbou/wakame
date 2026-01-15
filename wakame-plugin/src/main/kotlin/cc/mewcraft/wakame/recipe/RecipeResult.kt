@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.recipe
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.item.ItemRef
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.item.toNMS
-import cc.mewcraft.wakame.util.require
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
@@ -55,7 +55,7 @@ data class SingleRecipeResult(
 /**
  * [RecipeResult] 的序列化器.
  */
-internal object RecipeResultSerializer : TypeSerializer2<RecipeResult> {
+internal object RecipeResultSerializer : SimpleSerializer<RecipeResult> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeResult {
         val item = node.node("item").require<ItemRef>()
         val amount = node.node("amount").getInt(1).apply {

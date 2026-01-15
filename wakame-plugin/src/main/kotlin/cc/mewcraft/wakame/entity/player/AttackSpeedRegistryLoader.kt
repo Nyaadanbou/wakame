@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.entity.player
 
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -9,15 +10,14 @@ import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
-import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.yamlLoader
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import java.io.File
 
-@Init(stage = InitStage.PRE_WORLD)
+@Init(InitStage.PRE_WORLD)
 internal object AttackSpeedRegistryLoader : RegistryLoader {
 
     private val rootDirectory: File = KoishDataPaths.CONFIGS.resolve("attack_speed/").toFile()

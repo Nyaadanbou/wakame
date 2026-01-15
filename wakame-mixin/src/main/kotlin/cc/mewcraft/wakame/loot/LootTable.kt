@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.loot
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.loot.context.LootContext
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import io.leangen.geantyref.TypeFactory
 import io.leangen.geantyref.TypeToken
@@ -24,7 +24,7 @@ inline fun <reified S> LootTable(
  */
 interface LootTable<S> {
     companion object {
-        val SERIALIZER: TypeSerializer2<LootTable<*>> = Serializer
+        val SERIALIZER: SimpleSerializer<LootTable<*>> = Serializer
 
         fun <T> empty(): LootTable<T> {
             return SimpleLootTable(emptyList())
@@ -41,7 +41,7 @@ interface LootTable<S> {
      */
     fun select(context: LootContext): List<S>
 
-    private object Serializer : TypeSerializer2<LootTable<*>> {
+    private object Serializer : SimpleSerializer<LootTable<*>> {
         override fun deserialize(type: Type, node: ConfigurationNode): LootTable<*> {
             val rawScalar = node.rawScalar()
             if (rawScalar is String) {

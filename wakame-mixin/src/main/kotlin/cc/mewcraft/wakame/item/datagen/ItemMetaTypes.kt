@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.datagen
 
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.registerExact
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.item.data.impl.CoreContainer
@@ -12,8 +14,6 @@ import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
 import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.registerExact
 import io.papermc.paper.datacomponent.item.TooltipDisplay
 import io.papermc.paper.datacomponent.item.UseCooldown
 import net.kyori.adventure.key.Key

@@ -15,7 +15,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
-@Init(stage = InitStage.PRE_WORLD)
+@Init(InitStage.PRE_WORLD)
 internal object ItemRefBootstrap {
 
     @InitFun

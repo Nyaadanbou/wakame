@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.serialization.configurate.serializer
 
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.util.EnumLookup
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -8,7 +8,7 @@ import org.spongepowered.configurate.serialize.SerializationException
 import xyz.xenondevs.commons.reflection.rawType
 import java.lang.reflect.Type
 
-object CompressedEnumValueSerializer : TypeSerializer2<Enum<*>> {
+object CompressedEnumValueSerializer : SimpleSerializer<Enum<*>> {
 
     override fun deserialize(type: Type, node: ConfigurationNode): Enum<*>? {
         val ordinal = node.get<Int>() ?: throw SerializationException(node, type, "Invalid enum ordinal")

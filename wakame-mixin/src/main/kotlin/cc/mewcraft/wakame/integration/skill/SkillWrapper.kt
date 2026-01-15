@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.integration.skill
 
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.registerExact
+import cc.mewcraft.lazyconfig.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.item.property.impl.Castable
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.Registry
-import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.registerExact
 import org.bukkit.entity.Player
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting

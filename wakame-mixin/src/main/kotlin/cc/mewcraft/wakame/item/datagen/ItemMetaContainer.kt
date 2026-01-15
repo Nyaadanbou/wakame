@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.datagen
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.register
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item.data.ItemDataContainer
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.util.register
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap
 import org.jetbrains.annotations.ApiStatus
 import org.spongepowered.configurate.ConfigurationNode
@@ -136,7 +136,7 @@ private class SimpleItemMetaContainer(
         return if (metaMap.isEmpty()) ItemMetaContainer.EMPTY else this
     }
 
-    object Serializer : TypeSerializer2<ItemMetaContainer> {
+    object Serializer : SimpleSerializer<ItemMetaContainer> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemMetaContainer {
             val builder = ItemMetaContainer.builder()
             for ((rawNodeKey, node) in node.childrenMap()) {

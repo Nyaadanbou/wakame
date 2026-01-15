@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.network
 
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.optionalEntry
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.item.display.ItemRenderers
 import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.item.koishTypeId
@@ -44,7 +44,7 @@ private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "r
 /**
  * 修改 [net.minecraft.world.item.ItemStack].
  */
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 internal object ItemStackRender : PacketListener, Listener {
 
     @InitFun

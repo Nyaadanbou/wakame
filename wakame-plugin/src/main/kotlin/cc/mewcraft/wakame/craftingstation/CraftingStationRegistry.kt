@@ -1,27 +1,20 @@
 package cc.mewcraft.wakame.craftingstation
 
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.util.IdePauser
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.yamlLoader
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import org.jetbrains.annotations.VisibleForTesting
 
 @Init(
     stage = InitStage.POST_WORLD,
     runAfter = [
         CraftingStationRecipeRegistry::class, // deps: 需要直接的数据
-    ]
-)
-@Reload(
-    runAfter = [
-        CraftingStationRecipeRegistry::class
     ]
 )
 internal object CraftingStationRegistry {
@@ -37,7 +30,6 @@ internal object CraftingStationRegistry {
     @InitFun
     fun init() = loadDataIntoRegistry()
 
-    @ReloadFun
     fun reload() = loadDataIntoRegistry()
 
     operator fun get(id: String): CraftingStation? {

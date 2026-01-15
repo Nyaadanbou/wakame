@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.util.ProxyServerSwitcher
 import org.bukkit.Bukkit
 
 
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 internal object BungeeCordPluginMessagingChannelInitializer {
 
     @InitFun
@@ -18,7 +18,7 @@ internal object BungeeCordPluginMessagingChannelInitializer {
     }
 }
 
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 internal object ProxyServerSwitcherInitializer {
 
     @InitFun

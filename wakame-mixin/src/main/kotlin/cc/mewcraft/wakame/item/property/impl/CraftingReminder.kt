@@ -1,16 +1,16 @@
 package cc.mewcraft.wakame.item.property.impl
 
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.registerExact
+import cc.mewcraft.lazyconfig.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.api.Koish
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.Registry
-import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toNMS
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.registerExact
 import net.minecraft.resources.ResourceLocation
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -58,7 +58,7 @@ object CraftingReminderTypes {
 @ConfigSerializable
 data class ItemReminder(
     val id: Identifier,
-    val amount: Int = 1
+    val amount: Int = 1,
 ) : CraftingReminder {
     override val type: CraftingReminderType = CraftingReminderTypes.ITEM
 
@@ -88,7 +88,7 @@ data class ItemReminder(
  */
 @ConfigSerializable
 data class HurtAndBreakReminder(
-    val damage: Int
+    val damage: Int,
 ) : CraftingReminder {
     override val type: CraftingReminderType = CraftingReminderTypes.HURT_AND_BREAK
 

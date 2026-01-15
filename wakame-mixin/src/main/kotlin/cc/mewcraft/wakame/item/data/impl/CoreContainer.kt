@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.data.impl
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import cc.mewcraft.wakame.item.typeId
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.withValue
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.ImmutableMultimap
@@ -29,7 +29,7 @@ sealed interface CoreContainer : Iterable<Map.Entry<String, Core>> {
     companion object {
 
         @JvmField
-        val SERIALIZER: TypeSerializer2<CoreContainer> = SimpleCoreContainer.Serializer
+        val SERIALIZER: SimpleSerializer<CoreContainer> = SimpleCoreContainer.Serializer
 
         @JvmField
         val EMPTY: CoreContainer = EmptyCoreContainer
@@ -140,7 +140,7 @@ private class SimpleCoreContainer(
     private var copyOnWrite: Boolean,
 ) : CoreContainer, CoreContainer.Builder {
 
-    object Serializer : TypeSerializer2<CoreContainer> {
+    object Serializer : SimpleSerializer<CoreContainer> {
         override fun deserialize(type: Type, node: ConfigurationNode): CoreContainer? {
             val dataMap = node.get<Map<String, Core>>() ?: return CoreContainer.EMPTY
             val container = CoreContainer.of(dataMap)

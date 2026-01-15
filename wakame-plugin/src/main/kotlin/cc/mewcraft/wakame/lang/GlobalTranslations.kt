@@ -1,14 +1,12 @@
 package cc.mewcraft.wakame.lang
 
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.adventure.translator.MiniMessageTranslationRegistry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry.RegistryLoader
-import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.yamlLoader
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.key.Key
@@ -37,9 +35,9 @@ fun ComponentLike.translate(viewer: Audience): Component {
 fun List<ComponentLike>.translate(locale: Locale): List<Component> = map { it.translate(locale) }
 fun List<ComponentLike>.translate(viewer: Audience): List<Component> = map { it.translate(viewer) }
 
-@Init(stage = InitStage.PRE_WORLD)
-@Reload
+@Init(InitStage.PRE_WORLD)
 object GlobalTranslations : RegistryLoader {
+
     private val TRANSLATION_KEY = Key.key("wakame", "global.translation")
     private val translations: MiniMessageTranslationRegistry = MiniMessageTranslationRegistry.create(TRANSLATION_KEY, MiniMessage.miniMessage())
 
@@ -49,7 +47,6 @@ object GlobalTranslations : RegistryLoader {
         loadDataIntoRegistry()
     }
 
-    @ReloadFun
     fun reload() {
         translations.unregisterAll()
         loadDataIntoRegistry()

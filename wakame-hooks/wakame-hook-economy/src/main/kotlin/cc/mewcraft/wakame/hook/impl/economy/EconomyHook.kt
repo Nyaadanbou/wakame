@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.hook.impl.economy
 
 import cc.mewcraft.economy.api.Currency
 import cc.mewcraft.economy.api.EconomyProvider
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.entry
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.integration.economy.EconomyIntegration2
 import cc.mewcraft.wakame.integration.economy.EconomyType

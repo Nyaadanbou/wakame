@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.hook.impl.auraskills
 
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.entry
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.entity.player.PlayerDataLoadingCoordinator
 import cc.mewcraft.wakame.entity.player.ResourceLoadingFixHandler
 import cc.mewcraft.wakame.integration.Hook

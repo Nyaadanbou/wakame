@@ -20,7 +20,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent
 /**
  * 伤害系统的监听器, 也是游戏内伤害计算逻辑的代码入口.
  */
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 internal object DamageListener : Listener {
 
     @InitFun
@@ -58,7 +58,7 @@ internal object DamageListener : Listener {
 /**
  * 监听 Koish 伤害事件, 使其遵循保护系统的规则.
  */
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 internal object DamageIntegration : Listener {
 
     @InitFun

@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap
 // 2) 玩家等级
 // 3) Koish
 
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 object PlayerDataLoadingCoordinator : Listener {
 
     private const val LOG_PREFIX = "[PlayerDataLoadingCoordinator]"

@@ -1,9 +1,14 @@
 package cc.mewcraft.wakame.hook.impl.towny.messaging
 
+import cc.mewcraft.messaging2.ServerInfoProvider
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.townynetwork.TownyNetworkIntegration
 import cc.mewcraft.wakame.messaging.MessagingManager
-import cc.mewcraft.wakame.messaging.packet.*
+import cc.mewcraft.wakame.messaging.handler.TownyNetworkPacketHandler
+import cc.mewcraft.wakame.messaging.packet.NationSpawnRequestPacket
+import cc.mewcraft.wakame.messaging.packet.NationSpawnResponsePacket
+import cc.mewcraft.wakame.messaging.packet.TownSpawnRequestPacket
+import cc.mewcraft.wakame.messaging.packet.TownSpawnResponsePacket
 import cc.mewcraft.wakame.util.ProxyServerSwitcher
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
@@ -24,16 +29,16 @@ import java.util.*
 private val townyApi: TownyAPI
     get() = TownyAPI.getInstance()
 private val serverId: UUID
-    get() = MessagingManager.serverId
+    get() = ServerInfoProvider.serverId
 private val serverKey: String
-    get() = MessagingManager.serverKey
+    get() = ServerInfoProvider.serverKey
 private val serverGroup: String
-    get() = MessagingManager.serverGroup
+    get() = ServerInfoProvider.serverGroup
 
 /**
  * 服务器上有安装 Towny 时的实现.
  */
-object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkHandler, Listener {
+object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkPacketHandler, Listener {
 
     override suspend fun reqTownSpawn(player: Player, targetServer: String) =
         TownyTeleportImpl.reqTownSpawn(player, targetServer)

@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 
-@Init(stage = InitStage.PRE_FLEKS)
+@Init(InitStage.PRE_FLEKS)
 object AttributeFleksPatcher : FleksPatcher {
     @InitFun
     fun init() {
@@ -24,7 +24,7 @@ object AttributeFleksPatcher : FleksPatcher {
     }
 }
 
-@Init(stage = InitStage.PRE_FLEKS)
+@Init(InitStage.PRE_FLEKS)
 object CommonFleksPatcher : FleksPatcher {
 
     @InitFun
@@ -33,7 +33,7 @@ object CommonFleksPatcher : FleksPatcher {
     }
 }
 
-@Init(stage = InitStage.PRE_FLEKS)
+@Init(InitStage.PRE_FLEKS)
 object EnchantmentFleksPatcher : FleksPatcher {
     @InitFun
     fun init() {
@@ -47,7 +47,7 @@ object EnchantmentFleksPatcher : FleksPatcher {
     }
 }
 
-@Init(stage = InitStage.PRE_FLEKS)
+@Init(InitStage.PRE_FLEKS)
 object ItemBehaviorFleksPatcher : FleksPatcher {
     @InitFun
     fun init() {
@@ -56,7 +56,7 @@ object ItemBehaviorFleksPatcher : FleksPatcher {
     }
 }
 
-@Init(stage = InitStage.PRE_FLEKS)
+@Init(InitStage.PRE_FLEKS)
 object ItemFleksPatcher : FleksPatcher {
     @InitFun
     fun init() {
@@ -64,7 +64,7 @@ object ItemFleksPatcher : FleksPatcher {
     }
 }
 
-@Init(stage = InitStage.PRE_FLEKS)
+@Init(InitStage.PRE_FLEKS)
 object KizamiFleksPatcher : FleksPatcher {
     @InitFun
     fun init() {
@@ -73,7 +73,7 @@ object KizamiFleksPatcher : FleksPatcher {
     }
 }
 
-@Init(stage = InitStage.PRE_FLEKS)
+@Init(InitStage.PRE_FLEKS)
 object PlayerFleksPatcher : FleksPatcher {
     @InitFun
     fun init() {

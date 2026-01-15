@@ -1,21 +1,22 @@
 package cc.mewcraft.wakame.catalog.item
 
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry.DynamicRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import kotlin.io.path.*
 
 
-@Init(stage = InitStage.POST_WORLD)
-@Reload
+@Init(InitStage.POST_WORLD)
 internal object CatalogItemCategoryRegistryLoader : RegistryLoader {
 
     @InitFun
@@ -25,7 +26,6 @@ internal object CatalogItemCategoryRegistryLoader : RegistryLoader {
         DynamicRegistries.ITEM_CATEGORY.freeze()
     }
 
-    @ReloadFun
     fun reload() {
         applyDataToRegistry(DynamicRegistries.ITEM_CATEGORY::update)
     }

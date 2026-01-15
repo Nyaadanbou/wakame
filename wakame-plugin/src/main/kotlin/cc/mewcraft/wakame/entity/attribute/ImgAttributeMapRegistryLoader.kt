@@ -3,8 +3,6 @@ package cc.mewcraft.wakame.entity.attribute
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.Identifier
@@ -12,9 +10,9 @@ import cc.mewcraft.wakame.util.Identifiers
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.jetbrains.annotations.ApiStatus
 
-@Init(stage = InitStage.POST_WORLD) // 实际依赖 AttributeSupplierRegistryLoader
-@Reload
+@Init(InitStage.POST_WORLD) // 依赖 AttributeSupplierRegistryLoader
 internal object ImgAttributeMapRegistryLoader {
+
     // 通过硬编码注册的 id, 但不确定对应的配置文件是否存在
     private val intrusiveRegisteredIds = HashSet<String>()
 
@@ -29,7 +27,6 @@ internal object ImgAttributeMapRegistryLoader {
     }
 
     @ApiStatus.Internal
-    @ReloadFun
     fun reload() {
         consumeData(BuiltInRegistries.IMG_ATTRIBUTE_MAP::update)
     }

@@ -1,10 +1,14 @@
 package cc.mewcraft.wakame.serialization.configurate.serializer
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.registry.Registry
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.MojangRegistry
+import cc.mewcraft.wakame.util.MojangResourceLocation
 import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
+import cc.mewcraft.wakame.util.getValueOrThrow
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import org.bukkit.Keyed
@@ -14,18 +18,18 @@ import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
 //<editor-fold desc="Koish Registry">
-/*internal*/ fun <T : Any> Registry<T>.valueByNameTypeSerializer(): TypeSerializer2<T> {
+/*internal*/ fun <T : Any> Registry<T>.valueByNameTypeSerializer(): SimpleSerializer<T> {
     return RegistryValueEntrySerializer(this)
 }
 
-/*internal*/ fun <T : Any> Registry<T>.holderByNameTypeSerializer(): TypeSerializer2<RegistryEntry<T>> {
+/*internal*/ fun <T : Any> Registry<T>.holderByNameTypeSerializer(): SimpleSerializer<RegistryEntry<T>> {
     return RegistryHolderEntrySerializer(this)
 }
 
 @PublishedApi
 internal class RegistryValueEntrySerializer<T : Any>(
     private val registry: Registry<T>,
-) : TypeSerializer2<T> {
+) : SimpleSerializer<T> {
     override fun deserialize(type: Type, node: ConfigurationNode): T {
         return registry.getOrThrow(node.require<String>())
     }
@@ -40,7 +44,7 @@ internal class RegistryValueEntrySerializer<T : Any>(
 @PublishedApi
 internal class RegistryHolderEntrySerializer<T : Any>(
     private val registry: Registry<T>,
-) : TypeSerializer2<RegistryEntry<T>> {
+) : SimpleSerializer<RegistryEntry<T>> {
     override fun deserialize(type: Type, node: ConfigurationNode): RegistryEntry<T> {
         return registry.createEntry(node.require<Identifier>())
     }
@@ -54,14 +58,14 @@ internal class RegistryHolderEntrySerializer<T : Any>(
 //</editor-fold>
 
 //<editor-fold desc="Paper Registry">
-/*internal*/ fun <T : Keyed> RegistryKey<T>.valueByNameTypeSerializer(): TypeSerializer2<T> {
+/*internal*/ fun <T : Keyed> RegistryKey<T>.valueByNameTypeSerializer(): SimpleSerializer<T> {
     return BukkitRegistryEntryValueSerializer(this)
 }
 
 @PublishedApi
 internal class BukkitRegistryEntryValueSerializer<T : Keyed>(
     private val registryKey: RegistryKey<T>,
-) : TypeSerializer2<T> {
+) : SimpleSerializer<T> {
     private val registry by lazy { RegistryAccess.registryAccess().getRegistry(registryKey) }
 
     override fun deserialize(type: Type, node: ConfigurationNode): T {
@@ -83,14 +87,14 @@ internal class BukkitRegistryEntryValueSerializer<T : Keyed>(
 //</editor-fold>
 
 //<editor-fold desc="Vanilla Registry">
-/*internal*/ fun <T : Any> MojangRegistry<T>.valueByNameTypeSerializer(): TypeSerializer2<T> {
+/*internal*/ fun <T : Any> MojangRegistry<T>.valueByNameTypeSerializer(): SimpleSerializer<T> {
     return MojangRegistryValueEntrySerializer(this)
 }
 
 @PublishedApi
 internal class MojangRegistryValueEntrySerializer<T : Any>(
     private val registry: MojangRegistry<T>,
-) : TypeSerializer2<T> {
+) : SimpleSerializer<T> {
     override fun deserialize(type: Type, node: ConfigurationNode): T {
         return registry.getValueOrThrow(MojangResourceLocation.parse(node.require<String>()))
     }

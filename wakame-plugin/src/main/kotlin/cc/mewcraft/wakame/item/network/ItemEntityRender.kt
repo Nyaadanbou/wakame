@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * 修改 [Item].
  */
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 internal object ItemEntityRender : PacketListener {
 
     private val SHADOW_ENTITY: ShadowEntity = BukkitShadowFactory.global().staticShadow<ShadowEntity>()

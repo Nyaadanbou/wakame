@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.craftingstation.recipe
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.adventure.key.Identified
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.adventure.toSimpleString
-import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -46,7 +46,7 @@ internal sealed interface Recipe : Identified, Examinable {
     /**
      * [Recipe] 的序列化器.
      */
-    object Serializer : TypeSerializer2<Recipe> {
+    object Serializer : SimpleSerializer<Recipe> {
         val HINT_NODE: RepresentationHint<Key> = RepresentationHint.of("key", typeTokenOf<Key>())
 
         override fun deserialize(type: Type, node: ConfigurationNode): Recipe {

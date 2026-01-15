@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.loot.entry
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.loot.context.LootContext
 import cc.mewcraft.wakame.loot.predicate.LootPredicate
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 
 /**
  * 若满足指定条件, 从 [children] 开头开始, 逐一选择子项直到有一个子项不满足条件为止.
@@ -12,7 +12,7 @@ class SequentialEntry<S>(
     conditions: List<LootPredicate> = emptyList(),
 ) : CompositeEntryBase<S>(children, conditions) {
     companion object {
-        val SERIALIZER: TypeSerializer2<SequentialEntry<*>> = makeSerializer(::SequentialEntry)
+        val SERIALIZER: SimpleSerializer<SequentialEntry<*>> = makeSerializer(::SequentialEntry)
     }
 
     override fun compose(children: List<ComposableEntryContainer<S>>): ComposableEntryContainer<S> {

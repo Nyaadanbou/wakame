@@ -3,6 +3,9 @@
 
 package cc.mewcraft.wakame.damage.mapping
 
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.registerExact
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.damage.DamageMetadataBuilder
@@ -12,13 +15,8 @@ import cc.mewcraft.wakame.damage.VanillaDamageMetadataBuilder
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.registerExact
-import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.yamlLoader
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.bukkit.damage.DamageType
 import org.bukkit.entity.EntityType
@@ -34,8 +32,7 @@ private const val DATA_DIR = "damage"
 /**
  * 关于该映射的具体作用请参考配置文件的注释.
  */
-@Init(stage = InitStage.POST_WORLD)
-@Reload
+@Init(InitStage.POST_WORLD)
 internal object DamageTypeDamageMappings {
 
     /**
@@ -67,7 +64,6 @@ internal object DamageTypeDamageMappings {
         loadDataIntoRegistry()
     }
 
-    @ReloadFun
     fun reload() {
         loadDataIntoRegistry()
     }
@@ -89,8 +85,7 @@ internal object DamageTypeDamageMappings {
 /**
  * 关于该映射的具体作用请参考配置文件的注释.
  */
-@Init(stage = InitStage.POST_WORLD)
-@Reload
+@Init(InitStage.POST_WORLD)
 internal object AttackCharacteristicDamageMappings {
 
     /**
@@ -108,7 +103,6 @@ internal object AttackCharacteristicDamageMappings {
         loadDataIntoRegistry()
     }
 
-    @ReloadFun
     fun reload() {
         loadDataIntoRegistry()
     }
@@ -140,8 +134,7 @@ internal object AttackCharacteristicDamageMappings {
 /**
  * 关于该映射的具体作用请参考配置文件的注释.
  */
-@Init(stage = InitStage.POST_WORLD)
-@Reload
+@Init(InitStage.POST_WORLD)
 internal object NullCausingDamageMappings {
 
     /**
@@ -159,7 +152,6 @@ internal object NullCausingDamageMappings {
         loadDataIntoRegistry()
     }
 
-    @ReloadFun
     fun reload() {
         loadDataIntoRegistry()
     }
@@ -193,8 +185,7 @@ internal object NullCausingDamageMappings {
 /**
  * 关于该映射的具体作用请参考配置文件的注释.
  */
-@Init(stage = InitStage.POST_WORLD)
-@Reload
+@Init(InitStage.POST_WORLD)
 internal object PlayerAdhocDamageMappings {
 
     /**
@@ -212,7 +203,6 @@ internal object PlayerAdhocDamageMappings {
         loadDataIntoRegistry()
     }
 
-    @ReloadFun
     fun reload() {
         loadDataIntoRegistry()
     }

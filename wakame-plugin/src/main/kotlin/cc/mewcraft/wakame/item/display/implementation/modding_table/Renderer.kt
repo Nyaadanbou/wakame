@@ -18,8 +18,6 @@ import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
@@ -52,10 +50,7 @@ internal sealed interface ModdingTableContext {
     data class Replace(override val session: ModdingSession, val replace: ModdingSession.Replace) : ModdingTableContext
 }
 
-@Init(
-    stage = InitStage.POST_WORLD
-)
-@Reload
+@Init(InitStage.POST_WORLD)
 internal object ModdingTableItemRenderer : AbstractItemRenderer<ModdingTableContext>() {
     override val name: String = "modding_table"
     override val formats = ModdingTableRendererFormatRegistry(this)
@@ -67,7 +62,6 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<ModdingTableCont
         loadDataFromConfigs()
     }
 
-    @ReloadFun
     fun reload() {
         loadDataFromConfigs()
     }

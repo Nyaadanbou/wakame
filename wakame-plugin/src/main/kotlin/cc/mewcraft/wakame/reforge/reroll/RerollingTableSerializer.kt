@@ -1,16 +1,16 @@
 package cc.mewcraft.wakame.reforge.reroll
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.yamlLoader
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.io.File
@@ -127,21 +127,21 @@ internal object RerollingTableSerializer {
         )
     }
 
-    private object TableCurrencyCostSerializer : TypeSerializer2<RerollingTable.TableCurrencyCost> {
+    private object TableCurrencyCostSerializer : SimpleSerializer<RerollingTable.TableCurrencyCost> {
         override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.TableCurrencyCost {
             val code = node.require<String>()
             return SimpleRerollingTable.TableCurrencyCost(code)
         }
     }
 
-    private object CoreContainerCurrencyCostSerializer : TypeSerializer2<RerollingTable.CoreContainerCurrencyCost> {
+    private object CoreContainerCurrencyCostSerializer : SimpleSerializer<RerollingTable.CoreContainerCurrencyCost> {
         override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.CoreContainerCurrencyCost {
             val code = node.require<String>()
             return SimpleRerollingTable.CoreContainerCurrencyCost(code)
         }
     }
 
-    private object CoreContainerRuleSerializer : TypeSerializer2<RerollingTable.CoreContainerRule> {
+    private object CoreContainerRuleSerializer : SimpleSerializer<RerollingTable.CoreContainerRule> {
         override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.CoreContainerRule {
             val currencyCost = node.node("currency_cost").require<RerollingTable.CoreContainerCurrencyCost>()
             return SimpleRerollingTable.CoreContainerRule(currencyCost)

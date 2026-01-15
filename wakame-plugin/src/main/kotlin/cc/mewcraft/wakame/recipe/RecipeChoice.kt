@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.recipe
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.item.ItemTagManager
 import cc.mewcraft.wakame.mixin.support.KoishIngredient
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.MojangIngredient
 import cc.mewcraft.wakame.util.adventure.toSimpleString
@@ -97,7 +97,7 @@ data class TagRecipeChoice(
 /**
  * [RecipeChoice] 的序列化器.
  */
-internal object RecipeChoiceSerializer : TypeSerializer2<RecipeChoice> {
+internal object RecipeChoiceSerializer : SimpleSerializer<RecipeChoice> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeChoice {
         val str = node.rawScalar().toString()
         // 以 `#` 开头的认为是一个标签

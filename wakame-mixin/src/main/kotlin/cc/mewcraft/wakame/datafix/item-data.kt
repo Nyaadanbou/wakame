@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.datafix
 
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.item.data.ItemDataType
 import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.transformation.ConfigurationTransformation
 

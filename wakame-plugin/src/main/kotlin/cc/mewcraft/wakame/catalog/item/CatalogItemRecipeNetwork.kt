@@ -17,7 +17,7 @@ import org.bukkit.inventory.*
 import java.util.*
 import org.bukkit.inventory.Recipe as BukkitRecipe
 
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 object CatalogItemRecipeNetwork {
 
     private lateinit var network: ImmutableNetwork<Optional<ItemRef>, CatalogRecipeEdge>

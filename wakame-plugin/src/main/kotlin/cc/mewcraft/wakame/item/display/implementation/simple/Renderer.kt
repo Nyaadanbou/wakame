@@ -17,8 +17,6 @@ import cc.mewcraft.wakame.item.property.impl.ExtraLore
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.util.item.fastLore
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import org.bukkit.inventory.ItemStack
@@ -28,10 +26,7 @@ internal class SimpleRendererFormatRegistry : AbstractRendererFormatRegistry(Sim
 
 internal class SimpleItemRendererLayout : AbstractRendererLayout(SimpleItemRenderer)
 
-@Init(
-    stage = InitStage.POST_WORLD
-)
-@Reload
+@Init(InitStage.POST_WORLD)
 internal object SimpleItemRenderer : AbstractItemRenderer<Nothing>() {
     override val name: String = "simple"
     override val formats: AbstractRendererFormatRegistry = SimpleRendererFormatRegistry()
@@ -43,7 +38,6 @@ internal object SimpleItemRenderer : AbstractItemRenderer<Nothing>() {
         loadDataFromConfigs()
     }
 
-    @ReloadFun
     fun reload() {
         loadDataFromConfigs()
     }

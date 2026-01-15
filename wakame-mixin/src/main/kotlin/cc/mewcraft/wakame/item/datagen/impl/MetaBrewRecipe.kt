@@ -1,16 +1,16 @@
 package cc.mewcraft.wakame.item.datagen.impl
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.registerExact
+import cc.mewcraft.lazyconfig.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.brewery.BrewRecipeManager
 import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.data.impl.ItemBrewRecipe
 import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
 import cc.mewcraft.wakame.item.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item.datagen.ItemMetaResult
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.util.MojangStack
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.registerExact
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -85,7 +85,7 @@ interface MetaBrewRecipe : ItemMetaEntry<String> {
     object RandomFromAll : MetaBrewRecipe {
 
         @JvmField
-        val SERIALIZER: TypeSerializer2<RandomFromAll> = TypeSerializer2<RandomFromAll> { type, node ->
+        val SERIALIZER: SimpleSerializer<RandomFromAll> = SimpleSerializer<RandomFromAll> { type, node ->
             if (node.virtual()) null else RandomFromAll
         }
 

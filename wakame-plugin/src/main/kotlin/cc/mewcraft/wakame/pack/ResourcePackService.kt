@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.pack
 
+import cc.mewcraft.lazyconfig.access.entry
+import cc.mewcraft.lazyconfig.access.node
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.config.node
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import com.sun.net.httpserver.HttpExchange
 import net.kyori.adventure.resource.ResourcePackInfo

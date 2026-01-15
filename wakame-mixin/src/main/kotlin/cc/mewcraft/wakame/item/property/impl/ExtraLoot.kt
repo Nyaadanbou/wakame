@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.item.property.impl
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.*
 import cc.mewcraft.wakame.util.item.toBukkit
 import io.papermc.paper.registry.RegistryKey
@@ -50,7 +51,7 @@ sealed interface ExtraLootEntry {
 interface BlockExtraLootEntry : ExtraLootEntry {
     fun matches(block: Block): Boolean
 
-    companion object Serializer : TypeSerializer2<BlockExtraLootEntry> {
+    companion object Serializer : SimpleSerializer<BlockExtraLootEntry> {
         override fun deserialize(type: Type, node: ConfigurationNode): BlockExtraLootEntry? {
             val lootTableId = node.node("loot_table").require<Identifier>()
             if (node.hasChild("tag")) {
@@ -95,7 +96,7 @@ data class BlockTagExtraLootEntry(
 interface EntityExtraLootEntry : ExtraLootEntry {
     fun matches(entity: Entity): Boolean
 
-    companion object Serializer : TypeSerializer2<EntityExtraLootEntry> {
+    companion object Serializer : SimpleSerializer<EntityExtraLootEntry> {
         override fun deserialize(type: Type, node: ConfigurationNode): EntityExtraLootEntry? {
             val lootTableId = node.node("loot_table").require<Identifier>()
             val entityIds = node.node("entities").getList<Identifier>(emptyList()).toSet()

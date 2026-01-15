@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.lifecycle.initializer
 
-import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.ecs.KoishFleks
 import cc.mewcraft.wakame.util.internalName
 import xyz.xenondevs.commons.collections.mapToArray
@@ -40,12 +39,12 @@ enum class InitStage(
      * Before configs are initialized.
      * Can be used to register custom config serializers via [Configs.registerSerializer].
      */
-    PRE_CONFIG(InternalInitStage.PRE_WORLD, runBefore = setOf(Configs::class)),
+    PRE_CONFIG(InternalInitStage.PRE_WORLD /*runBefore = setOf(Configs::class)*/),
 
     /**
      * Before the world is loaded.
      */
-    PRE_WORLD(InternalInitStage.PRE_WORLD, runAfter = setOf(Configs::class)),
+    PRE_WORLD(InternalInitStage.PRE_WORLD /*runAfter = setOf(Configs::class)*/),
 
     /**
      * After the world has been loaded.

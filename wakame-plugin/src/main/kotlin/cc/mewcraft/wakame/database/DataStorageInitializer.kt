@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.database
 
-import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.lazyconfig.access.ConfigAccess
+import cc.mewcraft.lazyconfig.access.entry
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -9,9 +9,9 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import com.zaxxer.hikari.HikariConfig
 import xyz.xenondevs.commons.provider.orElse
 
-private val GLOBAL_DATABASE_CONFIG_FILE = Configs["database"]
+private val GLOBAL_DATABASE_CONFIG_FILE = ConfigAccess["database"]
 
-@Init(stage = InitStage.PRE_WORLD)
+@Init(InitStage.PRE_WORLD)
 object DataStorageInitializer {
     private val adapter: DataAdapter by GLOBAL_DATABASE_CONFIG_FILE.entry<DataAdapter>("adapter").orElse(DataAdapter.SQLITE)
     private val config: DataStorageConfig by GLOBAL_DATABASE_CONFIG_FILE.entry("database")

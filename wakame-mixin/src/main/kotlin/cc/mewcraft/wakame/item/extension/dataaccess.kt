@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.extension
 
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.optionalEntry
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.optionalEntry
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.data.impl.Core

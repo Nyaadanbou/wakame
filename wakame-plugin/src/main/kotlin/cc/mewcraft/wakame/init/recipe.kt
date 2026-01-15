@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.init
 
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.event.map.MinecraftRecipeRegistrationDoneEvent
@@ -9,9 +11,12 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.recipe.*
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.IdePauser
+import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import cc.mewcraft.wakame.util.data.isYaml
 import cc.mewcraft.wakame.util.eventbus.MapEventBus
+import cc.mewcraft.wakame.util.runTask
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.VisibleForTesting

@@ -1,5 +1,5 @@
 plugins {
-    id("koish-conventions.kotlin")
+    id("koish.core-conventions")
     id("cc.mewcraft.libraries-repository")
     id("cc.mewcraft.copy-jar-docker")
     alias(local.plugins.blossom)
@@ -44,29 +44,15 @@ dependencies {
     api(local.commons.gson) {
         exclude("com.google.code.gson")
     }
-    api(local.commons.gson)
     api(local.commons.provider)
     api(local.commons.reflection)
     api(local.commons.tuple)
 
-    // 配置文件
-    api(platform(libs.bom.configurate.yaml))
-    api(platform(libs.bom.configurate.gson))
-    api(platform(libs.bom.configurate.extra.kotlin))
-    api(platform(libs.bom.configurate.extra.dfu8))
+    // 配置
+    api(project(":common:lazyconfig"))
 
     // 跨进程通讯
-    api(local.messenger)
-    api(local.messenger.nats)
-    api(local.messenger.rabbitmq)
-    api(local.messenger.redis)
-    api(local.zstdjni)
-    api(local.jedis) {
-        exclude("com.google.code.gson", "gson")
-    }
-    api(local.rabbitmq)
-    api(local.nats)
-    api(local.caffeine)
+    api(project(":common:messaging"))
 }
 
 sourceSets {
@@ -78,8 +64,6 @@ sourceSets {
         }
     }
 }
-
-// 故意不写 builderCopy 因为会导致 gradle 无法执行 copyJarToBuild
 
 dockerCopy {
     containerId = "aether-minecraft-1"

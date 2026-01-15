@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.serialization
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.registerExact
+import cc.mewcraft.lazyconfig.configurate.require
+import cc.mewcraft.lazyconfig.configurate.serializer.DispatchingSerializer
+import cc.mewcraft.lazyconfig.configurate.serializer.valueByNameTypeSerializer
 import cc.mewcraft.wakame.registry.Registry
 import cc.mewcraft.wakame.registry.SimpleRegistry
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.registerExact
-import cc.mewcraft.wakame.util.require
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -156,7 +156,7 @@ object AnimalTypes {
 // 1) 给实现类写好 TypeSerializer, 然后分别在 ConfigurationOptions 里注册
 
 // Cat 的 TypeSerializer
-object CatSerializer : TypeSerializer2<Cat> {
+object CatSerializer : SimpleSerializer<Cat> {
     override fun deserialize(type: Type, node: ConfigurationNode): Cat {
         return Cat(node.node("color").require<String>())
     }
@@ -167,7 +167,7 @@ object CatSerializer : TypeSerializer2<Cat> {
 }
 
 // Dog 的 TypeSerializer
-object DogSerializer : TypeSerializer2<Dog> {
+object DogSerializer : SimpleSerializer<Dog> {
     override fun deserialize(type: Type, node: ConfigurationNode): Dog {
         return Dog(node.node("weight").require<Int>())
     }

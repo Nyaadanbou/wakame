@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.datafix.ItemDataFix
 import cc.mewcraft.wakame.datafix.ItemDataFixer
 import cc.mewcraft.wakame.item.data.ItemDataContainer
 import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.util.Identifiers
-import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.configurate.yamlLoader
 import cc.mewcraft.wakame.util.test.TestOnly
-import cc.mewcraft.wakame.util.yamlLoader
 import org.junit.jupiter.api.BeforeAll
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader

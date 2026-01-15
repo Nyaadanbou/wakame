@@ -1,15 +1,15 @@
 package cc.mewcraft.wakame.craftingstation.recipe
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.item.display.ItemRenderers
 import cc.mewcraft.wakame.item.display.implementation.crafting_station.CraftingStationContext
 import cc.mewcraft.wakame.item.display.implementation.crafting_station.CraftingStationContext.Pos
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
 import cc.mewcraft.wakame.util.item.itemNameOrType
-import cc.mewcraft.wakame.util.require
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.Material
@@ -57,7 +57,7 @@ internal sealed interface RecipeChoice : Examinable {
     /**
      * [RecipeChoice] 的序列化器.
      */
-    object Serializer : TypeSerializer2<RecipeChoice> {
+    object Serializer : SimpleSerializer<RecipeChoice> {
         override fun deserialize(type: Type, node: ConfigurationNode): RecipeChoice {
             val choiceType = node.node("type").require<String>()
             when (choiceType) {

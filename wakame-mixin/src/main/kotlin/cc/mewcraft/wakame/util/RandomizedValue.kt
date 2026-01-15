@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.util
 
+import cc.mewcraft.lazyconfig.configurate.require
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializer

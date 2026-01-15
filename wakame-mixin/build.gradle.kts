@@ -1,7 +1,6 @@
 plugins {
-    id("koish-conventions.kotlin")
+    id("koish.core-conventions")
     id("cc.mewcraft.libraries-repository")
-    id("cc.mewcraft.copy-jar-build")
     id("cc.mewcraft.copy-jar-docker")
     id("io.papermc.paperweight.userdev")
     alias(local.plugins.blossom)
@@ -50,11 +49,6 @@ sourceSets {
             }
         }
     }
-}
-
-buildCopy {
-    fileName = "wakame-${project.version}.jar"
-    archiveTask = "shadowJar"
 }
 
 dockerCopy {

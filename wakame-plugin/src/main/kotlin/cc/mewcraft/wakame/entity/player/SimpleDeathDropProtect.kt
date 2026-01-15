@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.entity.player
 
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.entry
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit
  * 未来的功能:
  * - 兼容其他系统???
  */
-@Init(stage = InitStage.POST_WORLD)
+@Init(InitStage.POST_WORLD)
 internal object SimpleDeathDropProtect : Listener {
 
     @InitFun

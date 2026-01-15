@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item.property
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.register
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.util.register
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.jetbrains.annotations.ApiStatus
 import org.spongepowered.configurate.ConfigurationNode
@@ -122,7 +122,7 @@ private class SimpleItemPropContainer(
         return if (propertyMap.isEmpty()) ItemPropContainer.EMPTY else this
     }
 
-    object Serializer : TypeSerializer2<ItemPropContainer> {
+    object Serializer : SimpleSerializer<ItemPropContainer> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemPropContainer {
             val builder = ItemPropContainer.builder()
             for ((rawNodeKey, node) in node.childrenMap()) {

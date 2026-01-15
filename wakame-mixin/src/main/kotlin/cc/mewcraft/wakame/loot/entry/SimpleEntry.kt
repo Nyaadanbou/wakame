@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.loot.entry
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.loot.context.LootContext
 import cc.mewcraft.wakame.loot.predicate.LootPredicate
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -16,7 +16,7 @@ class SimpleEntry<S>(
     conditions: List<LootPredicate>,
 ) : LootPoolSingletonContainer<S>(weight, quality, conditions), Examinable {
     companion object {
-        val SERIALIZER: TypeSerializer2<SimpleEntry<*>> = TypeSerializer2 { type, node ->
+        val SERIALIZER: SimpleSerializer<SimpleEntry<*>> = SimpleSerializer { type, node ->
             val (weight, quality, conditions) = commonFields(node)
             val type = type as ParameterizedType
             val sType = type.actualTypeArguments[0]

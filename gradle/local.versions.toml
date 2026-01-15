@@ -7,6 +7,8 @@ libraries-repository = "0.0.4-snapshot"
 copy-jar-build = "0.0.2-snapshot"
 copy-jar-docker = "0.0.1-snapshot"
 paperweight = "2.0.0-beta.17"
+shadow = "9.2.2"
+indra = "3.1.3"
 blossom = "2.1.0"
 checkstyle = "10.12.5"
 stylecheck = "0.2.1"
@@ -21,13 +23,18 @@ apache-commons-compress = "1.27.1"
 koin = "4.0.0"
 commons = "1.24"
 fleks = "2.11"
-hikaricp = "5.1.0"
+exposed = "1.0.0-rc-3"
+h2 = "2.2.224"
 mariadb-jdbc = "3.5.4"
+mysql-jdbc = "8.0.33"
+postgresql-jdbc = "42.7.8"
+hikaricp = "5.1.0"
 snakeyaml-engine = "2.8"
 caffeine = "3.2.3"
 
 # Server deps
 paper = "1.21.8-R0.1-SNAPSHOT"
+velocity = "3.4.0-SNAPSHOT"
 mixin = "0.8.7"
 mixin-extras = "0.4.1"
 ignite = "1.1.0"
@@ -40,12 +47,14 @@ postgresql = "42.7.8"
 rabbitmq = "5.27.0"
 nats = "2.23.0"
 
-# synced with version used by lowest supported mc (currently 1.21.4 on paper)
+# synced with version used by lowest supported mc
 asm = "9.8"
 gson = "2.11.0"
 guava = "33.3.1-jre"
+fastutil = "8.5.15"
 log4j = "2.24.1"
 netty = "4.1.115.Final"
+adventure = "4.24.0"  # synced with version used by lowest supported mc
 
 # Test deps
 datafixerupper = "8.0.16"
@@ -87,6 +96,8 @@ bettergui = "10.2"
 # Gradle plugins
 
 plugin-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+plugin-shadow = {group = "com.gradleup.shadow", name = "com.gradleup.shadow.gradle.plugin", version.ref = "shadow" }
+plugin-indra-common = {group = "net.kyori", name = "indra-common", version.ref = "indra" }
 plugin-libraries-repository = { group = "cc.mewcraft.gradle", name = "libraries-repository-plugin", version.ref = "libraries-repository" }
 plugin-copy-jar-build = { group = "cc.mewcraft.gradle", name = "copy-jar-build-plugin", version.ref = "copy-jar-build" }
 plugin-copy-jar-docker = { group = "cc.mewcraft.gradle", name = "copy-jar-docker-plugin", version.ref = "copy-jar-docker" }
@@ -102,6 +113,7 @@ apache-commons-compress = { group = "org.apache.commons", name = "commons-compre
 
 # synced with version used by lowest supported mc (currently 1.21.4 on paper)
 asm = { group = "org.ow2.asm", name = "asm-commons", version.ref = "asm" }
+fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
 
 # Shaded deps
 # 这些依赖属于插件本身, 将打包进插件的 jar
@@ -119,8 +131,14 @@ commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflecti
 commons-tuple = { group = "xyz.xenondevs.commons", name = "commons-tuple", version.ref = "commons" }
 fleks = { group = "io.github.quillraven.fleks", name = "Fleks", version.ref = "fleks" }
 caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
-hikaricp = {group = "com.zaxxer", name = "HikariCP", version = "5.1.0" }
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
+exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+h2 = { module = "com.h2database:h2", version.ref = "h2" }
 mariadb-jdbc = { group = "org.mariadb.jdbc", name = "mariadb-java-client", version.ref = "mariadb-jdbc" }
+mysql-jdbc = { group = "com.mysql", name = "mysql-connector-j", version.ref = "mysql-jdbc" }
+postgresql-jdbc = { group = "org.postgresql", name = "postgresql", version.ref = "postgresql-jdbc" }
+hikaricp = { group = "com.zaxxer", name = "HikariCP", version = "5.1.0" }
 snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version.ref = "snakeyaml-engine" }
 messenger = { group = "de.hexaoxi", name = "messenger-api", version.ref = "messenger" }
 messenger-nats = { group = "de.hexaoxi", name = "messenger-nats", version.ref = "messenger" }
@@ -139,6 +157,19 @@ kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-debug = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-debug", version.ref = "kotlinx-coroutines" }
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
+velocity-api = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
+adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
+adventure-extra-kotlin = { group = "net.kyori", name = "adventure-extra-kotlin", version.ref = "adventure" }
+adventure-key = { group = "net.kyori", name = "adventure-key", version.ref = "adventure" }
+adventure-nbt = { group = "net.kyori", name = "adventure-nbt", version.ref = "adventure" }
+adventure-text-logger-slf4j = { group = "net.kyori", name = "adventure-text-logger-slf4j", version.ref = "adventure" }
+adventure-text-minimessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
+adventure-text-serializer-ansi = { group = "net.kyori", name = "adventure-text-serializer-ansi", version.ref = "adventure" }
+adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version.ref = "adventure" }
+adventure-text-serializer-json = { group = "net.kyori", name = "adventure-text-serializer-json", version.ref = "adventure" }
+adventure-text-serializer-legacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
+adventure-text-serializer-plain = { group = "net.kyori", name = "adventure-text-serializer-plain", version.ref = "adventure" }
+guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 mixin = { group = "org.spongepowered", name = "mixin", version.ref = "mixin" }
 mixin-extras = { group = "io.github.llamalad7", name = "mixinextras-common", version.ref = "mixin-extras" }
 ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }
@@ -191,4 +222,5 @@ bettergui = { group = "me.hsgamer", name = "bettergui", version.ref = "bettergui
 
 [plugins]
 
+shadow = {id = "com.gradleup.shadow", version.ref = "shadow" }
 blossom = { id = "net.kyori.blossom", version.ref = "blossom" }

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.loot.predicate
 
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.util.Predicates
 
 class AllOfPredicate(
@@ -8,6 +8,6 @@ class AllOfPredicate(
 ) : CompositeLootItemCondition(terms, Predicates.allOf(terms)) {
     companion object {
         @JvmField
-        val SERIALIZER: TypeSerializer2<AllOfPredicate> = createSerializer(::AllOfPredicate)
+        val SERIALIZER: SimpleSerializer<AllOfPredicate> = createSerializer(::AllOfPredicate)
     }
 }

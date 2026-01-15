@@ -1,15 +1,11 @@
 package cc.mewcraft.wakame.recipe
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.adventure.key.Identified
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.MojangResourceKey
-import cc.mewcraft.wakame.util.RECIPE_MANAGER
+import cc.mewcraft.wakame.util.*
 import cc.mewcraft.wakame.util.adventure.toSimpleString
-import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.toResourceLocation
-import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
@@ -71,7 +67,7 @@ sealed interface MinecraftRecipe : Identified, Examinable {
     /**
      * [MinecraftRecipe] 的序列化器.
      */
-    object Serializer : TypeSerializer2<MinecraftRecipe> {
+    object Serializer : SimpleSerializer<MinecraftRecipe> {
         /**
          * ## Node structure
          * ```yaml
@@ -653,14 +649,14 @@ private fun ConfigurationNode.getRecipeKey(): Key {
  */
 internal class RecipeTypeBridge<T : MinecraftRecipe>(
     val typeToken: TypeToken<T>,
-    val serializer: TypeSerializer2<T>,
+    val serializer: SimpleSerializer<T>,
 ) {
     constructor(
         typeToken: TypeToken<T>,
         serializer: (Type, ConfigurationNode) -> T,
     ) : this(
         typeToken,
-        TypeSerializer2<T> { type, node -> serializer(type, node) }
+        SimpleSerializer<T> { type, node -> serializer(type, node) }
     )
 }
 

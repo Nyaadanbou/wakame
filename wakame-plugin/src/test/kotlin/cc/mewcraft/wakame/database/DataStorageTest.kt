@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.database
 
+import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.util.test.TestOnly
 import cc.mewcraft.wakame.util.test.TestPath
@@ -22,7 +22,7 @@ class DataStorageTest {
         @JvmStatic
         fun setup() {
             KoishDataPaths.initializeForTest(TestPath.TEST)
-            ConfigAccess.register(Configs)
+            ConfigAccess.setImplementation(Configs)
             DataStorageInitializer.init()
 
             transaction {

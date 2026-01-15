@@ -3,16 +3,11 @@ package cc.mewcraft.wakame.pack
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.runTask
 import org.bukkit.event.player.PlayerJoinEvent
 
-@Init(
-    stage = InitStage.POST_WORLD,
-)
-@Reload
+@Init(InitStage.POST_WORLD)
 internal object ResourcePackLifecycle {
 
     @InitFun
@@ -28,7 +23,6 @@ internal object ResourcePackLifecycle {
         }
     }
 
-    @ReloadFun
     fun reload() {
         // 重新配置 资源包分发系统
         val service = ResourcePackServiceProvider.set()

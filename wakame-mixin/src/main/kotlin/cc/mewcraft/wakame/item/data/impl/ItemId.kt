@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.item.data.impl
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.item.KoishItem
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE
 import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
-import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
@@ -25,7 +25,7 @@ private constructor(
     companion object {
 
         @JvmField
-        val SERIALIZER: TypeSerializer2<ItemId> = Serializer
+        val SERIALIZER: SimpleSerializer<ItemId> = Serializer
 
         private val POOL: HashMap<Identifier, ItemId> = HashMap<Identifier, ItemId>()
 
@@ -43,7 +43,7 @@ private constructor(
     }
 
     // 该序列化操作使用对象池来返回 ItemId 的实例
-    private object Serializer : TypeSerializer2<ItemId> {
+    private object Serializer : SimpleSerializer<ItemId> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemId {
             return of(node.require<Identifier>())
         }

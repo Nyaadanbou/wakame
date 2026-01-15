@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.damage
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.molang.Expression
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.NodeKey
@@ -26,7 +26,7 @@ internal sealed interface DamageMetadataBuilder<T> {
     fun build(context: RawDamageContext): DamageMetadata
 
     companion object {
-        fun serializer(): TypeSerializer<DamageMetadataBuilder<*>> = object : TypeSerializer2<DamageMetadataBuilder<*>> {
+        fun serializer(): TypeSerializer<DamageMetadataBuilder<*>> = object : SimpleSerializer<DamageMetadataBuilder<*>> {
 
             // FIXME 使用 DispatchingSerializer 替代该实现
             private val TYPE_MAPPING: Map<String, KType> = mapOf(

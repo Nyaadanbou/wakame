@@ -6,8 +6,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.util.registerEvents
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -16,12 +14,11 @@ import xyz.xenondevs.invui.InvUI
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.WindowManager
 
-@Init(stage = InitStage.POST_WORLD)
-@Reload
+@Init(InitStage.POST_WORLD)
 internal object BasicGuiInitializer : Listener {
 
     @InitFun
-    private fun init() {
+    fun init() {
         // See: https://docs.xen.cx/invui/#paper-plugin
         InvUI.getInstance().setPlugin(KoishPlugin)
 
@@ -33,15 +30,21 @@ internal object BasicGuiInitializer : Listener {
     }
 
     @DisableFun
-    @ReloadFun
-    private fun close() {
-        // 关服时/重载时关闭所有 Window 以避免一些未知的问题
-        WindowManager.getInstance().windows.forEach(Window::close)
+    fun close() {
+        closeWindows()
+    }
+
+    fun reload() {
+        closeWindows()
     }
 
     @EventHandler
-    private fun onQuit(event: PlayerQuitEvent) {
+    fun onQuit(event: PlayerQuitEvent) {
         // 玩家退出服务器后移除其图鉴菜单栈
         CatalogItemMenuStacks.removeStack(event.player)
+    }
+
+    private fun closeWindows() {
+        WindowManager.getInstance().windows.forEach(Window::close)
     }
 }
