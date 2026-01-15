@@ -3,7 +3,6 @@ package cc.mewcraft.extracontexts.paper
 import cc.mewcraft.extracontexts.api.KeyValueStoreManager
 import cc.mewcraft.extracontexts.common.database.DatabaseManager
 import cc.mewcraft.extracontexts.common.database.ReactiveDatabaseConfiguration
-import cc.mewcraft.extracontexts.common.example.registerDummyKeyValuePairs
 import cc.mewcraft.extracontexts.common.messaging.MessagingInitializer
 import cc.mewcraft.extracontexts.common.storage.CachedKeyValueStoreManager
 import cc.mewcraft.lazyconfig.MAIN_CONFIG
@@ -49,7 +48,7 @@ class ExtraContextsPaperPlugin : JavaPlugin() {
         luckPerms.contextManager.registerCalculator(OpCalculator())
 
         // Register some dummy data
-        registerDummyKeyValuePairs(slF4JLogger)
+        //registerDummyKeyValuePairs(slF4JLogger)
     }
 
     override fun onDisable() {

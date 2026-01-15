@@ -3,7 +3,6 @@ package cc.mewcraft.extracontexts.velocity
 import cc.mewcraft.extracontexts.api.KeyValueStoreManager
 import cc.mewcraft.extracontexts.common.database.DatabaseManager
 import cc.mewcraft.extracontexts.common.database.ReactiveDatabaseConfiguration
-import cc.mewcraft.extracontexts.common.example.registerDummyKeyValuePairs
 import cc.mewcraft.extracontexts.common.messaging.MessagingInitializer
 import cc.mewcraft.extracontexts.common.storage.CachedKeyValueStoreManager
 import cc.mewcraft.lazyconfig.MAIN_CONFIG
@@ -64,7 +63,7 @@ class ExtraContextsVelocityPlugin @Inject constructor(
         luckPerms.contextManager.registerCalculator(keyValueStoreContextCalculator)
 
         // Register some dummy data
-        registerDummyKeyValuePairs(logger)
+        //registerDummyKeyValuePairs(logger)
     }
 
     @Subscribe
