@@ -45,6 +45,7 @@ object BetonQuestHook {
 
         // Objective
         val objectiveRegistry = plugin.questRegistries.objective()
+        //objectiveRegistry.register("configure", ConfigureObjectiveFactory())
 
         // Placeholder
         val placeholderRegistry = plugin.questRegistries.placeholder()

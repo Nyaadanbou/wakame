@@ -63,4 +63,7 @@ dependencies {
 
     // plugin: ExtraContexts
     compileOnly(project(":wakame-externals:extra-contexts:api"))
+
+    // plugin: LuckPerms
+    compileOnly(local.luckperms)
 }
