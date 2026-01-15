@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame
 
 import cc.mewcraft.lazyconfig.access.ConfigAccess
+import cc.mewcraft.wakame.api.config.PrimaryConfig
 import cc.mewcraft.wakame.command.KoishCommandManager
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.PermanentStorage
+import cc.mewcraft.wakame.config.PrimaryConfigImpl
 import cc.mewcraft.wakame.lang.LanguageExtractor
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
 import cc.mewcraft.wakame.util.data.Version
@@ -77,6 +79,7 @@ internal class KoishBootstrap : PluginBootstrap {
             // 而这些配置所对应的文件可能还没有内容 (例如首次使用 Koish 插件时数据文件还未被拷贝到插件的数据目录),
             // 从而导致读取配置项时找不到需要的配置项, 抛出 NPE
             Configs.initialize()
+            PrimaryConfig.setImplementation(PrimaryConfigImpl())
             LanguageExtractor.extractDefaults()
             //AssetExtractor.extractDefaults() // 暂时没资源文件可以提取
 

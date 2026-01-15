@@ -113,6 +113,10 @@ dimension_key_mappings:
   minecraft:nether: 下界
   minecraft:end: 末地
 
+# 可以点亮下界传送门的维度名字列表
+nether_portal_functional_dimensions:
+  - koish:hollow
+
 # 在发送 ClientboundUpdateAttributesPacket 封包时移除掉以下属性
 # 目前仅用于配合伤害系统来“移除” ARMOR 和 ARMOR_TOUGHNESS 这两属性
 # 此功能可以带来几个好处:
