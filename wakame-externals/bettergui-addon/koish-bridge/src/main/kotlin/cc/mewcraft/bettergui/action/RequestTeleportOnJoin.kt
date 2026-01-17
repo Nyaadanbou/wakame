@@ -36,7 +36,9 @@ class RequestTeleportOnJoin : Action {
             return
         }
         SchedulerUtil.entity(player).run({
-            TeleportOnJoin.request(uuid, this.key, this.group)
+            val key2 = stringReplacer.replaceOrOriginal(key, uuid)
+            val group2 = stringReplacer.replaceOrOriginal(group, uuid)
+            TeleportOnJoin.request(uuid, key2, group2)
         }, process::next)
     }
 }

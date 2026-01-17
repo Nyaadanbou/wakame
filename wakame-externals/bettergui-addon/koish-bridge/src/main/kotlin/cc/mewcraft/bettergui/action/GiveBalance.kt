@@ -33,20 +33,20 @@ class GiveBalance : Action {
     }
 
     override fun apply(uuid: UUID, process: TaskProcess, stringReplacer: StringReplacer) {
-        val amountStr = stringReplacer.replaceOrOriginal(this.amount, uuid)
-        val currency = stringReplacer.replaceOrOriginal(this.currency, uuid)
+        val amount2 = stringReplacer.replaceOrOriginal(this.amount, uuid)
+        val currency2 = stringReplacer.replaceOrOriginal(this.currency, uuid)
         val player = Bukkit.getPlayer(uuid) ?: run {
             process.next()
             return
         }
-        val amount = Validate.getNumber(amountStr).map(BigDecimal::toDouble).getOrNull() ?: run {
-            player.sendRichMessage("<red>Invalid currency amount: $amountStr")
+        val amount = Validate.getNumber(amount2).map(BigDecimal::toDouble).getOrNull() ?: run {
+            player.sendRichMessage("<red>Invalid currency amount: $amount2")
             process.next()
             return
         }
         if (amount > 0) {
             SchedulerUtil.entity(player).run({
-                EconomyIntegration2.give(uuid, amount, currency).onFailure {
+                EconomyIntegration2.give(uuid, amount, currency2).onFailure {
                     player.sendRichMessage("<red>Error: the transaction couldn't be executed.")
                 }
             }, process::next)

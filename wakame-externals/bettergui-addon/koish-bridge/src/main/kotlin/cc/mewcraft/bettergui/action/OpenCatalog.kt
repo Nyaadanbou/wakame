@@ -23,15 +23,15 @@ import java.util.*
  */
 class OpenCatalog : Action {
 
-    private val catalogType: CatalogType
+    private val catalogType: String
 
     constructor(input: ActionBuilder.Input) {
-        val value = input.value
-        catalogType = CatalogType.valueOf(value.uppercase())
+        this.catalogType = input.value
     }
 
     override fun apply(uuid: UUID, process: TaskProcess, stringReplacer: StringReplacer) {
-        when (catalogType) {
+        val catalogType2 = CatalogType.valueOf(stringReplacer.replaceOrOriginal(catalogType, uuid).uppercase())
+        when (catalogType2) {
             CatalogType.ITEM -> {
                 val player = Bukkit.getPlayer(uuid) ?: run {
                     process.next()
