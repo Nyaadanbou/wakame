@@ -141,7 +141,7 @@ fun runAsyncTaskTimer(delay: Long, period: Long, run: (task: BukkitTask, count: 
 @OptIn(ExperimentalAtomicApi::class)
 private fun countAwareTask(run: (BukkitTask, Long) -> Unit): (task: BukkitTask) -> Unit {
     val count = AtomicLong(0)
-    val wrapper = { task: BukkitTask ->
+    val wrapper = fun(task: BukkitTask) {
         run(task, count.fetchAndAdd(1))
     }
     return wrapper
