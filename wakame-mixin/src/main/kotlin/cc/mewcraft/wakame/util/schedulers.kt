@@ -140,8 +140,8 @@ fun runAsyncTaskTimer(delay: Long, period: Long, run: (task: BukkitTask, count: 
  * Creates a count aware task.
  */
 private fun countAwareTask(run: (BukkitTask, Long) -> Unit): (task: BukkitTask) -> Unit {
+    val count = AtomicLong(0)
     return { task ->
-        val count = AtomicLong(0)
         run(task, count.fetchAndAdd(1))
     }
 }
