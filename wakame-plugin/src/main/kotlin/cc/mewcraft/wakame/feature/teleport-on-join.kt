@@ -8,7 +8,6 @@ import cc.mewcraft.messaging2.ServerInfoProvider
 import cc.mewcraft.wakame.messaging.MessagingManager
 import cc.mewcraft.wakame.messaging.handler.TeleportOnJoinPacketHandler
 import cc.mewcraft.wakame.messaging.packet.TeleportOnJoinRequestPacket
-import cc.mewcraft.wakame.util.ProxyServerSwitcher
 import cc.mewcraft.wakame.util.runTaskLater
 import cc.mewcraft.wakame.util.runTaskTimer
 import org.bukkit.Bukkit
