@@ -5,18 +5,19 @@ import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializer
 import java.lang.reflect.Type
 
 object LocationSerializer : TypeSerializer<Location> {
-    override fun deserialize(type: Type, node: ConfigurationNode): Location? {
+    override fun deserialize(type: Type, node: ConfigurationNode): Location {
         val x = node.node("x").require<Double>()
         val y = node.node("y").require<Double>()
         val z = node.node("z").require<Double>()
         val yaw = node.node("yaw").getFloat(0f)
         val pitch = node.node("pitch").getFloat(0f)
         val worldName = node.node("world").require<Key>()
-        val world = Bukkit.getWorld(worldName)
+        val world = Bukkit.getWorld(worldName) ?: throw SerializationException("world '${worldName}' is not loaded or does not exist")
         return Location(world, x, y, z, yaw, pitch)
     }
 

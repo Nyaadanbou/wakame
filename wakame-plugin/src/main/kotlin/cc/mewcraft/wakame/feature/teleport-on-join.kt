@@ -64,14 +64,14 @@ class TeleportOnJoinListener : Listener {
             // 添加药水效果
             // 开发日记 2026/1/17 必须这么实现因为此时 Player 对象还没完全初始化
             runTaskTimer(10, 5) task@{ task, count ->
-                if (count >= 20) {
+                if (count > 20) {
                     task.cancel()
-                    return@task
                 }
                 val player = Bukkit.getPlayer(playerId)
                 if (player != null) {
                     player.addPotionEffects(config.effects)
                     task.cancel()
+                    return@task
                 }
             }
         }
