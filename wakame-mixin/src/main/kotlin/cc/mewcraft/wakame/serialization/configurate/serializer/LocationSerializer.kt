@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.serialization.configurate.serializer
 
 import cc.mewcraft.lazyconfig.configurate.require
+import cc.mewcraft.wakame.LOGGER
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializer
 import java.lang.reflect.Type
 
@@ -17,7 +17,10 @@ object LocationSerializer : TypeSerializer<Location> {
         val yaw = node.node("yaw").getFloat(0f)
         val pitch = node.node("pitch").getFloat(0f)
         val worldName = node.node("world").require<Key>()
-        val world = Bukkit.getWorld(worldName) ?: throw SerializationException("world '${worldName}' is not loaded or does not exist")
+        val world = Bukkit.getWorld(worldName) ?: run {
+            LOGGER.warn("world '${worldName}' is not loaded or does not exist, defaulting to main world")
+            Bukkit.getWorlds().first()
+        }
         return Location(world, x, y, z, yaw, pitch)
     }
 
