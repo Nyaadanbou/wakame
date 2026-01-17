@@ -55,10 +55,10 @@ class TeleportOnJoinListener : Listener {
     // TODO 等升级到 Paper 1.21.11 时更换为 AsyncPlayerSpawnLocationEvent
     @EventHandler
     fun on(event: PlayerSpawnLocationEvent) {
-        val config = TeleportOnJoin.config
-        if (config.enabled.not()) return
         val playerId = event.player.uniqueId
-        if (TeleportOnJoinPacketHandler.has(playerId) && config.conditions.all { condition -> condition.test(playerId) }) {
+        if (!TeleportOnJoinPacketHandler.has(playerId)) return
+        val config = TeleportOnJoin.config
+        if (config.enabled && config.conditions.all { condition -> condition.test(playerId) }) {
             // 设置传送位置
             event.spawnLocation = config.target
             LOGGER.info("Set spawn location for ${event.player.name} on join")
@@ -67,14 +67,17 @@ class TeleportOnJoinListener : Listener {
 
     @EventHandler
     fun on(event: PlayerResourceLoadEvent) {
-        val config = TeleportOnJoin.config
-        if (config.enabled.not()) return
         val player = event.player
-        // 应用药水效果
-        player.addPotionEffects(config.effects)
-        LOGGER.info("Applied potion effects to ${player.name} on join")
-        // 清理请求状态, 因为这里已经处理
-        TeleportOnJoinPacketHandler.clean(player.uniqueId)
+        val playerId = player.uniqueId
+        if (!TeleportOnJoinPacketHandler.has(playerId)) return
+        val config = TeleportOnJoin.config
+        if (config.enabled && config.conditions.all { condition -> condition.test(playerId) }) {
+            // 应用药水效果
+            player.addPotionEffects(config.effects)
+            LOGGER.info("Applied potion effects to ${player.name} on join")
+            // 清理请求状态, 因为这里已经处理
+            TeleportOnJoinPacketHandler.clean(playerId)
+        }
     }
 }
 
