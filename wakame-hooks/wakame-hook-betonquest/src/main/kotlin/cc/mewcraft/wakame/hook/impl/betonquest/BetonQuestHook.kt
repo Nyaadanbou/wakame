@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.hook.impl.betonquest
 
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.koish.LockFreezeTicksActionFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.koish.SetFreezeTicksActionFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.koish.TeleportOnJoinActionFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.party.CreatePartyActionFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.party.LeavePartyActionFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.koish.AttributeFactory
@@ -31,17 +32,18 @@ object BetonQuestHook {
 
         // Condition
         val conditionRegistry = plugin.questRegistries.condition()
-        conditionRegistry.register("hasparty", HasPartyFactory(loggerFactory))
         conditionRegistry.register("attribute", AttributeFactory(loggerFactory))
-        conditionRegistry.register("outside", OutsideFactory(loggerFactory))
+        conditionRegistry.register("hasparty", HasPartyFactory(loggerFactory))
         conditionRegistry.register("light", LightFactory(loggerFactory))
+        conditionRegistry.register("outside", OutsideFactory(loggerFactory))
 
         // Action
         val actionRegistry = plugin.questRegistries.action()
         actionRegistry.register("createparty", CreatePartyActionFactory(loggerFactory, questTypeApi, profileProvider))
         actionRegistry.register("leaveparty", LeavePartyActionFactory(loggerFactory))
-        actionRegistry.register("setfreezeticks", SetFreezeTicksActionFactory(loggerFactory))
         actionRegistry.register("lockfreezeticks", LockFreezeTicksActionFactory(loggerFactory))
+        actionRegistry.register("setfreezeticks", SetFreezeTicksActionFactory(loggerFactory))
+        actionRegistry.register("teleportonjoin", TeleportOnJoinActionFactory(loggerFactory))
 
         // Objective
         val objectiveRegistry = plugin.questRegistries.objective()

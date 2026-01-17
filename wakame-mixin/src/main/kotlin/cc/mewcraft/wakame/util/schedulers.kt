@@ -1,5 +1,4 @@
 @file:JvmName("SchedulerUtils")
-@file:OptIn(ExperimentalAtomicApi::class)
 
 package cc.mewcraft.wakame.util
 
@@ -139,6 +138,7 @@ fun runAsyncTaskTimer(delay: Long, period: Long, run: (task: BukkitTask, count: 
 /**
  * Creates a count aware task.
  */
+@OptIn(ExperimentalAtomicApi::class)
 private fun countAwareTask(run: (BukkitTask, Long) -> Unit): (task: BukkitTask) -> Unit {
     val count = AtomicLong(0)
     val wrapper = { task: BukkitTask ->

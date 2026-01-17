@@ -26,6 +26,11 @@ import java.util.*
 object TeleportOnJoin {
 
     /**
+     * 配置文件.
+     */
+    val config: TeleportOnJoinConfig by MAIN_CONFIG.entry("teleport_on_join_explicit_server")
+
+    /**
      * 请求跨服传送.
      *
      * @param playerId 玩家 UUID
@@ -46,14 +51,10 @@ object TeleportOnJoin {
 
 class TeleportOnJoinListener : Listener {
 
-    /**
-     * 配置文件.
-     */
-    val config: TeleportOnJoinConfig by MAIN_CONFIG.entry("teleport_on_join_explicit_server")
-
     // TODO 等升级到 Paper 1.21.11 时更换为 AsyncPlayerSpawnLocationEvent
     @EventHandler
     fun on(event: PlayerSpawnLocationEvent) {
+        val config = TeleportOnJoin.config
         if (config.enabled.not()) return
         val playerId = event.player.uniqueId
         if (TeleportOnJoinPacketHandler.has(playerId) && config.conditions.all { condition -> condition.test(playerId) }) {
