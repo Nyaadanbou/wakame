@@ -4,10 +4,7 @@ import cc.mewcraft.messaging2.AbstractMessagingManager
 import cc.mewcraft.messaging2.MessagingConfiguration
 import cc.mewcraft.messaging2.StaticAccessApi
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.messaging.packet.NationSpawnRequestPacket
-import cc.mewcraft.wakame.messaging.packet.NationSpawnResponsePacket
-import cc.mewcraft.wakame.messaging.packet.TownSpawnRequestPacket
-import cc.mewcraft.wakame.messaging.packet.TownSpawnResponsePacket
+import cc.mewcraft.wakame.messaging.packet.*
 import ninja.egg82.messenger.handler.AbstractMessagingHandler
 import org.slf4j.Logger
 
@@ -22,6 +19,10 @@ class MessagingManager(
     override val protocolVersion: Byte = 1
 
     override fun registerPackets() {
+        /* TeleportOnJoin */
+        registerPacket(::TeleportOnJoinRequestPacket)
+
+        /* TownyNetwork */
         registerPacket(::TownSpawnRequestPacket)
         registerPacket(::TownSpawnResponsePacket)
         registerPacket(::NationSpawnRequestPacket)

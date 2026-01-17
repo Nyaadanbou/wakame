@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.config
 
 import cc.mewcraft.lazyconfig.access.ConfigsBase
+import cc.mewcraft.lazyconfig.configurate.registerExact
 import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.feature.TeleportOnJoinCondition
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import cc.mewcraft.wakame.util.configurate.KOISH_SERIALIZERS
 import net.kyori.adventure.key.Key
@@ -40,6 +42,7 @@ internal object Configs : ConfigsBase() {
         val children = super.buildSerials(namespace)
             .childBuilder()
             .registerAll(KOISH_SERIALIZERS)
+            .registerExact(TeleportOnJoinCondition.serializer())
             .build()
         return children
     }
