@@ -120,7 +120,7 @@ nether_portal_functional_dimensions:
 # 玩家明确进入服务器时, 修改其出现在世界里的位置坐标
 teleport_on_join_explicit_server:
   # 是否启用该功能
-  enabled: true
+  enabled: false
   # 执行传送的条件
   conditions:
     - { type: server_group, group: xmine }
@@ -130,6 +130,9 @@ teleport_on_join_explicit_server:
     - { world: koish:eden, x: 2500, y: 128, z: -2500 }
     - { world: koish:eden, x: -2500, y: 128, z: 2500 }
     - { world: koish:eden, x: -2500, y: 128, z: -2500 }
+  # 传送后应用的效果
+  effects:
+    - { type: minecraft:slow_falling, duration: 200, amplifier: 1 }
 
 # 在发送 ClientboundUpdateAttributesPacket 封包时移除掉以下属性
 # 目前仅用于配合伤害系统来“移除” ARMOR 和 ARMOR_TOUGHNESS 这两属性

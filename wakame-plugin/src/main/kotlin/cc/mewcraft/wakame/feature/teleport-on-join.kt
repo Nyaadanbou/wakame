@@ -10,11 +10,12 @@ import cc.mewcraft.wakame.messaging.handler.TeleportOnJoinPacketHandler
 import cc.mewcraft.wakame.messaging.packet.TeleportOnJoinRequestPacket
 import cc.mewcraft.wakame.util.ProxyServerSwitcher
 import cc.mewcraft.wakame.util.runTaskLater
+import cc.mewcraft.wakame.util.runTaskTimer
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.potion.PotionEffect
 import org.spigotmc.event.player.PlayerSpawnLocationEvent
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import java.util.*
@@ -36,7 +37,7 @@ object TeleportOnJoin {
         MessagingManager.queuePacket {
             TeleportOnJoinRequestPacket(ServerInfoProvider.serverId, playerId, group)
         }
-        runTaskLater(30) task@{
+        runTaskLater(30) task@{ ->
             val player = Bukkit.getPlayer(playerId) ?: return@task
             ProxyServerSwitcher.switch(player, key)
         }
@@ -54,11 +55,26 @@ class TeleportOnJoinListener : Listener {
     // TODO 等升级到 Paper 1.21.11 时更换为 AsyncPlayerSpawnLocationEvent
     @EventHandler
     fun on(event: PlayerSpawnLocationEvent) {
-        val player = event.player
-        val playerId = player.uniqueId
-        if (TeleportOnJoinPacketHandler.has(playerId) && config.conditions.all { condition -> condition.test(player) }) {
+        if (config.enabled.not()) return
+        val playerId = event.player.uniqueId
+        if (TeleportOnJoinPacketHandler.has(playerId) && config.conditions.all { condition -> condition.test(playerId) }) {
+            // 清理请求状态, 因为这里已经处理
             TeleportOnJoinPacketHandler.clean(playerId)
+            // 设置传送位置
             event.spawnLocation = config.target
+            // 添加药水效果
+            // 开发日记 2026/1/17 必须这么实现因为此时 Player 对象还没完全初始化
+            runTaskTimer(10, 5) task@{ task, count ->
+                if (count >= 20) {
+                    task.cancel()
+                    return@task
+                }
+                val player = Bukkit.getPlayer(playerId)
+                if (player != null) {
+                    player.addPotionEffects(config.effects)
+                    task.cancel()
+                }
+            }
         }
     }
 }
@@ -69,7 +85,7 @@ class TeleportOnJoinListener : Listener {
  */
 interface TeleportOnJoinCondition {
 
-    fun test(player: Player): Boolean
+    fun test(playerId: UUID): Boolean
 
     companion object {
         fun serializer(): SimpleSerializer<TeleportOnJoinCondition> {
@@ -86,7 +102,7 @@ interface TeleportOnJoinCondition {
         val group: String,
     ) : TeleportOnJoinCondition {
 
-        override fun test(player: Player): Boolean {
+        override fun test(playerId: UUID): Boolean {
             return group == ServerInfoProvider.serverGroup
         }
     }
@@ -110,6 +126,10 @@ data class TeleportOnJoinConfig(
      * 传送到的位置列表.
      */
     val locations: List<Location> = emptyList(),
+    /**
+     * 传送后应用的效果.
+     */
+    val effects: List<PotionEffect> = emptyList(),
 ) {
     /**
      * 随机选择的目标位置. (每次反序列化就固定)
