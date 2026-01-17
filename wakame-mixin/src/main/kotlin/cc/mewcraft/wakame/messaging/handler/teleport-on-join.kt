@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 object TeleportOnJoinPacketHandler : SimplePacketHandler {
 
     private val pendingRequests: Cache<UUID, Unit> = CacheBuilder.newBuilder()
-        .expireAfterWrite(10, TimeUnit.SECONDS)
+        .expireAfterWrite(30, TimeUnit.SECONDS)
         .build<UUID, Unit>()
 
     fun has(uuid: UUID): Boolean {

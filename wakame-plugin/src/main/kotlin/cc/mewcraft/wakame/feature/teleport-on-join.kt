@@ -6,11 +6,11 @@ import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.lazyconfig.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.messaging2.ServerInfoProvider
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.api.event.player.PlayerResourceLoadEvent
 import cc.mewcraft.wakame.messaging.MessagingManager
 import cc.mewcraft.wakame.messaging.handler.TeleportOnJoinPacketHandler
 import cc.mewcraft.wakame.messaging.packet.TeleportOnJoinRequestPacket
 import cc.mewcraft.wakame.util.runTaskLater
-import cc.mewcraft.wakame.util.runTaskTimer
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
@@ -59,24 +59,22 @@ class TeleportOnJoinListener : Listener {
         if (config.enabled.not()) return
         val playerId = event.player.uniqueId
         if (TeleportOnJoinPacketHandler.has(playerId) && config.conditions.all { condition -> condition.test(playerId) }) {
-            // 清理请求状态, 因为这里已经处理
-            TeleportOnJoinPacketHandler.clean(playerId)
             // 设置传送位置
             event.spawnLocation = config.target
             LOGGER.info("Set spawn location for ${event.player.name} on join")
-            // 添加药水效果
-            // 开发日记 2026/1/17 必须这么实现因为此时 Player 对象还没完全初始化
-            runTaskTimer(0, 10) task@{ task, count ->
-                val player = Bukkit.getPlayer(playerId)
-                if (player != null) {
-                    player.addPotionEffects(config.effects)
-                    LOGGER.info("Applied potion effects to ${player.name} on join")
-                }
-                if (count > 20) {
-                    task.cancel()
-                }
-            }
         }
+    }
+
+    @EventHandler
+    fun on(event: PlayerResourceLoadEvent) {
+        val config = TeleportOnJoin.config
+        if (config.enabled.not()) return
+        val player = event.player
+        // 应用药水效果
+        player.addPotionEffects(config.effects)
+        LOGGER.info("Applied potion effects to ${player.name} on join")
+        // 清理请求状态, 因为这里已经处理
+        TeleportOnJoinPacketHandler.clean(player.uniqueId)
     }
 }
 

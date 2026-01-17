@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.entity.player
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.api.event.player.PlayerResourceLoadEvent
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.registerEvents
@@ -143,7 +144,10 @@ object PlayerDataLoadingCoordinator : Listener {
 
                 runTaskLater(1) { -> // 疑问: 除了延迟 1t 外还有更好维护的解决方式吗?
                     if (player.isConnected) {
+                        // 加载
                         ResourceSynchronizer.load(player)
+                        // 触发 PlayerResourceLoadEvent
+                        PlayerResourceLoadEvent(player).callEvent()
                     }
                 }
             }
