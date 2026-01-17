@@ -12,7 +12,7 @@ internal object ResourcePackLifecycle {
 
     @InitFun
     fun init() {
-        runTask { ResourcePackServiceProvider.get().start() }
+        runTask { -> ResourcePackServiceProvider.get().start() }
 
         // 在玩家加入服务器时发送资源包.
         event<PlayerJoinEvent> { event ->

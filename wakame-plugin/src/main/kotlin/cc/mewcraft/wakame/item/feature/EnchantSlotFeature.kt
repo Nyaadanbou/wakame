@@ -160,7 +160,7 @@ object EnchantSlotFeature : Listener {
         player.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
 
         // 更新背包 (延迟 1t 总没错)
-        runTaskLater(1) { player.updateInventory() }
+        runTaskLater(1) { -> player.updateInventory() }
 
         // 发送提示信息
         player.sendMessage(TranslatableMessages.MSG_MAX_ENCHANT_SLOT_REACHED)
@@ -202,7 +202,7 @@ object EnchantSlotFeature : Listener {
         addSlotExtra(targetItem)
         player.playSound(player, Sound.BLOCK_ANVIL_USE, 1f, 1f)
 
-        runTaskLater(1) { player.updateInventory() } // 必须延迟 1t 否则被打额外槽位的物品会从视觉上消失
+        runTaskLater(1) { -> player.updateInventory() } // 必须延迟 1t 否则被打额外槽位的物品会从视觉上消失
     }
 
     // 监听玩家在魔咒台为物品魔咒时, 限制物品的魔咒容量, 防止超出自定义的最大"魔咒槽"容量
@@ -230,7 +230,7 @@ object EnchantSlotFeature : Listener {
         // 随机移除超出容量的魔咒
         val excessAmt = slotUsedFinal - slotLimit
         if (item.type != Material.BOOK && excessAmt > 0) {
-            runTask {
+            runTask { ->
                 var removedAmt = 0
                 val enchantsOnItem = (item.getData(DataComponentTypes.ENCHANTMENTS)?.enchantments() ?: emptyMap()).toMutableMap()
                 enchantsOnItem.forEach { (enchantment, _) ->
