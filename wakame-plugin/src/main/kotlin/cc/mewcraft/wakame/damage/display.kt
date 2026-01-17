@@ -106,7 +106,7 @@ internal object DamageDisplay : Listener {
         )
 
         for (animation in settings.animations) {
-            runTaskLater(animation.delay) {
+            runTaskLater(animation.delay) { ->
                 val hologramData = hologram.data<TextHologramData>()
 
                 // 根据 animation 更新 hologram
@@ -129,7 +129,7 @@ internal object DamageDisplay : Listener {
 
         // 发送 [隐藏] hologram 的封包
         // 配置文件需要手动确保在“动画”播放完毕后再隐藏
-        runTaskLater(settings.animationDuration) {
+        runTaskLater(settings.animationDuration) { ->
             hologram.hide(viewer)
         }
     }

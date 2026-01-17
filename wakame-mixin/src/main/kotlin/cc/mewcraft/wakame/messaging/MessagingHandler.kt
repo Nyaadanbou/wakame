@@ -1,10 +1,8 @@
 package cc.mewcraft.wakame.messaging
 
+import cc.mewcraft.wakame.messaging.handler.TeleportOnJoinPacketHandler
 import cc.mewcraft.wakame.messaging.handler.TownyNetworkPacketHandler
-import cc.mewcraft.wakame.messaging.packet.NationSpawnRequestPacket
-import cc.mewcraft.wakame.messaging.packet.NationSpawnResponsePacket
-import cc.mewcraft.wakame.messaging.packet.TownSpawnRequestPacket
-import cc.mewcraft.wakame.messaging.packet.TownSpawnResponsePacket
+import cc.mewcraft.wakame.messaging.packet.*
 import ninja.egg82.messenger.handler.AbstractMessagingHandler
 import ninja.egg82.messenger.packets.Packet
 import ninja.egg82.messenger.services.PacketService
@@ -20,7 +18,13 @@ class MessagingHandler(
     override fun handlePacket(packet: Packet): Boolean {
         when (packet) {
 
-            /* Towny */
+            /* TeleportOnJoin */
+
+            is TeleportOnJoinRequestPacket -> {
+                TeleportOnJoinPacketHandler.handle(packet); return true
+            }
+
+            /* TownyNetwork */
 
             is TownSpawnRequestPacket -> {
                 TownyNetworkPacketHandler.handle(packet); return true
@@ -37,10 +41,6 @@ class MessagingHandler(
             is NationSpawnResponsePacket -> {
                 TownyNetworkPacketHandler.handle(packet); return true
             }
-
-            // 后续添加更多封包类型时, 在这里添加处理的逻辑
-
-            /* ... */
         }
 
         return false

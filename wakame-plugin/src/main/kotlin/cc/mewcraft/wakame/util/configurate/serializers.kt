@@ -39,6 +39,7 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     // Math
     .register(Vector3fSerializer)
     // Bukkit Object
+    .register(LocationSerializer)
     .register(PotionEffectSerializer)
     // Bukkit Enum
     .register(EntityTypeSerializer)

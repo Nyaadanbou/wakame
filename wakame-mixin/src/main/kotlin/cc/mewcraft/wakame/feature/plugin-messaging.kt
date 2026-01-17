@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.util
+package cc.mewcraft.wakame.feature
 
 import cc.mewcraft.wakame.PluginProvider
 import org.bukkit.entity.Player

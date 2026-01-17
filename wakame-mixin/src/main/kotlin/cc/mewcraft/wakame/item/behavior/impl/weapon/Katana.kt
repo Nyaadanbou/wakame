@@ -278,10 +278,10 @@ object Katana : Weapon {
         // 消耗气
         katanaState.addBladeSpirit(-config.spiritBladeSlashSpiritConsume3)
         spiritBladeSlashBase(player, katanaState, config.spiritBladeSlashDamageMultiplier3, Random.nextDouble(32.0, 38.0).toFloat())
-        runTaskLater(3) {
+        runTaskLater(3) { ->
             spiritBladeSlashBase(player, katanaState, config.spiritBladeSlashDamageMultiplier3, Random.nextDouble(-38.0, -32.0).toFloat())
         }
-        runTaskLater(6) {
+        runTaskLater(6) { ->
             spiritBladeSlashBase(player, katanaState, config.spiritBladeSlashDamageMultiplier3, Random.nextDouble(85.0, 95.0).toFloat())
         }
         // 设置冷却
