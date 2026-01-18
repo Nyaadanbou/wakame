@@ -2,6 +2,7 @@ plugins {
     id("koish.core-conventions")
     id("cc.mewcraft.libraries-repository")
     id("cc.mewcraft.copy-jar-docker")
+    id("xyz.jpenilla.gremlin-gradle")
     alias(local.plugins.blossom)
 }
 
@@ -17,9 +18,11 @@ repositories {
 dependencies {
     /* internal */
 
-    //region 运行时由 koish-mod 提供
+    //region 运行时由 koish-mixin 提供
     compileOnlyApi(project(":wakame-mixin"))
     //endregion
+
+    //region 打包进该 project 的其他 project
     runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-auraskills"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-betonquest"))
@@ -28,8 +31,7 @@ dependencies {
     runtimeOnly(project(":wakame-hooks:wakame-hook-breweryx"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-carbonchat"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-chestshop"))
-    // FIXME 仓库已经挂掉并且作者似乎没有修复的打算
-    // runtimeOnly(project(":wakame-hooks:wakame-hook-chestsort"))
+    // runtimeOnly(project(":wakame-hooks:wakame-hook-chestsort")) // FIXME 仓库已经挂掉并且作者似乎没有修复的打算
     runtimeOnly(project(":wakame-hooks:wakame-hook-craftengine"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-economy"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-economybridge"))
@@ -45,20 +47,22 @@ dependencies {
     runtimeOnly(project(":wakame-hooks:wakame-hook-townyflight"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-vault"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-worldguard"))
+    //endregion
 
     /* libraries */
 
+    // Gremlin
+    implementation(local.gremlin.runtime)
+
     // 数据库
-    api(platform(libs.bom.exposed))
-    implementation(local.hikaricp) {
-        exclude("org.slf4j", "slf4j-api")
-    }
-    implementation(local.mariadb.jdbc) {
-        exclude("org.slf4j", "slf4j-api")
-    }
+    runtimeDownload(local.exposed.core)
+    runtimeDownload(local.exposed.dao)
+    runtimeDownload(local.exposed.jdbc)
+    runtimeDownload(local.hikaricp)
+    runtimeDownload(local.mariadb.jdbc)
 
     // 原版UI
-    api(platform(libs.bom.adventure))
+    runtimeDownload(platform(libs.bom.adventure))
 
     // 箱子UI (该依赖将由自定义的 classloader 加载, 所以这里是 compileOnly)
     compileOnly(platform(libs.bom.invui)) {
@@ -66,14 +70,14 @@ dependencies {
     }
 
     // 资源包
-    api(platform(libs.bom.creative))
+    runtimeDownload(platform(libs.bom.creative))
 
     // 指令框架
-    implementation(platform(libs.bom.cloud.paper))
-    implementation(platform(libs.bom.cloud.kotlin))
+    runtimeDownload(platform(libs.bom.cloud.paper))
+    runtimeDownload(platform(libs.bom.cloud.kotlin))
 
     // Git
-    implementation(platform(libs.bom.jgit))
+    runtimeDownload(platform(libs.bom.jgit))
 
     /* test environment (just add whatever we need) */
 
@@ -100,6 +104,20 @@ dependencies {
     testImplementation(platform(libs.bom.configurate.gson))
     testImplementation(platform(libs.bom.configurate.extra.kotlin))
     testImplementation(platform(libs.bom.configurate.extra.dfu8))
+}
+
+configurations {
+    runtimeDownload {
+        exclude("org.slf4j", "slf4j-api")
+    }
+}
+
+tasks {
+    writeDependencies {
+        outputFileName = "koish-dependencies.txt"
+        repos.add("https://repo.papermc.io/repository/maven-public/")
+        repos.add("https://repo.maven.apache.org/maven2/")
+    }
 }
 
 sourceSets {

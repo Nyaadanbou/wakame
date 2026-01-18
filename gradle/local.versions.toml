@@ -14,6 +14,7 @@ checkstyle = "10.12.5"
 stylecheck = "0.2.1"
 ktlint = "0.50.0"
 spotless = "7.0.4"
+gremlin = "0.0.9"
 
 # Gradle plugin deps
 docker-java = "3.4.1"
@@ -96,8 +97,9 @@ bettergui = "10.2"
 # Gradle plugins
 
 plugin-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
-plugin-shadow = {group = "com.gradleup.shadow", name = "com.gradleup.shadow.gradle.plugin", version.ref = "shadow" }
-plugin-indra-common = {group = "net.kyori", name = "indra-common", version.ref = "indra" }
+plugin-gremlin-gradle = { group = "xyz.jpenilla", name = "gremlin-gradle", version.ref = "gremlin" }
+plugin-shadow = { group = "com.gradleup.shadow", name = "com.gradleup.shadow.gradle.plugin", version.ref = "shadow" }
+plugin-indra-common = { group = "net.kyori", name = "indra-common", version.ref = "indra" }
 plugin-libraries-repository = { group = "cc.mewcraft.gradle", name = "libraries-repository-plugin", version.ref = "libraries-repository" }
 plugin-copy-jar-build = { group = "cc.mewcraft.gradle", name = "copy-jar-build-plugin", version.ref = "copy-jar-build" }
 plugin-copy-jar-docker = { group = "cc.mewcraft.gradle", name = "copy-jar-docker-plugin", version.ref = "copy-jar-docker" }
@@ -118,6 +120,7 @@ fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil"
 # Shaded deps
 # 这些依赖属于插件本身, 将打包进插件的 jar
 
+gremlin-runtime = { group = "xyz.jpenilla", name = "gremlin-runtime", version.ref = "gremlin" }
 koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koin" }
 koin-core = { group = "io.insert-koin", name = "koin-core" }
 koin-core-coroutines = { group = "io.insert-koin", name = "koin-core-coroutines" }
@@ -222,5 +225,4 @@ bettergui = { group = "me.hsgamer", name = "bettergui", version.ref = "bettergui
 
 [plugins]
 
-shadow = {id = "com.gradleup.shadow", version.ref = "shadow" }
 blossom = { id = "net.kyori.blossom", version.ref = "blossom" }
