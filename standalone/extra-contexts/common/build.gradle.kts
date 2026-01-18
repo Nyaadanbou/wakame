@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    api(project(":wakame-externals:extra-contexts:api"))
+    api(project(":standalone:extra-contexts:api"))
     api(project(":common:messaging"))
 
     compileOnlyApi(local.luckperms)

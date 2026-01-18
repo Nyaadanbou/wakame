@@ -62,7 +62,7 @@ dependencies {
     compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit") { isTransitive = false }
 
     // plugin: ExtraContexts
-    compileOnly(project(":wakame-externals:extra-contexts:api"))
+    compileOnly(project(":standalone:extra-contexts:api"))
 
     // plugin: LuckPerms
     compileOnly(local.luckperms)

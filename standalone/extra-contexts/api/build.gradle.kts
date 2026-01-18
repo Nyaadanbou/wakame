@@ -14,7 +14,7 @@ repositories {
 
 publishing {
     repositories {
-        nyaadanbouPrivate().apply {
+        nyaadanbouReleases().apply {
             credentials(PasswordCredentials::class)
         }
     }

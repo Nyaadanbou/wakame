@@ -12,15 +12,14 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":wakame-externals:extra-contexts:common"))
+    implementation(project(":standalone:extra-contexts:common"))
 
-    compileOnly(local.velocity.api); kapt(local.velocity.api)
-    runtimeOnly(local.fastutil) // 与 paper 不同: velocity 运行时并不包含此依赖, 但 messaging 需要这个
+    compileOnly(local.paper)
 }
 
 dockerCopy {
     containerId = "aether-minecraft-1"
-    containerPath = "/minecraft/proxy/plugins/"
+    containerPath = "/minecraft/game1/plugins/"
     fileMode = 0b110_100_100
     userId = 999
     groupId = 999
@@ -29,9 +28,9 @@ dockerCopy {
 
 tasks {
     shadowJar {
-        archiveBaseName.set("extracontexts")
+        archiveBaseName.set("ExtraContexts")
         val pkg = "cc.mewcraft.extracontexts"
-        configureForPlatform(pkg, ServerPlatform.VELOCITY)
+        configureForPlatform(pkg, ServerPlatform.PAPER)
         relocateWithPrefix(pkg) {
             //move("com.github.luben.zstd", "zstd") // relocations don't work with natives. FIXME https://pastes.dev/qEtUHGgkNT
             move("cc.mewcraft.lazyconfig", "lazyconfig")
@@ -46,7 +45,6 @@ tasks {
             move("com.zaxxer.hikari", "hikari")
             move("io.leangen.geantyref", "geantyref")
             move("io.nats", "nats")
-            move("it.unimi.dsi.fastutil", "fastutil")
             move("ninja.egg82.messenger", "messenger")
             move("org.apache.commons.codec", "apache.commons.codec")
             move("org.apache.commons.pool2", "apache.commons.pool2")
