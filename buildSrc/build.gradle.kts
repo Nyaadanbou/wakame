@@ -17,6 +17,7 @@ dependencies {
     implementation(local.plugin.copy.jar.build)
     implementation(local.plugin.copy.jar.docker)
     implementation(local.plugin.paperweight.userdev)
+    implementation(local.plugin.gremlin.gradle)
 }
 
 dependencies {
