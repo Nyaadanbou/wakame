@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import cc.mewcraft.wakame.mixin.support.ExtraDataComponents;
+import cc.mewcraft.wakame.mixin.support.KoishNetworkDataSanitizer;
 import net.minecraft.core.component.DataComponentPatch;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,12 +25,6 @@ public abstract class MixinDataComponentPatch$3 {
             ordinal = 1
     )
     private DataComponentPatch modifyPatch(DataComponentPatch patch) {
-        var optional = patch.get(ExtraDataComponents.DATA_CONTAINER);
-        //noinspection OptionalAssignedToNull
-        if (optional != null) { // 这里不为 null 的语义是该组件可能为 add 也可能为 remove - 只有这种情况需要 forget
-            return patch.forget(t -> t == ExtraDataComponents.DATA_CONTAINER);
-        } else {
-            return patch;
-        }
+        return KoishNetworkDataSanitizer.sanitizeDataComponentPatch(patch);
     }
 }
