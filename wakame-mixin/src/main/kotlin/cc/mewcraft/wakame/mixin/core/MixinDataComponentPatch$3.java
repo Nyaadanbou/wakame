@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import cc.mewcraft.wakame.mixin.support.KoishNetworkDataSanitizer;
+import cc.mewcraft.wakame.mixin.support.KoishDataSanitizer;
 import net.minecraft.core.component.DataComponentPatch;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,6 +25,6 @@ public abstract class MixinDataComponentPatch$3 {
             ordinal = 1
     )
     private DataComponentPatch modifyPatch(DataComponentPatch patch) {
-        return KoishNetworkDataSanitizer.sanitizeDataComponentPatch(patch);
+        return KoishDataSanitizer.sanitizeDataComponentPatch(patch);
     }
 }
