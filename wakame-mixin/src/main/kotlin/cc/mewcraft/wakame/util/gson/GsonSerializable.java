@@ -51,6 +51,7 @@ public interface GsonSerializable {
      * @return the deserialized object
      * @throws IllegalStateException if the clazz does not have a deserialization method
      */
+    @SuppressWarnings("unchecked")
     static <T extends GsonSerializable> T deserialize(Class<T> clazz, JsonElement element) {
         Method deserializeMethod = getDeserializeMethod(clazz);
         if (deserializeMethod == null) {
@@ -58,7 +59,6 @@ public interface GsonSerializable {
         }
 
         try {
-            //noinspection unchecked
             return (T) deserializeMethod.invoke(null, element);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);

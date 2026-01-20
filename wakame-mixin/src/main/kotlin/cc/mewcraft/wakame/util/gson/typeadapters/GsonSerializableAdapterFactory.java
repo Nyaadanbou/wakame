@@ -44,6 +44,7 @@ public final class GsonSerializableAdapterFactory implements TypeAdapterFactory 
     private GsonSerializableAdapterFactory() {
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
         Class<? super T> clazz = type.getRawType();
@@ -64,6 +65,7 @@ public final class GsonSerializableAdapterFactory implements TypeAdapterFactory 
                 gson.toJson(value.serialize(), out);
             }
 
+            @SuppressWarnings("deprecation")
             @Override
             public GsonSerializable read(JsonReader in) throws IOException {
                 JsonElement element = GsonProvider.parser().parse(in);
@@ -73,7 +75,6 @@ public final class GsonSerializableAdapterFactory implements TypeAdapterFactory 
                 }
 
                 try {
-                    //noinspection unchecked
                     return (GsonSerializable) deserializeMethod.invoke(null, element);
                 } catch (Exception e) {
                     throw new IOException(e);
@@ -81,7 +82,6 @@ public final class GsonSerializableAdapterFactory implements TypeAdapterFactory 
             }
         };
 
-        //noinspection unchecked
         return (TypeAdapter<T>) typeAdapter;
     }
 

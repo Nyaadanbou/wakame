@@ -34,17 +34,18 @@ import java.util.stream.Stream;
 
 final class RandomSelectorImpl<E> implements RandomSelector<E> {
 
+    @SuppressWarnings("unchecked")
     static <E> RandomSelector<E> uniform(Collection<E> elements) {
         Objects.requireNonNull(elements, "elements must not be null");
         Preconditions.checkArgument(!elements.isEmpty(), "elements must not be empty");
 
         int size = elements.size();
 
-        //noinspection unchecked
         E[] array = elements.toArray((E[]) new Object[size]);
         return new RandomSelectorImpl<>(array, new BoundedRandomSelector(size));
     }
 
+    @SuppressWarnings("unchecked")
     static <E> RandomSelector<E> weighted(Collection<E> elements, Weigher<? super E> weigher) {
         Objects.requireNonNull(elements, "elements must not be null");
         Objects.requireNonNull(weigher, "weigher must not be null");
@@ -52,7 +53,6 @@ final class RandomSelectorImpl<E> implements RandomSelector<E> {
 
         int size = elements.size();
 
-        //noinspection unchecked
         E[] elementArray = elements.toArray((E[]) new Object[size]);
 
         double totalWeight = 0d;

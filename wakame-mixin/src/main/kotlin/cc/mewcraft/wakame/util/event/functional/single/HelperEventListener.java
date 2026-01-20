@@ -186,6 +186,7 @@ class HelperEventListener<T extends Event> implements SingleSubscription<T>, Eve
         return true;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public Collection<Object> getFunctions() {
         List<Object> functions = new ArrayList<>();

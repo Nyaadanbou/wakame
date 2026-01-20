@@ -17,6 +17,7 @@ public abstract class MixinDataComponentPatch$Builder implements ExtraDataCompon
     @Shadow
     private Reference2ObjectMap<DataComponentType<?>, Optional<?>> map;
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> Optional<T> koish$get(DataComponentType<T> type) {
         return (Optional<T>) map.get(type);

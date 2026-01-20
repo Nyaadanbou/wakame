@@ -62,6 +62,7 @@ public final class GsonProvider {
             .setPrettyPrinting()
             .create();
 
+    @SuppressWarnings("deprecation")
     private static final JsonParser PARSER = new JsonParser();
 
     public static Gson standard() {
@@ -76,10 +77,12 @@ public final class GsonProvider {
         return PARSER;
     }
 
+    @SuppressWarnings("deprecation")
     public static JsonObject readObject(Reader reader) {
         return PARSER.parse(reader).getAsJsonObject();
     }
 
+    @SuppressWarnings("deprecation")
     public static JsonObject readObject(String s) {
         return PARSER.parse(s).getAsJsonObject();
     }

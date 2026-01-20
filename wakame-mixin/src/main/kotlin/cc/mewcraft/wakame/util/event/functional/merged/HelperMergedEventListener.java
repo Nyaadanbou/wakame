@@ -194,6 +194,7 @@ class HelperMergedEventListener<T> implements MergedSubscription<T>, EventExecut
         return true;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public Collection<Object> getFunctions() {
         List<Object> functions = new ArrayList<>();

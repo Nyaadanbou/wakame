@@ -51,10 +51,10 @@ final class MetadataKeyImpl<T> implements MetadataKey<T> {
         return this.type;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public T cast(Object object) throws ClassCastException {
         Objects.requireNonNull(object, "object");
-        //noinspection unchecked
         return (T) this.type.getRawType().cast(object);
     }
 
