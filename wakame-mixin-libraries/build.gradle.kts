@@ -1,18 +1,11 @@
 plugins {
     id("koish.core-conventions")
-    id("cc.mewcraft.libraries-repository")
     id("cc.mewcraft.copy-jar-docker")
-    alias(local.plugins.blossom)
 }
 
 group = "cc.mewcraft.koish"
 version = "0.0.1-snapshot"
 description = "This JAR contains the dependencies for other subprojects."
-
-repositories {
-    nyaadanbouReleases()
-    nyaadanbouPrivate()
-}
 
 dependencies {
     // 写在最前面:
@@ -28,39 +21,43 @@ dependencies {
     compileOnly(local.mixin.extras)
 
     // ECS
-    api(local.fleks) {
-        exclude("org.jetbrains.kotlin")
-        exclude("org.jetbrains.kotlinx")
-    }
+    api(local.fleks)
 
     // 表达式解析
-    api(libs.mocha)
+    api(local.mocha)
 
     // 反射
     api(local.shadow.bukkit)
 
-    // 通用库
-    api(local.commons.collections)
-    api(local.commons.gson) {
-        exclude("com.google.code.gson")
-    }
-    api(local.commons.provider)
-    api(local.commons.reflection)
-    api(local.commons.tuple)
-
     // 配置
     api(project(":common:lazyconfig"))
+    runtimeOnly(local.commons.collections)
+    runtimeOnly(local.commons.gson)
+    runtimeOnly(local.commons.provider)
+    runtimeOnly(local.commons.reflection)
+    runtimeOnly(local.commons.tuple)
+    runtimeOnly(local.configurate.yaml)
+    runtimeOnly(local.configurate.gson)
+    runtimeOnly(local.configurate.extra.dfu8)
+    runtimeOnly(local.configurate.extra.kotlin)
 
     // 跨进程通讯
     api(project(":common:messaging"))
+    runtimeOnly(local.messenger)
+    runtimeOnly(local.messenger.nats)
+    runtimeOnly(local.messenger.rabbitmq)
+    runtimeOnly(local.messenger.redis)
+    runtimeOnly(local.zstdjni)
+    runtimeOnly(local.jedis)
+    runtimeOnly(local.rabbitmq)
+    runtimeOnly(local.nats)
+    runtimeOnly(local.caffeine)
 }
 
 sourceSets {
     main {
         blossom {
-            resources {
-                property("version", project.version.toString())
-            }
+            configure(project)
         }
     }
 }
@@ -72,4 +69,10 @@ dockerCopy {
     userId = 999
     groupId = 999
     archiveTask = "shadowJar"
+}
+
+tasks {
+    shadowJar {
+        configure(ServerPlatform.PAPER)
+    }
 }

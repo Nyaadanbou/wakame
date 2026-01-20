@@ -7,8 +7,7 @@ version = "0.0.1"
 
 repositories {
     nyaadanbouReleases()
-    nyaadanbouPrivate()
-    configure()
+    jmpSnapshots()
 }
 
 dependencies {
@@ -17,20 +16,18 @@ dependencies {
     // Guava
     compileOnly(local.guava)
 
-    // 冒险库
+    // 冒险库 (这些平台有提供运行时, 所以 compileOnly)
     compileOnly(local.adventure.key)
     compileOnly(local.adventure.text.serializer.gson)
 
     // 跨进程通讯
-    api(local.messenger)
-    api(local.messenger.nats)
-    api(local.messenger.rabbitmq)
-    api(local.messenger.redis)
-    api(local.zstdjni)
-    api(local.jedis) {
-        exclude("com.google.code.gson", "gson")
-    }
-    api(local.rabbitmq)
-    api(local.nats)
-    api(local.caffeine)
+    compileOnlyApi(local.messenger)
+    compileOnlyApi(local.messenger.nats)
+    compileOnlyApi(local.messenger.rabbitmq)
+    compileOnlyApi(local.messenger.redis)
+    compileOnlyApi(local.zstdjni)
+    compileOnlyApi(local.jedis)
+    compileOnlyApi(local.rabbitmq)
+    compileOnlyApi(local.nats)
+    compileOnlyApi(local.caffeine)
 }

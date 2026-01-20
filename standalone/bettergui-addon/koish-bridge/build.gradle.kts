@@ -1,18 +1,23 @@
 plugins {
-    id("koish.bettergui-addon")
-    id("cc.mewcraft.libraries-repository")
+    id("koish.bettergui-addon-conventions")
 }
 
 version = "0.0.1"
 
 repositories {
-    nyaadanbouReleases()
-    nyaadanbouPrivate()
+    jmpSnapshots()
 }
 
 dependencies {
-    // internal
     compileOnly(project(":wakame-plugin"))
+}
+
+sourceSets {
+    main {
+        blossom {
+            configure(project)
+        }
+    }
 }
 
 tasks {

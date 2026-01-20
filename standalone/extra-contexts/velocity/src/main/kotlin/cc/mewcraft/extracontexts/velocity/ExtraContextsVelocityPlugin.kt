@@ -4,6 +4,7 @@ import cc.mewcraft.extracontexts.api.KeyValueStoreManager
 import cc.mewcraft.extracontexts.common.database.DatabaseManager
 import cc.mewcraft.extracontexts.common.database.ReactiveDatabaseConfiguration
 import cc.mewcraft.extracontexts.common.messaging.MessagingInitializer
+import cc.mewcraft.extracontexts.common.runtime.ExtraContextsDependencies
 import cc.mewcraft.extracontexts.common.storage.CachedKeyValueStoreManager
 import cc.mewcraft.lazyconfig.MAIN_CONFIG
 import cc.mewcraft.messaging2.ReactiveMessagingConfiguration
@@ -13,9 +14,11 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent
 import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.plugin.annotation.DataDirectory
+import com.velocitypowered.api.proxy.ProxyServer
 import net.luckperms.api.LuckPerms
 import net.luckperms.api.LuckPermsProvider
 import org.slf4j.Logger
+import xyz.jpenilla.gremlin.runtime.platformsupport.VelocityClasspathAppender
 import java.nio.file.Path
 import kotlin.io.path.outputStream
 
@@ -30,6 +33,7 @@ const val PLUGIN_NAMESPACE = "extracontexts"
     description = "Adds key-value pair context support to LuckPerms"
 )
 class ExtraContextsVelocityPlugin @Inject constructor(
+    val proxy: ProxyServer,
     val logger: Logger,
     @param:DataDirectory
     val dataDirectory: Path,
@@ -43,6 +47,10 @@ class ExtraContextsVelocityPlugin @Inject constructor(
 
     @Subscribe
     fun onProxyInitialize(event: ProxyInitializeEvent) {
+        val dependencyPaths = ExtraContextsDependencies.resolve(dataDirectory.resolve("libs"))
+        val classpathAppender = VelocityClasspathAppender(proxy, this)
+        classpathAppender.append(dependencyPaths)
+
         pluginConfigs = VelocityPluginConfigs(this)
         pluginConfigs.initialize()
 

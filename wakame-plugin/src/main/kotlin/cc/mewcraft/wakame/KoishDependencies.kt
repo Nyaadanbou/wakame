@@ -15,7 +15,7 @@ import java.nio.file.Path
  * downloads any missing jars into a cache under the plugin's data folder,
  * and returns the resolved jar file paths.
  */
-object KoishDependencies {
+internal object KoishDependencies {
 
     private const val DEPENDENCIES_RESOURCE = "koish-dependencies.txt"
 
@@ -27,11 +27,9 @@ object KoishDependencies {
      */
     @JvmStatic
     fun resolve(cacheDir: Path): Set<Path> {
-        val logger = LoggerFactory.getLogger("KoishGremlin")
-        val deps = DependencySet.readFromClasspathResource(
-            KoishDependencies::class.java.classLoader, DEPENDENCIES_RESOURCE,
-        )
+        val deps = DependencySet.readFromClasspathResource(KoishDependencies::class.java.classLoader, DEPENDENCIES_RESOURCE)
         val cache = DependencyCache(cacheDir)
+        val logger = LoggerFactory.getLogger(KoishDependencies::class.java.simpleName)
         val files: Set<Path>
         DependencyResolver(Slf4jGremlinLogger(logger)).use { downloader ->
             files = downloader.resolve(deps, cache).jarFiles()

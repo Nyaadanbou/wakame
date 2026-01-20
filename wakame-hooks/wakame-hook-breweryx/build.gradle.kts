@@ -1,13 +1,10 @@
 plugins {
-    id("koish.core-conventions")
-    id("cc.mewcraft.libraries-repository")
+    id("koish.core-hook-conventions")
 }
 
 version = "0.0.1"
 
 repositories {
-    nyaadanbouReleases()
-    nyaadanbouPrivate()
     maven {
         name = "jsinco"
         url = uri("https://repo.jsinco.dev/releases")

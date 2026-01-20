@@ -1,18 +1,13 @@
 plugins {
-    id("koish.core-conventions")
-    id("cc.mewcraft.libraries-repository")
+    id("koish.core-hook-conventions")
 }
 
 version = "0.0.1"
 
 repositories {
-    nyaadanbouReleases()
-    nyaadanbouPrivate()
-    repositories {
-        maven {
-            name = "momirealms"
-            url = uri("https://repo.momirealms.net/releases/")
-        }
+    maven {
+        name = "momirealms"
+        url = uri("https://repo.momirealms.net/releases/")
     }
 }
 

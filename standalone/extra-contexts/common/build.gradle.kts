@@ -1,27 +1,25 @@
 plugins {
     id("koish.extracontexts-conventions")
-    id("cc.mewcraft.libraries-repository")
 }
 
 version = "0.0.1"
-
-repositories {
-    nyaadanbouReleases()
-    nyaadanbouPrivate()
-}
 
 dependencies {
     api(project(":standalone:extra-contexts:api"))
     api(project(":common:messaging"))
 
-    compileOnlyApi(local.luckperms)
-    implementation(local.caffeine)
-    implementation(local.exposed.core)
-    implementation(local.exposed.dao)
-    implementation(local.exposed.jdbc)
-    implementation(local.h2)
-    implementation(local.mariadb.jdbc)
-    implementation(local.mysql.jdbc)
-    implementation(local.postgresql.jdbc)
-    implementation(local.hikaricp)
+    api(local.gremlin.runtime)
+    api(local.jarrelocator)
+
+    compileOnly(local.luckperms)
+
+    compileOnly(local.caffeine)
+    compileOnly(local.exposed.core)
+    compileOnly(local.exposed.dao)
+    compileOnly(local.exposed.jdbc)
+    compileOnly(local.h2)
+    compileOnly(local.mariadb.jdbc)
+    compileOnly(local.mysql.jdbc)
+    compileOnly(local.postgresql.jdbc)
+    compileOnly(local.hikaricp)
 }

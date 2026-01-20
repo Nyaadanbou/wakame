@@ -1,166 +1,181 @@
 [versions]
 
 # Gradle plugins
+
+blossom = "2.2.0"
+checkstyle = "10.12.5"
+copy-jar-build = "0.0.2-snapshot"
+copy-jar-docker = "0.0.1-snapshot"
+gremlin = "0.0.9"
+indra = "3.1.3"
 kotlin = "2.3.0"
 kotlinx-coroutines = "1.10.2"
 libraries-repository = "0.0.4-snapshot"
-copy-jar-build = "0.0.2-snapshot"
-copy-jar-docker = "0.0.1-snapshot"
+nyaadanbou-repository = "0.0.1-snapshot"
 paperweight = "2.0.0-beta.17"
 shadow = "9.2.2"
-indra = "3.1.3"
-blossom = "2.1.0"
-checkstyle = "10.12.5"
-stylecheck = "0.2.1"
-ktlint = "0.50.0"
 spotless = "7.0.4"
-gremlin = "0.0.9"
 
-# Gradle plugin deps
-docker-java = "3.4.1"
-apache-commons-compress = "1.27.1"
+# Shaded dependencies
 
-# Shaded deps
-koin = "4.0.0"
+caffeine = "3.2.3"
+cloud = "2.0.0"
+cloud-minecraft = "2.0.0-beta.11"
+cloud-processors = "1.0.0-rc.1"
 commons = "1.24"
-fleks = "2.11"
+configurate = "4.2.0-SNAPSHOT"
+creative = "1.9.1"
 exposed = "1.0.0-rc-3"
+fleks = "2.11"
 h2 = "2.2.224"
+hikaricp = "5.1.0"
+invui = "1.49"
+jarrelocator = "1.7"
+jgit = "6.9.0.202403050737-r"
+koin = "4.0.0"
 mariadb-jdbc = "3.5.4"
+mocha = "3.0.0"
 mysql-jdbc = "8.0.33"
 postgresql-jdbc = "42.7.8"
-hikaricp = "5.1.0"
 snakeyaml-engine = "2.8"
-caffeine = "3.2.3"
 
-# Server deps
-paper = "1.21.8-R0.1-SNAPSHOT"
-velocity = "3.4.0-SNAPSHOT"
+# Server dependencies
+
+adventure = "4.24.0"
+asm = "9.8"
+fastutil = "8.5.15"
+guava = "33.3.1-jre"
+ignite = "1.1.0"
+jedis = "7.0.0"
+messenger = "1.1.0-SNAPSHOT"
 mixin = "0.8.7"
 mixin-extras = "0.4.1"
-ignite = "1.1.0"
-shadow-nbt = "1.21.3-SNAPSHOT"
-shadow-bukkit = "1.21.3-SNAPSHOT"
-messenger = "1.1.0-SNAPSHOT"
-zstdjni = "1.5.7-5"
-jedis = "7.0.0"
-postgresql = "42.7.8"
-rabbitmq = "5.27.0"
 nats = "2.23.0"
-
-# synced with version used by lowest supported mc
-asm = "9.8"
-gson = "2.11.0"
-guava = "33.3.1-jre"
-fastutil = "8.5.15"
-log4j = "2.24.1"
 netty = "4.1.115.Final"
-adventure = "4.24.0"  # synced with version used by lowest supported mc
+paper = "1.21.8-R0.1-SNAPSHOT"
+rabbitmq = "5.27.0"
+shadow-bukkit = "1.21.3-SNAPSHOT"
+shadow-nbt = "1.21.3-SNAPSHOT"
+velocity = "3.4.0-SNAPSHOT"
+zstdjni = "1.5.7-5"
 
-# Test deps
+# Test dependencies
+
 datafixerupper = "8.0.16"
-kotlinx-coroutines-core = "1.8.1"
 jdbc-sqlite = "3.50.2.0"
+mockk = "1.13.10"
+logback-classic = "1.5.6"
 
-# Plugin deps
-helper = "6.0.0"
+# Plugin dependencies
+
 adventurelevel = "2.0.0"
-betterhud = "1.12"
+auraskills = "2.2.4"
+betonquest = "3.0.0-SNAPSHOT"
 bettercommand = "1.4.3"
-mythicmobs = "5.10.1"
-economy = "2.2.0"
+bettergui = "10.2"
+betterhud = "1.12"
+breweryx = "3.4.10"
+carbonchat = "3.0.0-beta.26"
+chestshop = "3.12.3-SNAPSHOT"
 chestsort = "13.0.0-SNAPSHOT"
-vault = "1.7"
+craftengine = "0.0.63"
+economy = "2.2.0"
+economybridge = "1.2.1"
+huskhomes = "4.9.9"
+husksync = "3.8.7+1.21.8"
 luckperms = "5.4"
+mythicdungeons = "1.3.0-SNAPSHOT"
+mythicmobs = "5.10.1"
+nightcore = "2.7.8"
 papi = "2.11.6"
 quickshop = "6.2.0.10"
+thebrewingproject = "v2.4.1"
 towny = "0.100.4.0"
+townyflight = "1.13.0"
+vault = "1.7"
 worldedit = "7.3.0"
 worldguard = "7.0.7"
-townyflight = "1.13.0"
-nightcore = "2.7.8"
-economybridge = "1.2.1" # 同上
-breweryx = "3.4.10"
-thebrewingproject = "v2.4.1"
-chestshop = "3.12.3-SNAPSHOT"
-craftengine = "0.0.63"
-auraskills = "2.2.4"
-husksync = "3.8.7+1.21.8"
-huskhomes = "4.9.9"
-carbonchat = "3.0.0-beta.26"
-mythicdungeons = "1.3.0-SNAPSHOT"
-betonquest = "3.0.0-SNAPSHOT"
-bettergui = "10.2"
 
 [libraries]
 
 # Gradle plugins
 
-plugin-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
-plugin-gremlin-gradle = { group = "xyz.jpenilla", name = "gremlin-gradle", version.ref = "gremlin" }
-plugin-shadow = { group = "com.gradleup.shadow", name = "com.gradleup.shadow.gradle.plugin", version.ref = "shadow" }
-plugin-indra-common = { group = "net.kyori", name = "indra-common", version.ref = "indra" }
-plugin-libraries-repository = { group = "cc.mewcraft.gradle", name = "libraries-repository-plugin", version.ref = "libraries-repository" }
+plugin-blossom = { group = "net.kyori", name = "blossom", version.ref = "blossom" }
 plugin-copy-jar-build = { group = "cc.mewcraft.gradle", name = "copy-jar-build-plugin", version.ref = "copy-jar-build" }
 plugin-copy-jar-docker = { group = "cc.mewcraft.gradle", name = "copy-jar-docker-plugin", version.ref = "copy-jar-docker" }
+plugin-gremlin-gradle = { group = "xyz.jpenilla", name = "gremlin-gradle", version.ref = "gremlin" }
+plugin-indra-common = { group = "net.kyori", name = "indra-common", version.ref = "indra" }
+plugin-indra-licenser-spotless = { group = "net.kyori", name = "indra-licenser-spotless", version.ref = "indra" }
+plugin-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+plugin-libraries-repository = { group = "cc.mewcraft.gradle", name = "libraries-repository-plugin", version.ref = "libraries-repository" }
+plugin-nyaadanbou-repository = { group = "cc.mewcraft.gradle", name = "nyaadanbou-repository-plugin", version.ref = "nyaadanbou-repository" }
 plugin-paperweight-userdev = { group = "io.papermc.paperweight", name = "paperweight-userdev", version.ref = "paperweight" }
+plugin-shadow = { group = "com.gradleup.shadow", name = "com.gradleup.shadow.gradle.plugin", version.ref = "shadow" }
 plugin-spotless = { group = "com.diffplug.spotless", name = "com.diffplug.spotless.gradle.plugin", version.ref = "spotless" }
 
-# Build logics
-stylecheck = { group = "ca.stellardrift", name = "stylecheck", version.ref = "stylecheck" }
+# Shaded dependencies
+# 这些依赖属于插件本身, 将打包进插件的 JAR
 
-# Gradle plugin deps
-docker-java = { group = "com.github.docker-java", name = "docker-java", version.ref = "docker-java" }
-apache-commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "apache-commons-compress" }
-
-# synced with version used by lowest supported mc (currently 1.21.4 on paper)
-asm = { group = "org.ow2.asm", name = "asm-commons", version.ref = "asm" }
-fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
-
-# Shaded deps
-# 这些依赖属于插件本身, 将打包进插件的 jar
-
-gremlin-runtime = { group = "xyz.jpenilla", name = "gremlin-runtime", version.ref = "gremlin" }
-koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koin" }
-koin-core = { group = "io.insert-koin", name = "koin-core" }
-koin-core-coroutines = { group = "io.insert-koin", name = "koin-core-coroutines" }
-koin-test = { group = "io.insert-koin", name = "koin-test" }
-koin-test-junit5 = { group = "io.insert-koin", name = "koin-test-junit5" }
+caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
+cloud-core = { group = "org.incendo", name = "cloud-core", version.ref = "cloud" }
+cloud-kotlin-coroutines = { group = "org.incendo", name = "cloud-kotlin-coroutines", version.ref = "cloud" }
+cloud-kotlin-extensions = { group = "org.incendo", name = "cloud-kotlin-extensions", version.ref = "cloud" }
+cloud-minecraft-extras = { group = "org.incendo", name = "cloud-minecraft-extras", version.ref = "cloud-minecraft" }
+cloud-paper = { group = "org.incendo", name = "cloud-paper", version.ref = "cloud-minecraft" }
+cloud-processors-confirmation = { group = "org.incendo", name = "cloud-processors-confirmation", version.ref = "cloud-processors" }
+cloud-velocity = { group = "org.incendo", name = "cloud-velocity", version.ref = "cloud-minecraft" }
 commons-collections = { group = "xyz.xenondevs.commons", name = "commons-collections", version.ref = "commons" }
 commons-gson = { group = "xyz.xenondevs.commons", name = "commons-gson", version.ref = "commons" }
 commons-guava = { group = "xyz.xenondevs.commons", name = "commons-guava", version.ref = "commons" }
 commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version.ref = "commons" }
 commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "commons" }
 commons-tuple = { group = "xyz.xenondevs.commons", name = "commons-tuple", version.ref = "commons" }
-fleks = { group = "io.github.quillraven.fleks", name = "Fleks", version.ref = "fleks" }
-caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
+configurate-extra-dfu4 = { group = "cc.mewcraft.configurate", name = "configurate-extra-dfu4", version.ref = "configurate" }
+configurate-extra-dfu8 = { group = "cc.mewcraft.configurate", name = "configurate-extra-dfu8", version.ref = "configurate" }
+configurate-extra-kotlin = { group = "cc.mewcraft.configurate", name = "configurate-extra-kotlin", version.ref = "configurate" }
+configurate-gson = { group = "cc.mewcraft.configurate", name = "configurate-gson", version.ref = "configurate" }
+configurate-yaml = { group = "cc.mewcraft.configurate", name = "configurate-yaml", version.ref = "configurate" }
+creative-api = { group = "team.unnamed", name = "creative-api", version.ref = "creative" }
+creative-serializer-minecraft = { group = "team.unnamed", name = "creative-serializer-minecraft", version.ref = "creative" }
+creative-server = { group = "team.unnamed", name = "creative-server", version.ref = "creative" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
 exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+fleks = { group = "io.github.quillraven.fleks", name = "Fleks", version.ref = "fleks" }
+gremlin-runtime = { group = "xyz.jpenilla", name = "gremlin-runtime", version.ref = "gremlin" }
 h2 = { module = "com.h2database:h2", version.ref = "h2" }
+hikaricp = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikaricp" }
+invui-core = { group = "xyz.xenondevs.invui", name = "invui-core", version.ref = "invui" }
+invui-inventoryaccess = { group = "xyz.xenondevs.invui", name = "inventory-access", version.ref = "invui" }
+invui-inventoryaccess-r24 = { group = "xyz.xenondevs.invui", name = "inventory-access-r24", version.ref = "invui" }
+invui-inventoryaccess-r25 = { group = "xyz.xenondevs.invui", name = "inventory-access-r25", version.ref = "invui" }
+invui-inventoryaccess-r26 = { group = "xyz.xenondevs.invui", name = "inventory-access-r26", version.ref = "invui" }
+invui-kotlin = { group = "xyz.xenondevs.invui", name = "invui-kotlin", version.ref = "invui" }
+jarrelocator = { group = "me.lucko", name = "jar-relocator", version.ref = "jarrelocator" }
+jedis = { group = "redis.clients", name = "jedis", version.ref = "jedis" }
+jgit = { group = "org.eclipse.jgit", name = "org.eclipse.jgit", version.ref = "jgit" }
+koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koin" }
+koin-core = { group = "io.insert-koin", name = "koin-core" }
+koin-core-coroutines = { group = "io.insert-koin", name = "koin-core-coroutines" }
+koin-test = { group = "io.insert-koin", name = "koin-test" }
+koin-test-junit5 = { group = "io.insert-koin", name = "koin-test-junit5" }
 mariadb-jdbc = { group = "org.mariadb.jdbc", name = "mariadb-java-client", version.ref = "mariadb-jdbc" }
-mysql-jdbc = { group = "com.mysql", name = "mysql-connector-j", version.ref = "mysql-jdbc" }
-postgresql-jdbc = { group = "org.postgresql", name = "postgresql", version.ref = "postgresql-jdbc" }
-hikaricp = { group = "com.zaxxer", name = "HikariCP", version = "5.1.0" }
-snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version.ref = "snakeyaml-engine" }
 messenger = { group = "de.hexaoxi", name = "messenger-api", version.ref = "messenger" }
 messenger-nats = { group = "de.hexaoxi", name = "messenger-nats", version.ref = "messenger" }
 messenger-rabbitmq = { group = "de.hexaoxi", name = "messenger-rabbitmq", version.ref = "messenger" }
 messenger-redis = { group = "de.hexaoxi", name = "messenger-redis", version.ref = "messenger" }
-netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
-zstdjni = { group = "com.github.luben", name = "zstd-jni", version.ref = "zstdjni" }
-jedis = { group = "redis.clients", name = "jedis", version.ref = "jedis" }
-rabbitmq = { group = "com.rabbitmq", name = "amqp-client", version.ref = "rabbitmq" }
+mocha = { group = "team.unnamed", name = "mocha", version.ref = "mocha" }
+mysql-jdbc = { group = "com.mysql", name = "mysql-connector-j", version.ref = "mysql-jdbc" }
 nats = { group = "io.nats", name = "jnats", version.ref = "nats" }
+postgresql-jdbc = { group = "org.postgresql", name = "postgresql", version.ref = "postgresql-jdbc" }
+rabbitmq = { group = "com.rabbitmq", name = "amqp-client", version.ref = "rabbitmq" }
+zstdjni = { group = "com.github.luben", name = "zstd-jni", version.ref = "zstdjni" }
 
-# Server deps
-# 这些依赖属于服务端核心, 由服务端的 classloader 加载
+# Server dependencies
+# 这些依赖属于服务端核心, 由服务端的 Classloader 加载
 
-kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
-kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
-kotlinx-coroutines-debug = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-debug", version.ref = "kotlinx-coroutines" }
-paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
-velocity-api = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
+# 跟最低支持的 MC 版本保持一致
+asm = { group = "org.ow2.asm", name = "asm-commons", version.ref = "asm" }
 adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
 adventure-extra-kotlin = { group = "net.kyori", name = "adventure-extra-kotlin", version.ref = "adventure" }
 adventure-key = { group = "net.kyori", name = "adventure-key", version.ref = "adventure" }
@@ -172,56 +187,65 @@ adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-s
 adventure-text-serializer-json = { group = "net.kyori", name = "adventure-text-serializer-json", version.ref = "adventure" }
 adventure-text-serializer-legacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
 adventure-text-serializer-plain = { group = "net.kyori", name = "adventure-text-serializer-plain", version.ref = "adventure" }
+fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
+ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-debug = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-debug", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 mixin = { group = "org.spongepowered", name = "mixin", version.ref = "mixin" }
 mixin-extras = { group = "io.github.llamalad7", name = "mixinextras-common", version.ref = "mixin-extras" }
-ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }
-shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }
+netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
+paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 shadow-bukkit = { group = "cc.mewcraft", name = "shadow-bukkit", version.ref = "shadow-bukkit" }
+shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }
+snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version.ref = "snakeyaml-engine" }
+velocity-api = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
+#
 
-# Test deps
-# 这些依赖只由测试使用. 在实际运行环境中存在服务端中.
-
-datafixerupper = { group = "com.mojang", name = "datafixerupper", version.ref = "datafixerupper" }
-kotlinx-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "kotlinx-coroutines-core" }
-sqlite-jdbc = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "jdbc-sqlite" }
-
-# Plugin deps
+# Plugin dependencies
 # 这些依赖属于插件, 无论是自研的还是第三方的
 
-helper = { group = "me.lucko", name = "helper", version.ref = "helper" }
-mythicmobs = { group = "io.lumine", name = "Mythic-Dist", version.ref = "mythicmobs" }
 adventurelevel = { group = "cc.mewcraft.adventurelevel", name = "api", version.ref = "adventurelevel" }
+auraskills = { group = "dev.aurelium", name = "auraskills-api-bukkit", version.ref = "auraskills" }
+betonquest = { group = "org.betonquest", name = "betonquest", version.ref = "betonquest" }
+bettercommand = { group = "io.github.toxicity188", name = "BetterCommand", version.ref = "bettercommand" }
+bettergui = { group = "me.hsgamer", name = "bettergui", version.ref = "bettergui" }
 betterhud-api = { group = "io.github.toxicity188", name = "BetterHud-standard-api", version.ref = "betterhud" }
 betterhud-bukkit = { group = "io.github.toxicity188", name = "BetterHud-bukkit-api", version.ref = "betterhud" }
-bettercommand = { group = "io.github.toxicity188", name = "BetterCommand", version.ref = "bettercommand" }
-economy = { group = "cc.mewcraft.economy", name = "api", version.ref = "economy" }
+breweryx = { group = "com.dre.brewery", name = "BreweryX", version.ref = "breweryx" }
+carbonchat = { group = "de.hexaoxi", name = "carbonchat-api", version.ref = "carbonchat" }
+chestshop = { group = "com.acrobot.chestshop", name = "chestshop", version.ref = "chestshop" }
 chestsort = { group = "de.jeff_media", name = "ChestSortAPI", version.ref = "chestsort" }
-worldedit = { group = "com.sk89q.worldedit", name = "worldedit-bukkit", version.ref = "worldguard" }
-worldguard = { group = "com.sk89q.worldguard", name = "worldguard-bukkit", version.ref = "worldguard" }
-vault = { group = "com.github.MilkBowl", name = "VaultAPI", version.ref = "vault" }
+craftengine-bukkit = { group = "net.momirealms", name = "craft-engine-bukkit", version.ref = "craftengine" }
+craftengine-core = { group = "net.momirealms", name = "craft-engine-core", version.ref = "craftengine" }
+economy = { group = "cc.mewcraft.economy", name = "api", version.ref = "economy" }
+economybridge = { group = "su.nightexpress.economybridge", name = "economy-bridge", version.ref = "economybridge" }
+huskhomes-bukkit = { group = "net.william278.huskhomes", name = "huskhomes-bukkit", version.ref = "huskhomes" }
+huskhomes-common = { group = "net.william278.huskhomes", name = "huskhomes-common", version.ref = "huskhomes" }
+husksync = { group = "net.william278.husksync", name = "husksync-bukkit", version.ref = "husksync" }
 luckperms = { group = "net.luckperms", name = "api", version.ref = "luckperms" }
+mythicdungeons = { group = "net.playavalon", name = "MythicDungeons", version.ref = "mythicdungeons" }
+mythicmobs = { group = "io.lumine", name = "Mythic-Dist", version.ref = "mythicmobs" }
+nightcore = { group = "su.nightexpress.nightcore", name = "main", version.ref = "nightcore" }
 papi = { group = "me.clip", name = "placeholderapi", version.ref = "papi" }
 quickshop-api = { group = "com.ghostchu", name = "quickshop-api", version.ref = "quickshop" }
 quickshop-bukkit = { group = "com.ghostchu", name = "quickshop-bukkit", version.ref = "quickshop" }
 quickshop-common = { group = "com.ghostchu", name = "quickshop-common", version.ref = "quickshop" }
+thebrewingproject = { group = "com.github.BreweryTeam", name = "TheBrewingProject", version.ref = "thebrewingproject" }
 towny = { group = "com.palmergames.bukkit.towny", name = "towny", version.ref = "towny" }
 townyflight = { group = "com.github.TownyAdvanced", name = "TownyFlight", version.ref = "townyflight" }
-nightcore = { group = "su.nightexpress.nightcore", name = "main", version.ref = "nightcore" }
-economybridge = { group = "su.nightexpress.economybridge", name = "economy-bridge", version.ref = "economybridge" }
-breweryx = { group = "com.dre.brewery", name = "BreweryX", version.ref = "breweryx" }
-thebrewingproject = { group = "com.github.BreweryTeam", name = "TheBrewingProject", version.ref = "thebrewingproject" }
-chestshop = { group = "com.acrobot.chestshop", name = "chestshop", version.ref = "chestshop" }
-craftengine-core = { group = "net.momirealms", name = "craft-engine-core", version.ref = "craftengine" }
-craftengine-bukkit = { group = "net.momirealms", name = "craft-engine-bukkit", version.ref = "craftengine" }
-auraskills = { group = "dev.aurelium", name = "auraskills-api-bukkit", version.ref = "auraskills" }
-husksync = { group = "net.william278.husksync", name = "husksync-bukkit", version.ref = "husksync" }
-huskhomes-common = { group = "net.william278.huskhomes", name = "huskhomes-common", version.ref = "huskhomes" }
-huskhomes-bukkit = { group = "net.william278.huskhomes", name = "huskhomes-bukkit", version.ref = "huskhomes" }
-carbonchat = { group = "de.hexaoxi", name = "carbonchat-api", version.ref = "carbonchat" }
-mythicdungeons = { group = "net.playavalon", name = "MythicDungeons", version.ref = "mythicdungeons" }
-betonquest = { group = "org.betonquest", name = "betonquest", version.ref = "betonquest" }
-bettergui = { group = "me.hsgamer", name = "bettergui", version.ref = "bettergui" }
+vault = { group = "com.github.MilkBowl", name = "VaultAPI", version.ref = "vault" }
+worldedit = { group = "com.sk89q.worldedit", name = "worldedit-bukkit", version.ref = "worldedit" }
+worldguard = { group = "com.sk89q.worldguard", name = "worldguard-bukkit", version.ref = "worldguard" }
+
+# Test dependencies
+# 这些依赖只由测试使用, 而在实际运行环境中存在于服务端中.
+
+datafixerupper = { group = "com.mojang", name = "datafixerupper", version.ref = "datafixerupper" }
+logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback-classic" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+sqlite-jdbc = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "jdbc-sqlite" }
 
 [plugins]
 

@@ -1,22 +1,14 @@
 plugins {
     id("koish.extracontexts-conventions")
-    id("cc.mewcraft.libraries-repository")
     `maven-publish`
 }
 
 group = "cc.mewcraft.extracontexts"
 version = "0.0.1-snapshot"
 
-repositories {
-    nyaadanbouReleases()
-    nyaadanbouPrivate()
-}
-
 publishing {
     repositories {
-        nyaadanbouReleases().apply {
-            credentials(PasswordCredentials::class)
-        }
+        nyaadanbouReleases()
     }
     publications {
         create<MavenPublication>("maven") {

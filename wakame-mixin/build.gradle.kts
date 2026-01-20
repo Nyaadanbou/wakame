@@ -1,19 +1,12 @@
 plugins {
     id("koish.core-conventions")
-    id("cc.mewcraft.libraries-repository")
     id("cc.mewcraft.copy-jar-docker")
     id("io.papermc.paperweight.userdev")
-    alias(local.plugins.blossom)
 }
 
 group = "cc.mewcraft.koish"
 version = "0.0.1-snapshot"
 description = "The core gameplay implementation of Xiaomi's server (ignite mod)"
-
-repositories {
-    nyaadanbouReleases()
-    nyaadanbouPrivate()
-}
 
 paperweight {
     // 因为:
@@ -34,19 +27,14 @@ dependencies {
     compileOnly(local.mixin)
     compileOnly(local.mixin.extras)
 
-    // API
     api(project(":wakame-api"))
-
-    // 内部库
     compileOnlyApi(project(":wakame-mixin-libraries"))
 }
 
 sourceSets {
     main {
         blossom {
-            resources {
-                property("version", project.version.toString())
-            }
+            configure(project)
         }
     }
 }
@@ -58,4 +46,10 @@ dockerCopy {
     userId = 999
     groupId = 999
     archiveTask = "shadowJar"
+}
+
+tasks {
+    shadowJar {
+        configure(ServerPlatform.PAPER)
+    }
 }

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.mixin.libraries.plugin;
+package cc.mewcraft.koish.libs.plugin;
 
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;

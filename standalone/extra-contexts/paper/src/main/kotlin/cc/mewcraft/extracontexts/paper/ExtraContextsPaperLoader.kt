@@ -1,15 +1,15 @@
-package cc.mewcraft.wakame
+package cc.mewcraft.extracontexts.paper
 
-import cc.mewcraft.wakame.KoishDependencies.resolve
+import cc.mewcraft.extracontexts.common.runtime.ExtraContextsDependencies
 import io.papermc.paper.plugin.loader.PluginClasspathBuilder
 import io.papermc.paper.plugin.loader.PluginLoader
 import xyz.jpenilla.gremlin.runtime.platformsupport.PaperClasspathAppender
 
-internal class KoishLoader : PluginLoader {
+class ExtraContextsPaperLoader : PluginLoader {
 
     override fun classloader(classpath: PluginClasspathBuilder) {
         PaperClasspathAppender(classpath).append(
-            resolve(classpath.getContext().getDataDirectory().resolve("libs"))
+            ExtraContextsDependencies.resolve(classpath.context.dataDirectory.resolve("libs"))
         )
     }
 }
