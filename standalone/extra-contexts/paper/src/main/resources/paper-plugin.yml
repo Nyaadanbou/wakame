@@ -1,0 +1,12 @@
+name: ExtraContexts
+version: 0.0.1
+description: Adds key-value context support to LuckPerms
+authors: [ Nailm ]
+main: cc.mewcraft.extracontexts.paper.ExtraContextsPaperPlugin
+loader: cc.mewcraft.extracontexts.paper.ExtraContextsPaperLoader
+api-version: 1.21.8
+dependencies:
+  server:
+    LuckPerms:
+      required: true
+      load: OMIT

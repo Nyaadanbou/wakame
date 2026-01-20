@@ -46,6 +46,7 @@ public final class EventFilters {
 
     private static final Predicate<? extends Cancellable> IGNORE_CANCELLED = e -> !e.isCancelled();
     private static final Predicate<? extends Cancellable> IGNORE_UNCANCELLED = Cancellable::isCancelled;
+    @SuppressWarnings("deprecation")
     private static final Predicate<? extends PlayerLoginEvent> IGNORE_DISALLOWED_LOGIN = e -> e.getResult() == PlayerLoginEvent.Result.ALLOWED;
     private static final Predicate<? extends AsyncPlayerPreLoginEvent> IGNORE_DISALLOWED_PRE_LOGIN = e -> e.getLoginResult() == AsyncPlayerPreLoginEvent.Result.ALLOWED;
 
@@ -91,6 +92,7 @@ public final class EventFilters {
      * @param <T> the event type
      * @return a predicate which only returns true if the login is allowed
      */
+    @SuppressWarnings("deprecation")
     public static <T extends PlayerLoginEvent> Predicate<T> ignoreDisallowedLogin() {
         return (Predicate<T>) IGNORE_DISALLOWED_LOGIN;
     }

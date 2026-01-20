@@ -1,6 +1,5 @@
 plugins {
     id("koish.core-conventions")
-    id("cc.mewcraft.libraries-repository")
     `maven-publish`
 }
 
@@ -14,7 +13,7 @@ dependencies {
 
 publishing {
     repositories {
-        nyaadanbouReleases().credentials(PasswordCredentials::class)
+        nyaadanbouReleases()
     }
     publications {
         create<MavenPublication>("maven") {

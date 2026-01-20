@@ -1,14 +1,10 @@
 plugins {
-    id("koish.core-conventions")
-    id("cc.mewcraft.libraries-repository")
+    id("koish.core-hook-conventions")
 }
 
 version = "0.0.1"
 
 repositories {
-    nyaadanbouReleases()
-    nyaadanbouPrivate()
-
     // plugin: BetonQuest
     maven {
         name = "betonquest"
@@ -62,7 +58,7 @@ dependencies {
     compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit") { isTransitive = false }
 
     // plugin: ExtraContexts
-    compileOnly(project(":wakame-externals:extra-contexts:api"))
+    compileOnly(project(":standalone:extra-contexts:api"))
 
     // plugin: LuckPerms
     compileOnly(local.luckperms)

@@ -1,14 +1,10 @@
 plugins {
-    id("koish.core-conventions")
-    id("cc.mewcraft.libraries-repository")
+    id("koish.core-hook-conventions")
 }
 
 version = "0.0.1"
 
 repositories {
-    nyaadanbouReleases()
-    nyaadanbouPrivate()
-
     // plugin: PlotSquared
     maven { url = uri("https://repo.codemc.io/repository/maven-releases/") }
     maven { url = uri("https://repo.codemc.io/repository/maven-snapshots/") }

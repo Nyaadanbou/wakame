@@ -66,7 +66,6 @@ public interface Subscription extends Terminable {
      * @return the functions used by this subscription.
      * @deprecated not API, subject to change or removal
      */
-    @Deprecated
     Collection<Object> getFunctions();
 
 }

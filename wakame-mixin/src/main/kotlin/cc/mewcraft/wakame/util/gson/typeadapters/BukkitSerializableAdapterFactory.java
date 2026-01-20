@@ -44,6 +44,7 @@ public final class BukkitSerializableAdapterFactory implements TypeAdapterFactor
     private BukkitSerializableAdapterFactory() {
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
         Class<? super T> clazz = type.getRawType();
@@ -52,7 +53,6 @@ public final class BukkitSerializableAdapterFactory implements TypeAdapterFactor
             return null;
         }
 
-        //noinspection unchecked
         return (TypeAdapter<T>) new Adapter(gson);
     }
 
@@ -90,11 +90,11 @@ public final class BukkitSerializableAdapterFactory implements TypeAdapterFactor
             return ConfigurationSerialization.deserializeObject(map);
         }
 
+        @SuppressWarnings({"rawtypes", "unchecked"})
         private void deserializeChildren(Map<String, Object> map) {
             for (Map.Entry<String, Object> entry : map.entrySet()) {
                 if (entry.getValue() instanceof Map) {
                     try {
-                        //noinspection unchecked
                         Map<String, Object> value = (Map) entry.getValue();
 
                         deserializeChildren(value);

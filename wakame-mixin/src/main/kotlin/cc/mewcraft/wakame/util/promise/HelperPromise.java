@@ -63,12 +63,12 @@ final class HelperPromise<V> implements Promise<V> {
         return new HelperPromise<>(t);
     }
 
+    @SuppressWarnings("unchecked")
     static <U> Promise<U> wrapFuture(Future<U> future) {
         if (future instanceof CompletableFuture<?>) {
             return new HelperPromise<>(((CompletableFuture<U>) future).thenApply(Function.identity()));
 
         } else if (future instanceof CompletionStage<?>) {
-            //noinspection unchecked
             CompletionStage<U> fut = (CompletionStage<U>) future;
             return new HelperPromise<>(fut.toCompletableFuture().thenApply(Function.identity()));
 

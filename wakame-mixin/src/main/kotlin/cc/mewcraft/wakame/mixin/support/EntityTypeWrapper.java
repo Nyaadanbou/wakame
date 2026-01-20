@@ -15,9 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -76,6 +74,7 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
         this.id = id;
     }
 
+    @SuppressWarnings("unchecked")
     public EntityType<T> getDelegate() {
         if (delegate == null) {
             org.bukkit.entity.EntityType entityType = MythicApiProvider.get().getEntityType(PaperAdventure.asAdventure(id));
@@ -249,6 +248,7 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
         throw new UnsupportedOperationException();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public Holder.Reference<EntityType<?>> builtInRegistryHolder() {
         throw new UnsupportedOperationException();

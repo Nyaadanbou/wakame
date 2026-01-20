@@ -7,7 +7,7 @@ pluginManagement {
 
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
-    id("nyaadanbou-repository") version "0.0.1-snapshot"
+    id("nyaadanbou-repository-settings") version "0.0.1-snapshot"
 }
 
 dependencyResolutionManagement {
@@ -16,23 +16,18 @@ dependencyResolutionManagement {
             from(files("gradle/local.versions.toml"))
         }
     }
-    versionCatalogs {
-        create("libs") {
-            from("cc.mewcraft.gradle:catalog:0.11-SNAPSHOT")
-        }
-    }
 }
 
 rootProject.name = "wakame"
 
 include(":common:lazyconfig")
 include(":common:messaging")
+include(":standalone:bettergui-addon:koish-bridge")
+include(":standalone:extra-contexts:api")
+include(":standalone:extra-contexts:common")
+include(":standalone:extra-contexts:paper")
+include(":standalone:extra-contexts:velocity")
 include(":wakame-api")
-include(":wakame-externals:bettergui-addon:koish-bridge")
-include(":wakame-externals:extra-contexts:api")
-include(":wakame-externals:extra-contexts:common")
-include(":wakame-externals:extra-contexts:paper")
-include(":wakame-externals:extra-contexts:velocity")
 include(":wakame-hooks:wakame-hook-adventurelevel")
 include(":wakame-hooks:wakame-hook-auraskills")
 include(":wakame-hooks:wakame-hook-betonquest")

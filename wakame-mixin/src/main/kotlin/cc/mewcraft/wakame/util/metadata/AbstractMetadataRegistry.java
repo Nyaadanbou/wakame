@@ -43,8 +43,8 @@ public class AbstractMetadataRegistry<T> implements MetadataRegistry<T> {
 
     private static final CacheLoader<?, MetadataMap> LOADER = new Loader<>();
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private static <T> CacheLoader<T, MetadataMap> getLoader() {
-        //noinspection unchecked
         return (CacheLoader) LOADER;
     }
 

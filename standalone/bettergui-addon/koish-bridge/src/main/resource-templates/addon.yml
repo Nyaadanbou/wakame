@@ -1,0 +1,4 @@
+name: KoishBridge
+version: "{{ version }}"
+main: "cc.mewcraft.bettergui.KoishBridge"
+description: "Add Koish support to BetterGUI"
