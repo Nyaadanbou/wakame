@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.hook.impl.craftengine.CKey
 import cc.mewcraft.wakame.hook.impl.craftengine.toCraftEngine
 import cc.mewcraft.wakame.item.ItemRefHandler
 import cc.mewcraft.wakame.util.Identifier
+import io.papermc.paper.datacomponent.DataComponentTypes
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.momirealms.craftengine.bukkit.api.CraftEngineItems
@@ -28,7 +29,11 @@ class CraftEngineItemRefHandler : ItemRefHandler<BukkitCustomItem> {
     }
 
     override fun getName(id: Identifier): Component? {
-        return getInternalType(id)?.id()?.toString()?.let(Component::text)
+        // CraftEngine 无法直接从 ID 获取得到物品的名字
+        // 我们只能先生成一个 ItemStack 然后再从中获取名字
+        val item = getInternalType(id)?.buildItemStack(1) ?: return null
+        val data = item.getData(DataComponentTypes.ITEM_NAME)
+        return data
     }
 
     override fun getInternalType(id: Identifier): BukkitCustomItem? {
