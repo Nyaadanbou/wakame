@@ -10,8 +10,6 @@ import cc.mewcraft.wakame.api.event.player.PlayerResourceLoadEvent
 import cc.mewcraft.wakame.messaging.MessagingManager
 import cc.mewcraft.wakame.messaging.handler.TeleportOnJoinPacketHandler
 import cc.mewcraft.wakame.messaging.packet.TeleportOnJoinRequestPacket
-import cc.mewcraft.wakame.util.runTaskLater
-import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -41,10 +39,6 @@ object TeleportOnJoin {
     fun request(playerId: UUID, key: String, group: String) {
         MessagingManager.queuePacket {
             TeleportOnJoinRequestPacket(ServerInfoProvider.serverId, playerId, group)
-        }
-        runTaskLater(30) task@{ ->
-            val player = Bukkit.getPlayer(playerId) ?: return@task
-            ProxyServerSwitcher.switch(player, key)
         }
     }
 }
