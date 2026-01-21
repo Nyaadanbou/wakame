@@ -2,12 +2,11 @@ package cc.mewcraft.wakame.station
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.core.ItemRefMock
-import cc.mewcraft.wakame.craftingstation.CraftingStationRecipeRegistry
-import cc.mewcraft.wakame.craftingstation.CraftingStationRegistry
-import cc.mewcraft.wakame.craftingstation.SimpleCraftingStation
 import cc.mewcraft.wakame.craftingstation.recipe.ExpChoice
 import cc.mewcraft.wakame.craftingstation.recipe.ItemChoice
 import cc.mewcraft.wakame.craftingstation.recipe.ItemResult
+import cc.mewcraft.wakame.craftingstation.station.CraftingStationRegistry
+import cc.mewcraft.wakame.craftingstation.station.SimpleCraftingStation
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.test.TestOnly
@@ -42,12 +41,12 @@ class StationSerializationTest {
 
     @Test
     fun `simple station serialization`() = runBlocking {
-        CraftingStationRecipeRegistry.loadDataIntoRegistry() // 单元测试时跳过合成站配方的有效性验证
-        CraftingStationRegistry.loadDataIntoRegistry()
+        CraftingStationRegistry.loadRecipesIntoRegistry() // 单元测试时跳过合成站配方的有效性验证
+        CraftingStationRegistry.loadStationsIntoRegistry()
 
         val key1 = Key.key("test:raw_bronze")
 
-        val recipe1 = CraftingStationRecipeRegistry.raw[key1]
+        val recipe1 = CraftingStationRegistry.getRawRecipe(key1)
         assertNotNull(recipe1)
 
         val input1 = recipe1.input
@@ -64,7 +63,7 @@ class StationSerializationTest {
 
         val key2 = Key.key("test:amethyst_dust")
 
-        val recipe2 = CraftingStationRecipeRegistry.raw[key2]
+        val recipe2 = CraftingStationRegistry.raw[key2]
         assertNotNull(recipe2)
 
         val input2 = recipe2.input
@@ -79,7 +78,7 @@ class StationSerializationTest {
 
         val id = "simple_station"
 
-        val station = CraftingStationRegistry.get(id)
+        val station = CraftingStationRegistry.getStation(id)
         assertNotNull(station)
         assertIs<SimpleCraftingStation>(station)
         assertContentEquals(

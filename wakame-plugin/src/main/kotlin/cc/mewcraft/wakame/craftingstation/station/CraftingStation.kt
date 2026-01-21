@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.craftingstation
+package cc.mewcraft.wakame.craftingstation.station
 
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.lazyconfig.configurate.require
@@ -82,9 +82,9 @@ internal object StationSerializer : SimpleSerializer<CraftingStation> {
                 val recipeKeys = node.node("recipes").getList<Key>(emptyList())
                 for (key in recipeKeys) {
                     val stationRecipe = if (SharedConstants.isRunningInIde) {
-                        CraftingStationRecipeRegistry.raw[key]
+                        CraftingStationRegistry.getRawRecipe(key)
                     } else {
-                        CraftingStationRecipeRegistry[key]
+                        CraftingStationRegistry.getRecipe(key)
                     }
                     if (stationRecipe == null) {
                         LOGGER.warn("Can't find station recipe: '$key'. Skip adding it to station: '$id'")

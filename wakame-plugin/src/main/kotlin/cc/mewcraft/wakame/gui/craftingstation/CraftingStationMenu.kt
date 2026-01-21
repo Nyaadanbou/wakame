@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.gui.craftingstation
 
-import cc.mewcraft.wakame.craftingstation.CraftingStation
-import cc.mewcraft.wakame.craftingstation.CraftingStationSession
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.craftingstation.recipe.RecipeMatcherResult
+import cc.mewcraft.wakame.craftingstation.station.CraftingStation
+import cc.mewcraft.wakame.craftingstation.station.CraftingStationSession
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
 import cc.mewcraft.wakame.item.resolveToItemWrapper
