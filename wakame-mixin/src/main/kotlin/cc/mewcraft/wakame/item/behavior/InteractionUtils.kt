@@ -8,16 +8,38 @@ import cc.mewcraft.wakame.util.toLocation
 import io.papermc.paper.entity.Shearable
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
-import org.bukkit.*
+import org.bukkit.Bukkit
+import org.bukkit.GameMode
+import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.NamespacedKey
+import org.bukkit.Tag
+import org.bukkit.World
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
-import org.bukkit.block.data.type.*
+import org.bukkit.block.data.type.Beehive
+import org.bukkit.block.data.type.Bell
+import org.bukkit.block.data.type.CaveVines
+import org.bukkit.block.data.type.ChiseledBookshelf
+import org.bukkit.block.data.type.Jukebox
+import org.bukkit.block.data.type.RespawnAnchor
+import org.bukkit.block.data.type.Vault
 import org.bukkit.craftbukkit.block.impl.CraftComposter
 import org.bukkit.craftbukkit.block.impl.CraftSweetBerryBush
-import org.bukkit.entity.*
+import org.bukkit.entity.Ageable
+import org.bukkit.entity.Allay
+import org.bukkit.entity.Entity
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.HappyGhast
+import org.bukkit.entity.IronGolem
+import org.bukkit.entity.MushroomCow
+import org.bukkit.entity.Piglin
+import org.bukkit.entity.Player
+import org.bukkit.entity.Steerable
+import org.bukkit.entity.Tameable
 import org.bukkit.entity.memory.MemoryKey
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
@@ -29,6 +51,12 @@ data class UseOnContext(
     override val itemstack: ItemStack,
     val hand: InteractionHand,
     val interactContext: BlockInteractContext,
+
+    /**
+     * 标记此次交互是否触发了方块的交互.
+     * 例如, 玩家使用剪刀/玻璃瓶非潜行状态下交互蜂巢, 或某个自定义方块右键后执行了特定效果, 此时标记为 true.
+     */
+    val isTriggerBlockInteract: Boolean
 ) : ItemBehaviorContext {
     val world: World
         get() = player.world
@@ -60,6 +88,12 @@ data class UseEntityContext(
     override val itemstack: ItemStack,
     val hand: InteractionHand,
     val entity: Entity,
+
+    /**
+     * 标记此次交互是否触发了实体的交互.
+     * 例如, 玩家右键村民试图交易, 此时标记为 true.
+     */
+    val isTriggerEntityInteract: Boolean
 ) : ItemBehaviorContext {
     val world: World
         get() = player.world
@@ -721,7 +755,7 @@ private object InteractableEntities {
         ) { player, itemStack, entity ->
             player.isOp && player.gameMode == GameMode.CREATIVE
         }
-        // 任何情况下, 可交互, *除非物品有 Koish 物品行为*
+        // 任何情况下, 可交互
         createInteractableEntity(
             listOf(
                 EntityType.CAMEL,
@@ -749,11 +783,7 @@ private object InteractableEntities {
                 EntityType.FURNACE_MINECART,
                 EntityType.HOPPER_MINECART
             )
-        ) { player, itemStack, entity ->
-            // 2026/1/11 开发日记
-            // 之所以有物品行为时返回 false, 是因为有些物品行为可能就是需要和这些实体进行交互, 比如 entity_in_bucket
-            !itemStack.hasBehaviorAny()
-        }
+        ) { player, itemStack, entity -> true }
     }
 
     private fun createInteractableEntity(entityType: EntityType, checkLogic: (player: Player, itemStack: ItemStack, entity: Entity) -> Boolean) {
@@ -814,7 +844,13 @@ private object InteractableEntities {
  *
  * 举例说明:
  * 设计一个"海带球"物品, 使用原版可堆肥的物品作为基底, 并添加使用后投掷出弹射物的自定义行为, 这样"海带球"在玩家右键堆肥桶的时候不会被投掷.
- * 那如果希望堆肥的时候触发自定义行为该怎么办呢? 应该新增一个handlePlayerCompostItem(...), 而不是在交互行为里面去实现.
+ * 那如果希望堆肥的时候触发自定义行为该怎么办呢? 应该新增一个 CompostFeature, 而不是在交互行为里面去实现.
+ *
+ * 2026/1/19 芙兰
+ * 新的需求与实现:
+ * 某些情景下, 我们可能希望添加优先级等同于"剪刀和玻璃瓶交互蜂巢"这种交互代码位于方块中的高优先交互.
+ * 因此, 我们不再一刀切(即默认触发方块交互就不触发物品交互).
+ * 而是将"是否触发方块交互"作为布尔值传递到后续代码中, 让后续代码决定是否执行物品交互/是否取消事件.
  */
 fun Block.isInteractable(player: Player, itemStack: ItemStack, interactContext: BlockInteractContext): Boolean {
     // 如果方块是自定义方块, 认为不可交互
@@ -831,6 +867,9 @@ fun Block.isInteractable(player: Player, itemStack: ItemStack, interactContext: 
  * 判定该情形下实体是否具有原版交互.
  * 实体原版交互的优先级高于原版物品交互.
  * 此时玩家手中物品的自定义行为不应该执行.
+ *
+ * 2026/1/19 芙兰
+ * 与上述方块交互类似, 实体交互也传递"是否触发实体交互"的标记.
  */
 fun Entity.isInteractable(player: Player, itemStack: ItemStack): Boolean {
     val checkLogic = INTERACTABLE_ENTITIES[this.type] ?: return false

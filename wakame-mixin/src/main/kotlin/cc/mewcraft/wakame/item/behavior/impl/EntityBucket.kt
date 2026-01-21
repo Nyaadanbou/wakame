@@ -1,14 +1,57 @@
 package cc.mewcraft.wakame.item.behavior.impl
 
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
-import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.behavior.InteractionResult
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.UseEntityContext
 import cc.mewcraft.wakame.item.behavior.UseOnContext
 import cc.mewcraft.wakame.item.data.ItemDataTypes
-import cc.mewcraft.wakame.item.data.impl.*
+import cc.mewcraft.wakame.item.data.impl.AllayEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.ArmadilloEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.BeeEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.CamelEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.CatEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.ChickenEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.CowEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.DolphinEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.DonkeyEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.EntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.FoxEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.FrogEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.GlowSquidEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.GoatEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.HappyGhastEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.HoglinEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.HorseEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.IronGolemEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.LlamaEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.MooshroomEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.MuleEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.OcelotEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.PandaEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.ParrotEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.PigEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.PolarBearEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.RabbitEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.SheepEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.SkeletonHorseEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.SnifferEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.SnowGolemEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.SquidEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.StriderEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.TraderLlamaEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.TurtleEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.VillagerEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.WanderingTraderEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.WolfEntityBucketInfo
+import cc.mewcraft.wakame.item.data.impl.ZombieVillagerEntityBucketInfo
+import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.getProp
+import cc.mewcraft.wakame.item.hasData
+import cc.mewcraft.wakame.item.hasProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
+import cc.mewcraft.wakame.item.removeData
+import cc.mewcraft.wakame.item.setData
 import cc.mewcraft.wakame.util.adventure.plain
 import cc.mewcraft.wakame.util.metadata.Empty
 import cc.mewcraft.wakame.util.metadata.ExpiringValue
@@ -23,7 +66,48 @@ import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.block.BlockFace
-import org.bukkit.entity.*
+import org.bukkit.entity.Allay
+import org.bukkit.entity.Armadillo
+import org.bukkit.entity.Bee
+import org.bukkit.entity.Camel
+import org.bukkit.entity.Cat
+import org.bukkit.entity.Chicken
+import org.bukkit.entity.Cow
+import org.bukkit.entity.Dolphin
+import org.bukkit.entity.Donkey
+import org.bukkit.entity.Entity
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.Fox
+import org.bukkit.entity.Frog
+import org.bukkit.entity.GlowSquid
+import org.bukkit.entity.Goat
+import org.bukkit.entity.HappyGhast
+import org.bukkit.entity.Hoglin
+import org.bukkit.entity.Horse
+import org.bukkit.entity.IronGolem
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Llama
+import org.bukkit.entity.Mule
+import org.bukkit.entity.MushroomCow
+import org.bukkit.entity.Ocelot
+import org.bukkit.entity.Panda
+import org.bukkit.entity.Parrot
+import org.bukkit.entity.Pig
+import org.bukkit.entity.Player
+import org.bukkit.entity.PolarBear
+import org.bukkit.entity.Rabbit
+import org.bukkit.entity.Sheep
+import org.bukkit.entity.SkeletonHorse
+import org.bukkit.entity.Sniffer
+import org.bukkit.entity.Snowman
+import org.bukkit.entity.Squid
+import org.bukkit.entity.Strider
+import org.bukkit.entity.TraderLlama
+import org.bukkit.entity.Turtle
+import org.bukkit.entity.Villager
+import org.bukkit.entity.WanderingTrader
+import org.bukkit.entity.Wolf
+import org.bukkit.entity.ZombieVillager
 import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
@@ -39,6 +123,9 @@ object EntityBucket : ItemBehavior {
 
     // 当玩家手持一个生物桶右键方块顶部时
     override fun handleUseOn(context: UseOnContext): InteractionResult {
+        // 此次交互触发了方块交互 - 交互失败
+        if (context.isTriggerBlockInteract) return InteractionResult.FAIL
+
         val player = context.player
         val itemstack = context.itemstack
         // 区域保护检查不通过 - 交互失败
@@ -83,6 +170,8 @@ object EntityBucket : ItemBehavior {
 
     // 当玩家手持一个生物桶右键生物时
     override fun handleUseEntity(context: UseEntityContext): InteractionResult {
+        // 即使此次交互触发了实体交互, 也继续执行后续代码, 如果捕捉成功还应该取消交互事件
+        // 因为捕捉生物的优先级高于生物本身的交互(例如打开村民交易界面/上马/让狗坐下等)
         val player = context.player
         val itemstack = context.itemstack
         val entity = context.entity
@@ -123,7 +212,8 @@ object EntityBucket : ItemBehavior {
         entity.remove()
         // 标记玩家已捕捉过生物
         Metadata.provideForPlayer(player).put(JUST_BUCKETED_ENTITY, ExpiringValue.of(Empty.instance(), 1, TimeUnit.SECONDS))
-        return InteractionResult.SUCCESS
+        // 捕捉成功应该取消掉交互事件
+        return InteractionResult.SUCCESS_AND_CANCEL
     }
 
     private fun hasEntityBucketBehavior(itemstack: ItemStack): Boolean {

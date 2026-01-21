@@ -2,8 +2,26 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.entity.player.isInventoryListenable
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
-import cc.mewcraft.wakame.item.behavior.*
+import cc.mewcraft.wakame.item.behavior.AttackContext
+import cc.mewcraft.wakame.item.behavior.AttackEntityContext
+import cc.mewcraft.wakame.item.behavior.AttackOnContext
+import cc.mewcraft.wakame.item.behavior.BehaviorResult
+import cc.mewcraft.wakame.item.behavior.BlockInteractContext
+import cc.mewcraft.wakame.item.behavior.CauseDamageContext
+import cc.mewcraft.wakame.item.behavior.ConsumeContext
+import cc.mewcraft.wakame.item.behavior.DurabilityDecreaseContext
+import cc.mewcraft.wakame.item.behavior.InteractionHand
+import cc.mewcraft.wakame.item.behavior.InteractionResult
 import cc.mewcraft.wakame.item.behavior.ItemStackActivationChecker.isActive
+import cc.mewcraft.wakame.item.behavior.ReceiveDamageContext
+import cc.mewcraft.wakame.item.behavior.StopUseContext
+import cc.mewcraft.wakame.item.behavior.UseContext
+import cc.mewcraft.wakame.item.behavior.UseEntityContext
+import cc.mewcraft.wakame.item.behavior.UseOnContext
+import cc.mewcraft.wakame.item.behavior.handleBehavior
+import cc.mewcraft.wakame.item.behavior.isInteractable
+import cc.mewcraft.wakame.item.behavior.isSuccess
+import cc.mewcraft.wakame.item.behavior.shouldCancel
 import cc.mewcraft.wakame.item.property.impl.ItemSlotRegistry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -93,12 +111,12 @@ internal object ItemBehaviorListener : Listener {
         if (action == Action.RIGHT_CLICK_AIR) { // 玩家交互空气
             if (hand == InteractionHand.MAIN_HAND) { // 若玩家已右键交互实体 - 不处理, 避免同时触发 Use 和 UseEntity 行为
                 if (alreadyCallInteractEntityWithMainHandPlayers.contains(player)) {
-                    event.isCancelled = true
+                    // 此时直接返回, 不应该取消事件
                     return
                 }
             } else {
                 if (alreadyCallInteractEntityWithOffHandPlayers.contains(player)) {
-                    event.isCancelled = true
+                    // 此时直接返回, 不应该取消事件
                     return
                 }
             }
@@ -125,13 +143,13 @@ internal object ItemBehaviorListener : Listener {
             )
             // 判定方块是否可以交互
             val interactable = block.isInteractable(player, itemstack, blockInteractContext)
-            // 方块本身可交互且玩家为非潜行状态 - 不处理
-            // 此时应优先触发方块交互, 不执行物品的自定义交互
-            // 反过来也就是说, 玩家潜行或是方块本身不可交互时, 才尝试执行物品的交互
-            if (!player.isSneaking && interactable) return
+            // 方块本身可交互且玩家为非潜行状态 - 标记"触发了方块的交互"
+            // 通常情况下, 此时应优先触发方块交互, 不执行物品的自定义交互
+            // 但可能存在创建高优先级交互的需求, 故作为上下文中的标记传递至后续代码中
+            val isTriggerVanillaBlockInteract = !player.isSneaking && interactable
             // 遍历物品上的所有行为, 依次执行所有 handleUseOn 逻辑
             // 执行顺序取决于注册顺序, 因此用需要取消后续行为的行为应更早注册
-            val useOnContext = UseOnContext(player, itemstack, hand, blockInteractContext)
+            val useOnContext = UseOnContext(player, itemstack, hand, blockInteractContext, isTriggerVanillaBlockInteract)
             itemstack.handleBehavior { behavior ->
                 val result = behavior.handleUseOn(useOnContext)
                 if (result.isSuccess()) {
@@ -171,9 +189,11 @@ internal object ItemBehaviorListener : Listener {
         }.takeUnlessEmpty() ?: return // 玩家手中没有物品 - 不处理
         val entity = event.rightClicked
 
-        // 判定玩家手中的物品和实体是否存在原版交互
-        if (entity.isInteractable(player, itemstack)) return // 实体存在原版交互 - 不处理
-        val useEntityContext = UseEntityContext(player, itemstack, hand, entity)
+        // 实体存在原版交互 - 标记"触发了实体的交互"
+        // 通常情况下, 此时应优先触发实体交互, 不执行物品的自定义交互
+        // 但可能存在创建高优先级交互的需求, 故作为上下文中的标记传递至后续代码中
+        val isTriggerEntityInteract = entity.isInteractable(player, itemstack)
+        val useEntityContext = UseEntityContext(player, itemstack, hand, entity, isTriggerEntityInteract)
         itemstack.handleBehavior { behavior ->
             val result = behavior.handleUseEntity(useEntityContext)
             if (result.isSuccess()) {
