@@ -2,11 +2,11 @@ package cc.mewcraft.wakame.station
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.core.ItemRefMock
-import cc.mewcraft.wakame.craftingstation.CraftingStationRegistry
-import cc.mewcraft.wakame.craftingstation.SimpleCraftingStation
 import cc.mewcraft.wakame.craftingstation.recipe.ExpChoice
 import cc.mewcraft.wakame.craftingstation.recipe.ItemChoice
 import cc.mewcraft.wakame.craftingstation.recipe.ItemResult
+import cc.mewcraft.wakame.craftingstation.station.CraftingStationRegistry
+import cc.mewcraft.wakame.craftingstation.station.SimpleCraftingStation
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.test.TestOnly

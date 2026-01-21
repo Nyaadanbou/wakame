@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
-import cc.mewcraft.wakame.craftingstation.CraftingStation
-import cc.mewcraft.wakame.craftingstation.CraftingStationRegistry
+import cc.mewcraft.wakame.craftingstation.station.CraftingStation
+import cc.mewcraft.wakame.craftingstation.station.CraftingStationRegistry
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent

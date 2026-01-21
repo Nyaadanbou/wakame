@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.craftingstation
+package cc.mewcraft.wakame.craftingstation.station
 
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.lazyconfig.configurate.require

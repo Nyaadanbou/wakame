@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.craftingstation
+package cc.mewcraft.wakame.craftingstation.station
 
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.craftingstation.recipe.RecipeMatcherResult

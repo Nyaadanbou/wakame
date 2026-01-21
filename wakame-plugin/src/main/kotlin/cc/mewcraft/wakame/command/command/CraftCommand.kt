@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
 import cc.mewcraft.wakame.command.parser.CraftingStationParser
-import cc.mewcraft.wakame.craftingstation.CraftingStation
+import cc.mewcraft.wakame.craftingstation.station.CraftingStation
 import cc.mewcraft.wakame.gui.craftingstation.CraftingStationMenu
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import kotlinx.coroutines.Dispatchers
