@@ -38,12 +38,16 @@ class OpenCatalog : Action {
                     return
                 }
                 SchedulerUtil.entity(player).run({
-                    // 如果未指定类别, 则优先打开最近一次看过的菜单
-                    val last = CatalogItemMenuStacks.peek(player)
-                    if (last != null) {
-                        last.open()
-                    } else {
-                        CatalogItemMenuStacks.rewrite(player, CatalogItemMainMenu(player))
+                    try {
+                        // 如果未指定类别, 则优先打开最近一次看过的菜单
+                        val last = CatalogItemMenuStacks.peek(player)
+                        if (last != null) {
+                            last.open()
+                        } else {
+                            CatalogItemMenuStacks.rewrite(player, CatalogItemMainMenu(player))
+                        }
+                    } finally {
+                        process.next()
                     }
                 }, process::next)
             }

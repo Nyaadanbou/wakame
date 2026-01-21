@@ -46,8 +46,12 @@ class GiveBalance : Action {
         }
         if (amount > 0) {
             SchedulerUtil.entity(player).run({
-                EconomyIntegration2.give(uuid, amount, currency2).onFailure {
-                    player.sendRichMessage("<red>Error: the transaction couldn't be executed.")
+                try {
+                    EconomyIntegration2.give(uuid, amount, currency2).onFailure {
+                        player.sendRichMessage("<red>Error: the transaction couldn't be executed.")
+                    }
+                } finally {
+                    process.next()
                 }
             }, process::next)
         } else {
