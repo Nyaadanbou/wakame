@@ -31,7 +31,7 @@ internal class CraftingStationParser<C : Any> : ArgumentParser<C, CraftingStatio
         }
 
         val readStr = commandInput.readString()
-        return ArgumentParseResult.success(CraftingStationRegistry.get(readStr)!!)
+        return ArgumentParseResult.success(CraftingStationRegistry.getStation(readStr)!!)
     }
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {

@@ -1,23 +1,30 @@
 package cc.mewcraft.wakame.craftingstation
 
 import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.registerExact
 import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.craftingstation.recipe.Recipe
+import cc.mewcraft.wakame.craftingstation.recipe.RecipeChoice
+import cc.mewcraft.wakame.craftingstation.recipe.RecipeResult
+import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.IdePauser
+import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.configurate.yamlLoader
+import cc.mewcraft.wakame.util.runTaskLater
+import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
 
-@Init(
-    stage = InitStage.POST_WORLD,
-    runAfter = [
-        CraftingStationRecipeRegistry::class, // deps: 需要直接的数据
-    ]
-)
+@Init(InitStage.POST_WORLD)
 internal object CraftingStationRegistry {
+
+    private val rawRecipes: MutableMap<Key, Recipe> = mutableMapOf()
+
+    private val checkedRecipes: MutableMap<Key, Recipe> = mutableMapOf()
 
     private val stations: MutableMap<String, CraftingStation> = mutableMapOf()
 
@@ -28,16 +35,74 @@ internal object CraftingStationRegistry {
         get() = stations.keys
 
     @InitFun
-    fun init() = loadDataIntoRegistry()
+    fun init() {
+        // 初始化时延迟一点加载, 以便在 CraftEngine 之后
+        runTaskLater(20) { ->
+            loadRecipesIntoRegistry()
+            registerStationRecipes()
+            loadStationsIntoRegistry()
+        }
+    }
 
-    fun reload() = loadDataIntoRegistry()
+    fun reload() {
+        loadRecipesIntoRegistry()
+        registerStationRecipes()
+        loadStationsIntoRegistry()
+    }
 
-    operator fun get(id: String): CraftingStation? {
+    fun getRecipe(key: Key): Recipe? {
+        return checkedRecipes[key]
+    }
+
+    @VisibleForTesting
+    fun getRawRecipe(key: Key): Recipe? {
+        return rawRecipes[key]
+    }
+
+    fun getStation(id: String): CraftingStation? {
         return stations[id]
     }
 
     @VisibleForTesting
-    fun loadDataIntoRegistry() {
+    fun loadRecipesIntoRegistry() {
+        rawRecipes.clear()
+
+        val recipeDir = KoishDataPaths.CONFIGS
+            .resolve(CraftingStationConstants.DATA_DIR)
+            .resolve("recipes")
+            .toFile()
+        for ((file, namespace, path) in NamespacedFileTreeWalker(recipeDir, "yml", true)) {
+            try {
+                val fileText = file.readText()
+                val key = Key.key(namespace, path)
+
+                val recipeNode = yamlLoader {
+                    withDefaults()
+                    serializers {
+                        registerExact(Recipe.Serializer)
+                        registerExact(RecipeChoice.Serializer)
+                        registerExact(RecipeResult.Serializer)
+                        register(ItemRef.SERIALIZER)
+                    }
+                }.buildAndLoadString(fileText)
+
+                // 注入 key 节点
+                recipeNode.hint(Recipe.Serializer.HINT_NODE, key)
+                // 反序列化 Recipe
+                val recipe = recipeNode.require<Recipe>()
+                // 添加进临时注册表
+                rawRecipes[key] = recipe
+
+            } catch (e: Throwable) {
+                val message = "Can't load station recipe: '${file.relativeTo(recipeDir)}'"
+                IdePauser.pauseInIde(IllegalArgumentException(message, e))
+                LOGGER.warn(message, e)
+            }
+        }
+    }
+
+    @VisibleForTesting
+    fun loadStationsIntoRegistry() {
         stations.clear()
 
         val stationDir = KoishDataPaths.CONFIGS
@@ -67,5 +132,14 @@ internal object CraftingStationRegistry {
             }
 
         LOGGER.info("Registered stations: {}", stations.keys.joinToString())
+    }
+
+    private fun registerStationRecipes() {
+        rawRecipes.forEach { (key, recipe) ->
+            checkedRecipes[key] = recipe
+        }
+
+        LOGGER.info("Registered station recipes: {}", checkedRecipes.keys.joinToString())
+        LOGGER.info("Registered ${checkedRecipes.size} station recipes")
     }
 }

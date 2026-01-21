@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
-import cc.mewcraft.wakame.craftingstation.CraftingStationRecipeRegistry
 import cc.mewcraft.wakame.craftingstation.CraftingStationRegistry
 import cc.mewcraft.wakame.damage.mapping.AttackCharacteristicDamageMappings
 import cc.mewcraft.wakame.damage.mapping.DamageTypeDamageMappings
@@ -118,7 +117,6 @@ private object ReloadProcess {
 
         BasicGuiInitializer.reload()
 
-        CraftingStationRecipeRegistry.reload()
         CraftingStationRegistry.reload()
         MergingTableRegistry.reload()
         ModdingTableRegistry.reload()
