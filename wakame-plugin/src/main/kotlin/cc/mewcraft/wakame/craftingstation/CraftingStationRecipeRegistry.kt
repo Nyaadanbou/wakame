@@ -15,6 +15,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.IdePauser
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.configurate.yamlLoader
+import cc.mewcraft.wakame.util.runTaskLater
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
 
@@ -32,8 +33,11 @@ internal object CraftingStationRecipeRegistry {
 
     @InitFun
     fun load() {
-        loadDataIntoRegistry()
-        registerStationRecipes()
+        // 初始化时延迟一点加载, 以便在 CraftEngine 之后
+        runTaskLater(20) { ->
+            loadDataIntoRegistry()
+            registerStationRecipes()
+        }
     }
 
     fun reload() {

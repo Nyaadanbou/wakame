@@ -37,7 +37,7 @@ dependencies:
       load: OMIT
     CraftEngine:
       required: false
-      load: OMIT # 只在服务端完全启动后调其 API
+      load: OMIT
     Economy:
       required: false
       load: OMIT
