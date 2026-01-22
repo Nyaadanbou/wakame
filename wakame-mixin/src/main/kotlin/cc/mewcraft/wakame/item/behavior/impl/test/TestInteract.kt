@@ -7,6 +7,9 @@ import org.bukkit.Bukkit
 
 object TestInteract : ItemBehavior {
     override fun handleUseOn(context: UseOnContext): InteractionResult {
+        // 此次交互触发了方块交互 - 交互失败
+        if (context.triggersBlockInteract) return InteractionResult.FAIL
+
         context.player.sendMessage(
             "你对 <light_purple>方块</light_purple> 进行了 <gold>使用</gold> 交互".mini
                 .hoverEvent(
@@ -14,11 +17,11 @@ object TestInteract : ItemBehavior {
                         .appendNewline()
                         .append(text("主副手: ${context.hand}"))
                         .appendNewline()
-                        .append(text("方块坐标: ${context.interactContext.blockPosition}"))
+                        .append(text("方块坐标: ${context.context.blockPosition}"))
                         .appendNewline()
-                        .append(text("交互点: ${context.interactContext.interactPoint}"))
+                        .append(text("交互点: ${context.context.interactPoint}"))
                         .appendNewline()
-                        .append(text("交互面: ${context.interactContext.interactFace}"))
+                        .append(text("交互面: ${context.context.interactFace}"))
                 )
         )
         return InteractionResult.SUCCESS
@@ -37,6 +40,9 @@ object TestInteract : ItemBehavior {
     }
 
     override fun handleUseEntity(context: UseEntityContext): InteractionResult {
+        // 此次交互触发了实体交互 - 交互失败
+        if (context.triggersEntityInteract) return InteractionResult.FAIL
+
         context.player.sendMessage(
             "你对 <green>实体</green> 进行了 <gold>使用</gold> 交互".mini
                 .hoverEvent(

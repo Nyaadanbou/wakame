@@ -39,6 +39,9 @@ object EntityBucket : ItemBehavior {
 
     // 当玩家手持一个生物桶右键方块顶部时
     override fun handleUseOn(context: UseOnContext): InteractionResult {
+        // 此次交互触发了方块交互 - 交互失败
+        if (context.triggersBlockInteract) return InteractionResult.FAIL
+
         val player = context.player
         val itemstack = context.itemstack
         // 区域保护检查不通过 - 交互失败
@@ -83,6 +86,8 @@ object EntityBucket : ItemBehavior {
 
     // 当玩家手持一个生物桶右键生物时
     override fun handleUseEntity(context: UseEntityContext): InteractionResult {
+        // 即使此次交互触发了实体交互, 也继续执行后续代码, 如果捕捉成功还应该取消交互事件
+        // 因为捕捉生物的优先级高于生物本身的交互 (例如打开村民交易界面/上马/让狗坐下等)
         val player = context.player
         val itemstack = context.itemstack
         val entity = context.entity
@@ -123,7 +128,8 @@ object EntityBucket : ItemBehavior {
         entity.remove()
         // 标记玩家已捕捉过生物
         Metadata.provideForPlayer(player).put(JUST_BUCKETED_ENTITY, ExpiringValue.of(Empty.instance(), 1, TimeUnit.SECONDS))
-        return InteractionResult.SUCCESS
+        // 捕捉成功应该取消掉交互事件
+        return InteractionResult.SUCCESS_AND_CANCEL
     }
 
     private fun hasEntityBucketBehavior(itemstack: ItemStack): Boolean {
