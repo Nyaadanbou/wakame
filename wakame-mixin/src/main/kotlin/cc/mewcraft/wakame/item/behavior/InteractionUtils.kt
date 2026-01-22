@@ -158,8 +158,22 @@ fun InteractionResult.shouldCancel(): Boolean {
     return this == InteractionResult.SUCCESS_AND_CANCEL || this == InteractionResult.FAIL_AND_CANCEL
 }
 
+/**
+ * 方块交互检查逻辑的函数接口.
+ */
+fun interface BlockInteractionTest {
+    fun test(player: Player, itemstack: ItemStack, blockData: BlockData, context: BlockInteractContext): Boolean
+}
+
+/**
+ * 实体交互检查逻辑的函数接口.
+ */
+fun interface EntityInteractionTest {
+    fun test(player: Player, itemstack: ItemStack, entity: Entity): Boolean
+}
+
 private object InteractableBlocks {
-    val INTERACTABLE_BLOCKS: Reference2ObjectMap<BlockType, (player: Player, itemstack: ItemStack, blockData: BlockData, context: BlockInteractContext) -> Boolean> = Reference2ObjectOpenHashMap()
+    val INTERACTABLE_BLOCKS: Reference2ObjectMap<BlockType, BlockInteractionTest> = Reference2ObjectOpenHashMap()
 
     // 该列表并不全面, 但基本够用
     // 例如, 未考虑: 可参与营火配方的物品会触发营火的方块交互, 炼药锅的各种交互
@@ -293,7 +307,9 @@ private object InteractableBlocks {
         }
         // 洞穴藤蔓有浆果时, 方块可交互
         // 玩家手持骨粉且无浆果时, 方块可交互
-        createInteractableBlocks(listOf(BlockType.CAVE_VINES, BlockType.CAVE_VINES_PLANT)) { player, itemstack, blockData, context ->
+        createInteractableBlocks(
+            listOf(BlockType.CAVE_VINES, BlockType.CAVE_VINES_PLANT)
+        ) { player, itemstack, blockData, context ->
             blockData is CaveVines && (blockData.hasBerries() || itemstack.checkItemType(ItemType.BONE_MEAL))
         }
         // 宝库处于 active 状态时, 方块可交互
@@ -543,14 +559,14 @@ private object InteractableBlocks {
         ) { player, itemstack, blockData, context -> true }
     }
 
-    private fun createInteractableBlock(blockType: BlockType, checkLogic: (player: Player, itemstack: ItemStack, blockData: BlockData, context: BlockInteractContext) -> Boolean) {
-        INTERACTABLE_BLOCKS.put(blockType, checkLogic)?.let {
+    private fun createInteractableBlock(blockType: BlockType, test: BlockInteractionTest) {
+        INTERACTABLE_BLOCKS.put(blockType, test)?.let {
             LOGGER.warn("Duplicate interactable block created: $blockType")
         }
     }
 
-    private fun createInteractableBlocks(blockTypes: List<BlockType>, checkLogic: (player: Player, itemstack: ItemStack, blockData: BlockData, context: BlockInteractContext) -> Boolean) {
-        blockTypes.forEach { createInteractableBlock(it, checkLogic) }
+    private fun createInteractableBlocks(blockTypes: List<BlockType>, test: BlockInteractionTest) {
+        blockTypes.forEach { createInteractableBlock(it, test) }
     }
 
     /**
@@ -562,7 +578,7 @@ private object InteractableBlocks {
 }
 
 private object InteractableEntities {
-    val INTERACTABLE_ENTITIES: Reference2ObjectMap<EntityType, (player: Player, itemstack: ItemStack, entity: Entity) -> Boolean> = Reference2ObjectOpenHashMap()
+    val INTERACTABLE_ENTITIES: Reference2ObjectMap<EntityType, EntityInteractionTest> = Reference2ObjectOpenHashMap()
 
     init {
         // 玩家手持对应食物时, 可交互
@@ -604,7 +620,9 @@ private object InteractableEntities {
             itemstack.checkItemType(ItemType.WATER_BUCKET)
         }
         // 玩家可以修剪实体时, 可交互
-        createInteractableEntity(listOf(EntityType.BOGGED, EntityType.SNOW_GOLEM)) { player, itemstack, entity ->
+        createInteractableEntity(
+            listOf(EntityType.BOGGED, EntityType.SNOW_GOLEM)
+        ) { player, itemstack, entity ->
             itemstack.checkCanShear(entity)
         }
         // 玩家可以修剪实体时, 可交互
@@ -625,7 +643,9 @@ private object InteractableEntities {
         }
         // 玩家手持桶且实体已成年时, 可交互
         // 玩家手持对应食物时, 可交互
-        createInteractableEntity(listOf(EntityType.COW, EntityType.GOAT)) { player, itemstack, entity ->
+        createInteractableEntity(
+            listOf(EntityType.COW, EntityType.GOAT)
+        ) { player, itemstack, entity ->
             (itemstack.checkItemType(ItemType.BUCKET) && entity.checkIsAdult()) || itemstack.checkIsCorrespondingFood(entity)
         }
         // 玩家手持刷子时且实体已成年时, 可交互
@@ -636,7 +656,9 @@ private object InteractableEntities {
         // 若实体已成年且未装备鞍, 玩家手持鞍时, 可交互
         // 若实体已成年且已装备鞍, 玩家非潜行时, 可交互
         // 玩家手持对应食物时, 可交互
-        createInteractableEntity(listOf(EntityType.PIG, EntityType.STRIDER)) { player, itemstack, entity ->
+        createInteractableEntity(
+            listOf(EntityType.PIG, EntityType.STRIDER)
+        ) { player, itemstack, entity ->
             val flag = if (entity is Steerable && entity.checkIsAdult()) {
                 if (entity.hasSaddle()) {
                     !player.isSneaking
@@ -689,12 +711,16 @@ private object InteractableEntities {
             itemstack.checkItemTag(Tag.ITEMS_FISHES)
         }
         // 实体已驯服时, 可交互
-        createInteractableEntity(listOf(EntityType.SKELETON_HORSE, EntityType.ZOMBIE_HORSE)) { player, itemstack, entity ->
+        createInteractableEntity(
+            listOf(EntityType.SKELETON_HORSE, EntityType.ZOMBIE_HORSE)
+        ) { player, itemstack, entity ->
             entity is Tameable && entity.isTamed
         }
         // 实体已驯服且玩家是其主人时, 可交互
         // 玩家手持对应食物时, 可交互
-        createInteractableEntity(listOf(EntityType.CAT, EntityType.WOLF)) { player, itemstack, entity ->
+        createInteractableEntity(
+            listOf(EntityType.CAT, EntityType.WOLF)
+        ) { player, itemstack, entity ->
             (entity is Tameable && entity.isTamed && entity.ownerUniqueId == player.uniqueId) || itemstack.checkIsCorrespondingFood(entity)
         }
         // 实体已驯服且玩家是其主人时, 可交互
@@ -763,13 +789,13 @@ private object InteractableEntities {
         ) { player, itemstack, entity -> true }
     }
 
-    private fun createInteractableEntity(entityType: EntityType, test: (player: Player, itemstack: ItemStack, entity: Entity) -> Boolean) {
+    private fun createInteractableEntity(entityType: EntityType, test: EntityInteractionTest) {
         INTERACTABLE_ENTITIES.put(entityType, test)?.let {
             LOGGER.warn("Duplicate interactable entity created: $entityType")
         }
     }
 
-    private fun createInteractableEntity(entityTypes: List<EntityType>, test: (player: Player, itemstack: ItemStack, entity: Entity) -> Boolean) {
+    private fun createInteractableEntity(entityTypes: List<EntityType>, test: EntityInteractionTest) {
         entityTypes.forEach { createInteractableEntity(it, test) }
     }
 
@@ -836,7 +862,7 @@ fun Block.isInteractable(player: Player, itemstack: ItemStack, context: BlockInt
     if (UniversalBlocks.isCustomBlock(this)) return false
     val blockType = this.type.asBlockType() ?: return false // 不可能在此处return
     val test = INTERACTABLE_BLOCKS[blockType] ?: return false
-    return test(player, itemstack, blockData, context)
+    return test.test(player, itemstack, blockData, context)
 }
 
 /**
@@ -848,5 +874,5 @@ fun Block.isInteractable(player: Player, itemstack: ItemStack, context: BlockInt
 // 与上述方块交互类似, 实体交互也传递"是否触发实体交互"的标记.
 fun Entity.isInteractable(player: Player, itemstack: ItemStack): Boolean {
     val test = INTERACTABLE_ENTITIES[this.type] ?: return false
-    return test(player, itemstack, this)
+    return test.test(player, itemstack, this)
 }
