@@ -242,7 +242,10 @@ private object InteractableBlocks {
         }
         // 玩家手持剪刀或玻璃瓶且蜂巢蜂蜜等级大于等于 5 时, 方块可交互
         createInteractableBlocks(
-            listOf(BlockType.BEEHIVE, BlockType.BEE_NEST)
+            listOf(
+                BlockType.BEEHIVE,
+                BlockType.BEE_NEST
+            )
         ) { player, itemstack, blockData, context ->
             itemstack.checkItemType(ItemType.SHEARS, ItemType.GLASS_BOTTLE) && blockData is Beehive && blockData.honeyLevel >= blockData.maximumHoneyLevel
         }
@@ -308,7 +311,10 @@ private object InteractableBlocks {
         // 洞穴藤蔓有浆果时, 方块可交互
         // 玩家手持骨粉且无浆果时, 方块可交互
         createInteractableBlocks(
-            listOf(BlockType.CAVE_VINES, BlockType.CAVE_VINES_PLANT)
+            listOf(
+                BlockType.CAVE_VINES,
+                BlockType.CAVE_VINES_PLANT
+            )
         ) { player, itemstack, blockData, context ->
             blockData is CaveVines && (blockData.hasBerries() || itemstack.checkItemType(ItemType.BONE_MEAL))
         }
@@ -621,7 +627,10 @@ private object InteractableEntities {
         }
         // 玩家可以修剪实体时, 可交互
         createInteractableEntity(
-            listOf(EntityType.BOGGED, EntityType.SNOW_GOLEM)
+            listOf(
+                EntityType.BOGGED,
+                EntityType.SNOW_GOLEM
+            )
         ) { player, itemstack, entity ->
             itemstack.checkCanShear(entity)
         }
@@ -644,7 +653,10 @@ private object InteractableEntities {
         // 玩家手持桶且实体已成年时, 可交互
         // 玩家手持对应食物时, 可交互
         createInteractableEntity(
-            listOf(EntityType.COW, EntityType.GOAT)
+            listOf(
+                EntityType.COW,
+                EntityType.GOAT
+            )
         ) { player, itemstack, entity ->
             (itemstack.checkItemType(ItemType.BUCKET) && entity.checkIsAdult()) || itemstack.checkIsCorrespondingFood(entity)
         }
@@ -657,7 +669,10 @@ private object InteractableEntities {
         // 若实体已成年且已装备鞍, 玩家非潜行时, 可交互
         // 玩家手持对应食物时, 可交互
         createInteractableEntity(
-            listOf(EntityType.PIG, EntityType.STRIDER)
+            listOf(
+                EntityType.PIG,
+                EntityType.STRIDER
+            )
         ) { player, itemstack, entity ->
             val flag = if (entity is Steerable && entity.checkIsAdult()) {
                 if (entity.hasSaddle()) {
@@ -712,14 +727,20 @@ private object InteractableEntities {
         }
         // 实体已驯服时, 可交互
         createInteractableEntity(
-            listOf(EntityType.SKELETON_HORSE, EntityType.ZOMBIE_HORSE)
+            listOf(
+                EntityType.SKELETON_HORSE,
+                EntityType.ZOMBIE_HORSE
+            )
         ) { player, itemstack, entity ->
             entity is Tameable && entity.isTamed
         }
         // 实体已驯服且玩家是其主人时, 可交互
         // 玩家手持对应食物时, 可交互
         createInteractableEntity(
-            listOf(EntityType.CAT, EntityType.WOLF)
+            listOf(
+                EntityType.CAT,
+                EntityType.WOLF
+            )
         ) { player, itemstack, entity ->
             (entity is Tameable && entity.isTamed && entity.ownerUniqueId == player.uniqueId) || itemstack.checkIsCorrespondingFood(entity)
         }
