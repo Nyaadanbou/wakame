@@ -14,7 +14,7 @@ object CraftEnginePlaceLiquidCollisionBlock : ItemBehavior {
 
     override fun handleUseOn(context: UseOnContext): InteractionResult {
         // 此次交互触发了方块交互 - 交互失败
-        if (context.isTriggerBlockInteract) return InteractionResult.FAIL
+        if (context.triggersBlockInteract) return InteractionResult.FAIL
 
         // 未指定方块 ID 和放置高度 - 交互失败
         val settings = context.itemstack.getProp(ItemPropTypes.PLACE_LIQUID_COLLISION_BLOCK) ?: return InteractionResult.FAIL

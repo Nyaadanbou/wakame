@@ -8,38 +8,16 @@ import cc.mewcraft.wakame.util.toLocation
 import io.papermc.paper.entity.Shearable
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
-import org.bukkit.Bukkit
-import org.bukkit.GameMode
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
-import org.bukkit.Tag
-import org.bukkit.World
+import org.bukkit.*
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
-import org.bukkit.block.data.type.Beehive
-import org.bukkit.block.data.type.Bell
-import org.bukkit.block.data.type.CaveVines
-import org.bukkit.block.data.type.ChiseledBookshelf
-import org.bukkit.block.data.type.Jukebox
-import org.bukkit.block.data.type.RespawnAnchor
-import org.bukkit.block.data.type.Vault
+import org.bukkit.block.data.type.*
 import org.bukkit.craftbukkit.block.impl.CraftComposter
 import org.bukkit.craftbukkit.block.impl.CraftSweetBerryBush
-import org.bukkit.entity.Ageable
-import org.bukkit.entity.Allay
-import org.bukkit.entity.Entity
-import org.bukkit.entity.EntityType
-import org.bukkit.entity.HappyGhast
-import org.bukkit.entity.IronGolem
-import org.bukkit.entity.MushroomCow
-import org.bukkit.entity.Piglin
-import org.bukkit.entity.Player
-import org.bukkit.entity.Steerable
-import org.bukkit.entity.Tameable
+import org.bukkit.entity.*
 import org.bukkit.entity.memory.MemoryKey
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
@@ -50,28 +28,27 @@ data class UseOnContext(
     override val player: Player,
     override val itemstack: ItemStack,
     val hand: InteractionHand,
-    val interactContext: BlockInteractContext,
-
+    val context: BlockInteractContext,
     /**
      * 标记此次交互是否触发了方块的交互.
      * 例如, 玩家使用剪刀/玻璃瓶非潜行状态下交互蜂巢, 或某个自定义方块右键后执行了特定效果, 此时标记为 true.
      */
-    val isTriggerBlockInteract: Boolean
+    val triggersBlockInteract: Boolean,
 ) : ItemBehaviorContext {
     val world: World
         get() = player.world
 
     val blockLocation: Location
-        get() = this.interactContext.blockPosition.toLocation(this.world)
+        get() = this.context.blockPosition.toLocation(this.world)
 
     val blockPosition: Vector3d
-        get() = interactContext.blockPosition
+        get() = context.blockPosition
 
     val interactFace: BlockFace
-        get() = interactContext.interactFace
+        get() = context.interactFace
 
     val interactPoint: Vector3d
-        get() = interactContext.interactPoint
+        get() = context.interactPoint
 }
 
 data class UseContext(
@@ -93,7 +70,7 @@ data class UseEntityContext(
      * 标记此次交互是否触发了实体的交互.
      * 例如, 玩家右键村民试图交易, 此时标记为 true.
      */
-    val isTriggerEntityInteract: Boolean
+    val triggersEntityInteract: Boolean,
 ) : ItemBehaviorContext {
     val world: World
         get() = player.world
@@ -182,7 +159,7 @@ fun InteractionResult.shouldCancel(): Boolean {
 }
 
 private object InteractableBlocks {
-    val INTERACTABLE_BLOCKS: Reference2ObjectMap<BlockType, (player: Player, itemStack: ItemStack, blockData: BlockData, interactContext: BlockInteractContext) -> Boolean> = Reference2ObjectOpenHashMap()
+    val INTERACTABLE_BLOCKS: Reference2ObjectMap<BlockType, (player: Player, itemstack: ItemStack, blockData: BlockData, context: BlockInteractContext) -> Boolean> = Reference2ObjectOpenHashMap()
 
     // 该列表并不全面, 但基本够用
     // 例如, 未考虑: 可参与营火配方的物品会触发营火的方块交互, 炼药锅的各种交互
@@ -190,7 +167,7 @@ private object InteractableBlocks {
     // 也就是说, 只要不用这些特定的物品做自定义物品的基底, 就没有任何影响
     init {
         // 玩家可食用蛋糕方块时, 方块可交互
-        // 该判断逻辑与nms一致
+        // 该判断逻辑与 NMS 一致
         createInteractableBlocks(
             listOf(
                 BlockType.CAKE,
@@ -212,10 +189,10 @@ private object InteractableBlocks {
                 BlockType.RED_CANDLE_CAKE,
                 BlockType.BLACK_CANDLE_CAKE,
             )
-        ) { player, itemStack, blockData, interactContext ->
+        ) { player, itemstack, blockData, context ->
             player.isInvulnerable || player.foodLevel < 20
         }
-        // 玩家为op且处于创造模式时, 方块可交互
+        // 玩家为 OP 且处于创造模式时, 方块可交互
         createInteractableBlocks(
             listOf(
                 BlockType.COMMAND_BLOCK,
@@ -226,45 +203,45 @@ private object InteractableBlocks {
                 BlockType.TEST_INSTANCE_BLOCK,
                 BlockType.TEST_BLOCK
             )
-        ) { player, itemStack, blockData, interactContext ->
+        ) { player, itemstack, blockData, context ->
             player.isOp && player.gameMode == GameMode.CREATIVE
         }
         // 玩家手持光源方块物品时, 方块可交互
-        createInteractableBlock(BlockType.LIGHT) { player, itemStack, blockData, interactContext ->
-            itemStack.checkItemType(ItemType.LIGHT)
+        createInteractableBlock(BlockType.LIGHT) { player, itemstack, blockData, context ->
+            itemstack.checkItemType(ItemType.LIGHT)
         }
         // 玩家手持指南针时, 方块可交互
-        createInteractableBlock(BlockType.LODESTONE) { player, itemStack, blockData, interactContext ->
-            itemStack.checkItemType(ItemType.COMPASS)
+        createInteractableBlock(BlockType.LODESTONE) { player, itemstack, blockData, context ->
+            itemstack.checkItemType(ItemType.COMPASS)
         }
         // 玩家手持剪刀时, 方块可交互
-        createInteractableBlock(BlockType.PUMPKIN) { player, itemStack, blockData, interactContext ->
-            itemStack.checkItemType(ItemType.SHEARS)
+        createInteractableBlock(BlockType.PUMPKIN) { player, itemstack, blockData, context ->
+            itemstack.checkItemType(ItemType.SHEARS)
         }
         // 玩家手持桶时, 方块可交互
-        createInteractableBlock(BlockType.POWDER_SNOW) { player, itemStack, blockData, interactContext ->
-            itemStack.checkItemType(ItemType.BUCKET)
+        createInteractableBlock(BlockType.POWDER_SNOW) { player, itemstack, blockData, context ->
+            itemstack.checkItemType(ItemType.BUCKET)
         }
         // 玩家手持打火石或火焰弹时, 方块可交互
-        createInteractableBlock(BlockType.TNT) { player, itemStack, blockData, interactContext ->
-            itemStack.checkItemType(ItemType.FLINT_AND_STEEL, ItemType.FIRE_CHARGE)
+        createInteractableBlock(BlockType.TNT) { player, itemstack, blockData, context ->
+            itemstack.checkItemType(ItemType.FLINT_AND_STEEL, ItemType.FIRE_CHARGE)
         }
-        // 玩家手持剪刀或玻璃瓶且蜂巢蜂蜜等级大于等于5时, 方块可交互
+        // 玩家手持剪刀或玻璃瓶且蜂巢蜂蜜等级大于等于 5 时, 方块可交互
         createInteractableBlocks(
             listOf(BlockType.BEEHIVE, BlockType.BEE_NEST)
-        ) { player, itemStack, blockData, interactContext ->
-            itemStack.checkItemType(ItemType.SHEARS, ItemType.GLASS_BOTTLE) && blockData is Beehive && blockData.honeyLevel >= blockData.maximumHoneyLevel
+        ) { player, itemstack, blockData, context ->
+            itemstack.checkItemType(ItemType.SHEARS, ItemType.GLASS_BOTTLE) && blockData is Beehive && blockData.honeyLevel >= blockData.maximumHoneyLevel
         }
         // 玩家交互钟特定侧面的特定位置时, 方块可交互
-        createInteractableBlock(BlockType.BELL) { player, itemStack, blockData, interactContext ->
-            val blockPosition = interactContext.blockPosition
+        createInteractableBlock(BlockType.BELL) { player, itemstack, blockData, context ->
+            val blockPosition = context.blockPosition
             if (blockData is Bell) {
-                val interactFace = interactContext.interactFace
+                val interactFace = context.interactFace
                 val isSide = when (interactFace) {
                     BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST -> true
                     else -> false
                 }
-                val deltaY = interactContext.interactPoint.y - blockPosition.y
+                val deltaY = context.interactPoint.y - blockPosition.y
                 if (isSide && deltaY <= 0.8123999834060669) {
                     return@createInteractableBlock when (blockData.attachment) {
                         Bell.Attachment.FLOOR -> {
@@ -292,35 +269,35 @@ private object InteractableBlocks {
             return@createInteractableBlock false
         }
         // 玩家交互朝向面时, 方块可交互
-        createInteractableBlock(BlockType.CHISELED_BOOKSHELF) { player, itemStack, blockData, interactContext ->
-            blockData is ChiseledBookshelf && blockData.facing == interactContext.interactFace
+        createInteractableBlock(BlockType.CHISELED_BOOKSHELF) { player, itemstack, blockData, context ->
+            blockData is ChiseledBookshelf && blockData.facing == context.interactFace
         }
         // 玩家手持可堆肥物品时, 方块可交互
         // 堆肥桶堆满时, 方块可交互
-        createInteractableBlock(BlockType.COMPOSTER) { player, itemStack, blockData, interactContext ->
-            (blockData is CraftComposter && blockData.level == blockData.maximumLevel) || itemStack.type.isCompostable
+        createInteractableBlock(BlockType.COMPOSTER) { player, itemstack, blockData, context ->
+            (blockData is CraftComposter && blockData.level == blockData.maximumLevel) || itemstack.type.isCompostable
         }
-        // 重生锚充能等级大于0时, 方块可交互
+        // 重生锚充能等级大于 0 时, 方块可交互
         // 玩家手持荧石块时, 方块可交互
-        createInteractableBlock(BlockType.RESPAWN_ANCHOR) { player, itemStack, blockData, interactContext ->
-            (blockData is RespawnAnchor && blockData.charges > 0) || itemStack.checkItemType(ItemType.GLOWSTONE)
+        createInteractableBlock(BlockType.RESPAWN_ANCHOR) { player, itemstack, blockData, context ->
+            (blockData is RespawnAnchor && blockData.charges > 0) || itemstack.checkItemType(ItemType.GLOWSTONE)
         }
         // 唱片机内有唱片时, 方块可交互
-        createInteractableBlock(BlockType.JUKEBOX) { player, itemStack, blockData, interactContext ->
+        createInteractableBlock(BlockType.JUKEBOX) { player, itemstack, blockData, context ->
             blockData is Jukebox && blockData.hasRecord()
         }
-        // 甜浆果丛age为2和3时, 方块可交互
-        // 玩家手持骨粉且age小于3时, 方块可交互
-        createInteractableBlock(BlockType.SWEET_BERRY_BUSH) { player, itemStack, blockData, interactContext ->
-            blockData is CraftSweetBerryBush && (blockData.age >= 2 || (blockData.age < 3 && itemStack.checkItemType(ItemType.BONE_MEAL)))
+        // 甜浆果丛 age 为 2 和 3 时, 方块可交互
+        // 玩家手持骨粉且 age 小于 3 时, 方块可交互
+        createInteractableBlock(BlockType.SWEET_BERRY_BUSH) { player, itemstack, blockData, context ->
+            blockData is CraftSweetBerryBush && (blockData.age >= 2 || (blockData.age < 3 && itemstack.checkItemType(ItemType.BONE_MEAL)))
         }
         // 洞穴藤蔓有浆果时, 方块可交互
         // 玩家手持骨粉且无浆果时, 方块可交互
-        createInteractableBlocks(listOf(BlockType.CAVE_VINES, BlockType.CAVE_VINES_PLANT)) { player, itemStack, blockData, interactContext ->
-            blockData is CaveVines && (blockData.hasBerries() || itemStack.checkItemType(ItemType.BONE_MEAL))
+        createInteractableBlocks(listOf(BlockType.CAVE_VINES, BlockType.CAVE_VINES_PLANT)) { player, itemstack, blockData, context ->
+            blockData is CaveVines && (blockData.hasBerries() || itemstack.checkItemType(ItemType.BONE_MEAL))
         }
-        // 宝库处于active状态时, 方块可交互
-        createInteractableBlock(BlockType.VAULT) { player, itemStack, blockData, interactContext ->
+        // 宝库处于 active 状态时, 方块可交互
+        createInteractableBlock(BlockType.VAULT) { player, itemstack, blockData, context ->
             blockData is Vault && blockData.vaultState == Vault.State.ACTIVE
         }
         // 任何情况下, 方块可交互
@@ -563,16 +540,16 @@ private object InteractableBlocks {
                 BlockType.STONECUTTER,
                 BlockType.TRAPPED_CHEST,
             )
-        ) { player, itemStack, blockData, interactContext -> true }
+        ) { player, itemstack, blockData, context -> true }
     }
 
-    private fun createInteractableBlock(blockType: BlockType, checkLogic: (player: Player, itemStack: ItemStack, blockData: BlockData, interactContext: BlockInteractContext) -> Boolean) {
+    private fun createInteractableBlock(blockType: BlockType, checkLogic: (player: Player, itemstack: ItemStack, blockData: BlockData, context: BlockInteractContext) -> Boolean) {
         INTERACTABLE_BLOCKS.put(blockType, checkLogic)?.let {
             LOGGER.warn("Duplicate interactable block created: $blockType")
         }
     }
 
-    private fun createInteractableBlocks(blockTypes: List<BlockType>, checkLogic: (player: Player, itemStack: ItemStack, blockData: BlockData, interactContext: BlockInteractContext) -> Boolean) {
+    private fun createInteractableBlocks(blockTypes: List<BlockType>, checkLogic: (player: Player, itemstack: ItemStack, blockData: BlockData, context: BlockInteractContext) -> Boolean) {
         blockTypes.forEach { createInteractableBlock(it, checkLogic) }
     }
 
@@ -585,7 +562,7 @@ private object InteractableBlocks {
 }
 
 private object InteractableEntities {
-    val INTERACTABLE_ENTITIES: Reference2ObjectMap<EntityType, (player: Player, itemStack: ItemStack, entity: Entity) -> Boolean> = Reference2ObjectOpenHashMap()
+    val INTERACTABLE_ENTITIES: Reference2ObjectMap<EntityType, (player: Player, itemstack: ItemStack, entity: Entity) -> Boolean> = Reference2ObjectOpenHashMap()
 
     init {
         // 玩家手持对应食物时, 可交互
@@ -602,18 +579,18 @@ private object InteractableEntities {
                 EntityType.SNIFFER,
                 EntityType.TURTLE,
             )
-        ) { player, itemStack, entity ->
-            itemStack.checkIsCorrespondingFood(entity)
+        ) { player, itemstack, entity ->
+            itemstack.checkIsCorrespondingFood(entity)
         }
         // 玩家手持水桶时, 可交互
         // 玩家手持对应食物时, 可交互
-        createInteractableEntity(EntityType.AXOLOTL) { player, itemStack, entity ->
-            itemStack.checkItemType(ItemType.WATER_BUCKET) || itemStack.checkIsCorrespondingFood(entity)
+        createInteractableEntity(EntityType.AXOLOTL) { player, itemstack, entity ->
+            itemstack.checkItemType(ItemType.WATER_BUCKET) || itemstack.checkIsCorrespondingFood(entity)
         }
         // 玩家手持水桶时, 可交互
-        // 玩家手持frog_food标签物品时(蝌蚪食物使用此标签), 可交互
-        createInteractableEntity(EntityType.TADPOLE) { player, itemStack, entity ->
-            itemStack.checkItemType(ItemType.WATER_BUCKET) || itemStack.checkItemTag(Tag.ITEMS_FROG_FOOD)
+        // 玩家手持 #frog_food 标签物品时 (蝌蚪食物使用此标签), 可交互
+        createInteractableEntity(EntityType.TADPOLE) { player, itemstack, entity ->
+            itemstack.checkItemType(ItemType.WATER_BUCKET) || itemstack.checkItemTag(Tag.ITEMS_FROG_FOOD)
         }
         // 玩家手持水桶时, 可交互
         createInteractableEntity(
@@ -623,115 +600,115 @@ private object InteractableEntities {
                 EntityType.SALMON,
                 EntityType.TROPICAL_FISH,
             )
-        ) { player, itemStack, entity ->
-            itemStack.checkItemType(ItemType.WATER_BUCKET)
+        ) { player, itemstack, entity ->
+            itemstack.checkItemType(ItemType.WATER_BUCKET)
         }
         // 玩家可以修剪实体时, 可交互
-        createInteractableEntity(listOf(EntityType.BOGGED, EntityType.SNOW_GOLEM)) { player, itemStack, entity ->
-            itemStack.checkCanShear(entity)
+        createInteractableEntity(listOf(EntityType.BOGGED, EntityType.SNOW_GOLEM)) { player, itemstack, entity ->
+            itemstack.checkCanShear(entity)
         }
         // 玩家可以修剪实体时, 可交互
         // 玩家手持对应食物时, 可交互
-        // 染料的交互逻辑在物品上而非Sheep实体上
-        createInteractableEntity(EntityType.SHEEP) { player, itemStack, entity ->
-            itemStack.checkCanShear(entity) || itemStack.checkIsCorrespondingFood(entity)
+        // 染料的交互逻辑在物品上而非 Sheep 实体上
+        createInteractableEntity(EntityType.SHEEP) { player, itemstack, entity ->
+            itemstack.checkCanShear(entity) || itemstack.checkIsCorrespondingFood(entity)
         }
         // 玩家可以修剪实体时, 可交互
         // 玩家手持牛对应食物时(哞菇食物用的是牛标签), 可交互
         // 玩家手持桶或碗且实体已成年时, 可交互
-        // 哞菇为棕色变种且玩家手持small_flowers标签物品时, 可交互
-        createInteractableEntity(EntityType.MOOSHROOM) { player, itemStack, entity ->
-            itemStack.checkCanShear(entity) ||
-                    itemStack.checkItemTag(Tag.ITEMS_COW_FOOD) ||
-                    (itemStack.checkItemType(ItemType.BUCKET, ItemType.BOWL) && entity.checkIsAdult()) ||
-                    (entity is MushroomCow && entity.variant == MushroomCow.Variant.BROWN && itemStack.checkItemTag(Tag.ITEMS_SMALL_FLOWERS))
+        // 哞菇为棕色变种且玩家手持 #small_flowers 标签物品时, 可交互
+        createInteractableEntity(EntityType.MOOSHROOM) { player, itemstack, entity ->
+            itemstack.checkCanShear(entity) ||
+                    itemstack.checkItemTag(Tag.ITEMS_COW_FOOD) ||
+                    (itemstack.checkItemType(ItemType.BUCKET, ItemType.BOWL) && entity.checkIsAdult()) ||
+                    (entity is MushroomCow && entity.variant == MushroomCow.Variant.BROWN && itemstack.checkItemTag(Tag.ITEMS_SMALL_FLOWERS))
         }
         // 玩家手持桶且实体已成年时, 可交互
         // 玩家手持对应食物时, 可交互
-        createInteractableEntity(listOf(EntityType.COW, EntityType.GOAT)) { player, itemStack, entity ->
-            (itemStack.checkItemType(ItemType.BUCKET) && entity.checkIsAdult()) || itemStack.checkIsCorrespondingFood(entity)
+        createInteractableEntity(listOf(EntityType.COW, EntityType.GOAT)) { player, itemstack, entity ->
+            (itemstack.checkItemType(ItemType.BUCKET) && entity.checkIsAdult()) || itemstack.checkIsCorrespondingFood(entity)
         }
         // 玩家手持刷子时且实体已成年时, 可交互
         // 玩家手持对应食物时, 可交互
-        createInteractableEntity(EntityType.ARMADILLO) { player, itemStack, entity ->
-            (itemStack.checkItemType(ItemType.BRUSH) && entity.checkIsAdult()) || itemStack.checkIsCorrespondingFood(entity)
+        createInteractableEntity(EntityType.ARMADILLO) { player, itemstack, entity ->
+            (itemstack.checkItemType(ItemType.BRUSH) && entity.checkIsAdult()) || itemstack.checkIsCorrespondingFood(entity)
         }
         // 若实体已成年且未装备鞍, 玩家手持鞍时, 可交互
         // 若实体已成年且已装备鞍, 玩家非潜行时, 可交互
         // 玩家手持对应食物时, 可交互
-        createInteractableEntity(listOf(EntityType.PIG, EntityType.STRIDER)) { player, itemStack, entity ->
+        createInteractableEntity(listOf(EntityType.PIG, EntityType.STRIDER)) { player, itemstack, entity ->
             val flag = if (entity is Steerable && entity.checkIsAdult()) {
                 if (entity.hasSaddle()) {
                     !player.isSneaking
                 } else {
-                    itemStack.checkItemType(ItemType.SADDLE)
+                    itemstack.checkItemType(ItemType.SADDLE)
                 }
             } else {
                 false
             }
-            flag || itemStack.checkIsCorrespondingFood(entity)
+            flag || itemstack.checkIsCorrespondingFood(entity)
         }
         // 若快乐恶魂已成年且未装备挽具, 玩家手持挽具时, 可交互
         // 若快乐恶魂已成年且已装备挽具, 玩家非潜行时, 可交互
         // 玩家手持对应食物时, 可交互
-        createInteractableEntity(EntityType.HAPPY_GHAST) { player, itemStack, entity ->
+        createInteractableEntity(EntityType.HAPPY_GHAST) { player, itemstack, entity ->
             val flag = if (entity is HappyGhast && entity.isAdult) {
                 val itemInBody = entity.equipment.getItem(EquipmentSlot.BODY)
                 if (itemInBody.checkItemTag(Tag.ITEMS_HARNESSES)) {
                     !player.isSneaking
                 } else {
-                    itemStack.checkItemTag(Tag.ITEMS_HARNESSES)
+                    itemstack.checkItemTag(Tag.ITEMS_HARNESSES)
                 }
             } else {
                 false
             }
-            flag || itemStack.checkIsCorrespondingFood(entity)
+            flag || itemstack.checkIsCorrespondingFood(entity)
         }
         // 玩家手持金苹果时, 可交互
-        createInteractableEntity(EntityType.ZOMBIE_VILLAGER) { player, itemStack, entity ->
-            itemStack.checkItemType(ItemType.GOLDEN_APPLE)
+        createInteractableEntity(EntityType.ZOMBIE_VILLAGER) { player, itemstack, entity ->
+            itemstack.checkItemType(ItemType.GOLDEN_APPLE)
         }
         // 玩家手持金锭且猪灵非幼年、不处于交易中、且可交易时, 可交互
-        createInteractableEntity(EntityType.PIGLIN) { player, itemStack, entity ->
-            itemStack.checkItemType(ItemType.GOLD_INGOT) &&
+        createInteractableEntity(EntityType.PIGLIN) { player, itemstack, entity ->
+            itemstack.checkItemType(ItemType.GOLD_INGOT) &&
                     entity is Piglin &&
                     entity.isAdult &&
                     entity.getMemory(MemoryKey.ADMIRING_ITEM) == false &&
                     entity.getMemory(MemoryKey.ADMIRING_DISABLED) == false
         }
         // 玩家手持铁锭且铁傀儡生命值不等于最大生命值时, 可交互
-        createInteractableEntity(EntityType.IRON_GOLEM) { player, itemStack, entity ->
-            itemStack.checkItemType(ItemType.IRON_INGOT) && entity is IronGolem && entity.health == entity.getAttribute(Attribute.MAX_HEALTH)?.value
+        createInteractableEntity(EntityType.IRON_GOLEM) { player, itemstack, entity ->
+            itemstack.checkItemType(ItemType.IRON_INGOT) && entity is IronGolem && entity.health == entity.getAttribute(Attribute.MAX_HEALTH)?.value
         }
         // 玩家手持creeper_igniters标签物品时, 可交互
-        createInteractableEntity(EntityType.CREEPER) { player, itemStack, entity ->
-            itemStack.checkItemTag(Tag.ITEMS_CREEPER_IGNITERS)
+        createInteractableEntity(EntityType.CREEPER) { player, itemstack, entity ->
+            itemstack.checkItemTag(Tag.ITEMS_CREEPER_IGNITERS)
         }
         // 玩家手持fishes标签物品时, 可交互
-        createInteractableEntity(EntityType.DOLPHIN) { player, itemStack, entity ->
-            itemStack.checkItemTag(Tag.ITEMS_FISHES)
+        createInteractableEntity(EntityType.DOLPHIN) { player, itemstack, entity ->
+            itemstack.checkItemTag(Tag.ITEMS_FISHES)
         }
         // 实体已驯服时, 可交互
-        createInteractableEntity(listOf(EntityType.SKELETON_HORSE, EntityType.ZOMBIE_HORSE)) { player, itemStack, entity ->
+        createInteractableEntity(listOf(EntityType.SKELETON_HORSE, EntityType.ZOMBIE_HORSE)) { player, itemstack, entity ->
             entity is Tameable && entity.isTamed
         }
         // 实体已驯服且玩家是其主人时, 可交互
         // 玩家手持对应食物时, 可交互
-        createInteractableEntity(listOf(EntityType.CAT, EntityType.WOLF)) { player, itemStack, entity ->
-            (entity is Tameable && entity.isTamed && entity.ownerUniqueId == player.uniqueId) || itemStack.checkIsCorrespondingFood(entity)
+        createInteractableEntity(listOf(EntityType.CAT, EntityType.WOLF)) { player, itemstack, entity ->
+            (entity is Tameable && entity.isTamed && entity.ownerUniqueId == player.uniqueId) || itemstack.checkIsCorrespondingFood(entity)
         }
         // 实体已驯服且玩家是其主人时, 可交互
-        // 玩家手持parrot_poisonous_food标签物品时, 可交互
+        // 玩家手持 #parrot_poisonous_food 标签物品时, 可交互
         // 玩家手持对应食物时, 可交互
-        createInteractableEntity(EntityType.PARROT) { player, itemStack, entity ->
-            (entity is Tameable && entity.isTamed && entity.ownerUniqueId == player.uniqueId) || itemStack.checkItemTag(Tag.ITEMS_PARROT_POISONOUS_FOOD) || itemStack.checkIsCorrespondingFood(entity)
+        createInteractableEntity(EntityType.PARROT) { player, itemstack, entity ->
+            (entity is Tameable && entity.isTamed && entity.ownerUniqueId == player.uniqueId) || itemstack.checkItemTag(Tag.ITEMS_PARROT_POISONOUS_FOOD) || itemstack.checkIsCorrespondingFood(entity)
         }
         // 悦灵手中无物品时, 可交互
         // 悦灵手中有物品且玩家手中无物品时, 可交互
-        // 玩家手持duplicates_allays标签物品且悦灵可复制时, 可交互
-        createInteractableEntity(EntityType.ALLAY) { player, itemStack, entity ->
+        // 玩家手持 #duplicates_allays 标签物品且悦灵可复制时, 可交互
+        createInteractableEntity(EntityType.ALLAY) { player, itemstack, entity ->
             if (entity !is Allay) return@createInteractableEntity false
-            entity.equipment.itemInMainHand.isEmpty || itemStack.isEmpty || (itemStack.checkItemTag(Tag.ITEMS_DUPLICATES_ALLAYS) && entity.canDuplicate())
+            entity.equipment.itemInMainHand.isEmpty || itemstack.isEmpty || (itemstack.checkItemTag(Tag.ITEMS_DUPLICATES_ALLAYS) && entity.canDuplicate())
         }
         // 玩家非潜行交互载具时，可交互
         createInteractableEntity(
@@ -748,11 +725,11 @@ private object InteractableEntities {
                 EntityType.BAMBOO_RAFT,
                 EntityType.MINECART,
             )
-        ) { player, itemStack, entity -> !player.isSneaking }
-        // 玩家为op且处于创造模式时, 可交互
+        ) { player, itemstack, entity -> !player.isSneaking }
+        // 玩家为 OP 且处于创造模式时, 可交互
         createInteractableEntity(
             EntityType.COMMAND_BLOCK_MINECART
-        ) { player, itemStack, entity ->
+        ) { player, itemstack, entity ->
             player.isOp && player.gameMode == GameMode.CREATIVE
         }
         // 任何情况下, 可交互
@@ -783,17 +760,17 @@ private object InteractableEntities {
                 EntityType.FURNACE_MINECART,
                 EntityType.HOPPER_MINECART
             )
-        ) { player, itemStack, entity -> true }
+        ) { player, itemstack, entity -> true }
     }
 
-    private fun createInteractableEntity(entityType: EntityType, checkLogic: (player: Player, itemStack: ItemStack, entity: Entity) -> Boolean) {
-        INTERACTABLE_ENTITIES.put(entityType, checkLogic)?.let {
+    private fun createInteractableEntity(entityType: EntityType, test: (player: Player, itemstack: ItemStack, entity: Entity) -> Boolean) {
+        INTERACTABLE_ENTITIES.put(entityType, test)?.let {
             LOGGER.warn("Duplicate interactable entity created: $entityType")
         }
     }
 
-    private fun createInteractableEntity(entityTypes: List<EntityType>, checkLogic: (player: Player, itemStack: ItemStack, entity: Entity) -> Boolean) {
-        entityTypes.forEach { createInteractableEntity(it, checkLogic) }
+    private fun createInteractableEntity(entityTypes: List<EntityType>, test: (player: Player, itemstack: ItemStack, entity: Entity) -> Boolean) {
+        entityTypes.forEach { createInteractableEntity(it, test) }
     }
 
     /**
@@ -835,43 +812,41 @@ private object InteractableEntities {
 
 /**
  * 判定该情形下原版方块是否具有原版交互.
- * 方块原版交互高于原版物品交互.
- * 此时玩家手中物品的原版行为和自定义行为都不应该执行.
+ *
+ * 方块原版交互永远高于物品原版交互, 此时玩家手中物品的原版行为和自定义行为都不应该执行.
  *
  * 一些原版方块交互需要特定物品才能触发, 如剪刀和玻璃瓶交互蜂巢.
- * 这种情况我们认为原版方块可以交互(实际上nms的代码也是将这些交互写在方块中), 函数返回 true.
+ * 这种情况我们认为原版方块可以交互 (实际上 NMS 的代码也是将这些交互写在方块中), 函数返回 true.
  * 这样设计意味着自定义物品的基底若能对特定方块触发方块交互, 则不会再执行自定义行为.
  *
  * 举例说明:
  * 设计一个"海带球"物品, 使用原版可堆肥的物品作为基底, 并添加使用后投掷出弹射物的自定义行为, 这样"海带球"在玩家右键堆肥桶的时候不会被投掷.
- * 那如果希望堆肥的时候触发自定义行为该怎么办呢? 应该新增一个 CompostFeature, 而不是在交互行为里面去实现.
- *
- * 2026/1/19 芙兰
- * 新的需求与实现:
- * 某些情景下, 我们可能希望添加优先级等同于"剪刀和玻璃瓶交互蜂巢"这种交互代码位于方块中的高优先交互.
- * 因此, 我们不再一刀切(即默认触发方块交互就不触发物品交互).
- * 而是将"是否触发方块交互"作为布尔值传递到后续代码中, 让后续代码决定是否执行物品交互/是否取消事件.
+ * 那如果希望堆肥的时候触发自定义行为该怎么办呢? 应该新增一个 "CompostFeature", 而不是在交互行为里面去实现.
  */
-fun Block.isInteractable(player: Player, itemStack: ItemStack, interactContext: BlockInteractContext): Boolean {
+// 2026/1/19 芙兰
+// 新的需求与实现:
+// 某些情景下, 我们可能希望添加优先级等同于"剪刀和玻璃瓶交互蜂巢"这种交互代码位于方块中的高优先交互.
+// 因此, 我们不再一刀切 (即默认触发方块交互就不触发物品交互), 而是将"是否触发方块交互"作为布尔值传递到后续代码中,
+// 让后续代码决定是否执行物品交互/是否取消事件.
+fun Block.isInteractable(player: Player, itemstack: ItemStack, context: BlockInteractContext): Boolean {
     // 如果方块是自定义方块, 认为不可交互
     // 自定义方块的交互判定在 Koish 的交互判定之前, 代码执行到此处, 自定义方块的交互早已检查过
     // 如果当时自定义方块可交互, 代码不会执行到此处
     // 因此, 此时自定义方块方块必然不可交互
     if (UniversalBlocks.isCustomBlock(this)) return false
     val blockType = this.type.asBlockType() ?: return false // 不可能在此处return
-    val checkLogic = INTERACTABLE_BLOCKS[blockType] ?: return false
-    return checkLogic(player, itemStack, blockData, interactContext)
+    val test = INTERACTABLE_BLOCKS[blockType] ?: return false
+    return test(player, itemstack, blockData, context)
 }
 
 /**
  * 判定该情形下实体是否具有原版交互.
  * 实体原版交互的优先级高于原版物品交互.
  * 此时玩家手中物品的自定义行为不应该执行.
- *
- * 2026/1/19 芙兰
- * 与上述方块交互类似, 实体交互也传递"是否触发实体交互"的标记.
  */
-fun Entity.isInteractable(player: Player, itemStack: ItemStack): Boolean {
-    val checkLogic = INTERACTABLE_ENTITIES[this.type] ?: return false
-    return checkLogic(player, itemStack, this)
+// 2026/1/19 芙兰
+// 与上述方块交互类似, 实体交互也传递"是否触发实体交互"的标记.
+fun Entity.isInteractable(player: Player, itemstack: ItemStack): Boolean {
+    val test = INTERACTABLE_ENTITIES[this.type] ?: return false
+    return test(player, itemstack, this)
 }
