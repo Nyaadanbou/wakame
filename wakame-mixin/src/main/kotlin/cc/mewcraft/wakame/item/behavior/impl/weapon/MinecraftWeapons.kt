@@ -5,7 +5,9 @@ import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.item.behavior.AttackContext
+import cc.mewcraft.wakame.item.behavior.InteractionHand
 import cc.mewcraft.wakame.item.behavior.InteractionResult
+import cc.mewcraft.wakame.item.behavior.UseContext
 import cc.mewcraft.wakame.item.extension.addCooldown
 import cc.mewcraft.wakame.item.extension.damageItem
 import cc.mewcraft.wakame.item.extension.isOnCooldown
@@ -14,6 +16,19 @@ import cc.mewcraft.wakame.item.property.ItemPropTypes
 import org.bukkit.FluidCollisionMode
 import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.EquipmentSlot
+
+object Bow : Weapon {
+    override fun handleSimpleUse(context: UseContext): InteractionResult {
+        if (context.hand == InteractionHand.OFF_HAND) return InteractionResult.FAIL_AND_CANCEL
+        return InteractionResult.SUCCESS
+    }
+}
+
+object Crossbow : Weapon {
+}
+
+object Mace : Weapon {
+}
 
 /**
  * 一般近战武器的物品行为.
@@ -66,4 +81,7 @@ object Melee : Weapon {
         }
         return InteractionResult.SUCCESS
     }
+}
+
+object Trident : Weapon {
 }
