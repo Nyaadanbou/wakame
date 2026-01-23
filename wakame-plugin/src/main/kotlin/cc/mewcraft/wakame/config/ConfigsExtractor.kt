@@ -15,7 +15,6 @@ internal object ConfigsExtractor {
     // 要抽取的文件, 全部位于 zip 的 /configs 之下
     private val FILES_TO_EXTRACT: List<String> = listOf(
         "attributes.yml",
-        "brewery/config.yml",
         "config.yml",
         "damage/config.yml",
         "damage/attack_characteristics_mappings.yml",
@@ -24,6 +23,8 @@ internal object ConfigsExtractor {
         "damage/player_adhoc_mappings.yml",
         "database.yml",
         "entities.yml",
+        "hook/auraskills/stats.yml",
+        "hook/brewery/config.yml",
         "levels.yml",
         "resourcepack.yml",
     )
