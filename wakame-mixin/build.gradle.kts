@@ -22,7 +22,7 @@ dependencies {
     paperweight.paperDevBundle(local.versions.paper)
 
     // Mixin & Ignite (这些依赖由 Ignite 启动器提供)
-    remapper("net.fabricmc", "tiny-remapper", "0.10.4", classifier = "fat")
+    remapper("net.fabricmc:tiny-remapper:0.10.4:fat")
     compileOnly(local.ignite)
     compileOnly(local.mixin)
     compileOnly(local.mixin.extras)
