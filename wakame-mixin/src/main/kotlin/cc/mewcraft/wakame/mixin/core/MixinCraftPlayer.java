@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
+import cc.mewcraft.wakame.api.config.PrimaryConfig;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -15,7 +16,9 @@ public abstract class MixinCraftPlayer {
             at = @At("HEAD")
     )
     private void injected1(double scale, CallbackInfo ci) {
-        koish$printStackTrace("setHealthScale");
+        if (PrimaryConfig.Impl.getPrintStackOnSetHealthScale()) {
+            koish$printStackTrace("setHealthScale");
+        }
     }
 
     @Inject(
@@ -23,7 +26,9 @@ public abstract class MixinCraftPlayer {
             at = @At("HEAD")
     )
     private void injected2(boolean scale, CallbackInfo ci) {
-        koish$printStackTrace("setHealthScaled");
+        if (PrimaryConfig.Impl.getPrintStackOnSetHealthScale()) {
+            koish$printStackTrace("setHealthScaled");
+        }
     }
 
     /**
@@ -37,9 +42,9 @@ public abstract class MixinCraftPlayer {
 
         for (StackTraceElement element : stackTrace) {
             sb.append("  at ").append(element.getClassName())
-              .append(".").append(element.getMethodName())
-              .append("(").append(element.getFileName())
-              .append(":").append(element.getLineNumber()).append(")\n");
+                    .append(".").append(element.getMethodName())
+                    .append("(").append(element.getFileName())
+                    .append(":").append(element.getLineNumber()).append(")\n");
         }
 
         System.out.println(sb);

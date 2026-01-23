@@ -17,6 +17,7 @@
     "MixinBaseFireBlock",
     "MixinCraftEntityType",
     "MixinCraftingRecipe",
+    "MixinCraftPlayer",
     "MixinCriteriaTriggers",
     "MixinDataComponentPatch$3",
     "MixinDataComponentPatch$Builder",
