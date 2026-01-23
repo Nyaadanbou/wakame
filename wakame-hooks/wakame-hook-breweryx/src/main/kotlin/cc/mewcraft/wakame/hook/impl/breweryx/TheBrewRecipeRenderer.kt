@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.item.SlotDisplayLoreData
 import cc.mewcraft.wakame.util.adventure.legacy
 import net.kyori.adventure.text.Component
 
-private val CONFIG = ConfigAccess["brewery/config"]
+private val CONFIG = ConfigAccess["hook/brewery/config"]
 
 /**
  * 一般的 [BrewRecipeRenderer] 实现.

@@ -39,7 +39,7 @@ object AuraSkillsHook : PlayerManaIntegration by AuraPlayerManaIntegration {
     }
 
     private fun registerTraits() {
-        val contentDirectory = KoishDataPaths.CONFIGS.resolve("auraskills").toFile()
+        val contentDirectory = KoishDataPaths.CONFIGS.resolve("hook/auraskills").toFile()
         val koishRegistry = AuraSkillsApi.get().useRegistry("koish", contentDirectory)
 
         koishRegistry.registerTrait(KoishTraits.ATTACK_KNOCKBACK)
