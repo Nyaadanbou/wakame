@@ -145,6 +145,9 @@ elytra_extras:
   # 使用烟花时消耗的魔法值
   rocket_boost_mana_cost: 10.0
 
+# 给客户端设置的生命值缩放
+clientbound_health_scale: 20.0
+
 # 在发送 ClientboundUpdateAttributesPacket 封包时移除掉以下属性
 # 目前仅用于配合伤害系统来“移除” ARMOR 和 ARMOR_TOUGHNESS 这两属性
 # 此功能可以带来几个好处:
