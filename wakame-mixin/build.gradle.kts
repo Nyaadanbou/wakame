@@ -1,12 +1,32 @@
 plugins {
     id("koish.core-conventions")
     id("cc.mewcraft.copy-jar-docker")
-    id("io.papermc.paperweight.userdev")
+    id("io.canvasmc.weaver.userdev")
+    id("io.canvasmc.horizon")
 }
 
 group = "cc.mewcraft.koish"
 version = "0.0.1-snapshot"
 description = "The core gameplay implementation of Xiaomi's server (ignite mod)"
+
+repositories {
+    mavenLocal {
+        content {
+            includeGroup("io.canvasmc.horizon")
+        }
+    }
+}
+
+dependencies {
+    // Horizon API
+    horizon.horizonApi(local.versions.horizon.core)
+
+    // Paper API + NMS
+    paperweight.paperDevBundle(local.versions.paper)
+
+    api(project(":wakame-api"))
+    compileOnlyApi(project(":wakame-mixin-libraries"))
+}
 
 paperweight {
     // 因为:
@@ -17,18 +37,10 @@ paperweight {
     addServerDependencyTo.add(project.configurations.named(JavaPlugin.COMPILE_ONLY_API_CONFIGURATION_NAME))
 }
 
-dependencies {
-    // Paper API + NMS
-    paperweight.paperDevBundle(local.versions.paper)
-
-    // Mixin & Ignite (这些依赖由 Ignite 启动器提供)
-    remapper("net.fabricmc:tiny-remapper:0.10.4:fat")
-    compileOnly(local.ignite)
-    compileOnly(local.mixin)
-    compileOnly(local.mixin.extras)
-
-    api(project(":wakame-api"))
-    compileOnlyApi(project(":wakame-mixin-libraries"))
+horizon {
+    accessTransformerFiles.from(
+        file("src/main/resource-templates/widener.at")
+    )
 }
 
 sourceSets {
@@ -41,7 +53,7 @@ sourceSets {
 
 dockerCopy {
     containerId = "aether-minecraft-1"
-    containerPath = "/minecraft/game1/mods/"
+    containerPath = "/minecraft/game1/plugins/"
     fileMode = 0b110_100_100
     userId = 999
     groupId = 999

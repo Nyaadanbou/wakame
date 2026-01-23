@@ -1,7 +1,0 @@
-{
-  "id": "wakame",
-  "version": "{{ version }}",
-  "mixins": [
-    "mixins.wakame.json"
-  ]
-}

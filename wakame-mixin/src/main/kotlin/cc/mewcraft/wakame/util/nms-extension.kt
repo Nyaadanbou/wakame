@@ -32,6 +32,7 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import java.util.*
+import java.util.concurrent.ConcurrentMap
 import kotlin.jvm.optionals.getOrNull
 
 val MINECRAFT_SERVER: DedicatedServer by lazy { (Bukkit.getServer() as CraftServer).server }
@@ -304,7 +305,7 @@ fun <E : Any> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
 }
 
 object NMSUtils {
-    private val ENTITY_ID_CACHE: MutableMap<Int, Entity?> = MapMaker().weakValues().makeMap()
+    private val ENTITY_ID_CACHE: ConcurrentMap<Int, Entity> = MapMaker().weakValues().makeMap()
 
     fun getEntity(entityId: Int, world: World? = null): Entity? {
         return ENTITY_ID_CACHE.computeIfAbsent(entityId) { id -> getEntityByIdWithWorld(id, world) }
