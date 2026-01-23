@@ -1,7 +1,7 @@
 plugins {
     id("koish.core-conventions")
     id("cc.mewcraft.copy-jar-docker")
-    //id("io.canvasmc.weaver.userdev")
+    id("io.canvasmc.weaver.userdev")
     //id("io.canvasmc.horizon")
 }
 
@@ -27,7 +27,7 @@ dependencies {
     //horizon.horizonApi(local.versions.horizon.core)
 
     // Paper API + NMS
-    //paperweight.paperDevBundle(local.versions.paper)
+    paperweight.paperDevBundle(local.versions.paper)
 
     // ECS
     api(local.fleks)
