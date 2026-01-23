@@ -10,4 +10,5 @@ import xyz.xenondevs.commons.provider.Provider
 /**
  * 主配置文件.
  */
+@get:JvmName("main")
 val MAIN_CONFIG: Provider<CommentedConfigurationNode> = ConfigAccess["config"]
