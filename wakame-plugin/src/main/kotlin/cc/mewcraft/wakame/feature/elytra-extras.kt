@@ -78,6 +78,7 @@ class ElytraExtrasListener : Listener {
                 if (!PlayerManaIntegration.consumeMana(player, config.glideDrainPerSecond)) {
                     // 魔法值不足，停止滑翔
                     player.isGliding = false
+                    player.fallDistance = 0f
                     iterator.remove()
                 }
             }
@@ -90,24 +91,21 @@ class ElytraExtrasListener : Listener {
         if (config.enabled.not()) return
 
         val player = event.entity as? Player ?: return
-        val enterGlideDrain = config.enterGlideManaCost
 
         if (event.isGliding) {
             // 进入滑翔状态:
 
-            if (PlayerManaIntegration.getMana(player) < enterGlideDrain) {
-                // 进入滑翔状态, 但是魔法值不足:
-
-                event.isCancelled = true
-                glideStateMap.remove(player)
-            } else {
+            if (PlayerManaIntegration.consumeMana(player, config.enterGlideManaCost)) {
                 // 进入滑翔状态, 并且魔法值足够:
-
-                // 进入滑翔时消耗魔法值
-                PlayerManaIntegration.consumeMana(player, enterGlideDrain)
 
                 // 初始化滑翔状态
                 glideStateMap[player] = GlideState()
+            } else {
+                // 进入滑翔状态, 但是魔法值不足:
+
+                event.isCancelled = true
+                player.fallDistance = 0f
+                glideStateMap.remove(player)
             }
         } else {
             // 退出滑翔状态:
