@@ -20,12 +20,12 @@ internal class Disableable(
         // this runBefore that
         runBeforeNames
             .flatMap { runBeforeName -> all.filter { it.className == runBeforeName } }
-            .forEach { graph.putEdge(this, it) }
+            .forEach { LifecycleUtils.tryPutEdge(graph, this, it) }
 
         // this runAfter that
         runAfterNames
             .flatMap { runAfterName -> all.filter { it.className == runAfterName } }
-            .forEach { graph.putEdge(it, this) }
+            .forEach { LifecycleUtils.tryPutEdge(graph, it, this) }
     }
 
     override suspend fun run() {
@@ -42,15 +42,17 @@ internal class Disableable(
 
         fun fromInitAnnotation(
             classLoader: ClassLoader,
-            className: String, methodName: String,
+            className: String,
+            methodName: String,
             annotation: Map<String, Any?>,
         ): Disableable {
             return Disableable(
-                classLoader,
-                className, methodName,
-                (LifecycleUtils.getDispatcher(annotation) ?: LifecycleDispatcher.SYNC).dispatcher,
-                LifecycleUtils.getStrings("runBefore", annotation),
-                LifecycleUtils.getStrings("runAfter", annotation)
+                classLoader = classLoader,
+                className = className,
+                methodName = methodName,
+                dispatcher = (LifecycleUtils.getDispatcher(annotation) ?: LifecycleDispatcher.SYNC).dispatcher,
+                runBeforeNames = LifecycleUtils.getStrings("runBefore", annotation),
+                runAfterNames = LifecycleUtils.getStrings("runAfter", annotation),
             )
         }
     }

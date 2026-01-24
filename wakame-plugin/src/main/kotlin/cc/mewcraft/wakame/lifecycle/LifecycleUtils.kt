@@ -8,18 +8,15 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.lifecycle.initializer.InitializerRunnable
 import com.google.common.graph.Graph
 import com.google.common.graph.MutableGraph
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.core.LoggerContext
-import org.objectweb.asm.Type
 import xyz.xenondevs.commons.provider.orElse
 import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.KClass
-import kotlin.reflect.KParameter
-import kotlin.reflect.full.callSuspend
-import kotlin.reflect.full.functions
-import kotlin.reflect.jvm.isAccessible
-import kotlin.reflect.jvm.javaMethod
 
 private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "initializer").orElse(false)
 
@@ -27,23 +24,11 @@ internal object LifecycleUtils {
 
     // Executions
 
-    private sealed interface TaskWrapper<T : Any> {
-        val value: T
-        fun completion(): Deferred<Unit>
-        fun dispatcher(): CoroutineDispatcher?
-        suspend fun execute()
-
-        class Init(override val value: InitializerRunnable<*>) : TaskWrapper<InitializerRunnable<*>> {
-            override fun completion(): Deferred<Unit> = value.completion
-            override fun dispatcher(): CoroutineDispatcher? = value.dispatcher
-            override suspend fun execute() = value.run()
-        }
-    }
-
-    private fun wrapTask(task: Any): TaskWrapper<*> {
-        return when (task) {
-            is InitializerRunnable<*> -> TaskWrapper.Init(task)
-            else -> error("Unhandled task type: $task")
+    private fun asExecutable(task: InitializerRunnable<*>): LifecycleExecution.ExecutableTask {
+        return object : LifecycleExecution.ExecutableTask {
+            override val completion: Deferred<Unit> get() = task.completion
+            override val dispatcher: CoroutineDispatcher? get() = task.dispatcher
+            override suspend fun execute() = task.run()
         }
     }
 
@@ -55,31 +40,18 @@ internal object LifecycleUtils {
         task: T,
         graph: Graph<T>,
     ) {
-        scope.launch {
-            // await dependencies, which may increase during wait
-            var prevDepsSize = 0
-            var deps: List<Deferred<*>> = emptyList()
-
-            fun findDependencies(): List<Deferred<*>> {
-                deps = graph.predecessors(task)
-                    .map { wrapTask(it).completion() }
-                return deps
-            }
-
-            while (prevDepsSize != findDependencies().size) {
-                prevDepsSize = deps.size
-                deps.awaitAll()
-            }
-
-            // run in preferred context
-            withContext(wrapTask(task).dispatcher() ?: scope.coroutineContext) {
-                if (LOGGING) {
-                    LOGGER.info(task.toString())
+        LifecycleExecution.launch(
+            scope = scope,
+            task = task,
+            graph = graph,
+            toExecutable = { node ->
+                when (node) {
+                    is InitializerRunnable<*> -> asExecutable(node)
+                    else -> error("Unhandled task type: $node")
                 }
-
-                wrapTask(task).execute()
-            }
-        }
+            },
+            logging = LOGGING,
+        )
     }
 
     /**
@@ -89,14 +61,21 @@ internal object LifecycleUtils {
         scope: CoroutineScope,
         graph: Graph<T>,
     ) {
-        for (nodes in graph.nodes()) {
-            launch(scope, nodes, graph)
-        }
+        LifecycleExecution.launchAll(
+            scope = scope,
+            graph = graph,
+            toExecutable = { node ->
+                when (node) {
+                    is InitializerRunnable<*> -> asExecutable(node)
+                    else -> error("Unhandled task type: $node")
+                }
+            },
+            logging = LOGGING,
+        )
     }
 
     /**
      * Wraps [run] in a try-catch block with error logging specific to lifecycle.
-     * Returns whether the lifecycle has run successful, and also shuts down the server if it wasn't.
      */
     inline fun runLifecycle(run: () -> Unit) {
         try {
@@ -121,52 +100,23 @@ internal object LifecycleUtils {
         clazz: KClass<out Any>,
         functionName: String,
         completion: CompletableDeferred<Unit>,
-    ) {
-        val function = clazz.functions.first {
-            it.javaMethod!!.name == functionName && it.parameters.size == 1 && it.parameters[0].kind == KParameter.Kind.INSTANCE
-        }
-        function.isAccessible = true
-        function.callSuspend(clazz.objectInstance ?: throw IllegalArgumentException("$clazz.simpleName is not an object"))
-        completion.complete(Unit)
-    }
+    ) = LifecycleReflection.executeSuspendFunction(clazz, functionName, completion)
 
     // Graph
 
-    fun <T : Any> tryPutEdge(graph: MutableGraph<T>, from: T, to: T) {
-        try {
-            graph.putEdge(from, to)
-        } catch (e: IllegalArgumentException) {
-            throw IllegalArgumentException("Failed to add edge from '$from' to '$to'", e)
-        }
-    }
+    fun <T : Any> tryPutEdge(graph: MutableGraph<T>, from: T, to: T) = LifecycleGraph.tryPutEdge(graph, from, to)
 
     // Annotations
 
-    @Suppress("UNCHECKED_CAST")
-    inline fun <reified T : Enum<T>> getEnum(name: String, annotationMap: Map<String, Any?>): T? {
-        return (annotationMap[name] as Array<String>?)
-            ?.get(1)
-            ?.let { enumValueOf<T>(it) }
-    }
+    inline fun <reified T : Enum<T>> getEnum(name: String, annotationMap: Map<String, Any?>): T? =
+        LifecycleAnnotations.getEnum(name, annotationMap)
 
-    @Suppress("UNCHECKED_CAST")
-    fun getStrings(name: String, annotationMap: Map<String, Any?>): HashSet<String> {
-        return (annotationMap[name] as List<Type>?)
-            ?.mapTo(HashSet()) { it.internalName }
-            ?: HashSet()
-    }
+    fun getStrings(name: String, annotationMap: Map<String, Any?>): HashSet<String> =
+        LifecycleAnnotations.getStrings(name, annotationMap)
 
-    @Suppress("UNCHECKED_CAST")
-    fun getDispatcher(annotationMap: Map<String, Any?>): LifecycleDispatcher? {
-        return (annotationMap["dispatcher"] as Array<String>?)
-            ?.get(1)
-            ?.let { enumValueOf<LifecycleDispatcher>(it) }
-    }
+    fun getDispatcher(annotationMap: Map<String, Any?>): LifecycleDispatcher? =
+        LifecycleAnnotations.getDispatcher(annotationMap)
 
-    fun getAnnotationCommons(annotationMap: Map<String, Any?>): Triple<LifecycleDispatcher?, HashSet<String>, HashSet<String>> {
-        val dispatcher = getDispatcher(annotationMap)
-        val runBefore = getStrings("runBefore", annotationMap)
-        val runAfter = getStrings("runAfter", annotationMap)
-        return Triple(dispatcher, runBefore, runAfter)
-    }
+    fun getAnnotationCommons(annotationMap: Map<String, Any?>): Triple<LifecycleDispatcher?, HashSet<String>, HashSet<String>> =
+        LifecycleAnnotations.getCommons(annotationMap)
 }
