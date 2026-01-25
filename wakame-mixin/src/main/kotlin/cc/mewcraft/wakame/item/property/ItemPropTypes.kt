@@ -11,10 +11,31 @@ import cc.mewcraft.wakame.item.SlotDisplayNameData
 import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.item.data.impl.CoreContainer
 import cc.mewcraft.wakame.item.data.impl.ItemLevel
-import cc.mewcraft.wakame.item.property.impl.*
+import cc.mewcraft.wakame.item.property.impl.Arrow
+import cc.mewcraft.wakame.item.property.impl.BlockExtraLootEntry
+import cc.mewcraft.wakame.item.property.impl.Castable
+import cc.mewcraft.wakame.item.property.impl.CraftingReminder
+import cc.mewcraft.wakame.item.property.impl.EnchantSlotCapacity
+import cc.mewcraft.wakame.item.property.impl.EntityBucket
+import cc.mewcraft.wakame.item.property.impl.EntityExtraLootEntry
+import cc.mewcraft.wakame.item.property.impl.ExtraLoot
+import cc.mewcraft.wakame.item.property.impl.ExtraLore
+import cc.mewcraft.wakame.item.property.impl.Fuel
+import cc.mewcraft.wakame.item.property.impl.HoldLastDamage
+import cc.mewcraft.wakame.item.property.impl.ItemBase
+import cc.mewcraft.wakame.item.property.impl.ItemSlot
+import cc.mewcraft.wakame.item.property.impl.ItemSlotGroup
+import cc.mewcraft.wakame.item.property.impl.LiquidCollisionBlockSettings
+import cc.mewcraft.wakame.item.property.impl.OpenCatalog
+import cc.mewcraft.wakame.item.property.impl.OpenExternalMenu
+import cc.mewcraft.wakame.item.property.impl.TownyFlight
+import cc.mewcraft.wakame.item.property.impl.WorldTimeControl
+import cc.mewcraft.wakame.item.property.impl.WorldWeatherControl
 import cc.mewcraft.wakame.item.property.impl.weapon.DualSword
 import cc.mewcraft.wakame.item.property.impl.weapon.Katana
+import cc.mewcraft.wakame.item.property.impl.weapon.Mace
 import cc.mewcraft.wakame.item.property.impl.weapon.Melee
+import cc.mewcraft.wakame.item.property.impl.weapon.Trident
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.BuiltInRegistries
@@ -151,22 +172,50 @@ data object ItemPropTypes {
     val KATANA: ItemPropType<Katana> = typeOf("katana")
 
     /**
-     * 使物品具有近战武器行为.
-     */
-    @JvmField
-    val MELEE: ItemPropType<Melee> = typeOf("melee")
-
-    /**
-     * 使物品具有双手剑行为.
+     * 使物品具有双剑行为.
      */
     @JvmField
     val DUAL_SWORD: ItemPropType<DualSword> = typeOf("dual_sword")
 
     /**
-     * 使物品具有三叉戟行为.
+     * 原版弓 武器行为所需配置.
+     *
+     * @see cc.mewcraft.wakame.item.behavior.impl.weapon.Bow
      */
     @JvmField
-    val TRIDENT: ItemPropType<Unit> = typeOf("trident")
+    val MINECRAFT_BOW: ItemPropType<Unit> = typeOf("minecraft_bow")
+
+    /**
+     * 原版弩 武器行为所需配置.
+     *
+     * @see cc.mewcraft.wakame.item.behavior.impl.weapon.Crossbow
+     */
+    @JvmField
+    val MINECRAFT_CROSSBOW: ItemPropType<Unit> = typeOf("minecraft_crossbow")
+
+    /**
+     * 原版重锤 武器行为所需配置.
+     *
+     * @see cc.mewcraft.wakame.item.behavior.impl.weapon.Mace
+     */
+    @JvmField
+    val MINECRAFT_MACE: ItemPropType<Mace> = typeOf("minecraft_mace")
+
+    /**
+     * 原版近战(斧, 镐, 锄等单体武器) 武器行为所需配置.
+     *
+     * @see cc.mewcraft.wakame.item.behavior.impl.weapon.Melee
+     */
+    @JvmField
+    val MINECRAFT_MELEE: ItemPropType<Melee> = typeOf("minecraft_melee")
+
+    /**
+     * 原版三叉戟 武器行为所需配置.
+     *
+     * @see cc.mewcraft.wakame.item.behavior.impl.weapon.Trident
+     */
+    @JvmField
+    val MINECRAFT_TRIDENT: ItemPropType<Trident> = typeOf("minecraft_trident")
 
     /**
      * 存在该 property 则表示玩家可以对一个物品发起收购操作.

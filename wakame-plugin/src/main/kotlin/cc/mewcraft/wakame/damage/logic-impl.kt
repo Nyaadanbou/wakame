@@ -36,7 +36,9 @@ import com.google.common.cache.CacheBuilder
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import net.kyori.adventure.extra.kotlin.join
-import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.Component.empty
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.Component.translatable
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.LinearComponents
 import net.kyori.adventure.text.event.ClickEvent
@@ -45,9 +47,26 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.damage.DamageSource
 import org.bukkit.damage.DamageType
-import org.bukkit.entity.*
+import org.bukkit.entity.AbstractArrow
+import org.bukkit.entity.Arrow
+import org.bukkit.entity.Entity
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.FallingBlock
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+import org.bukkit.entity.Projectile
+import org.bukkit.entity.SpectralArrow
+import org.bukkit.entity.Trident
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.*
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ABSORPTION
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ARMOR
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BASE
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BLOCKING
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.FREEZING
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.HARD_HAT
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.INVULNERABILITY_REDUCTION
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.MAGIC
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.RESISTANCE
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.potion.PotionEffectType
@@ -828,6 +847,7 @@ internal object DamageManagerImpl : DamageManagerApi {
         val force = registeredProjectileDamage?.force ?: 1.0
         val damageBundle = run {
             val itemstack = abstractArrow.itemStack
+            // FIXME 未考虑三叉戟
             if (!itemstack.hasProp(ItemPropTypes.ARROW)) return null
             val itemcores = itemstack.coreContainer ?: return null
             val modifiersOnArrow = itemcores.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
