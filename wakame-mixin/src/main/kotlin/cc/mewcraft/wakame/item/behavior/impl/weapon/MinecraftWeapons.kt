@@ -1,87 +1,175 @@
 package cc.mewcraft.wakame.item.behavior.impl.weapon
 
-import cc.mewcraft.wakame.damage.KoishDamageSources
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
+import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
-import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.item.behavior.AttackContext
+import cc.mewcraft.wakame.item.behavior.AttackEntityContext
 import cc.mewcraft.wakame.item.behavior.InteractionHand
 import cc.mewcraft.wakame.item.behavior.InteractionResult
 import cc.mewcraft.wakame.item.behavior.UseContext
 import cc.mewcraft.wakame.item.extension.addCooldown
-import cc.mewcraft.wakame.item.extension.damageItem
 import cc.mewcraft.wakame.item.extension.isOnCooldown
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
-import org.bukkit.FluidCollisionMode
-import org.bukkit.entity.LivingEntity
-import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 
+/**
+ * 原版弓 武器行为.
+ * 箭矢伤害计算见 DamageManager 弹射物部分.
+ *
+ * 相较于原版的改动:
+ * 副手无法使用.
+ * 直接攻击(左键)实体不会有伤害.
+ */
 object Bow : Weapon {
+    // 禁止副手交互弓
     override fun handleSimpleUse(context: UseContext): InteractionResult {
-        if (context.hand == InteractionHand.OFF_HAND) return InteractionResult.FAIL_AND_CANCEL
-        return InteractionResult.SUCCESS
+        if (context.hand == InteractionHand.OFF_HAND) {
+            context.player.sendActionBar(TranslatableMessages.MSG_USE_BOW_IN_OFFHAND.build())
+            return InteractionResult.FAIL_AND_CANCEL
+        }
+        return InteractionResult.PASS
     }
 }
 
+/**
+ * 原版弩 武器行为.
+ * 箭矢伤害计算见 DamageManager 弹射物部分.
+ *
+ * 相较于原版的改动:
+ * 副手无法使用.
+ * 直接攻击(左键)实体不会有伤害.
+ */
 object Crossbow : Weapon {
-}
-
-object Mace : Weapon {
+    // 禁止副手交互弩
+    override fun handleSimpleUse(context: UseContext): InteractionResult {
+        if (context.hand == InteractionHand.OFF_HAND) {
+            context.player.sendActionBar(TranslatableMessages.MSG_USE_CROSSBOW_IN_OFFHAND.build())
+            return InteractionResult.FAIL_AND_CANCEL
+        }
+        return InteractionResult.PASS
+    }
 }
 
 /**
- * 一般近战武器的物品行为.
- * 特指左键点击生物以进行攻击的"近战武器", 如斧等.
- * 此类物品只有攻击到生物才会进入冷却.
+ * 原版重锤 武器行为.
+ *
+ * 相较于原版的改动:
+ * 伤害率会额外增加 下落高度 * [cc.mewcraft.wakame.item.property.impl.weapon.Mace.attackDamageRatePerFallDistance].
+ * 增加上限为 [cc.mewcraft.wakame.item.property.impl.weapon.Mace.attackDamageRateLimit].
  */
-object Melee : Weapon {
+object Mace : Weapon {
+    override fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
+        if (itemstack.isOnCooldown(player)) return null
+        val mace = itemstack.getProp(ItemPropTypes.MINECRAFT_MACE) ?: return null
+
+        val attrContainer = player.attributeContainer
+        val fallDistance = player.fallDistance.toDouble().coerceAtLeast(.0)
+        return PlayerDamageMetadata(attrContainer) {
+            every {
+                standard()
+                rate {
+                    standard() + (fallDistance * mace.attackDamageRatePerFallDistance).coerceAtMost(mace.attackDamageRateLimit)
+                }
+            }
+        }
+    }
+
     override fun handleSimpleAttack(context: AttackContext): InteractionResult {
         val itemstack = context.itemstack
         val player = context.player
         if (itemstack.isOnCooldown(player)) return InteractionResult.FAIL
-        val melee = itemstack.getProp(ItemPropTypes.MELEE) ?: return InteractionResult.FAIL
 
-        val world = player.world
-        val attrContainer = player.attributeContainer
-        val maxDistance = melee.attackRange
-
-        val rayTraceResult = world.rayTrace(
-            player.eyeLocation,
-            player.eyeLocation.direction,
-            maxDistance,
-            FluidCollisionMode.NEVER,
-            true, // 是否忽略草、告示牌、流体等有碰撞判定但是可穿过的方块
-            0.0
-        ) {
-            it is LivingEntity && it != player
-        }
-        // 未命中实体
-        if (rayTraceResult == null || rayTraceResult.hitBlock != null) {
-            return InteractionResult.FAIL
-        }
-        val hitEntity = rayTraceResult.hitEntity
-        if (hitEntity != null && hitEntity is LivingEntity) {
-            val damageMetadata = PlayerDamageMetadata(attrContainer) {
-                every {
-                    standard()
-                }
-            }
-            val damageSource = KoishDamageSources.playerAttack(player)
-            // 造成伤害
-            val flag = hitEntity.hurt(damageMetadata, damageSource, true)
-            // 如果成功造成了伤害
-            if (flag) {
-                // 设置耐久
-                player.damageItem(EquipmentSlot.HAND, melee.itemDamagePerAttack)
-            }
-            // 设置冷却
-            // 命中实体才进入冷却
-            itemstack.addCooldown(player, melee.attackCooldown)
-        }
+        val mace = itemstack.getProp(ItemPropTypes.MINECRAFT_MACE) ?: return InteractionResult.FAIL
+        itemstack.addCooldown(player, mace.attackCooldown)
         return InteractionResult.SUCCESS
     }
 }
 
+/**
+ * 原版近战(斧, 镐, 锄等单体武器) 武器行为.
+ *
+ * 相较于原版的改动:
+ * 只有攻击(默认左键)实体才会进入冷却.
+ * 攻击方块、空气不会进入冷却.
+ */
+object Melee : Weapon {
+    override fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
+        if (itemstack.isOnCooldown(player)) return null
+        val attrContainer = player.attributeContainer
+        return PlayerDamageMetadata(attrContainer) {
+            every {
+                standard()
+            }
+        }
+    }
+
+    override fun handleSimpleAttack(context: AttackContext): InteractionResult {
+        val itemstack = context.itemstack
+        val player = context.player
+        if (itemstack.isOnCooldown(player)) return InteractionResult.FAIL
+
+        return InteractionResult.SUCCESS
+    }
+
+    override fun handleAttackEntity(context: AttackEntityContext): InteractionResult {
+        val itemstack = context.itemstack
+        val player = context.player
+        if (itemstack.isOnCooldown(player)) return InteractionResult.FAIL
+
+        val melee = itemstack.getProp(ItemPropTypes.MINECRAFT_MELEE) ?: return InteractionResult.FAIL
+        itemstack.addCooldown(player, melee.attackCooldown)
+        return InteractionResult.SUCCESS
+    }
+}
+
+/**
+ * 原版三叉戟 武器行为.
+ * 投掷出的三叉戟伤害计算见 DamageManager 弹射物部分.
+ *
+ * 相较于原版的改动:
+ * 副手无法使用.
+ * 只有攻击(默认左键)实体才会进入冷却.
+ * 攻击方块、空气不会进入冷却.
+ */
 object Trident : Weapon {
+    // 禁止副手交互三叉戟
+    override fun handleSimpleUse(context: UseContext): InteractionResult {
+        if (context.hand == InteractionHand.OFF_HAND) {
+            context.player.sendActionBar(TranslatableMessages.MSG_USE_TRIDENT_IN_OFFHAND.build())
+            return InteractionResult.FAIL_AND_CANCEL
+        }
+        return InteractionResult.PASS
+    }
+
+    override fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
+        if (itemstack.isOnCooldown(player)) return null
+        val attrContainer = player.attributeContainer
+        return PlayerDamageMetadata(attrContainer) {
+            every {
+                standard()
+            }
+        }
+    }
+
+    override fun handleSimpleAttack(context: AttackContext): InteractionResult {
+        val itemstack = context.itemstack
+        val player = context.player
+        if (itemstack.isOnCooldown(player)) return InteractionResult.FAIL
+
+        return InteractionResult.SUCCESS
+    }
+
+    override fun handleAttackEntity(context: AttackEntityContext): InteractionResult {
+        val itemstack = context.itemstack
+        val player = context.player
+        if (itemstack.isOnCooldown(player)) return InteractionResult.FAIL
+
+        val trident = itemstack.getProp(ItemPropTypes.MINECRAFT_TRIDENT) ?: return InteractionResult.FAIL
+        itemstack.addCooldown(player, trident.attackCooldown)
+        return InteractionResult.SUCCESS
+    }
 }
