@@ -33,6 +33,8 @@ dependencies {
     runtimeOnly(project(":wakame-hooks:wakame-hook-mythicdungeons"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-mythicmobs"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-papi"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-plotsquared"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-portals"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-quickshop"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-thebrewingproject"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-towny"))
