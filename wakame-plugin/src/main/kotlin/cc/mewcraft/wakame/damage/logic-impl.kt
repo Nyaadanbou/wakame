@@ -234,6 +234,7 @@ internal object DamageManagerImpl : DamageManagerApi {
                 // 同上保险起见返回 originLastHurt
                 return originLastHurt
             }
+            handleKoishDamagePostprocessLogic(finalDamageContext)
 
             // 修改 BASE 伤害
             // 由于原版中某些伤害附带效果只能通过相应修饰器实现, 如增加相应统计信息/扣除黄心等
@@ -248,6 +249,10 @@ internal object DamageManagerImpl : DamageManagerApi {
             if (LOGGING) postprocessEvent.logging()
             return finalDamage
         }
+    }
+
+    private fun handleKoishDamagePostprocessLogic(finalDamageContext: FinalDamageContext) {
+        // TODO
     }
 
     /**
