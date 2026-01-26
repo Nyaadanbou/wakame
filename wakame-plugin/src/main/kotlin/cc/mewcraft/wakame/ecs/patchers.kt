@@ -44,6 +44,7 @@ object EnchantmentFleksPatcher : FleksPatcher {
         addToRegistrySystem("tick_fragile_enchantment") { TickFragileEnchantment }
         addToRegistrySystem("tick_smelter_enchantment") { TickSmelterEnchantment }
         addToRegistrySystem("tick_veinminer_enchantment") { TickVeinminerEnchantment }
+        addToRegistrySystem("tick_void_escape_enchantment") { TickVoidEscapeEnchantment }
     }
 }
 

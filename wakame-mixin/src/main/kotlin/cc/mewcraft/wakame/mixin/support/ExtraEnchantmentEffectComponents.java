@@ -71,6 +71,13 @@ public class ExtraEnchantmentEffectComponents {
             "koish:antigrav_shot", builder -> builder.persistent(EnchantmentAntigravShotEffect.CODEC)
     );
 
+    /**
+     * 使玩家在受到虚空伤害时传送到附近安全的位置.
+     */
+    public static final DataComponentType<EnchantmentVoidEscapeEffect> VOID_ESCAPE = register(
+            "koish:void_escape", builder -> builder.persistent(EnchantmentVoidEscapeEffect.CODEC)
+    );
+
     public static void bootstrap() {
         // 用于初始化静态变量
     }
