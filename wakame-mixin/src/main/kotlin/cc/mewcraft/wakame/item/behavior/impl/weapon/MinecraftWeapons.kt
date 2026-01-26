@@ -4,8 +4,6 @@ import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.entity.player.attributeContainer
-import cc.mewcraft.wakame.item.behavior.AttackContext
-import cc.mewcraft.wakame.item.behavior.AttackEntityContext
 import cc.mewcraft.wakame.item.behavior.InteractionHand
 import cc.mewcraft.wakame.item.behavior.InteractionResult
 import cc.mewcraft.wakame.item.behavior.UseContext
@@ -65,10 +63,10 @@ object Mace : Weapon {
     override fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
         if (itemstack.isOnCooldown(player)) return null
         val mace = itemstack.getProp(ItemPropTypes.MINECRAFT_MACE) ?: return null
+        itemstack.addCooldown(player, mace.attackCooldown)
 
-        val attrContainer = player.attributeContainer
         val fallDistance = player.fallDistance.toDouble().coerceAtLeast(.0)
-        return PlayerDamageMetadata(attrContainer) {
+        return PlayerDamageMetadata(player.attributeContainer) {
             every {
                 standard()
                 rate {
@@ -76,16 +74,6 @@ object Mace : Weapon {
                 }
             }
         }
-    }
-
-    override fun handleSimpleAttack(context: AttackContext): InteractionResult {
-        val itemstack = context.itemstack
-        val player = context.player
-        if (itemstack.isOnCooldown(player)) return InteractionResult.FAIL
-
-        val mace = itemstack.getProp(ItemPropTypes.MINECRAFT_MACE) ?: return InteractionResult.FAIL
-        itemstack.addCooldown(player, mace.attackCooldown)
-        return InteractionResult.SUCCESS
     }
 }
 
@@ -99,30 +87,14 @@ object Mace : Weapon {
 object Melee : Weapon {
     override fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
         if (itemstack.isOnCooldown(player)) return null
-        val attrContainer = player.attributeContainer
-        return PlayerDamageMetadata(attrContainer) {
+        val melee = itemstack.getProp(ItemPropTypes.MINECRAFT_MELEE) ?: return null
+        itemstack.addCooldown(player, melee.attackCooldown)
+
+        return PlayerDamageMetadata(player.attributeContainer) {
             every {
                 standard()
             }
         }
-    }
-
-    override fun handleSimpleAttack(context: AttackContext): InteractionResult {
-        val itemstack = context.itemstack
-        val player = context.player
-        if (itemstack.isOnCooldown(player)) return InteractionResult.FAIL
-
-        return InteractionResult.SUCCESS
-    }
-
-    override fun handleAttackEntity(context: AttackEntityContext): InteractionResult {
-        val itemstack = context.itemstack
-        val player = context.player
-        if (itemstack.isOnCooldown(player)) return InteractionResult.FAIL
-
-        val melee = itemstack.getProp(ItemPropTypes.MINECRAFT_MELEE) ?: return InteractionResult.FAIL
-        itemstack.addCooldown(player, melee.attackCooldown)
-        return InteractionResult.SUCCESS
     }
 }
 
@@ -147,29 +119,13 @@ object Trident : Weapon {
 
     override fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
         if (itemstack.isOnCooldown(player)) return null
-        val attrContainer = player.attributeContainer
-        return PlayerDamageMetadata(attrContainer) {
+        val trident = itemstack.getProp(ItemPropTypes.MINECRAFT_TRIDENT) ?: return null
+        itemstack.addCooldown(player, trident.attackCooldown)
+
+        return PlayerDamageMetadata(player.attributeContainer) {
             every {
                 standard()
             }
         }
-    }
-
-    override fun handleSimpleAttack(context: AttackContext): InteractionResult {
-        val itemstack = context.itemstack
-        val player = context.player
-        if (itemstack.isOnCooldown(player)) return InteractionResult.FAIL
-
-        return InteractionResult.SUCCESS
-    }
-
-    override fun handleAttackEntity(context: AttackEntityContext): InteractionResult {
-        val itemstack = context.itemstack
-        val player = context.player
-        if (itemstack.isOnCooldown(player)) return InteractionResult.FAIL
-
-        val trident = itemstack.getProp(ItemPropTypes.MINECRAFT_TRIDENT) ?: return InteractionResult.FAIL
-        itemstack.addCooldown(player, trident.attackCooldown)
-        return InteractionResult.SUCCESS
     }
 }
