@@ -387,6 +387,12 @@ data object ItemPropTypes {
         }
     }
 
+    /**
+     * 滑翔时的额外配置.
+     */
+    @JvmField
+    val GLIDING_EXTRAS = typeOf<GlidingExtras>("gliding_extras")
+
     // ------------
     // 方便函数
     // ------------
