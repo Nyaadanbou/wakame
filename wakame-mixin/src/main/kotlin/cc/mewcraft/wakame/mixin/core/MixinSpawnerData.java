@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class MixinSpawnerData {
 
     /**
-     * 替换 {@link Codec} 以便让 {@link net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData#type} 支持 MythicMobs 的怪物类型.
+     * 替换 {@link Codec} 以便让 {@link net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData#type()} 支持 MythicMobs 的怪物类型.
      *
      * @author g2213swo
      */

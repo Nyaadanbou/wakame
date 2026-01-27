@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.hook.impl.mythicmobs
 
 import cc.mewcraft.wakame.hook.impl.mythicmobs.listener.ConfigListener
 import cc.mewcraft.wakame.hook.impl.mythicmobs.listener.DamageListener
+import cc.mewcraft.wakame.hook.impl.mythicmobs.listener.ReloadListener
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.integration.skill.SkillIntegration
 import cc.mewcraft.wakame.mixin.support.MythicPluginBridge
@@ -17,7 +18,7 @@ object MythicMobsHook {
         // 注册 Listeners
         ConfigListener.registerEvents()
         DamageListener.registerEvents()
-        //ReloadListener.registerEvents()
+        ReloadListener.registerEvents()
 
         MythicPluginBridge.setImplementation(MythicPluginBridgeImpl)
         SkillIntegration.setImplementation(MythicSkillIntegration)

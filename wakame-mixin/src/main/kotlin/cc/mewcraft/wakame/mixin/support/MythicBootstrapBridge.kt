@@ -48,11 +48,11 @@ object MythicBootstrapBridge {
         }
 
         this.inited = true
-        LOGGER.info("MythicBootstrapBridge initialized, loaded ${this.data.size} MythicMobs entity types.")
+        LOGGER.info("MythicBootstrapBridge initialized, loaded ${this.data.size} MythicMobs entity types: ${data.entries.joinToString(prefix = "[", postfix = "]", transform = { "${it.key.path}: ${it.value.toShortString()}" })}.")
     }
 
     /**
-     * 根据 [id] 获取对应的 NMS [EntityType].
+     * 根据 [id] 获取对应的 [EntityType].
      */
     fun getEntityType(id: ResourceLocation): EntityType<*>? {
         if (inited.not()) {

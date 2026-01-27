@@ -38,7 +38,6 @@ import java.util.function.Consumer;
 public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
     public static final Codec<EntityType<?>> CODEC = ResourceLocation.CODEC.comapFlatMap(EntityTypeWrapper::encode, EntityTypeWrapper::decode);
-
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String NAMESPACE = "mythicmobs";
 
@@ -75,6 +74,13 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
     private EntityTypeWrapper(ResourceLocation id) {
         super(null, null, false, false, false, false, ImmutableSet.of(), EntityDimensions.scalable(0f, 0f), 0f, 0, 0, "", Optional.empty(), FeatureFlagSet.of());
         this.id = id;
+
+        // 注册当前实例到全局 EntityTypeWrapperObjects, 用于之后热更新 this.delegate
+        EntityTypeWrapperObjects.INSTANCE.register(this);
+    }
+
+    public ResourceLocation getId() {
+        return id;
     }
 
     @SuppressWarnings("unchecked")
@@ -91,6 +97,11 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
             }
         }
         return this.delegate;
+    }
+
+    @SuppressWarnings("unchecked")
+    public void setDelegate(EntityType<?> delegate) {
+        this.delegate = (EntityType<T>) delegate;
     }
 
     @Override
