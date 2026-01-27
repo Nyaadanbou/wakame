@@ -65,26 +65,31 @@ object EntityBucket : ItemBehavior {
         val entityData = itemstack.getData(ItemDataTypes.ENTITY_BUCKET_DATA) ?: return InteractionResult.FAIL
         val deserializedEntity = Bukkit.getUnsafe().deserializeEntity(entityData, player.world)
         val successfullySpawned = deserializedEntity.spawnAt(context.blockLocation.add(.0, 1.0, .0), CreatureSpawnEvent.SpawnReason.BUCKET)
-        if (successfullySpawned) {
-            // 还原物品状态, 也就是使其变成空桶时的状态
-            if (player.gameMode != GameMode.CREATIVE) {
-                itemstack.resetData(DataComponentTypes.CUSTOM_MODEL_DATA)
-                itemstack.resetData(DataComponentTypes.MAX_STACK_SIZE)
-                itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_DATA)
-                itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_INFO)
 
-                val prevItemName = itemstack.getData(ItemDataTypes.PREVIOUS_ITEM_NAME)
-                if (prevItemName != null) {
-                    itemstack.removeData(ItemDataTypes.PREVIOUS_ITEM_NAME)
-                    itemstack.setData(DataComponentTypes.ITEM_NAME, prevItemName)
-                }
-            }
+        if (!successfullySpawned) {
+            player.sendMessage(TranslatableMessages.MSG_ERR_CANNOT_SPAWN_ENTITY_HERE)
+            return InteractionResult.FAIL
+        }
 
-            if (deserializedEntity is LivingEntity) {
-                deserializedEntity.playHurtAnimation(0f)
-                deserializedEntity.playBucketActionSound(player)
+        // 还原物品状态, 也就是使其变成空桶时的状态
+        if (player.gameMode != GameMode.CREATIVE) {
+            itemstack.resetData(DataComponentTypes.CUSTOM_MODEL_DATA)
+            itemstack.resetData(DataComponentTypes.MAX_STACK_SIZE)
+            itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_DATA)
+            itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_INFO)
+
+            val prevItemName = itemstack.getData(ItemDataTypes.PREVIOUS_ITEM_NAME)
+            if (prevItemName != null) {
+                itemstack.removeData(ItemDataTypes.PREVIOUS_ITEM_NAME)
+                itemstack.setData(DataComponentTypes.ITEM_NAME, prevItemName)
             }
         }
+
+        if (deserializedEntity is LivingEntity) {
+            deserializedEntity.playHurtAnimation(0f)
+            deserializedEntity.playBucketActionSound(player)
+        }
+
         return InteractionResult.SUCCESS
     }
 
@@ -120,7 +125,7 @@ object EntityBucket : ItemBehavior {
             return InteractionResult.FAIL
         }
 
-        if (entityBucket.canCaptureBabies.not() && (entity as? Ageable)?.isAdult?.not() == true) {
+        if (entityBucket.canCaptureBabies.not() && entity is Ageable && entity.isAdult.not()) {
             player.sendMessage(TranslatableMessages.MSG_ERR_CANNOT_CAPTURE_BABIES)
             return InteractionResult.FAIL
         }

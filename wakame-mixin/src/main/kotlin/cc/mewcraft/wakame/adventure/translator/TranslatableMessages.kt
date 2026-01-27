@@ -98,6 +98,7 @@ object TranslatableMessages {
     val MSG_ERR_CANNOT_CAPTURE_THIS_ENTITY = create("msg_err_cannot_capture_this_entity")
     val MSG_ERR_NO_PERMISSION = create("msg_err_no_permission")
     val MSG_ERR_BLOCKED_BY_PROTECTION = create("msg_err_blocked_by_protection")
+    val MSG_ERR_CANNOT_SPAWN_ENTITY_HERE = create("msg_err_cannot_spawn_entity_here")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)
