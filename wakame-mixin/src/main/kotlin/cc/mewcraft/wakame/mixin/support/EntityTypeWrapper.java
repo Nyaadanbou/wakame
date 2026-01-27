@@ -21,7 +21,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.AABB;
 import org.bukkit.craftbukkit.entity.CraftEntity;
-import org.bukkit.craftbukkit.entity.CraftEntityType;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -38,54 +37,71 @@ import java.util.function.Consumer;
 @NullMarked
 public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
+    public static final Codec<EntityType<?>> CODEC = ResourceLocation.CODEC.comapFlatMap(EntityTypeWrapper::encode, EntityTypeWrapper::decode);
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final String MYTHICMOBS_NAMESPACE = "mythicmobs";
-    public static final Codec<EntityType<?>> CODEC = ResourceLocation.CODEC.comapFlatMap(
-            id -> {
-                if (id.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)) {
-                    return DataResult.success(BuiltInRegistries.ENTITY_TYPE.getValue(id));
-                } else {
-                    return parse(id);
-                }
-            },
-            entityType -> {
-                if (entityType instanceof EntityTypeWrapper<?> wrapper) {
-                    return wrapper.id;
-                }
-                return BuiltInRegistries.ENTITY_TYPE.getKey(entityType);
-            }
-    );
-
-    private final ResourceLocation id;
-
-    @Nullable
-    private EntityType<T> delegate = null; // make it lazy as MythicMobs is not loaded when this object is instantiated
+    private static final String NAMESPACE = "mythicmobs";
 
     private static <T extends Entity> DataResult<EntityType<T>> parse(ResourceLocation id) {
-        if (id.getNamespace().equals(MYTHICMOBS_NAMESPACE)) {
+        if (id.getNamespace().equals(NAMESPACE)) {
             return DataResult.success(new EntityTypeWrapper<>(id));
         } else {
             return DataResult.error(() -> "Unsupported entity type: " + id);
         }
     }
 
+    private static DataResult<? extends EntityType<?>> encode(ResourceLocation id) {
+        if (id.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)) {
+            return DataResult.success(BuiltInRegistries.ENTITY_TYPE.getValue(id));
+        } else {
+            return parse(id);
+        }
+    }
+
+    private static ResourceLocation decode(EntityType<?> entityType) {
+        if (entityType instanceof EntityTypeWrapper<?> wrapper) {
+            return wrapper.id;
+        } else {
+            return BuiltInRegistries.ENTITY_TYPE.getKey(entityType);
+        }
+    }
+
+    //
+
+    private final ResourceLocation id;
+    @Nullable
+    private EntityType<T> delegate;
+
     private EntityTypeWrapper(ResourceLocation id) {
         super(null, null, false, false, false, false, ImmutableSet.of(), EntityDimensions.scalable(0f, 0f), 0f, 0, 0, "", Optional.empty(), FeatureFlagSet.of());
         this.id = id;
+
+        // 注册当前实例到全局 EntityTypeWrapperObjects, 用于之后热更新 this.delegate
+        EntityTypeWrapperObjects.INSTANCE.register(this);
+    }
+
+    public ResourceLocation getId() {
+        return id;
     }
 
     @SuppressWarnings("unchecked")
     public EntityType<T> getDelegate() {
-        if (delegate == null) {
-            org.bukkit.entity.EntityType entityType = MythicApiProvider.get().getEntityType(PaperAdventure.asAdventure(id));
+        if (this.delegate == null) {
+            // 直接从 MythicBootstrapBridge 获取 NMS EntityType, 避免在 Bootstrap 阶段调用 CraftBukkit 还未初始化的代码
+            // 如果 MythicMobs 生物配置文件写错了 EntityType, 这里会抛出 RuntimeException 来终止服务端启动, 这是符合预期的
+            EntityType<T> entityType = (EntityType<T>) MythicBootstrapBridge.INSTANCE.getEntityType(id);
             if (entityType != null) {
-                delegate = (EntityType<T>) CraftEntityType.bukkitToMinecraft(entityType);
+                this.delegate = entityType;
             } else {
                 LOGGER.error("Could not find MythicMobs entity type {}. Fix you datapack(s) or MythicMobs configs as soon as possible. Fallback to BAT to avoid crash.", id);
-                delegate = (EntityType<T>) EntityType.BAT;
+                this.delegate = (EntityType<T>) EntityType.BAT;
             }
         }
-        return delegate;
+        return this.delegate;
+    }
+
+    @SuppressWarnings("unchecked")
+    public void setDelegate(EntityType<?> delegate) {
+        this.delegate = (EntityType<T>) delegate;
     }
 
     @Override
@@ -115,7 +131,7 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
     @Override
     public boolean canSerialize() {
-        throw new UnsupportedOperationException();
+        return getDelegate().canSerialize();
     }
 
     @Override
@@ -125,7 +141,7 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
     @Override
     public boolean fireImmune() {
-        throw new UnsupportedOperationException();
+        return getDelegate().fireImmune();
     }
 
     @Override
@@ -135,32 +151,32 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
     @Override
     public MobCategory getCategory() {
-        return MobCategory.MONSTER; // FIXME #376: 该函数会在 EntityType 构建时调用, 必须返回一个常量, 具体影响未知
+        return getDelegate().getCategory();
     }
 
     @Override
     public String getDescriptionId() {
-        throw new UnsupportedOperationException();
+        return getDelegate().getDescriptionId();
     }
 
     @Override
     public Component getDescription() {
-        throw new UnsupportedOperationException();
+        return getDelegate().getDescription();
     }
 
     @Override
     public String toString() {
-        throw new UnsupportedOperationException();
+        return getDelegate().toString();
     }
 
     @Override
     public String toShortString() {
-        throw new UnsupportedOperationException();
+        return getDelegate().toShortString();
     }
 
     @Override
     public Optional<ResourceKey<LootTable>> getDefaultLootTable() {
-        throw new UnsupportedOperationException();
+        return getDelegate().getDefaultLootTable();
     }
 
     @Override
@@ -175,7 +191,7 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
     @Override
     public FeatureFlagSet requiredFeatures() {
-        throw new UnsupportedOperationException();
+        return getDelegate().requiredFeatures();
     }
 
     @Override
@@ -193,7 +209,7 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
         // MythicMobs 5.8.2:
         // 在实体被创建时, MythicMobs 会识别这里写入的数据, 将实体变成对应的 MythicMobs 实体
-        MythicApiProvider.get().writeIdMark(bukkitEntity, PaperAdventure.asAdventure(id));
+        MythicPluginBridge.Impl.writeIdMark(bukkitEntity, PaperAdventure.asAdventure(id));
 
         return entity;
     }
