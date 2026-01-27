@@ -13,8 +13,5 @@ enum class CatalogType {
 
     // Custom
 
-    ATTRIBUTE,
-    ELEMENT,
     KIZAMI,
-    RARITY,
 }

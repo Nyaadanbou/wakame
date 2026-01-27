@@ -60,6 +60,13 @@ object KoishStackGenerator {
         return generate2(type, context).clone()
     }
 
+    /**
+     * 清除物品生成缓存.
+     */
+    fun cleanup() {
+        ITEM_STACK_CACHE.clear()
+    }
+
     private fun generate2(type: KoishItem, context: ItemGenerationContext): ItemStack {
         return if (type.dataConfig.randomized()) {
             generate1(type, context)

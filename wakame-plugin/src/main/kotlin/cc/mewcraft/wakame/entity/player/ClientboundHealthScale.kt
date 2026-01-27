@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.entity.player
 
+import cc.mewcraft.lazyconfig.MAIN_CONFIG
+import cc.mewcraft.lazyconfig.access.entryOrElse
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -14,7 +16,9 @@ import org.bukkit.event.player.PlayerJoinEvent
  * 按比例缩放玩家的最大生命值.
  */
 @Init(InitStage.POST_WORLD)
-internal object PlayerMaxHealthScale : Listener {
+internal object ClientboundHealthScale : Listener {
+
+    private val clientboundHealthScale: Double by MAIN_CONFIG.entryOrElse(20.0, "clientbound_health_scale")
 
     @InitFun
     fun init() {
@@ -27,6 +31,6 @@ internal object PlayerMaxHealthScale : Listener {
         // Koish 系统下玩家的最大生命值可以超过 20f,
         // 设置 healthScale 为 20f 避免红星占用过多屏幕
         // 但这也要求需要在其他地方显示玩家的当前/最大生命值
-        player.healthScale = 20.0
+        player.healthScale = clientboundHealthScale
     }
 }

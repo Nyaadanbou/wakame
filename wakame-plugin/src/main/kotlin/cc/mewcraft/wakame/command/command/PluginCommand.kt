@@ -21,6 +21,7 @@ import cc.mewcraft.wakame.init.RecipeInitializer
 import cc.mewcraft.wakame.item.CustomItemRegistryLoader
 import cc.mewcraft.wakame.item.ItemProxyRegistryLoader
 import cc.mewcraft.wakame.item.ItemTagManager
+import cc.mewcraft.wakame.item.KoishStackGenerator
 import cc.mewcraft.wakame.item.display.implementation.crafting_station.CraftingStationItemRenderer
 import cc.mewcraft.wakame.item.display.implementation.merging_table.MergingTableItemRenderer
 import cc.mewcraft.wakame.item.display.implementation.repairing_table.RepairingTableItemRenderer
@@ -112,6 +113,7 @@ private object ReloadProcess {
 
         LootTableRegistryLoader.reload()
 
+        KoishStackGenerator.cleanup()
         CustomItemRegistryLoader.reload()
         ItemProxyRegistryLoader.reload()
 

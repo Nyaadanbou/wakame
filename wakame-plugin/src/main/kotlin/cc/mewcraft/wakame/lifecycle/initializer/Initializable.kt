@@ -19,44 +19,48 @@ internal abstract class Initializable(
     override fun loadDependencies(all: Set<Initializable>, graph: MutableGraph<Initializable>) {
         // this runBefore that
         for (runBeforeName in runBeforeNames) {
-            val runBefore = findInitializableClass(all, runBeforeName)
-            if (runBefore == null) throw IllegalArgumentException("Could not find initializable class '$runBeforeName', which is a runBefore of '${this}'")
-            if (!stage.isPreWorld && runBefore.stage.isPreWorld) {
-                throw IllegalArgumentException("Incompatible stages: '${this}' (post-world) is configured to be initialized before '$runBeforeName' (pre-world)")
+            val target = findInitializableClass(all, runBeforeName)
+                ?: throw IllegalArgumentException("Could not find initializable class '$runBeforeName', which is a runBefore of '$this'")
+
+            if (!stage.isPreWorld && target.stage.isPreWorld) {
+                throw IllegalArgumentException("Incompatible stages: '$this' (post-world) is configured to be initialized before '$runBeforeName' (pre-world)")
             }
 
-            if (runBefore.completion.isCompleted) {
-                throw IllegalArgumentException("'${this}' is configured to be initialized before '$runBeforeName', but '$runBeforeName' is already initialized")
+            if (target.completion.isCompleted) {
+                throw IllegalArgumentException("'$this' is configured to be initialized before '$runBeforeName', but '$runBeforeName' is already initialized")
             }
 
             // stages are compatible, and execution order is already specified through those
-            if (stage != runBefore.stage) {
+            if (stage != target.stage) {
                 continue
             }
 
-            LifecycleUtils.tryPutEdge(graph, this, runBefore)
+            LifecycleUtils.tryPutEdge(graph, this, target)
         }
 
         // this runAfter that
         for (runAfterName in runAfterNames) {
-            val runAfters = HashSet<Initializable>()
             val runAfterClass = findInitializableClass(all, runAfterName)
-            if (runAfterClass == null) throw IllegalArgumentException("Could not find initializable class '$runAfterName', which is a runAfter of '${this}'")
-            runAfters += runAfterClass
-            if (runAfterClass != initClass)
-                runAfters += runAfterClass.initFunctions
+                ?: throw IllegalArgumentException("Could not find initializable class '$runAfterName', which is a runAfter of '$this'")
 
-            for (runAfter in runAfters) {
-                if (stage.isPreWorld && !runAfter.stage.isPreWorld) {
-                    throw IllegalArgumentException("Incompatible stages: '${this}' (pre-world) is configured to be initialized after '$runAfterName' (post-world)")
+            val targets = buildSet<Initializable> {
+                add(runAfterClass)
+                if (runAfterClass != initClass) {
+                    addAll(runAfterClass.initFunctions)
+                }
+            }
+
+            for (target in targets) {
+                if (stage.isPreWorld && !target.stage.isPreWorld) {
+                    throw IllegalArgumentException("Incompatible stages: '$this' (pre-world) is configured to be initialized after '$runAfterName' (post-world)")
                 }
 
                 // stages are compatible, and execution order is already specified through those
-                if (stage != runAfter.stage) {
+                if (stage != target.stage) {
                     continue
                 }
 
-                LifecycleUtils.tryPutEdge(graph, runAfter, this)
+                LifecycleUtils.tryPutEdge(graph, target, this)
             }
         }
     }
@@ -105,9 +109,12 @@ internal class InitializableClass(
             runAfter += stage.runAfter
 
             return InitializableClass(
-                classLoader, clazz,
-                stage.internalStage, (dispatcher ?: LifecycleDispatcher.SYNC).dispatcher,
-                runBefore, runAfter
+                classLoader = classLoader,
+                className = clazz,
+                stage = stage.internalStage,
+                dispatcher = (dispatcher ?: LifecycleDispatcher.SYNC).dispatcher,
+                runBeforeNames = runBefore,
+                runAfterNames = runAfter,
             )
         }
 
@@ -118,9 +125,12 @@ internal class InitializableClass(
             val dependsOn = LifecycleUtils.getStrings("dependsOn", annotation)
 
             return InitializableClass(
-                classLoader, clazz,
-                stage, (dispatcher ?: LifecycleDispatcher.SYNC).dispatcher,
-                emptySet(), dependsOn
+                classLoader = classLoader,
+                className = clazz,
+                stage = stage,
+                dispatcher = (dispatcher ?: LifecycleDispatcher.SYNC).dispatcher,
+                runBeforeNames = emptySet(),
+                runAfterNames = dependsOn,
             )
         }
     }
@@ -136,7 +146,7 @@ internal class InitializableFunction(
     initClass.stage,
     dispatcher,
     runBeforeNames,
-    runAfterNames + initClass.className
+    runAfterNames + initClass.className,
 ) {
 
     override suspend fun run() {
@@ -153,9 +163,11 @@ internal class InitializableFunction(
         fun fromInitAnnotation(clazz: InitializableClass, methodName: String, annotation: Map<String, Any?>): InitializableFunction {
             val (dispatcher, runBefore, runAfter) = LifecycleUtils.getAnnotationCommons(annotation)
             val func = InitializableFunction(
-                clazz, methodName,
-                dispatcher?.dispatcher ?: clazz.dispatcher,
-                runBefore, runAfter
+                initClass = clazz,
+                methodName = methodName,
+                dispatcher = dispatcher?.dispatcher ?: clazz.dispatcher,
+                runBeforeNames = runBefore,
+                runAfterNames = runAfter,
             )
             clazz.initFunctions += func
             return func

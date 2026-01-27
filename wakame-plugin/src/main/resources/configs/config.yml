@@ -134,6 +134,12 @@ teleport_on_join_explicit_server:
   effects:
     - { type: minecraft:slow_falling, duration: 200, amplifier: 1 }
 
+# 给客户端设置的生命值缩放
+clientbound_health_scale: 20.0
+
+# 是否在设置生命值缩放时打印堆栈信息
+print_stack_on_set_health_scale: false
+
 # 在发送 ClientboundUpdateAttributesPacket 封包时移除掉以下属性
 # 目前仅用于配合伤害系统来“移除” ARMOR 和 ARMOR_TOUGHNESS 这两属性
 # 此功能可以带来几个好处:

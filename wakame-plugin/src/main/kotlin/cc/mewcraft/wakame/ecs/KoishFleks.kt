@@ -37,6 +37,7 @@ internal object KoishFleks : Listener, Fleks, FleksPatcher {
         "tick_fragile_enchantment",
         "tick_smelter_enchantment",
         "tick_veinminer_enchantment",
+        "tick_void_escape_enchantment",
         "render_particle"
     ).map(Identifiers::of)
 

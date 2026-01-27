@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.hook.impl.auraskills
 import cc.mewcraft.lazyconfig.MAIN_CONFIG
 import cc.mewcraft.lazyconfig.access.entry
 import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.entity.player.PlayerDataLoadingCoordinator
 import cc.mewcraft.wakame.entity.player.ResourceLoadingFixHandler
 import cc.mewcraft.wakame.integration.Hook
@@ -14,6 +15,7 @@ import cc.mewcraft.wakame.util.event
 import dev.aurelium.auraskills.api.AuraSkillsApi
 import dev.aurelium.auraskills.api.event.user.UserLoadEvent
 import dev.aurelium.auraskills.api.user.SkillsUser
+import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -39,7 +41,7 @@ object AuraSkillsHook : PlayerManaIntegration by AuraPlayerManaIntegration {
     }
 
     private fun registerTraits() {
-        val contentDirectory = KoishDataPaths.CONFIGS.resolve("auraskills").toFile()
+        val contentDirectory = KoishDataPaths.CONFIGS.resolve("hook/auraskills").toFile()
         val koishRegistry = AuraSkillsApi.get().useRegistry("koish", contentDirectory)
 
         koishRegistry.registerTrait(KoishTraits.ATTACK_KNOCKBACK)
@@ -125,7 +127,11 @@ private object AuraPlayerManaIntegration : PlayerManaIntegration {
     }
 
     override fun consumeMana(player: Player, amount: Double): Boolean {
-        return getAuraUser(player).consumeMana(amount)
+        val consumeMana = getAuraUser(player).consumeMana(amount)
+        if (consumeMana) {
+            player.sendActionBar(TranslatableMessages.MSG_MANA_CONSUMED.arguments(Component.text(amount)))
+        }
+        return consumeMana
     }
 
     private fun getAuraUser(player: Player): SkillsUser {

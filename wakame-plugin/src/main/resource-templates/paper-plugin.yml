@@ -76,6 +76,9 @@ dependencies:
     PlotSquared:
       required: false
       load: OMIT
+    Portals:
+      required: false
+      load: OMIT
     QuickShop-Hikari:
       required: false
       load: OMIT # 只监听其事件, 所以顺序无关紧要
