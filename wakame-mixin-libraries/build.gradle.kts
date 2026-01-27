@@ -2,7 +2,7 @@ plugins {
     id("koish.core-conventions")
     id("cc.mewcraft.copy-jar-docker")
     id("io.canvasmc.weaver.userdev")
-    //id("io.canvasmc.horizon")
+    id("io.canvasmc.horizon")
 }
 
 group = "cc.mewcraft.koish"
@@ -24,7 +24,7 @@ dependencies {
     // 可以直接被服务端 (nms) 和 *任意插件* 直接访问.
 
     // Horizon API
-    //horizon.horizonApi(local.versions.horizon.core)
+    horizon.horizonApi(local.versions.horizon.core)
 
     // Paper API + NMS
     paperweight.paperDevBundle(local.versions.paper)
