@@ -94,6 +94,10 @@ object TranslatableMessages {
     val MSG_ERR_NO_NATION_AT_TARGET_SERVER = create("msg_err_no_nation_at_target_server")
     val MSG_ERR_NETWORK_TELEPORT_REQUEST_ALREADY_PENDING = create("msg_err_network_teleport_request_already_pending")
     val MSG_ERR_NETWORK_TELEPORT_REQUEST_EXPIRED = create("msg_err_network_teleport_request_expired")
+    val MSG_ERR_CANNOT_CAPTURE_BABIES = create("msg_err_cannot_capture_babies")
+    val MSG_ERR_CANNOT_CAPTURE_THIS_ENTITY = create("msg_err_cannot_capture_this_entity")
+    val MSG_ERR_NO_PERMISSION = create("msg_err_no_permission")
+    val MSG_ERR_BLOCKED_BY_PROTECTION = create("msg_err_blocked_by_protection")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

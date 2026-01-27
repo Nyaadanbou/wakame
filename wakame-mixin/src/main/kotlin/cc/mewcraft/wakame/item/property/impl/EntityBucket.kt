@@ -11,6 +11,7 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
 @ConfigSerializable
 data class EntityBucket(
     val itemNameFormat: String = "<entity_type>桶",
+    val canCaptureBabies: Boolean = false,
     val allowedEntityTypes: Set<Key> = emptySet(),
 ) {
     companion object {

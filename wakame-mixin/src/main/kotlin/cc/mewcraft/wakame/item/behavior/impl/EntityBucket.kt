@@ -1,14 +1,18 @@
 package cc.mewcraft.wakame.item.behavior.impl
 
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
-import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.behavior.InteractionResult
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.UseEntityContext
 import cc.mewcraft.wakame.item.behavior.UseOnContext
 import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.data.impl.*
+import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
+import cc.mewcraft.wakame.item.removeData
+import cc.mewcraft.wakame.item.setData
 import cc.mewcraft.wakame.util.adventure.plain
 import cc.mewcraft.wakame.util.metadata.Empty
 import cc.mewcraft.wakame.util.metadata.ExpiringValue
@@ -95,19 +99,29 @@ object EntityBucket : ItemBehavior {
         val entityBucketData = itemstack.getData(ItemDataTypes.ENTITY_BUCKET_DATA)
 
         if (!ProtectionManager.canInteractWithEntity(player, entity, itemstack)) {
+            player.sendMessage(TranslatableMessages.MSG_ERR_BLOCKED_BY_PROTECTION)
             return InteractionResult.FAIL
         }
 
-        // 已经是一个装有生物的生物桶了
         if (entityBucketData != null) {
+            // 已经是一个装有生物的生物桶了:
             return InteractionResult.FAIL
         }
 
-        // 检查是否可以捕捉该生物
         val entityTypeKey = entity.type.key
-        if (entityTypeKey !in entityBucket.allowedEntityTypes ||
-            !player.hasPermission("koish.item.behavior.entity_bucket.capture.${entityTypeKey.asString()}")
-        ) {
+        val permissionNode = "koish.item.behavior.entity_bucket.capture.${entityTypeKey.asString()}"
+        if (player.hasPermission(permissionNode).not()) {
+            player.sendMessage(TranslatableMessages.MSG_ERR_NO_PERMISSION.arguments(Component.text(permissionNode)))
+            return InteractionResult.FAIL
+        }
+
+        if ((entityTypeKey !in entityBucket.allowedEntityTypes)) {
+            player.sendMessage(TranslatableMessages.MSG_ERR_CANNOT_CAPTURE_THIS_ENTITY)
+            return InteractionResult.FAIL
+        }
+
+        if (entityBucket.canCaptureBabies.not() && (entity as? Ageable)?.isAdult?.not() == true) {
+            player.sendMessage(TranslatableMessages.MSG_ERR_CANNOT_CAPTURE_BABIES)
             return InteractionResult.FAIL
         }
 
@@ -130,14 +144,6 @@ object EntityBucket : ItemBehavior {
         Metadata.provideForPlayer(player).put(JUST_BUCKETED_ENTITY, ExpiringValue.of(Empty.instance(), 1, TimeUnit.SECONDS))
         // 捕捉成功应该取消掉交互事件
         return InteractionResult.SUCCESS_AND_CANCEL
-    }
-
-    private fun hasEntityBucketBehavior(itemstack: ItemStack): Boolean {
-        return itemstack.hasProp(ItemPropTypes.ENTITY_BUCKET)
-    }
-
-    private fun hasEntityBucketData(itemstack: ItemStack): Boolean {
-        return itemstack.hasData(ItemDataTypes.ENTITY_BUCKET_DATA)
     }
 
     private fun asEntityBucket(itemstack: ItemStack, clicked: Entity, player: Player) {
