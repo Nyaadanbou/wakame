@@ -16,6 +16,7 @@ import org.bukkit.event.Listener
 import java.io.File
 
 object ConfigListener : Listener {
+
     @EventHandler
     fun on(e: MythicConditionLoadEvent) {
         when (e.conditionName.lowercase()) {
