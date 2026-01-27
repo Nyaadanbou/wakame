@@ -90,7 +90,7 @@ msg_err_network_teleport_request_already_pending: "<red>你已经有一个跨位
 msg_err_network_teleport_request_expired: "<red>你的跨位面传送请求刚刚过期了."
 msg_err_cannot_capture_babies: "<red>无法捕捉幼体."
 msg_err_cannot_capture_this_entity: "<red>无法捕捉该实体."
-msg_err_no_permission: "<red>你没有权限这么做. <gray>(缺少: <arg:0>)"
+msg_err_no_permission: "<red>你没有权限这么做.</red> (缺少: <arg:0>)"
 msg_err_blocked_by_protection: "<red>你不能在当前区域这么做."
 
 # 像这样制定一个数字的格式, '#' 是 Java 的 DecimalFormat 的语法
