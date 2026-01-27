@@ -15,6 +15,9 @@ nyaadanbou-repository = "0.0.1-snapshot"
 paperweight = "2.0.0-beta.17"
 shadow = "9.2.2"
 spotless = "7.0.4"
+weaver = "2.3.12"
+horizon = "1.0.0-beta.10"
+horizon-core = "1.0.0-beta.local"
 
 # Shaded dependencies
 
@@ -104,6 +107,7 @@ plugin-blossom = { group = "net.kyori", name = "blossom", version.ref = "blossom
 plugin-copy-jar-build = { group = "cc.mewcraft.gradle", name = "copy-jar-build-plugin", version.ref = "copy-jar-build" }
 plugin-copy-jar-docker = { group = "cc.mewcraft.gradle", name = "copy-jar-docker-plugin", version.ref = "copy-jar-docker" }
 plugin-gremlin-gradle = { group = "xyz.jpenilla", name = "gremlin-gradle", version.ref = "gremlin" }
+plugin-horizon = { group = "io.canvasmc.horizon", name = "io.canvasmc.horizon.gradle.plugin", version.ref = "horizon" }
 plugin-indra-common = { group = "net.kyori", name = "indra-common", version.ref = "indra" }
 plugin-indra-licenser-spotless = { group = "net.kyori", name = "indra-licenser-spotless", version.ref = "indra" }
 plugin-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -112,6 +116,7 @@ plugin-nyaadanbou-repository = { group = "cc.mewcraft.gradle", name = "nyaadanbo
 plugin-paperweight-userdev = { group = "io.papermc.paperweight", name = "paperweight-userdev", version.ref = "paperweight" }
 plugin-shadow = { group = "com.gradleup.shadow", name = "com.gradleup.shadow.gradle.plugin", version.ref = "shadow" }
 plugin-spotless = { group = "com.diffplug.spotless", name = "com.diffplug.spotless.gradle.plugin", version.ref = "spotless" }
+plugin-weaver = { group = "io.canvasmc.weaver.userdev", name = "io.canvasmc.weaver.userdev.gradle.plugin", version.ref = "weaver" }
 
 # Shaded dependencies
 # 这些依赖属于插件本身, 将打包进插件的 JAR
@@ -189,19 +194,20 @@ adventure-text-serializer-legacy = { group = "net.kyori", name = "adventure-text
 adventure-text-serializer-plain = { group = "net.kyori", name = "adventure-text-serializer-plain", version.ref = "adventure" }
 fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
+netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
+snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version.ref = "snakeyaml-engine" }
+#
+
 ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-debug = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-debug", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 mixin = { group = "org.spongepowered", name = "mixin", version.ref = "mixin" }
 mixin-extras = { group = "io.github.llamalad7", name = "mixinextras-common", version.ref = "mixin-extras" }
-netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 shadow-bukkit = { group = "cc.mewcraft", name = "shadow-bukkit", version.ref = "shadow-bukkit" }
 shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }
-snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version.ref = "snakeyaml-engine" }
 velocity-api = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
-#
 
 # Plugin dependencies
 # 这些依赖属于插件, 无论是自研的还是第三方的

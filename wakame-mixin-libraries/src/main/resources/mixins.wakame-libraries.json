@@ -1,9 +1,0 @@
-{
-  "required": true,
-  "minVersion": "0.8.7",
-  "package": "cc.mewcraft.koish.libs.core",
-  "plugin": "cc.mewcraft.koish.libs.plugin.CorePlugin",
-  "target": "@env(DEFAULT)",
-  "compatibilityLevel": "JAVA_21",
-  "server": []
-}
