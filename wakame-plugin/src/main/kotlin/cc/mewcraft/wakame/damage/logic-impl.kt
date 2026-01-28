@@ -52,11 +52,13 @@ import org.bukkit.entity.Arrow
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.FallingBlock
+import org.bukkit.entity.Horse
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
 import org.bukkit.entity.SpectralArrow
 import org.bukkit.entity.Trident
+import org.bukkit.entity.Wolf
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ABSORPTION
 import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ARMOR
@@ -208,7 +210,17 @@ internal object DamageManagerImpl : DamageManagerApi {
      * 包含所有与 Bukkit 伤害事件交互的逻辑.
      */
     override fun injectDamageLogic(event: EntityDamageEvent, originLastHurt: Float, isDuringInvulnerable: Boolean): Float {
-        val finalDamageContext = handleKoishDamageCalculationLogic(event)
+        if (event.entity !is LivingEntity) {
+            // 不可能在这里return
+            // 因为该方法只会注入到 LivingEntity 类中, 调用时伤害事件中的 Entity 必然是 LivingEntity
+            // 保险起见照抄后续的取消事件代码
+            event.isCancelled = true
+            return originLastHurt
+        }
+
+        // 提取 Bukkit 伤害事件中的有用信息生成上下文
+        val rawDamageContext = RawDamageContext(event)
+        val finalDamageContext = handleKoishDamageCalculationLogic(rawDamageContext)
         if (finalDamageContext == null) {
             // Bukkit 伤害事件被取消, 后续服务端中的 actuallyHurt 方法会返回false
             // LivingEntity#lastHurt 变量其实不会被设置, 保险起见返回 originLastHurt
@@ -234,7 +246,7 @@ internal object DamageManagerImpl : DamageManagerApi {
                 // 同上保险起见返回 originLastHurt
                 return originLastHurt
             }
-            handleKoishDamagePostprocessLogic(finalDamageContext)
+            handleKoishDamagePostprocessLogic(rawDamageContext, finalDamageContext)
 
             // 修改 BASE 伤害
             // 由于原版中某些伤害附带效果只能通过相应修饰器实现, 如增加相应统计信息/扣除黄心等
@@ -251,8 +263,24 @@ internal object DamageManagerImpl : DamageManagerApi {
         }
     }
 
-    private fun handleKoishDamagePostprocessLogic(finalDamageContext: FinalDamageContext) {
-        // TODO
+    private fun handleKoishDamagePostprocessLogic(rawDamageContext: RawDamageContext, finalDamageContext: FinalDamageContext) {
+        val damageType = rawDamageContext.damageSource.damageType
+        val damagee = rawDamageContext.damagee
+        // 扣除盔甲耐久
+        if (!bypassesHurtEquipment(damageType)) {
+            when (damagee){
+                is Player -> {
+
+                }
+                is Wolf, is Horse ->{
+
+                }
+            }
+        }
+    }
+
+    private fun hurtEquipment(){
+
     }
 
     /**
@@ -260,13 +288,9 @@ internal object DamageManagerImpl : DamageManagerApi {
      *
      * 返回 `null` 意思是伤害事件应该要被取消.
      */
-    private fun handleKoishDamageCalculationLogic(event: EntityDamageEvent): FinalDamageContext? {
+    private fun handleKoishDamageCalculationLogic(rawDamageContext: RawDamageContext): FinalDamageContext? {
         // 只处理伤害承受者是生物的情况
         // TODO 考虑非生物
-        val damagee = event.entity as? LivingEntity ?: return null
-
-        // 提取 Bukkit 伤害事件中的有用信息生成上下文
-        val rawDamageContext = RawDamageContext(event)
 
         // 计算攻击阶段的伤害信息
         // 考虑伤害发起者对伤害值的各种影响
@@ -852,8 +876,11 @@ internal object DamageManagerImpl : DamageManagerApi {
         val force = registeredProjectileDamage?.force ?: 1.0
         val damageBundle = run {
             val itemstack = abstractArrow.itemStack
-            // FIXME 未考虑三叉戟
-            if (!itemstack.hasProp(ItemPropTypes.ARROW)) return null
+            if (abstractArrow is Trident) {
+                if (!itemstack.hasProp(ItemPropTypes.MINECRAFT_TRIDENT)) return null
+            } else {
+                if (!itemstack.hasProp(ItemPropTypes.ARROW)) return null
+            }
             val itemcores = itemstack.coreContainer ?: return null
             val modifiersOnArrow = itemcores.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
 

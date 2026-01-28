@@ -23,6 +23,7 @@ data class Mace(
 data class Melee(
     val attackCooldown: Int = 20,
 )
+
 /**
  * 原版三叉戟 武器的配置.
  *
