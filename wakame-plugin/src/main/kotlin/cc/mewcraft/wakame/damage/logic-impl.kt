@@ -23,16 +23,22 @@ import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.item.behavior.getBehavior
 import cc.mewcraft.wakame.item.behavior.impl.weapon.Weapon
 import cc.mewcraft.wakame.item.extension.coreContainer
+import cc.mewcraft.wakame.item.extension.damageItem
 import cc.mewcraft.wakame.item.hasProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.handle
+import cc.mewcraft.wakame.util.item.isDamageable
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.serverLevel
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.registry.RegistryAccess
+import io.papermc.paper.registry.RegistryKey
+import io.papermc.paper.registry.TypedKey
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import net.kyori.adventure.extra.kotlin.join
@@ -71,6 +77,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.MAGIC
 import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.RESISTANCE
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.commons.collections.enumSetOf
 import xyz.xenondevs.commons.provider.map
@@ -90,7 +97,7 @@ private val DAMAGE_CONFIG = ConfigAccess["damage/config"]
 private val PLAYER_INTRINSIC_ATTACK_COOLDOWN by DAMAGE_CONFIG.optionalEntry<Long>("player_intrinsic_attack_cooldown").orElse(5L).map { it * 50L }
 private val EQUIPMENT_CONFIG = DAMAGE_CONFIG.node("equipment")
 private val EQUIPMENT_NO_DURABILITY_LOSS_DAMAGE_TYPES by EQUIPMENT_CONFIG.optionalEntry<List<DamageType>>("no_durability_loss_damage_types").orElse(emptyList())
-private val EQUIPMENT_AMOUNT_PER_DAMAGE by EQUIPMENT_CONFIG.optionalEntry<Float>("amount_per_damage").orElse(0.25f)
+private val EQUIPMENT_AMOUNT_PER_DAMAGE by EQUIPMENT_CONFIG.optionalEntry<Double>("amount_per_damage").orElse(0.25)
 private val EQUIPMENT_MIN_AMOUNT by EQUIPMENT_CONFIG.optionalEntry<Int>("min_amount").orElse(1)
 private val EQUIPMENT_MAX_AMOUNT by EQUIPMENT_CONFIG.optionalEntry<Int>("max_amount").orElse(Int.MAX_VALUE)
 
@@ -268,19 +275,49 @@ internal object DamageManagerImpl : DamageManagerApi {
         val damagee = rawDamageContext.damagee
         // 扣除盔甲耐久
         if (!bypassesHurtEquipment(damageType)) {
-            when (damagee){
+            when (damagee) {
                 is Player -> {
-
+                    doHurtEquipment(rawDamageContext, finalDamageContext, listOf(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET))
                 }
-                is Wolf, is Horse ->{
 
+                is Wolf, is Horse -> {
+                    doHurtEquipment(rawDamageContext, finalDamageContext, listOf(EquipmentSlot.BODY))
                 }
             }
         }
     }
 
-    private fun hurtEquipment(){
+    private fun doHurtEquipment(rawDamageContext: RawDamageContext, finalDamageContext: FinalDamageContext, slots: List<EquipmentSlot>) {
+        val finalDamage = finalDamageContext.finalDamage
+        val damagee = rawDamageContext.damagee
+        val damageType = rawDamageContext.damageSource.damageType
+        if (finalDamage > 0) {
+            val entityEquipment = damagee.equipment ?: return
+            val registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.DAMAGE_TYPE)
+            for (equipmentSlot in slots) {
+                val itemStack = entityEquipment.getItem(equipmentSlot)
+                if (!itemStack.isDamageable) return
 
+                val equippable = itemStack.getData(DataComponentTypes.EQUIPPABLE) ?: return
+                if (!equippable.damageOnHurt()) return
+
+                val damageResistant = itemStack.getData(DataComponentTypes.DAMAGE_RESISTANT)
+                val canBeHurtBy = if (damageResistant == null) {
+                    true
+                } else {
+                    val tagKey = damageResistant.types()
+                    if (!registry.hasTag(tagKey)) {
+                        true
+                    } else {
+                        !registry.getTag(tagKey).contains(TypedKey.create(RegistryKey.DAMAGE_TYPE, damageType.key()))
+                    }
+                }
+                if (canBeHurtBy) {
+                    val amount = (finalDamage * EQUIPMENT_AMOUNT_PER_DAMAGE).toInt().coerceIn(EQUIPMENT_MIN_AMOUNT, EQUIPMENT_MAX_AMOUNT).coerceAtLeast(0)
+                    damagee.damageItemStack(equipmentSlot, amount)
+                }
+            }
+        }
     }
 
     /**

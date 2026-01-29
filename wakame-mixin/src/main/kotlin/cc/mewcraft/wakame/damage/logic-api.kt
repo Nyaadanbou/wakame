@@ -163,4 +163,10 @@ class FinalDamageContext(
      * 真正意义上的"最终", 可直接显示给玩家.
      */
     val finalDamageMap: Reference2DoubleMap<RegistryEntry<Element>>,
-)
+){
+
+    /**
+     * 最终伤害的值 (即各元素的最终伤害的简单相加).
+     */
+    val finalDamage: Double = finalDamageMap.values.sum()
+}
