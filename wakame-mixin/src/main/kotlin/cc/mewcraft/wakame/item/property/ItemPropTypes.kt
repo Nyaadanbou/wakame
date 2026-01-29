@@ -393,6 +393,18 @@ data object ItemPropTypes {
     @JvmField
     val GLIDING_EXTRAS = typeOf<GlidingExtras>("gliding_extras")
 
+    /**
+     * 目标服务器的名字. 用于转移玩家到其他服务器 (连接到同一 BungeeCord / Velocity 网络内).
+     */
+    @JvmField
+    val CONNECT = typeOf<String>("connect")
+
+    /**
+     * 目标服务器的地址. 用于转移玩家到其他服务器 (连接到不同的服务器网络).
+     */
+    @JvmField
+    val TRANSFER = typeOf<Transfer>("transfer")
+
     // ------------
     // 方便函数
     // ------------

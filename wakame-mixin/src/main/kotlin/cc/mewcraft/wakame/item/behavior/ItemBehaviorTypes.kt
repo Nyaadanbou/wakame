@@ -177,6 +177,18 @@ object ItemBehaviorTypes {
     @JvmField
     val WORLD_WEATHER_CONTROL = typeOf("world_weather_control", WorldWeatherControl)
 
+    /**
+     * 物品具有该行为时, 可以将玩家转移到指定的服务器 (BungeeCord / Velocity 网络内).
+     */
+    @JvmField
+    val CONNECT = typeOf("connect", Connect)
+
+    /**
+     * 物品具有该行为时, 可以将玩家转移到指定的服务器 (Transfer).
+     */
+    @JvmField
+    val TRANSFER = typeOf("transfer", Transfer)
+
     // ------------
     // 方便函数
     // ------------
