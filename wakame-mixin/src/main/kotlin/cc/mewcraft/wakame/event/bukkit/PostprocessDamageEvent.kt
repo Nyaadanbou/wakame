@@ -56,7 +56,7 @@ class PostprocessDamageEvent(
      * 获取本次伤害事件的最终伤害的值 (即各元素的最终伤害的简单相加).
      */
     val finalDamage: Double
-        get() = finalDamageContext.finalDamageMap.values.sum()
+        get() = finalDamageContext.finalDamage
 
     /**
      * 获取一个包含了每种元素的最终伤害值的映射.
