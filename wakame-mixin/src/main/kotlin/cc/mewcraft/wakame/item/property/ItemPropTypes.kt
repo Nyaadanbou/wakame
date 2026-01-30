@@ -21,6 +21,7 @@ import cc.mewcraft.wakame.item.property.impl.EntityExtraLootEntry
 import cc.mewcraft.wakame.item.property.impl.ExtraLoot
 import cc.mewcraft.wakame.item.property.impl.ExtraLore
 import cc.mewcraft.wakame.item.property.impl.Fuel
+import cc.mewcraft.wakame.item.property.impl.GlidingExtras
 import cc.mewcraft.wakame.item.property.impl.HoldLastDamage
 import cc.mewcraft.wakame.item.property.impl.ItemBase
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
@@ -29,6 +30,7 @@ import cc.mewcraft.wakame.item.property.impl.LiquidCollisionBlockSettings
 import cc.mewcraft.wakame.item.property.impl.OpenCatalog
 import cc.mewcraft.wakame.item.property.impl.OpenExternalMenu
 import cc.mewcraft.wakame.item.property.impl.TownyFlight
+import cc.mewcraft.wakame.item.property.impl.Transfer
 import cc.mewcraft.wakame.item.property.impl.WorldTimeControl
 import cc.mewcraft.wakame.item.property.impl.WorldWeatherControl
 import cc.mewcraft.wakame.item.property.impl.weapon.DualSword

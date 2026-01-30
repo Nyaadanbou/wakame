@@ -1,10 +1,12 @@
 package cc.mewcraft.wakame.item.behavior
 
 import cc.mewcraft.wakame.item.behavior.impl.Castable
+import cc.mewcraft.wakame.item.behavior.impl.Connect
 import cc.mewcraft.wakame.item.behavior.impl.EntityBucket
 import cc.mewcraft.wakame.item.behavior.impl.HoldLastDamage
 import cc.mewcraft.wakame.item.behavior.impl.OpenCatalog
 import cc.mewcraft.wakame.item.behavior.impl.TownyFlight
+import cc.mewcraft.wakame.item.behavior.impl.Transfer
 import cc.mewcraft.wakame.item.behavior.impl.WorldTimeControl
 import cc.mewcraft.wakame.item.behavior.impl.WorldWeatherControl
 import cc.mewcraft.wakame.item.behavior.impl.external.BrewRecipe
