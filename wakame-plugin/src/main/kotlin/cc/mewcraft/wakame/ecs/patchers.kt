@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.ecs
 
-import cc.mewcraft.wakame.ecs.system.RenderParticle
 import cc.mewcraft.wakame.enchantment.system.*
 import cc.mewcraft.wakame.entity.attribute.system.ApplyAttributeEffects
 import cc.mewcraft.wakame.entity.attribute.system.InitAttributeContainer
@@ -26,11 +25,7 @@ object AttributeFleksPatcher : FleksPatcher {
 
 @Init(InitStage.PRE_FLEKS)
 object CommonFleksPatcher : FleksPatcher {
-
-    @InitFun
-    fun init() {
-        addToRegistrySystem("render_particle") { RenderParticle } // 渲染粒子效果
-    }
+    // ParticleManager 已通过事件监听器自动处理粒子渲染，无需注册系统
 }
 
 @Init(InitStage.PRE_FLEKS)

@@ -16,8 +16,8 @@ import cc.mewcraft.wakame.item.setData
 import cc.mewcraft.wakame.util.adventure.plain
 import cc.mewcraft.wakame.util.metadata.Empty
 import cc.mewcraft.wakame.util.metadata.ExpiringValue
-import cc.mewcraft.wakame.util.metadata.Metadata
 import cc.mewcraft.wakame.util.metadata.MetadataKey
+import cc.mewcraft.wakame.util.metadata.metadata
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.CustomModelData
 import net.kyori.adventure.text.Component
@@ -58,7 +58,7 @@ object EntityBucket : ItemBehavior {
             return InteractionResult.FAIL
         }
 
-        if (Metadata.provideForPlayer(player).has(JUST_BUCKETED_ENTITY)) {
+        if (player.metadata().has(JUST_BUCKETED_ENTITY)) {
             return InteractionResult.FAIL
         }
 
@@ -146,7 +146,7 @@ object EntityBucket : ItemBehavior {
         // 移除实体
         entity.remove()
         // 标记玩家已捕捉过生物
-        Metadata.provideForPlayer(player).put(JUST_BUCKETED_ENTITY, ExpiringValue.of(Empty.instance(), 1, TimeUnit.SECONDS))
+        player.metadata().put(JUST_BUCKETED_ENTITY, ExpiringValue.of(Empty.instance(), 1, TimeUnit.SECONDS))
         // 捕捉成功应该取消掉交互事件
         return InteractionResult.SUCCESS_AND_CANCEL
     }

@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.util.ui
 
 import cc.mewcraft.wakame.util.cooldown.Cooldown
-import cc.mewcraft.wakame.util.metadata.Metadata
 import cc.mewcraft.wakame.util.metadata.MetadataKey
+import cc.mewcraft.wakame.util.metadata.metadata
 import org.bukkit.entity.Player
 import java.util.concurrent.TimeUnit
 
@@ -17,7 +17,7 @@ fun whisper(
  */
 object WhisperActionExecutor {
     fun execute(player: Player, key: MetadataKey<Cooldown>, def: Long, action: Player.() -> Unit) {
-        val cooldown = Metadata.provideForPlayer(player).getOrPut(key) { Cooldown.of(def, TimeUnit.SECONDS) }
+        val cooldown = player.metadata().getOrPut(key) { Cooldown.of(def, TimeUnit.SECONDS) }
         if (cooldown.test()) {
             action(player)
         }

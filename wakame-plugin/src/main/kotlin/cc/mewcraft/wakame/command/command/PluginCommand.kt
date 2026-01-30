@@ -17,6 +17,7 @@ import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.ImgAttributeMapRegistryLoader
 import cc.mewcraft.wakame.entity.typeref.EntityRefRegistryLoader
 import cc.mewcraft.wakame.gui.BasicGuiInitializer
+import cc.mewcraft.wakame.gui.catalog.item.CatalogItemMenuStacks
 import cc.mewcraft.wakame.init.RecipeInitializer
 import cc.mewcraft.wakame.item.CustomItemRegistryLoader
 import cc.mewcraft.wakame.item.ItemProxyRegistryLoader
@@ -136,6 +137,7 @@ private object ReloadProcess {
         CatalogItemMenuSettings.reload()
         CatalogItemLootTableRecipeRegistryLoader.reload()
         CatalogItemCategoryRegistryLoader.reload()
+        CatalogItemMenuStacks.clearStacks()
 
         AttackCharacteristicDamageMappings.reload()
         DamageTypeDamageMappings.reload()
