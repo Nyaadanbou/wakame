@@ -1,6 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
-package cc.mewcraft.wakame.ecs.data
+package cc.mewcraft.wakame.particle
 
 import io.papermc.paper.math.Position
 import org.bukkit.block.BlockFace

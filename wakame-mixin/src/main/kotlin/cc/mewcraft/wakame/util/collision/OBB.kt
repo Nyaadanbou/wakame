@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.util.collision
 
-import cc.mewcraft.wakame.ecs.Fleks
-import cc.mewcraft.wakame.ecs.component.ParticleEffect
-import cc.mewcraft.wakame.ecs.data.LinePath
-import cc.mewcraft.wakame.ecs.data.ParticleConfiguration
+import cc.mewcraft.wakame.particle.LinePath
+import cc.mewcraft.wakame.particle.ParticleConfiguration
+import cc.mewcraft.wakame.particle.ParticleEffect
+import cc.mewcraft.wakame.particle.ParticleManager
 import cc.mewcraft.wakame.util.*
 import com.destroystokyo.paper.ParticleBuilder
 import org.bukkit.Particle
@@ -105,22 +105,23 @@ data class OBB(
         for ((i, j) in edges) {
             val start = vertices[i]
             val end = vertices[j]
-            Fleks.INSTANCE.createEntity {
-                it += ParticleEffect(
-                    world = viewer.world,
+            ParticleManager.addEffect(
+                viewer.world,
+                ParticleEffect(
+                    viewer.world,
                     ParticleConfiguration(
-                        builderProvider = { loc ->
+                        builder = { loc ->
                             ParticleBuilder(Particle.END_ROD)
                                 .location(loc)
                                 .receivers(listOf(viewer))
                                 .extra(.0)
                         },
-                        particlePath = LinePath(start, end),
-                        amount = (start.distance(end) / 0.25).toInt(),
+                        path = LinePath(start, end),
+                        count = (start.distance(end) / 0.25).toInt(),
                         times = 1
                     )
                 )
-            }
+            )
         }
     }
 
