@@ -100,4 +100,8 @@ object CatalogItemMenuStacks {
     internal fun removeStack(player: Player) {
         menuStackMap.invalidate(player)
     }
+
+    internal fun clearStacks() {
+        menuStackMap.invalidateAll()
+    }
 }
