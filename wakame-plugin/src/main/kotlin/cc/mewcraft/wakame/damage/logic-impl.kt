@@ -23,22 +23,19 @@ import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.item.behavior.getBehavior
 import cc.mewcraft.wakame.item.behavior.impl.weapon.Weapon
 import cc.mewcraft.wakame.item.extension.coreContainer
-import cc.mewcraft.wakame.item.extension.damageItem
 import cc.mewcraft.wakame.item.hasProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.handle
+import cc.mewcraft.wakame.util.isResistantTo
 import cc.mewcraft.wakame.util.item.isDamageable
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.serverLevel
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import io.papermc.paper.datacomponent.DataComponentTypes
-import io.papermc.paper.registry.RegistryAccess
-import io.papermc.paper.registry.RegistryKey
-import io.papermc.paper.registry.TypedKey
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import net.kyori.adventure.extra.kotlin.join
@@ -200,20 +197,6 @@ internal object DamageManagerImpl : DamageManagerApi {
     }
 
     /**
-     * 判定某次伤害是否会使盔甲损失耐久度.
-     */
-    override fun bypassesHurtEquipment(damageType: DamageType): Boolean {
-        return EQUIPMENT_NO_DURABILITY_LOSS_DAMAGE_TYPES.contains(damageType)
-    }
-
-    /**
-     * 计算单次伤害下盔甲的耐久损失.
-     */
-    override fun computeEquipmentHurtAmount(damageAmount: Float): Int {
-        return (damageAmount * EQUIPMENT_AMOUNT_PER_DAMAGE).toInt().coerceIn(EQUIPMENT_MIN_AMOUNT, EQUIPMENT_MAX_AMOUNT).coerceAtLeast(0)
-    }
-
-    /**
      * 包含所有与 Bukkit 伤害事件交互的逻辑.
      */
     override fun injectDamageLogic(event: EntityDamageEvent, originLastHurt: Float, isDuringInvulnerable: Boolean): Float {
@@ -270,10 +253,16 @@ internal object DamageManagerImpl : DamageManagerApi {
         }
     }
 
+    /**
+     * Koish 伤害系统在伤害确定造成后, 处理相关伤害效果的逻辑.
+     *
+     * 类似服务端伤害相关代码中的 actuallyHurt, 处理盔甲耐久度损失, 统计信息等.
+     */
     private fun handleKoishDamagePostprocessLogic(rawDamageContext: RawDamageContext, finalDamageContext: FinalDamageContext) {
         val damageType = rawDamageContext.damageSource.damageType
         val damagee = rawDamageContext.damagee
-        // 扣除盔甲耐久
+
+        // 1. 扣除盔甲耐久
         if (!bypassesHurtEquipment(damageType)) {
             when (damagee) {
                 is Player -> {
@@ -285,15 +274,25 @@ internal object DamageManagerImpl : DamageManagerApi {
                 }
             }
         }
+
+        // 2. ...(未来可能引入更多)
     }
 
+    /**
+     * 判定某次伤害是否会使盔甲损失耐久度.
+     */
+    fun bypassesHurtEquipment(damageType: DamageType): Boolean {
+        return EQUIPMENT_NO_DURABILITY_LOSS_DAMAGE_TYPES.contains(damageType)
+    }
+
+    /**
+     * 实体受伤时扣除所装备盔甲耐久度的逻辑.
+     */
     private fun doHurtEquipment(rawDamageContext: RawDamageContext, finalDamageContext: FinalDamageContext, slots: List<EquipmentSlot>) {
         val finalDamage = finalDamageContext.finalDamage
         val damagee = rawDamageContext.damagee
-        val damageType = rawDamageContext.damageSource.damageType
         if (finalDamage > 0) {
             val entityEquipment = damagee.equipment ?: return
-            val registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.DAMAGE_TYPE)
             for (equipmentSlot in slots) {
                 val itemStack = entityEquipment.getItem(equipmentSlot)
                 if (!itemStack.isDamageable) return
@@ -302,17 +301,7 @@ internal object DamageManagerImpl : DamageManagerApi {
                 if (!equippable.damageOnHurt()) return
 
                 val damageResistant = itemStack.getData(DataComponentTypes.DAMAGE_RESISTANT)
-                val canBeHurtBy = if (damageResistant == null) {
-                    true
-                } else {
-                    val tagKey = damageResistant.types()
-                    if (!registry.hasTag(tagKey)) {
-                        true
-                    } else {
-                        !registry.getTag(tagKey).contains(TypedKey.create(RegistryKey.DAMAGE_TYPE, damageType.key()))
-                    }
-                }
-                if (canBeHurtBy) {
+                if (damageResistant == null || !damageResistant.isResistantTo(rawDamageContext.damageSource)) {
                     val amount = (finalDamage * EQUIPMENT_AMOUNT_PER_DAMAGE).toInt().coerceIn(EQUIPMENT_MIN_AMOUNT, EQUIPMENT_MAX_AMOUNT).coerceAtLeast(0)
                     damagee.damageItemStack(equipmentSlot, amount)
                 }
@@ -321,7 +310,7 @@ internal object DamageManagerImpl : DamageManagerApi {
     }
 
     /**
-     * Koish 伤害系统对伤害进行修改的逻辑.
+     * Koish 伤害系统对伤害进行计算并修改的逻辑.
      *
      * 返回 `null` 意思是伤害事件应该要被取消.
      */
@@ -917,11 +906,11 @@ internal object DamageManagerImpl : DamageManagerApi {
                 if (!itemstack.hasProp(ItemPropTypes.MINECRAFT_TRIDENT)) return null
             } else {
                 if (!itemstack.hasProp(ItemPropTypes.ARROW)) return null
+                // 只有箭矢/光灵箭才需要加上物品上的属性
+                val itemcores = itemstack.coreContainer ?: return null
+                val modifiersOnArrow = itemcores.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
+                attributes.addTransientModifiers(modifiersOnArrow)
             }
-            val itemcores = itemstack.coreContainer ?: return null
-            val modifiersOnArrow = itemcores.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
-
-            attributes.addTransientModifiers(modifiersOnArrow)
             damageBundle(attributes) {
                 every {
                     standard()

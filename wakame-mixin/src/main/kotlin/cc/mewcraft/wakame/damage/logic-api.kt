@@ -6,10 +6,12 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import org.bukkit.damage.DamageSource
-import org.bukkit.damage.DamageType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.*
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ABSORPTION
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BASE
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BLOCKING
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.RESISTANCE
 import org.jetbrains.annotations.ApiStatus
 
 
@@ -46,16 +48,6 @@ interface DamageManagerApi {
     ): Float
 
     /**
-     * 将插入到原版盔甲损失耐久度判定处.
-     */
-    fun bypassesHurtEquipment(damageType: DamageType): Boolean
-
-    /**
-     * 将插入到原版盔甲损失耐久度值计算处.
-     */
-    fun computeEquipmentHurtAmount(damageAmount: Float): Int
-
-    /**
      * 伴生对象, 提供 [DamageManagerApi] 的实例.
      */
     companion object Implementation : DamageManagerApi {
@@ -65,8 +57,6 @@ interface DamageManagerApi {
         private var implementation: DamageManagerApi = object : DamageManagerApi {
             override fun hurt(victim: LivingEntity, metadata: DamageMetadata, source: DamageSource, knockback: Boolean): Boolean = false
             override fun injectDamageLogic(event: EntityDamageEvent, originLastHurt: Float, isDuringInvulnerable: Boolean): Float = PLACEHOLDER_DAMAGE_VALUE
-            override fun bypassesHurtEquipment(damageType: DamageType): Boolean = false
-            override fun computeEquipmentHurtAmount(damageAmount: Float): Int = 0
         }
 
         @ApiStatus.Internal
@@ -80,14 +70,6 @@ interface DamageManagerApi {
 
         override fun injectDamageLogic(event: EntityDamageEvent, originLastHurt: Float, isDuringInvulnerable: Boolean): Float {
             return implementation.injectDamageLogic(event, originLastHurt, isDuringInvulnerable)
-        }
-
-        override fun bypassesHurtEquipment(damageType: DamageType): Boolean {
-            return implementation.bypassesHurtEquipment(damageType)
-        }
-
-        override fun computeEquipmentHurtAmount(damageAmount: Float): Int {
-            return implementation.computeEquipmentHurtAmount(damageAmount)
         }
     }
 }

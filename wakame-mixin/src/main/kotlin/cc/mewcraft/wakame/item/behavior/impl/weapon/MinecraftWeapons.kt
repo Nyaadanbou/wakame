@@ -56,6 +56,7 @@ object Crossbow : Weapon {
  * 原版重锤 武器行为.
  *
  * 相较于原版的改动:
+ * 只有造成伤害才会进入冷却.
  * 伤害率会额外增加 下落高度 * [cc.mewcraft.wakame.item.property.impl.weapon.Mace.attackDamageRatePerFallDistance].
  * 增加上限为 [cc.mewcraft.wakame.item.property.impl.weapon.Mace.attackDamageRateLimit].
  */
@@ -81,8 +82,7 @@ object Mace : Weapon {
  * 原版近战(斧, 镐, 锄等单体武器) 武器行为.
  *
  * 相较于原版的改动:
- * 只有攻击(默认左键)实体才会进入冷却.
- * 攻击方块、空气不会进入冷却.
+ * 只有造成伤害才会进入冷却.
  */
 object Melee : Weapon {
     override fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
@@ -104,8 +104,7 @@ object Melee : Weapon {
  *
  * 相较于原版的改动:
  * 副手无法使用.
- * 只有攻击(默认左键)实体才会进入冷却.
- * 攻击方块、空气不会进入冷却.
+ * 只有造成伤害才会进入冷却.
  */
 object Trident : Weapon {
     // 禁止副手交互三叉戟
