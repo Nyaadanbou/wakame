@@ -2,10 +2,8 @@
 
 package cc.mewcraft.wakame.particle
 
-import cc.mewcraft.wakame.util.metadata.getMetaOrNull
+import cc.mewcraft.wakame.util.metadata.metadata
 import cc.mewcraft.wakame.util.metadata.metadataKey
-import cc.mewcraft.wakame.util.metadata.removeMeta
-import cc.mewcraft.wakame.util.metadata.setMeta
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import org.bukkit.Bukkit
 import org.bukkit.World
@@ -22,8 +20,9 @@ object ParticleManager : Listener {
      * 在指定 [World] 添加粒子效果.
      */
     fun addEffect(world: World, effect: ParticleEffect) {
-        val effects = world.getMetaOrNull(PARTICLE_EFFECTS_KEY) ?: mutableListOf<ParticleEffect>().also {
-            world.setMeta(PARTICLE_EFFECTS_KEY, it)
+        val metadata = world.metadata()
+        val effects = metadata.getOrNull(PARTICLE_EFFECTS_KEY) ?: mutableListOf<ParticleEffect>().also {
+            metadata.put(PARTICLE_EFFECTS_KEY, it)
         }
         effects.add(effect)
     }
@@ -32,7 +31,7 @@ object ParticleManager : Listener {
      * 获取指定 [World] 的所有粒子效果.
      */
     fun getEffects(world: World): MutableList<ParticleEffect>? {
-        return world.getMetaOrNull(PARTICLE_EFFECTS_KEY)
+        return world.metadata().getOrNull(PARTICLE_EFFECTS_KEY)
     }
 
     /**
@@ -85,7 +84,7 @@ object ParticleManager : Listener {
 
             // 如果世界上没有粒子效果了, 删除 metadata
             if (effects.isEmpty()) {
-                world.removeMeta(PARTICLE_EFFECTS_KEY)
+                world.metadata().remove(PARTICLE_EFFECTS_KEY)
             }
         }
     }

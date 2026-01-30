@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.MetadataKeys
 import cc.mewcraft.wakame.ecs.component.BukkitBlock
 import cc.mewcraft.wakame.ecs.component.BukkitObject
-import cc.mewcraft.wakame.util.metadata.Metadata
+import cc.mewcraft.wakame.util.metadata.metadata
 import org.bukkit.block.Block
 
 /**
@@ -16,7 +16,7 @@ import org.bukkit.block.Block
  * 当本函数返回后, 如果 [BukkitBlock] 所在的区块卸载, 那么与之对应的 [KoishEntity] 也将变为无效.
  */
 fun Block.koishify(): KoishEntity {
-    val metadataMap = Metadata.provide(this)
+    val metadataMap = metadata()
     val koishEntity = metadataMap.getOrPut(MetadataKeys.ECS_BUKKIT_BLOCK_ENTITY_ID) {
         KoishEntity(
             Fleks.INSTANCE.createEntity {

@@ -10,8 +10,8 @@ import cc.mewcraft.wakame.enchantment.component.VoidEscape
 import cc.mewcraft.wakame.integration.teleport.RandomTeleport
 import cc.mewcraft.wakame.util.adventure.BukkitSound
 import cc.mewcraft.wakame.util.metadata.Empty
-import cc.mewcraft.wakame.util.metadata.Metadata
 import cc.mewcraft.wakame.util.metadata.MetadataKey
+import cc.mewcraft.wakame.util.metadata.metadata
 import com.github.quillraven.fleks.Entity
 import net.kyori.adventure.sound.Sound
 import org.bukkit.entity.Player
@@ -41,14 +41,14 @@ object TickVoidEscapeEnchantment : ListenableIteratingSystem(
         if (playerEntity.has(VoidEscape)) {
             // 从虚空掉落时触发随机传送效果:
 
-            if (Metadata.provideForPlayer(player).has(RANDOM_TELEPORT_IN_PROGRESS))
+            if (player.metadata().has(RANDOM_TELEPORT_IN_PROGRESS))
                 return
 
             val world = player.world
             val position = player.location.apply { y = 0.0 }
 
             // 标记随机传送正在进行中
-            Metadata.provideForPlayer(player).put(RANDOM_TELEPORT_IN_PROGRESS, Empty.instance())
+            player.metadata().put(RANDOM_TELEPORT_IN_PROGRESS, Empty.instance())
 
             RandomTeleport.execute(
                 entity = player,
@@ -58,13 +58,13 @@ object TickVoidEscapeEnchantment : ListenableIteratingSystem(
                 height = RANDOM_TELEPORT_HEIGHT
             ).thenRun {
                 // 清除随机传送进行中的标记
-                Metadata.provideForPlayer(player).remove(RANDOM_TELEPORT_IN_PROGRESS)
+                player.metadata().remove(RANDOM_TELEPORT_IN_PROGRESS)
 
                 player.playSound(Sound.sound().type(BukkitSound.ITEM_TOTEM_USE).source(Sound.Source.PLAYER).build())
                 player.playSound(Sound.sound().type(BukkitSound.ITEM_CHORUS_FRUIT_TELEPORT).source(Sound.Source.PLAYER).build())
             }.exceptionally {
                 // 清除随机传送进行中的标记
-                Metadata.provideForPlayer(player).remove(RANDOM_TELEPORT_IN_PROGRESS)
+                player.metadata().remove(RANDOM_TELEPORT_IN_PROGRESS)
 
                 LOGGER.warn("Failed to execute random teleport effect for player ${player.name}", it)
                 null
