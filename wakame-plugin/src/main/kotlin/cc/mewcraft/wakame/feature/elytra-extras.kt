@@ -10,10 +10,8 @@ import cc.mewcraft.wakame.item.property.impl.GlidingExtras
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.util.metadata.getMetaOrNull
+import cc.mewcraft.wakame.util.metadata.metadata
 import cc.mewcraft.wakame.util.metadata.metadataKey
-import cc.mewcraft.wakame.util.metadata.removeMeta
-import cc.mewcraft.wakame.util.metadata.setMeta
 import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.player.PlayerElytraBoostEvent
 import com.destroystokyo.paper.event.server.ServerTickEndEvent
@@ -77,7 +75,7 @@ class ElytraExtrasListener : Listener {
             if (glideState.ticksElapsed - glideState.lastDrainTick >= 20) {
                 glideState.lastDrainTick = glideState.ticksElapsed
 
-                val glidingExtras = player.getMetaOrNull(ACTIVATED_GLIDING_EXTRAS) ?: continue
+                val glidingExtras = player.metadata().getOrNull(ACTIVATED_GLIDING_EXTRAS) ?: continue
 
                 if (!PlayerManaIntegration.consumeMana(player, glidingExtras.glideDrainPerSecond)) {
                     // 魔法值不足，停止滑翔
@@ -99,7 +97,7 @@ class ElytraExtrasListener : Listener {
             ItemSlotChanges.testSlot(slot, prev)
         ) {
             if (prev.hasProp(ItemPropTypes.GLIDING_EXTRAS)) {
-                player.removeMeta(ACTIVATED_GLIDING_EXTRAS)
+                player.metadata().remove(ACTIVATED_GLIDING_EXTRAS)
             }
         }
 
@@ -110,7 +108,7 @@ class ElytraExtrasListener : Listener {
         ) {
             val glidingExtras = curr.getProp(ItemPropTypes.GLIDING_EXTRAS)
             if (glidingExtras != null) {
-                player.setMeta(ACTIVATED_GLIDING_EXTRAS, glidingExtras)
+                player.metadata().put(ACTIVATED_GLIDING_EXTRAS, glidingExtras)
             }
         }
     }
@@ -122,7 +120,7 @@ class ElytraExtrasListener : Listener {
         if (event.isGliding) {
             // 进入滑翔状态:
 
-            val glidingExtras = player.getMetaOrNull(ACTIVATED_GLIDING_EXTRAS) ?: return
+            val glidingExtras = player.metadata().getOrNull(ACTIVATED_GLIDING_EXTRAS) ?: return
 
             if (PlayerManaIntegration.consumeMana(player, glidingExtras.enterGlideManaCost)) {
                 // 进入滑翔状态, 并且魔法值足够:
@@ -146,7 +144,7 @@ class ElytraExtrasListener : Listener {
     @EventHandler
     fun on(event: PlayerElytraBoostEvent) {
         val player = event.player
-        val glidingExtras = player.getMetaOrNull(ACTIVATED_GLIDING_EXTRAS) ?: return
+        val glidingExtras = player.metadata().getOrNull(ACTIVATED_GLIDING_EXTRAS) ?: return
 
         if (!PlayerManaIntegration.consumeMana(player, glidingExtras.rocketBoostManaCost)) {
             // 使用烟花, 但是魔法值不足:

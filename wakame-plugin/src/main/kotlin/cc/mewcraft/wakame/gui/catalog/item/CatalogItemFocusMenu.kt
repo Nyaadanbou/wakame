@@ -82,7 +82,7 @@ internal class CatalogItemFocusMenu(
     }
 
     /**
-     * **背景** 占位的图标.
+     * **背景占位** 的图标.
      */
     inner class BackgroundItem : AbstractItem() {
 

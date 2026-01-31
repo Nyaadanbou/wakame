@@ -4,19 +4,21 @@
 # 展示所有类别的菜单
 main:
   title: "物品图鉴"
+  # ?: hint
   # .: background
   # <: prev_page
   # >: next_page
   # s: search
   # x: category
   structure:
-    - ". . . . . . . . ."
+    - ". . . . ? . . . ."
     - ". x x x x x x x ."
     - ". x x x x x x x ."
     - ". x x x x x x x ."
     - ". x x x x x x x ."
     - "< . . . s . . . >"
   icons:
+    hint: "internal/menu/catalog/default/hint"
     background: "internal/menu/common/default/background"
     prev_page: "internal/menu/catalog/default/prev_page"
     next_page: "internal/menu/catalog/default/next_page"
@@ -51,6 +53,7 @@ paged_catalog_recipes:
 # 高炉配方
 blasting_recipe:
   title: "高炉烧炼"
+  # ?: hint
   # .: background
   # i: input
   # o: output
@@ -59,10 +62,11 @@ blasting_recipe:
   structure:
     - ". . . . . . . . ."
     - ". . i . . . . . ."
-    - ". . ! . . . o . ."
+    - ". . ! . . . o . ?"
     - ". . f . . . . . ."
     - ". . . . . . . . ."
   icons:
+    hint: "internal/menu/catalog/default/hint"
     background: "internal/menu/common/default/background"
     cooking_info: "internal/menu/catalog/default/cooking_info"
     fuel: "internal/menu/catalog/default/fuel"
@@ -70,6 +74,7 @@ blasting_recipe:
 # 营火配方
 campfire_recipe:
   title: "营火烧炼"
+  # ?: hint
   # .: background
   # i: input
   # o: output
@@ -77,10 +82,11 @@ campfire_recipe:
   structure:
     - ". . . . . . . . ."
     - ". . i . . . . . ."
-    - ". . ! . . . o . ."
+    - ". . ! . . . o . ?"
     - ". . . . . . . . ."
     - ". . . . . . . . ."
   icons:
+    hint: "internal/menu/catalog/default/hint"
     background: "internal/menu/common/default/background"
     cooking_info: "internal/menu/catalog/default/cooking_info"
     fuel: "internal/menu/catalog/default/fuel"
@@ -88,6 +94,7 @@ campfire_recipe:
 # 熔炉配方
 furnace_recipe:
   title: "熔炉烧炼"
+  # ?: hint
   # .: background
   # i: input
   # o: output
@@ -96,10 +103,11 @@ furnace_recipe:
   structure:
     - ". . . . . . . . ."
     - ". . i . . . . . ."
-    - ". . ! . . . o . ."
+    - ". . ! . . . o . ?"
     - ". . f . . . . . ."
     - ". . . . . . . . ."
   icons:
+    hint: "internal/menu/catalog/default/hint"
     background: "internal/menu/common/default/background"
     cooking_info: "internal/menu/catalog/default/cooking_info"
     fuel: "internal/menu/catalog/default/fuel"
@@ -107,36 +115,41 @@ furnace_recipe:
 # 有序合成配方
 shaped_recipe:
   title: "工作台有序合成"
+  # ?: hint
   # .: background
   # i: input
   # o: output
   structure:
     - ". . . . . . . . ."
     - ". i i i . . . . ."
-    - ". i i i . . o . ."
+    - ". i i i . . o . ?"
     - ". i i i . . . . ."
     - ". . . . . . . . ."
   icons:
+    hint: "internal/menu/catalog/default/hint"
     background: "internal/menu/common/default/background"
 
 # 无序合成配方
 shapeless_recipe:
   title: "工作台无序合成"
+  # ?: hint
   # .: background
   # i: input
   # o: output
   structure:
     - ". . . . . . . . ."
     - ". i i i . . . . ."
-    - ". i i i . . o . ."
+    - ". i i i . . o . ?"
     - ". i i i . . . . ."
     - ". . . . . . . . ."
   icons:
+    hint: "internal/menu/catalog/default/hint"
     background: "internal/menu/common/default/background"
 
 # 锻造台转化配方
 smithing_transform_recipe:
   title: "锻造台"
+  # ?: hint
   # .: background
   # b: input(base)
   # t: input(template)
@@ -145,15 +158,17 @@ smithing_transform_recipe:
   structure:
     - ". . . . . . . . ."
     - ". . . . . . . . ."
-    - ". t b a . . o . ."
+    - ". t b a . . o . ?"
     - ". . . . . . . . ."
     - ". . . . . . . . ."
   icons:
+    hint: "internal/menu/catalog/default/hint"
     background: "internal/menu/common/default/background"
 
 # 锻造台纹饰配方
 smithing_trim_recipe:
   title: "锻造台"
+  # ?: hint
   # .: background
   # b: input(base)
   # t: input(template)
@@ -162,16 +177,18 @@ smithing_trim_recipe:
   structure:
     - ". . . . . . . . ."
     - ". . . . . . . . ."
-    - ". t b a . . r . ."
+    - ". t b a . . r . ?"
     - ". . . . . . . . ."
     - ". . . . . . . . ."
   icons:
+    hint: "internal/menu/catalog/default/hint"
     background: "internal/menu/common/default/background"
     trim_result: "internal/menu/catalog/default/trim_result"
 
 # 烟熏炉配方
 smoking_recipe:
   title: "烟熏炉烧炼"
+  # ?: hint
   # .: background
   # i: input
   # o: output
@@ -180,10 +197,11 @@ smoking_recipe:
   structure:
     - ". . . . . . . . ."
     - ". . i . . . . . ."
-    - ". . ! . . . o . ."
+    - ". . ! . . . o . ?"
     - ". . f . . . . . ."
     - ". . . . . . . . ."
   icons:
+    hint: "internal/menu/catalog/default/hint"
     background: "internal/menu/common/default/background"
     cooking_info: "internal/menu/catalog/default/cooking_info"
     fuel: "internal/menu/catalog/default/fuel"
@@ -191,33 +209,37 @@ smoking_recipe:
 # 切石机配方
 stonecutting_recipe:
   title: "切石机"
+  # ?: hint
   # .: background
   # i: input
   # o: output
   structure:
     - ". . . . . . . . ."
     - ". . . . . . . . ."
-    - ". . i . . . o . ."
+    - ". . i . . . o . ?"
     - ". . . . . . . . ."
     - ". . . . . . . . ."
   icons:
+    hint: "internal/menu/catalog/default/hint"
     background: "internal/menu/common/default/background"
 
 # 战利品表配方-箱子
 loot_table_recipe_chest:
   title: "获取箱子中的战利品"
+  # ?: hint
   # .: background
   # <: prev_page
   # >: next_page
   # i: input
   # o: output
   structure:
-    - ". . . . . . . . ."
+    - ". . . . . ? . . ."
     - ". . . o o o o o ."
     - ". i . o o o o o ."
     - ". . . o o o o o ."
     - ". . . < . . . > ."
   icons:
+    hint: "internal/menu/catalog/default/hint"
     background: "internal/menu/common/default/background"
     prev_page: "internal/menu/catalog/default/prev_page"
     next_page: "internal/menu/catalog/default/next_page"

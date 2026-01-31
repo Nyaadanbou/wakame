@@ -122,6 +122,7 @@ internal object CatalogRecipeGuiManager {
         val settings = catalogRecipe.menuSettings
         val gui = Gui.normal { builder ->
             builder.setStructure(*settings.structure)
+            builder.addIngredient('?', HintItem(settings))
             builder.addIngredient('.', BackgroundItem(settings))
             builder.addIngredient('!', CookingInfoItem(settings, catalogRecipe.cookingTime, catalogRecipe.experience))
             builder.addIngredient('f', FuelItem(settings))
@@ -138,6 +139,7 @@ internal object CatalogRecipeGuiManager {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
+            builder.addIngredient('?', HintItem(settings))
             builder.addIngredient('.', BackgroundItem(settings))
             builder.addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
             builder.addIngredient('o', DisplayItem(catalogRecipe.outputItem, catalogRecipe.recipe<ShapedRecipe>().result.amount))
@@ -165,6 +167,7 @@ internal object CatalogRecipeGuiManager {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
+            builder.addIngredient('?', HintItem(settings))
             builder.addIngredient('.', BackgroundItem(settings))
             builder.addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
             builder.addIngredient('o', DisplayItem(catalogRecipe.outputItems, catalogRecipe.recipe<ShapelessRecipe>().result.amount))
@@ -180,6 +183,7 @@ internal object CatalogRecipeGuiManager {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
+            builder.addIngredient('?', HintItem(settings))
             builder.addIngredient('.', BackgroundItem(settings))
             builder.addIngredient('b', DisplayItem(catalogRecipe.baseItems))
             builder.addIngredient('t', DisplayItem(catalogRecipe.templateItems))
@@ -196,6 +200,7 @@ internal object CatalogRecipeGuiManager {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
+            builder.addIngredient('?', HintItem(settings))
             builder.addIngredient('.', BackgroundItem(settings))
             builder.addIngredient('b', DisplayItem(catalogRecipe.baseItems))
             builder.addIngredient('t', DisplayItem(catalogRecipe.templateItems))
@@ -213,6 +218,7 @@ internal object CatalogRecipeGuiManager {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
+            builder.addIngredient('?', HintItem(settings))
             builder.addIngredient('.', BackgroundItem(settings))
             builder.addIngredient('i', DisplayItem(catalogRecipe.inputItems))
             builder.addIngredient('o', DisplayItem(catalogRecipe.outputItem, catalogRecipe.recipe<StonecuttingRecipe>().result.amount))
@@ -227,6 +233,7 @@ internal object CatalogRecipeGuiManager {
         val settings = catalogRecipe.catalogMenuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
+            builder.addIngredient('?', HintItem(settings))
             builder.addIngredient('.', BackgroundItem(settings))
             builder.addIngredient('<', PrevItem(settings))
             builder.addIngredient('>', NextItem(settings))
@@ -237,6 +244,22 @@ internal object CatalogRecipeGuiManager {
         return CatalogRecipeGui(settings.title, gui)
     }
 
+}
+
+/**
+ * `提示` 占位的图标.
+ */
+private class HintItem(
+    val settings: BasicMenuSettings,
+) : AbstractItem() {
+
+    override fun getItemProvider(): ItemProvider {
+        return settings.getSlotDisplay("hint").resolveToItemWrapper()
+    }
+
+    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+
+    }
 }
 
 /**
