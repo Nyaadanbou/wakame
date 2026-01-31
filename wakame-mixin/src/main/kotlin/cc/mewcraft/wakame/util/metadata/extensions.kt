@@ -28,14 +28,22 @@ fun Player.metadataOrNull(): JavaOptional<MetadataMap> = Metadata.getForPlayer(t
  *
  * @return metadata map for this entity
  */
-fun Entity.metadata(): MetadataMap = Metadata.provideForEntity(this)
+fun Entity.metadata(): MetadataMap = if (this is Player) {
+    Metadata.provideForPlayer(this)
+} else {
+    Metadata.provideForEntity(this)
+}
 
 /**
  * Gets the optional metadata map for this entity if it already exists.
  *
  * @return optional metadata map for this entity
  */
-fun Entity.metadataOrNull(): JavaOptional<MetadataMap> = Metadata.getForEntity(this)
+fun Entity.metadataOrNull(): JavaOptional<MetadataMap> = if (this is Player) {
+    Metadata.getForPlayer(this)
+} else {
+    Metadata.getForEntity(this)
+}
 
 /**
  * Gets the metadata map for this block, creating one if it doesn't exist.
