@@ -7,9 +7,9 @@ import org.betonquest.betonquest.api.instruction.Instruction
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
+import org.betonquest.betonquest.api.quest.action.OnlineAction
 import org.betonquest.betonquest.api.quest.action.PlayerAction
 import org.betonquest.betonquest.api.quest.action.PlayerActionFactory
-import org.betonquest.betonquest.api.quest.action.online.OnlineAction
 import org.betonquest.betonquest.api.quest.action.online.OnlineActionAdapter
 
 /**

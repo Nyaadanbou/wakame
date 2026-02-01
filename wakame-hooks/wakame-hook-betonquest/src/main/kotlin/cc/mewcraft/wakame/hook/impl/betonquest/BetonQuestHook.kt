@@ -25,8 +25,6 @@ object BetonQuestHook {
         val questTypeApi = plugin.questTypeApi
         val profileProvider = plugin.profileProvider
         val loggerFactory = plugin.loggerFactory
-        val variableProcessor = plugin.placeholderProcessor
-        val packManager = plugin.questPackageManager
 
         /* Quest Type Registries */
 
@@ -76,7 +74,7 @@ object BetonQuestHook {
         scheduleRegistry.register(
             "game-tick",
             ActionScheduling.ScheduleType(
-                GameTickScheduleFactory(variableProcessor, packManager),
+                GameTickScheduleFactory(),
                 GameTickScheduler(loggerFactory.create(GameTickScheduler::class.java), questTypeApi, plugin)
             ),
         )

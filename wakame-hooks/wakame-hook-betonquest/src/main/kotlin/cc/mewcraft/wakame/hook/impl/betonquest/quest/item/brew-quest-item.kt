@@ -12,8 +12,8 @@ import org.betonquest.betonquest.api.QuestException
 import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
 import org.betonquest.betonquest.api.item.QuestItem
-import org.betonquest.betonquest.api.kernel.TypeFactory
 import org.betonquest.betonquest.api.profile.Profile
+import org.betonquest.betonquest.api.quest.TypeFactory
 import org.betonquest.betonquest.item.QuestItemSerializer
 import org.betonquest.betonquest.item.QuestItemTagAdapterWrapper
 import org.betonquest.betonquest.item.QuestItemWrapper
