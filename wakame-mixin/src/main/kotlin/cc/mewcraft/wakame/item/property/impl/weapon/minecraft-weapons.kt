@@ -7,13 +7,13 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
  *
  * @property attackCooldown 攻击后物品冷却.
  * @property attackDamageRatePerFallHeight 每单位下落高度增加的伤害系数.
- * @property damageByFallHeightLimit 由于下落高度增加的额外伤害上限.
+ * @property damageByFallHeightLimit 下落高度增加的额外伤害的上限.
  */
 @ConfigSerializable
 data class Mace(
     val attackCooldown: Int = 33,
     val attackDamageRatePerFallHeight: Double = 1.0,
-    val damageByFallHeightLimit: Double = 100.0
+    val damageByFallHeightLimit: Double = 100.0,
 )
 
 /**
