@@ -17,7 +17,7 @@ import java.util.*
  *
  * The id field stores the UUID as a string (36 characters for standard UUID format).
  */
-object KeyValuePairs : Table("kv_store") {
+object KeyValuePairs : Table("extracontexts_key_values") {
     /**
      * Player UUID as string (36 characters).
      * Stored as VARCHAR instead of UUID type for better cross-database compatibility.
