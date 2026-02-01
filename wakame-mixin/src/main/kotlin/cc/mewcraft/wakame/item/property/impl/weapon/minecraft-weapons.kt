@@ -3,19 +3,21 @@ package cc.mewcraft.wakame.item.property.impl.weapon
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 /**
- * 原版重锤 武器的配置.
+ * **原版重锤**武器的配置.
  *
  * @property attackCooldown 攻击后物品冷却.
+ * @property attackDamageRatePerFallHeight 每单位下落高度增加的伤害系数.
+ * @property damageByFallHeightLimit 由于下落高度增加的额外伤害上限.
  */
 @ConfigSerializable
 data class Mace(
     val attackCooldown: Int = 33,
-    val attackDamageRatePerFallDistance: Double = 1.0,
-    val attackDamageRateLimit: Double = 100.0
+    val attackDamageRatePerFallHeight: Double = 1.0,
+    val damageByFallHeightLimit: Double = 100.0
 )
 
 /**
- * 原版近战(斧, 镐, 锄等单体武器) 武器的配置.
+ * **原版近战(斧, 镐, 锄等单体武器)**武器的配置.
  *
  * @property attackCooldown 攻击后物品冷却.
  */
@@ -25,7 +27,7 @@ data class Melee(
 )
 
 /**
- * 原版三叉戟 武器的配置.
+ * **原版三叉戟**武器的配置.
  *
  * @property attackCooldown 攻击后物品冷却.
  */

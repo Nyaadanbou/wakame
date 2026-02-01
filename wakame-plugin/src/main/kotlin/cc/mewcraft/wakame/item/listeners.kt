@@ -2,26 +2,8 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.entity.player.isInventoryListenable
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
-import cc.mewcraft.wakame.item.behavior.AttackContext
-import cc.mewcraft.wakame.item.behavior.AttackEntityContext
-import cc.mewcraft.wakame.item.behavior.AttackOnContext
-import cc.mewcraft.wakame.item.behavior.BehaviorResult
-import cc.mewcraft.wakame.item.behavior.BlockInteractContext
-import cc.mewcraft.wakame.item.behavior.CauseDamageContext
-import cc.mewcraft.wakame.item.behavior.ConsumeContext
-import cc.mewcraft.wakame.item.behavior.DurabilityDecreaseContext
-import cc.mewcraft.wakame.item.behavior.InteractionHand
-import cc.mewcraft.wakame.item.behavior.InteractionResult
+import cc.mewcraft.wakame.item.behavior.*
 import cc.mewcraft.wakame.item.behavior.ItemStackActivationChecker.isActive
-import cc.mewcraft.wakame.item.behavior.ReceiveDamageContext
-import cc.mewcraft.wakame.item.behavior.StopUseContext
-import cc.mewcraft.wakame.item.behavior.UseContext
-import cc.mewcraft.wakame.item.behavior.UseEntityContext
-import cc.mewcraft.wakame.item.behavior.UseOnContext
-import cc.mewcraft.wakame.item.behavior.handleBehavior
-import cc.mewcraft.wakame.item.behavior.isInteractable
-import cc.mewcraft.wakame.item.behavior.isSuccess
-import cc.mewcraft.wakame.item.behavior.shouldCancel
 import cc.mewcraft.wakame.item.property.impl.ItemSlotRegistry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -120,7 +102,7 @@ internal object ItemBehaviorListener : Listener {
         if (hand == InteractionHand.MAIN_HAND) {
             // 若玩家已右键交互实体 - 不处理, 避免同时触发 Use/UseOn 和 UseEntity 行为
             // 但由于网络延迟等原因, 实体交互事件和物品交互事件可能不在同一刻触发
-            // 此时玩家眼中为实体交互和物品交互同时触发(顺序严格先后), 该问题无法完美解决
+            // 此时玩家眼中为实体交互和物品交互同时触发 (顺序严格先后), 该问题无法完美解决
             if (alreadyCallInteractEntityWithMainHandPlayers.contains(player)) {
                 // 如果实体交互事件被取消, 需要再取消物品交互事件以防止触发原版交互
                 if (shouldCancelMainHandInteractEventPlayers.contains(player)) {

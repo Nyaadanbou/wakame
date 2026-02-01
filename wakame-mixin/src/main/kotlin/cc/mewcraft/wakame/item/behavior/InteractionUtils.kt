@@ -8,38 +8,16 @@ import cc.mewcraft.wakame.util.toLocation
 import io.papermc.paper.entity.Shearable
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
-import org.bukkit.Bukkit
-import org.bukkit.GameMode
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
-import org.bukkit.Tag
-import org.bukkit.World
+import org.bukkit.*
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
-import org.bukkit.block.data.type.Beehive
-import org.bukkit.block.data.type.Bell
-import org.bukkit.block.data.type.CaveVines
-import org.bukkit.block.data.type.ChiseledBookshelf
-import org.bukkit.block.data.type.Jukebox
-import org.bukkit.block.data.type.RespawnAnchor
-import org.bukkit.block.data.type.Vault
+import org.bukkit.block.data.type.*
 import org.bukkit.craftbukkit.block.impl.CraftComposter
 import org.bukkit.craftbukkit.block.impl.CraftSweetBerryBush
-import org.bukkit.entity.Ageable
-import org.bukkit.entity.Allay
-import org.bukkit.entity.Entity
-import org.bukkit.entity.EntityType
-import org.bukkit.entity.HappyGhast
-import org.bukkit.entity.IronGolem
-import org.bukkit.entity.MushroomCow
-import org.bukkit.entity.Piglin
-import org.bukkit.entity.Player
-import org.bukkit.entity.Steerable
-import org.bukkit.entity.Tameable
+import org.bukkit.entity.*
 import org.bukkit.entity.memory.MemoryKey
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
@@ -180,7 +158,7 @@ fun InteractionResult.shouldCancel(): Boolean {
     return this == InteractionResult.SUCCESS_AND_CANCEL || this == InteractionResult.FAIL_AND_CANCEL
 }
 
-enum class InteractEntityState{
+enum class InteractEntityState {
     CANCEL,
     PASS,
 }

@@ -1,27 +1,9 @@
 package cc.mewcraft.wakame.item.behavior
 
-import cc.mewcraft.wakame.item.behavior.impl.Castable
-import cc.mewcraft.wakame.item.behavior.impl.Connect
-import cc.mewcraft.wakame.item.behavior.impl.EntityBucket
-import cc.mewcraft.wakame.item.behavior.impl.HoldLastDamage
-import cc.mewcraft.wakame.item.behavior.impl.OpenCatalog
-import cc.mewcraft.wakame.item.behavior.impl.TownyFlight
-import cc.mewcraft.wakame.item.behavior.impl.Transfer
-import cc.mewcraft.wakame.item.behavior.impl.WorldTimeControl
-import cc.mewcraft.wakame.item.behavior.impl.WorldWeatherControl
-import cc.mewcraft.wakame.item.behavior.impl.external.BrewRecipe
-import cc.mewcraft.wakame.item.behavior.impl.external.OpenExternalMenu
-import cc.mewcraft.wakame.item.behavior.impl.external.PlaceBlock
-import cc.mewcraft.wakame.item.behavior.impl.external.PlaceDoubleHighBlock
-import cc.mewcraft.wakame.item.behavior.impl.external.PlaceLiquidCollisionBlock
+import cc.mewcraft.wakame.item.behavior.impl.*
+import cc.mewcraft.wakame.item.behavior.impl.external.*
 import cc.mewcraft.wakame.item.behavior.impl.test.TestInteract
-import cc.mewcraft.wakame.item.behavior.impl.weapon.Bow
-import cc.mewcraft.wakame.item.behavior.impl.weapon.Crossbow
-import cc.mewcraft.wakame.item.behavior.impl.weapon.DualSword
-import cc.mewcraft.wakame.item.behavior.impl.weapon.Katana
-import cc.mewcraft.wakame.item.behavior.impl.weapon.Mace
-import cc.mewcraft.wakame.item.behavior.impl.weapon.Melee
-import cc.mewcraft.wakame.item.behavior.impl.weapon.Trident
+import cc.mewcraft.wakame.item.behavior.impl.weapon.*
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 
 /**
@@ -59,7 +41,7 @@ object ItemBehaviorTypes {
     val HOLD_LAST_DAMAGE = typeOf("hold_last_damage", HoldLastDamage)
 
     /**
-     * 使物品具有 原版弓 武器行为.
+     * 使物品具有**原版弓**武器行为.
      *
      * @see cc.mewcraft.wakame.item.property.ItemPropTypes.MINECRAFT_BOW
      */
@@ -67,7 +49,7 @@ object ItemBehaviorTypes {
     val MINECRAFT_BOW = typeOf("minecraft_bow", Bow)
 
     /**
-     * 使物品具有 原版弩 武器行为.
+     * 使物品具有**原版弩**武器行为.
      *
      * @see cc.mewcraft.wakame.item.property.ItemPropTypes.MINECRAFT_CROSSBOW
      */
@@ -75,7 +57,7 @@ object ItemBehaviorTypes {
     val MINECRAFT_CROSSBOW = typeOf("minecraft_crossbow", Crossbow)
 
     /**
-     * 使物品具有 原版重锤 武器行为.
+     * 使物品具有**原版重锤**武器行为.
      *
      * @see cc.mewcraft.wakame.item.property.ItemPropTypes.MINECRAFT_MACE
      */
@@ -83,7 +65,7 @@ object ItemBehaviorTypes {
     val MINECRAFT_MACE = typeOf("minecraft_mace", Mace)
 
     /**
-     * 使物品具有 原版近战(斧, 镐, 锄等单体武器) 武器行为.
+     * 使物品具有**原版近战(斧, 镐, 锄等单体武器)**武器行为.
      *
      * @see cc.mewcraft.wakame.item.property.ItemPropTypes.MINECRAFT_MELEE
      */
@@ -91,7 +73,7 @@ object ItemBehaviorTypes {
     val MINECRAFT_MELEE = typeOf("minecraft_melee", Melee)
 
     /**
-     * 使物品具有 原版三叉戟 武器行为.
+     * 使物品具有**原版三叉戟**武器行为.
      *
      * @see cc.mewcraft.wakame.item.property.ItemPropTypes.MINECRAFT_TRIDENT
      */

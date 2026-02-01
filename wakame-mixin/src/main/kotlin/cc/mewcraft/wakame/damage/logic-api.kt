@@ -8,10 +8,7 @@ import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ABSORPTION
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BASE
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BLOCKING
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.RESISTANCE
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.*
 import org.jetbrains.annotations.ApiStatus
 
 
@@ -50,7 +47,7 @@ interface DamageManagerApi {
     /**
      * 伴生对象, 提供 [DamageManagerApi] 的实例.
      */
-    companion object Implementation : DamageManagerApi {
+    companion object Impl : DamageManagerApi {
 
         private const val PLACEHOLDER_DAMAGE_VALUE = 4.94f
 
@@ -145,7 +142,7 @@ class FinalDamageContext(
      * 真正意义上的"最终", 可直接显示给玩家.
      */
     val finalDamageMap: Reference2DoubleMap<RegistryEntry<Element>>,
-){
+) {
 
     /**
      * 最终伤害的值 (即各元素的最终伤害的简单相加).

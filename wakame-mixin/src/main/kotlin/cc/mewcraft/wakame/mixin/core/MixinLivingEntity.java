@@ -49,7 +49,7 @@ public abstract class MixinLivingEntity {
             )
     )
     private float redirectComputeAmountDuringInvulnerable(LivingEntity instance, EntityDamageEvent event) {
-        return DamageManagerApi.Implementation.injectDamageLogic(event, instance.lastHurt, true);
+        return DamageManagerApi.Impl.injectDamageLogic(event, instance.lastHurt, true);
     }
 
 
@@ -65,7 +65,7 @@ public abstract class MixinLivingEntity {
             )
     )
     private float redirectComputeAmountDuringNotInvulnerable(LivingEntity instance, EntityDamageEvent event) {
-        return DamageManagerApi.Implementation.injectDamageLogic(event, instance.lastHurt, false);
+        return DamageManagerApi.Impl.injectDamageLogic(event, instance.lastHurt, false);
     }
 
     /**
