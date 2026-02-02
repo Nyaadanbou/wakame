@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import cc.mewcraft.wakame.mixin.support.ExtraDataComponents;
+import cc.mewcraft.wakame.mixin.support.KoishDataSanitizer;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.component.TooltipDisplay;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,6 +19,6 @@ public abstract class MixinTooltipDisplay {
             )
     )
     private void onInit(boolean hideTooltip, SequencedSet<DataComponentType<?>> hiddenComponents, CallbackInfo ci) {
-        hiddenComponents.removeIf(t -> t == ExtraDataComponents.DATA_CONTAINER); // 移除 Koish 添加的自定义数据类型.
+        hiddenComponents.removeIf(KoishDataSanitizer::isExtra);
     }
 }

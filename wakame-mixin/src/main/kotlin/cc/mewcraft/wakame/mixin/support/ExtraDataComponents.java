@@ -10,6 +10,16 @@ import java.util.function.UnaryOperator;
 public class ExtraDataComponents {
 
     /**
+     * 用于储存 Koish 物品的唯一标识符.
+     * 该数据仅作为内部实现, 外部不应使用.
+     */
+    public static final DataComponentType<ItemKey> ITEM_KEY = register(
+            "koish:item_key", builder -> builder.persistent(
+                    Codec.lazyInitialized(ItemKey::makeCodec)
+            )
+    );
+
+    /**
      * 用于储存 Koish 添加的自定义数据.
      * 该数据仅作为内部实现, 外部不应使用.
      */

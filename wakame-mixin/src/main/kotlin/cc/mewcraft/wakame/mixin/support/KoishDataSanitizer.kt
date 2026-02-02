@@ -14,6 +14,11 @@ import java.util.function.Function
 
 object KoishDataSanitizer {
 
+    @JvmStatic
+    fun isExtra(type: DataComponentType<*>): Boolean {
+        return type == ExtraDataComponents.ITEM_KEY || type == ExtraDataComponents.DATA_CONTAINER
+    }
+
     /**
      * 用于修复[错误日志](https://pastes.dev/wLwiJSZMBA).
      *
@@ -26,6 +31,8 @@ object KoishDataSanitizer {
             return item
         }
 
+        // 移除 koish:item_id
+        item.remove(ExtraDataComponents.ITEM_KEY)
         // 移除 koish:data_container
         item.remove(ExtraDataComponents.DATA_CONTAINER)
         // 移除 minecraft:container 中可能包含的 koish:data_container
@@ -52,6 +59,8 @@ object KoishDataSanitizer {
 
         val builder = DataComponentPatch.builder().apply { copy(patch) }
 
+        // 移除 koish:item_id
+        builder.clear(ExtraDataComponents.ITEM_KEY)
         // 移除 koish:data_container
         builder.clear(ExtraDataComponents.DATA_CONTAINER)
         // 清理 minecraft:container 中可能包含的 koish:data_container
@@ -69,7 +78,8 @@ object KoishDataSanitizer {
      */
     @JvmStatic
     private fun estimateSanitizing(item: ItemStack): Boolean {
-        return item.has(ExtraDataComponents.DATA_CONTAINER) ||
+        return item.has(ExtraDataComponents.ITEM_KEY) ||
+                item.has(ExtraDataComponents.DATA_CONTAINER) ||
                 item.has(DataComponents.CONTAINER) ||
                 item.has(DataComponents.BUNDLE_CONTENTS) ||
                 item.has(DataComponents.CHARGED_PROJECTILES)
@@ -80,10 +90,12 @@ object KoishDataSanitizer {
      */
     @JvmStatic
     private fun estimateSanitizing(patch: DataComponentPatch): Boolean {
-        return patch.get(ExtraDataComponents.DATA_CONTAINER) != null ||
-                patch.get(DataComponents.CONTAINER)?.isPresent == true ||
-                patch.get(DataComponents.BUNDLE_CONTENTS)?.isPresent == true ||
-                patch.get(DataComponents.CHARGED_PROJECTILES)?.isPresent == true
+        return patch.get(ExtraDataComponents.ITEM_KEY) != null ||
+                patch.get(ExtraDataComponents.DATA_CONTAINER) != null ||
+                // 判定原版组件判断不为 null 实际上比较模糊, 因为我们不需要清理"不为 null 但 Optional#isEmpty() 返回 true"的数据
+                patch.get(DataComponents.CONTAINER) != null ||
+                patch.get(DataComponents.BUNDLE_CONTENTS) != null ||
+                patch.get(DataComponents.CHARGED_PROJECTILES) != null
     }
 
     @JvmStatic
@@ -156,9 +168,10 @@ private fun <T> sanitizeItemsInContainer(
     val newItems = ArrayList<ItemStack>()
     // 遍历 oldItems, 尝试移除物品上的 koish:data_container, 然后添加到 newItems
     for (item in oldItems) {
-        if (item.has(ExtraDataComponents.DATA_CONTAINER)) {
+        if (item.has(ExtraDataComponents.ITEM_KEY) || item.has(ExtraDataComponents.DATA_CONTAINER)) {
             removed = true
             val copy = item.copy() // 这里修改物品必须克隆, 这是 NMS 的代码传统
+            copy.remove(ExtraDataComponents.ITEM_KEY)
             copy.remove(ExtraDataComponents.DATA_CONTAINER)
             newItems.add(copy)
         } else {
