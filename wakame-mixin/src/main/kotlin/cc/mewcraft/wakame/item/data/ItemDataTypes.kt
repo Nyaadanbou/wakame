@@ -4,6 +4,7 @@ import cc.mewcraft.lazyconfig.configurate.register
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.data.impl.*
 import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.mixin.support.ItemKey
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
@@ -28,13 +29,15 @@ data object ItemDataTypes {
     // 注册表
     // ------------
 
+    @Deprecated("实现上不再使用")
     @JvmField
-    val ID: ItemDataType<ItemId> = typeOf("id") {
+    val ID: ItemDataType<ItemKey> = typeOf("id") {
         serializers {
-            register<ItemId>(ItemId.SERIALIZER)
+            register<ItemKey>(ItemKey.serializer())
         }
     }
 
+    @Deprecated("策划上从未使用")
     @JvmField
     val VARIANT: ItemDataType<Int> = typeOf("variant")
 

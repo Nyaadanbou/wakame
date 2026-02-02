@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import cc.mewcraft.wakame.mixin.support.ExtraDataComponents;
+import cc.mewcraft.wakame.mixin.support.KoishDataSanitizer;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,7 +27,7 @@ public class MixinHoverEvent$ShowItem {
     )
     private ItemStack redirected(ItemStack item) {
         item = item.copy();
-        item.remove(ExtraDataComponents.DATA_CONTAINER); // 移除 koish:data_container 组件以防止客户端收到非法封包而崩溃
+        KoishDataSanitizer.sanitizeItemStack(item);
         return item;
     }
 }

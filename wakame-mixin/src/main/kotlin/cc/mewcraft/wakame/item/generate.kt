@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.item.data.ItemDataContainer
 import cc.mewcraft.wakame.item.data.ItemDataTypes
-import cc.mewcraft.wakame.item.data.impl.ItemId
 import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
 import cc.mewcraft.wakame.item.datagen.ItemMetaContainer
 import cc.mewcraft.wakame.item.datagen.ItemMetaEntry
@@ -14,6 +13,7 @@ import cc.mewcraft.wakame.item.datagen.ItemMetaType
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.ItemBase
 import cc.mewcraft.wakame.mixin.support.ExtraDataComponents
+import cc.mewcraft.wakame.mixin.support.ItemKey
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
@@ -82,16 +82,15 @@ object KoishStackGenerator {
     }
 
     private fun generate0(type: KoishItem, context: ItemGenerationContext): ItemStack {
-        val dataContainer = ItemDataContainer.builder()
-
-        // 写入基础信息, 每个自定义物品都有
-        dataContainer[ItemDataTypes.ID] = ItemId.of(type.id)
-        dataContainer[ItemDataTypes.VERSION] = SharedConstants.ITEM_STACK_DATA_VERSION
-        dataContainer[ItemDataTypes.VARIANT] = 0
-
-        // 直接操作 MojangStack 以提高生成物品的速度
         val itembase = type.properties.getOrDefault(ItemPropTypes.BASE, ItemBase.EMPTY)
+
         val itemstack = itembase.createMojang()
+        // 写入物品唯一标识
+        itemstack.set(ExtraDataComponents.ITEM_KEY, ItemKey.of(type.id))
+
+        val dataContainer = ItemDataContainer.builder()
+        // 写入数据格式版本号
+        dataContainer[ItemDataTypes.VERSION] = SharedConstants.ITEM_STACK_DATA_VERSION
 
         // 在把 ItemStack 传递到 ItemMetaEntry 之前, 需要先将 ItemDataContainer 写入到 ItemStack.
         // 否则按照目前的实现, 简单的使用 ItemStack.setData 是无法将数据写入到 ItemStack 的,

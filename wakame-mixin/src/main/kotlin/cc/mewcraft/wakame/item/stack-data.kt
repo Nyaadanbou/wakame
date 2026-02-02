@@ -101,7 +101,10 @@ fun Item.hasItemProxy(): Boolean =
  * - 如果该物品堆叠来自其他物品系统, 将被当作是一个 *原版物品*, 命名空间为 `minecraft` // TODO 支持 ItemRef
  */
 val MojangStack.typeId: Identifier
-    get() = dataContainer(false)?.get(ItemDataTypes.ID)?.id ?: CraftItemType.minecraftToBukkit(item).key()
+    // 最终版本
+    //get() = get(ExtraDataComponents.ITEM_ID)?.id ?: CraftItemType.minecraftToBukkit(item).key()
+    // FIXME 临时版本, 用于过渡
+    get() = get(ExtraDataComponents.ITEM_KEY)?.id ?: dataContainer(false)?.get(ItemDataTypes.ID)?.id ?: CraftItemType.minecraftToBukkit(item).key()
 
 /**
  * 获取该物品堆叠的物品类型的 [Identifier].
@@ -110,7 +113,10 @@ val MojangStack.typeId: Identifier
  * - 不包含套皮物品/原版物品 - 这种情况会直接返回空值.
  */
 val MojangStack.koishTypeId: Identifier?
-    get() = dataContainer(false)?.get(ItemDataTypes.ID)?.id
+    // 最终版本
+    //get() = get(ExtraDataComponents.ITEM_ID)?.id
+    // FIXME 临时版本, 用于过渡
+    get() = get(ExtraDataComponents.ITEM_KEY)?.id ?: dataContainer(false)?.get(ItemDataTypes.ID)?.id
 
 /**
  * 方便函数, 其行为等同于判断 [koishItem] 是否为空.
@@ -146,7 +152,10 @@ val MojangStack.isProxyKoish: Boolean
  * *绝大多数情况下无需使用该函数.*
  */
 val MojangStack.koishItem: KoishItem?
-    get() = dataContainer(true)?.get(ItemDataTypes.ID)?.itemType
+    // 最终版本
+    //get() = get(ExtraDataComponents.ITEM_ID)?.itemType
+    // FIXME 临时版本, 用于过渡
+    get() = get(ExtraDataComponents.ITEM_KEY)?.itemType ?: dataContainer(true)?.get(ItemDataTypes.ID)?.itemType
 
 /**
  * 获取该物品堆叠的 *Koish 物品类型*.
@@ -162,7 +171,10 @@ val MojangStack.koishItem: KoishItem?
  * *绝大多数情况下无需使用该函数.*
  */
 val MojangStack.exactKoishItem: KoishItem?
-    get() = dataContainer(false)?.get(ItemDataTypes.ID)?.itemType
+    // 最终版本
+    //get() = get(ExtraDataComponents.ITEM_ID)?.itemType
+    // FIXME 临时版本
+    get() = get(ExtraDataComponents.ITEM_KEY)?.itemType ?: dataContainer(false)?.get(ItemDataTypes.ID)?.itemType
 
 /**
  * 获取该物品堆叠的套皮物品的实例.
