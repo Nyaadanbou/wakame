@@ -21,6 +21,7 @@ import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeS
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.typeTokenOf
 import cc.mewcraft.wakame.world.WeatherControl
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
@@ -430,6 +431,13 @@ data object ItemPropTypes {
      */
     @JvmField
     val TRANSFER = typeOf<Transfer>("transfer")
+
+    /**
+     * 绑定到客户端侧的物品模型.
+     */
+    @Deprecated("Hotfix")
+    @JvmField
+    val CLIENTBOUND_ITEM_MODEL = typeOf<Key>("clientbound/item_model")
 
     // ------------
     // 方便函数

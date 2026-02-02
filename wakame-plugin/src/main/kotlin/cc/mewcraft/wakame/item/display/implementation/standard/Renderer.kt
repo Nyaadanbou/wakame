@@ -157,6 +157,9 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
             item.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay().hiddenComponents(hiddenComponents))
         }
 
+        // 热修复自定义物品模型问题
+        HotfixItemModel.transform(item)
+
         // 热修复攻击冷却不显示问题
         HotfixWeaponCooldownDisplay.transform(item)
     }
