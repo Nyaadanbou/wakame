@@ -4,9 +4,9 @@ import org.betonquest.betonquest.api.instruction.Instruction
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
+import org.betonquest.betonquest.api.quest.condition.OnlineCondition
 import org.betonquest.betonquest.api.quest.condition.PlayerCondition
 import org.betonquest.betonquest.api.quest.condition.PlayerConditionFactory
-import org.betonquest.betonquest.api.quest.condition.online.OnlineCondition
 import org.betonquest.betonquest.api.quest.condition.online.OnlineConditionAdapter
 
 /**
