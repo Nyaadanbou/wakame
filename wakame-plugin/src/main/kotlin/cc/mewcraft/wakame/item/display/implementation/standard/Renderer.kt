@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.display.implementation.standard
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.player.AttackSpeed
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.data.impl.*
 import cc.mewcraft.wakame.item.datagen.ItemMetaTypes
@@ -16,9 +17,6 @@ import cc.mewcraft.wakame.item.display.implementation.*
 import cc.mewcraft.wakame.item.display.implementation.common.*
 import cc.mewcraft.wakame.item.extension.*
 import cc.mewcraft.wakame.item.feature.EnchantSlotFeature
-import cc.mewcraft.wakame.item.getData
-import cc.mewcraft.wakame.item.getMeta
-import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.*
 import cc.mewcraft.wakame.kizami.Kizami
@@ -158,6 +156,12 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         if (hiddenComponents.isNotEmpty()) {
             item.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay().hiddenComponents(hiddenComponents))
         }
+
+        // 热修复自定义物品模型问题
+        HotfixItemModel.transform(item)
+
+        // 热修复攻击冷却不显示问题
+        HotfixWeaponCooldownDisplay.transform(item)
     }
 
     private fun renderCoreContainer(collector: ReferenceOpenHashSet<IndexedText>, coreContainer: CoreContainer?) {

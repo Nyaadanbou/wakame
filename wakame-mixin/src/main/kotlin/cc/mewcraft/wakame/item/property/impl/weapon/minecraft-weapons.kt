@@ -2,6 +2,10 @@ package cc.mewcraft.wakame.item.property.impl.weapon
 
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
+interface AttackCooldownLike {
+    val attackCooldown: Int
+}
+
 /**
  * **原版重锤**武器的配置.
  *
@@ -11,10 +15,10 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
  */
 @ConfigSerializable
 data class Mace(
-    val attackCooldown: Int = 33,
+    override val attackCooldown: Int = 33,
     val attackDamageRatePerFallHeight: Double = 1.0,
     val damageByFallHeightLimit: Double = 100.0,
-)
+) : AttackCooldownLike
 
 /**
  * **原版近战(斧, 镐, 锄等单体武器)**武器的配置.
@@ -23,8 +27,8 @@ data class Mace(
  */
 @ConfigSerializable
 data class Melee(
-    val attackCooldown: Int = 20,
-)
+    override val attackCooldown: Int = 20,
+) : AttackCooldownLike
 
 /**
  * **原版三叉戟**武器的配置.
@@ -33,5 +37,5 @@ data class Melee(
  */
 @ConfigSerializable
 data class Trident(
-    val attackCooldown: Int = 18,
-)
+    override val attackCooldown: Int = 18,
+) : AttackCooldownLike
