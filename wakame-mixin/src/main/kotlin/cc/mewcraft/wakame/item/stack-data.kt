@@ -102,9 +102,9 @@ fun Item.hasItemProxy(): Boolean =
  */
 val MojangStack.typeId: Identifier
     // 最终版本
-    //get() = get(ExtraDataComponents.ITEM_ID)?.id ?: CraftItemType.minecraftToBukkit(item).key()
+    //get() = get(ExtraDataComponents.ITEM_KEY)?.id ?: CraftItemType.minecraftToBukkit(item).key()
     // FIXME 临时版本, 用于过渡
-    get() = get(ExtraDataComponents.ITEM_KEY)?.id ?: dataContainer(false)?.get(ItemDataTypes.ID)?.id ?: CraftItemType.minecraftToBukkit(item).key()
+    get() = get(ExtraDataComponents.ITEM_KEY)?.id ?: get(ExtraDataComponents.DATA_CONTAINER)?.get(ItemDataTypes.ID)?.id ?: CraftItemType.minecraftToBukkit(item).key()
 
 /**
  * 获取该物品堆叠的物品类型的 [Identifier].
@@ -114,9 +114,9 @@ val MojangStack.typeId: Identifier
  */
 val MojangStack.koishTypeId: Identifier?
     // 最终版本
-    //get() = get(ExtraDataComponents.ITEM_ID)?.id
+    //get() = get(ExtraDataComponents.ITEM_KEY)?.id
     // FIXME 临时版本, 用于过渡
-    get() = get(ExtraDataComponents.ITEM_KEY)?.id ?: dataContainer(false)?.get(ItemDataTypes.ID)?.id
+    get() = get(ExtraDataComponents.ITEM_KEY)?.id ?: get(ExtraDataComponents.DATA_CONTAINER)?.get(ItemDataTypes.ID)?.id
 
 /**
  * 方便函数, 其行为等同于判断 [koishItem] 是否为空.
@@ -153,9 +153,9 @@ val MojangStack.isProxyKoish: Boolean
  */
 val MojangStack.koishItem: KoishItem?
     // 最终版本
-    //get() = get(ExtraDataComponents.ITEM_ID)?.itemType
+    //get() = get(ExtraDataComponents.ITEM_KEY)?.itemType
     // FIXME 临时版本, 用于过渡
-    get() = get(ExtraDataComponents.ITEM_KEY)?.itemType ?: dataContainer(true)?.get(ItemDataTypes.ID)?.itemType
+    get() = get(ExtraDataComponents.ITEM_KEY)?.itemType ?: get(ExtraDataComponents.DATA_CONTAINER)?.get(ItemDataTypes.ID)?.itemType ?: item.itemProxy
 
 /**
  * 获取该物品堆叠的 *Koish 物品类型*.
@@ -172,9 +172,9 @@ val MojangStack.koishItem: KoishItem?
  */
 val MojangStack.exactKoishItem: KoishItem?
     // 最终版本
-    //get() = get(ExtraDataComponents.ITEM_ID)?.itemType
+    //get() = get(ExtraDataComponents.ITEM_KEY)?.itemType
     // FIXME 临时版本
-    get() = get(ExtraDataComponents.ITEM_KEY)?.itemType ?: dataContainer(false)?.get(ItemDataTypes.ID)?.itemType
+    get() = get(ExtraDataComponents.ITEM_KEY)?.itemType ?: get(ExtraDataComponents.DATA_CONTAINER)?.get(ItemDataTypes.ID)?.itemType
 
 /**
  * 获取该物品堆叠的套皮物品的实例.

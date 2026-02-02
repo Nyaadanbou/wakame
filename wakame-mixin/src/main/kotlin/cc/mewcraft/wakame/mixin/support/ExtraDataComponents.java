@@ -14,9 +14,7 @@ public class ExtraDataComponents {
      * 该数据仅作为内部实现, 外部不应使用.
      */
     public static final DataComponentType<ItemKey> ITEM_KEY = register(
-            "koish:item_key", builder -> builder.persistent(
-                    Codec.lazyInitialized(ItemKey::makeCodec)
-            )
+            "koish:item_key", builder -> builder.persistent(ItemKey.CODEC)
     );
 
     /**
