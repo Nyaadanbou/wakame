@@ -5,9 +5,9 @@ import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
 import org.betonquest.betonquest.api.quest.condition.OnlineCondition
+import org.betonquest.betonquest.api.quest.condition.OnlineConditionAdapter
 import org.betonquest.betonquest.api.quest.condition.PlayerCondition
 import org.betonquest.betonquest.api.quest.condition.PlayerConditionFactory
-import org.betonquest.betonquest.api.quest.condition.online.OnlineConditionAdapter
 
 /**
  * 检查玩家的头顶是否是天空 (头顶往上无限延伸只有空气方块).
