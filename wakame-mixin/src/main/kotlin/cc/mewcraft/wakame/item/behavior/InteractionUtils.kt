@@ -158,6 +158,11 @@ fun InteractionResult.shouldCancel(): Boolean {
     return this == InteractionResult.SUCCESS_AND_CANCEL || this == InteractionResult.FAIL_AND_CANCEL
 }
 
+enum class InteractEntityState {
+    CANCEL,
+    PASS,
+}
+
 /**
  * 方块交互检查逻辑的函数接口.
  */

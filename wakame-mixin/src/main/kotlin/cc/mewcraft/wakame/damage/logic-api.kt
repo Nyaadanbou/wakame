@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import org.bukkit.damage.DamageSource
-import org.bukkit.damage.DamageType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.*
@@ -46,27 +45,15 @@ interface DamageManagerApi {
     ): Float
 
     /**
-     * 将插入到原版盔甲损失耐久度判定处.
-     */
-    fun bypassesHurtEquipment(damageType: DamageType): Boolean
-
-    /**
-     * 将插入到原版盔甲损失耐久度值计算处.
-     */
-    fun computeEquipmentHurtAmount(damageAmount: Float): Int
-
-    /**
      * 伴生对象, 提供 [DamageManagerApi] 的实例.
      */
-    companion object Implementation : DamageManagerApi {
+    companion object Impl : DamageManagerApi {
 
         private const val PLACEHOLDER_DAMAGE_VALUE = 4.94f
 
         private var implementation: DamageManagerApi = object : DamageManagerApi {
             override fun hurt(victim: LivingEntity, metadata: DamageMetadata, source: DamageSource, knockback: Boolean): Boolean = false
             override fun injectDamageLogic(event: EntityDamageEvent, originLastHurt: Float, isDuringInvulnerable: Boolean): Float = PLACEHOLDER_DAMAGE_VALUE
-            override fun bypassesHurtEquipment(damageType: DamageType): Boolean = false
-            override fun computeEquipmentHurtAmount(damageAmount: Float): Int = 0
         }
 
         @ApiStatus.Internal
@@ -80,14 +67,6 @@ interface DamageManagerApi {
 
         override fun injectDamageLogic(event: EntityDamageEvent, originLastHurt: Float, isDuringInvulnerable: Boolean): Float {
             return implementation.injectDamageLogic(event, originLastHurt, isDuringInvulnerable)
-        }
-
-        override fun bypassesHurtEquipment(damageType: DamageType): Boolean {
-            return implementation.bypassesHurtEquipment(damageType)
-        }
-
-        override fun computeEquipmentHurtAmount(damageAmount: Float): Int {
-            return implementation.computeEquipmentHurtAmount(damageAmount)
         }
     }
 }
@@ -163,4 +142,10 @@ class FinalDamageContext(
      * 真正意义上的"最终", 可直接显示给玩家.
      */
     val finalDamageMap: Reference2DoubleMap<RegistryEntry<Element>>,
-)
+) {
+
+    /**
+     * 最终伤害的值 (即各元素的最终伤害的简单相加).
+     */
+    val finalDamage: Double = finalDamageMap.values.sum()
+}

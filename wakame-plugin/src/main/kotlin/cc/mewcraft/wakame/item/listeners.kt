@@ -2,26 +2,8 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.entity.player.isInventoryListenable
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
-import cc.mewcraft.wakame.item.behavior.AttackContext
-import cc.mewcraft.wakame.item.behavior.AttackEntityContext
-import cc.mewcraft.wakame.item.behavior.AttackOnContext
-import cc.mewcraft.wakame.item.behavior.BehaviorResult
-import cc.mewcraft.wakame.item.behavior.BlockInteractContext
-import cc.mewcraft.wakame.item.behavior.CauseDamageContext
-import cc.mewcraft.wakame.item.behavior.ConsumeContext
-import cc.mewcraft.wakame.item.behavior.DurabilityDecreaseContext
-import cc.mewcraft.wakame.item.behavior.InteractionHand
-import cc.mewcraft.wakame.item.behavior.InteractionResult
+import cc.mewcraft.wakame.item.behavior.*
 import cc.mewcraft.wakame.item.behavior.ItemStackActivationChecker.isActive
-import cc.mewcraft.wakame.item.behavior.ReceiveDamageContext
-import cc.mewcraft.wakame.item.behavior.StopUseContext
-import cc.mewcraft.wakame.item.behavior.UseContext
-import cc.mewcraft.wakame.item.behavior.UseEntityContext
-import cc.mewcraft.wakame.item.behavior.UseOnContext
-import cc.mewcraft.wakame.item.behavior.handleBehavior
-import cc.mewcraft.wakame.item.behavior.isInteractable
-import cc.mewcraft.wakame.item.behavior.isSuccess
-import cc.mewcraft.wakame.item.behavior.shouldCancel
 import cc.mewcraft.wakame.item.property.impl.ItemSlotRegistry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -57,18 +39,27 @@ internal object ItemBehaviorListener : Listener {
     @JvmStatic
     private val alreadySuccessfulUsePlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
     @JvmStatic
+    private val alreadySuccessfulUseEntityPlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
+    @JvmStatic
     private val alreadySuccessfulAttackPlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
     @JvmStatic
     private val alreadyCallInteractEntityWithMainHandPlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
     @JvmStatic
     private val alreadyCallInteractEntityWithOffHandPlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
+    @JvmStatic
+    private val shouldCancelMainHandInteractEventPlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
+    @JvmStatic
+    private val shouldCancelOffHandInteractEventPlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
 
     @EventHandler
     fun onServerTick(event: ServerTickStartEvent) {
         alreadySuccessfulUsePlayers.clear()
+        alreadySuccessfulUseEntityPlayers.clear()
         alreadySuccessfulAttackPlayers.clear()
         alreadyCallInteractEntityWithMainHandPlayers.clear()
         alreadyCallInteractEntityWithOffHandPlayers.clear()
+        shouldCancelMainHandInteractEventPlayers.clear()
+        shouldCancelOffHandInteractEventPlayers.clear()
     }
 
     // Koish 的交互应该在最后的最后触发.
@@ -108,18 +99,28 @@ internal object ItemBehaviorListener : Listener {
         }
         val itemstack = event.item?.takeUnlessEmpty() ?: return // 玩家手中没有物品 - 不处理
 
-        if (action == Action.RIGHT_CLICK_AIR) { // 玩家交互空气
-            if (hand == InteractionHand.MAIN_HAND) { // 若玩家已右键交互实体 - 不处理, 避免同时触发 Use 和 UseEntity 行为
-                if (alreadyCallInteractEntityWithMainHandPlayers.contains(player)) {
-                    // 此时直接返回, 不应该取消事件
-                    return
+        if (hand == InteractionHand.MAIN_HAND) {
+            // 若玩家已右键交互实体 - 不处理, 避免同时触发 Use/UseOn 和 UseEntity 行为
+            // 但由于网络延迟等原因, 实体交互事件和物品交互事件可能不在同一刻触发
+            // 此时玩家眼中为实体交互和物品交互同时触发 (顺序严格先后), 该问题无法完美解决
+            if (alreadyCallInteractEntityWithMainHandPlayers.contains(player)) {
+                // 如果实体交互事件被取消, 需要再取消物品交互事件以防止触发原版交互
+                if (shouldCancelMainHandInteractEventPlayers.contains(player)) {
+                    event.isCancelled = true
                 }
-            } else {
-                if (alreadyCallInteractEntityWithOffHandPlayers.contains(player)) {
-                    // 此时直接返回, 不应该取消事件
-                    return
-                }
+                return
             }
+        } else {
+            if (alreadyCallInteractEntityWithOffHandPlayers.contains(player)) {
+                // 同上
+                if (shouldCancelOffHandInteractEventPlayers.contains(player)) {
+                    event.isCancelled = true
+                }
+                return
+            }
+        }
+
+        if (action == Action.RIGHT_CLICK_AIR) { // 玩家交互空气
             val useContext = UseContext(player, itemstack, hand)
             itemstack.handleBehavior { behavior ->
                 val result = behavior.handleUse(useContext)
@@ -170,7 +171,7 @@ internal object ItemBehaviorListener : Listener {
         val player = event.player
         if (!player.isInventoryListenable) return // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
         if (player.gameMode == GameMode.SPECTATOR) return // 玩家处于旁观者模式 - 不处理
-        if (alreadySuccessfulUsePlayers.contains(player)) { // 限制每 tick 只能成功交互一次, 并取消多余的交互事件
+        if (alreadySuccessfulUseEntityPlayers.contains(player)) { // 限制每 tick 只能成功交互一次, 并取消多余的交互事件
             event.isCancelled = true
             return
         }
@@ -197,10 +198,15 @@ internal object ItemBehaviorListener : Listener {
         itemstack.handleBehavior { behavior ->
             val result = behavior.handleUseEntity(useEntityContext)
             if (result.isSuccess()) {
-                alreadySuccessfulUsePlayers.add(player)
+                alreadySuccessfulUseEntityPlayers.add(player)
             }
             if (result.shouldCancel()) {
                 event.isCancelled = true
+                if (hand == InteractionHand.MAIN_HAND) {
+                    shouldCancelMainHandInteractEventPlayers.add(player)
+                } else {
+                    shouldCancelOffHandInteractEventPlayers.add(player)
+                }
             }
             if (result != InteractionResult.PASS) {
                 return

@@ -7,7 +7,6 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import org.bukkit.craftbukkit.damage.CraftDamageType;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -50,7 +49,7 @@ public abstract class MixinLivingEntity {
             )
     )
     private float redirectComputeAmountDuringInvulnerable(LivingEntity instance, EntityDamageEvent event) {
-        return DamageManagerApi.Implementation.injectDamageLogic(event, instance.lastHurt, true);
+        return DamageManagerApi.Impl.injectDamageLogic(event, instance.lastHurt, true);
     }
 
 
@@ -66,7 +65,7 @@ public abstract class MixinLivingEntity {
             )
     )
     private float redirectComputeAmountDuringNotInvulnerable(LivingEntity instance, EntityDamageEvent event) {
-        return DamageManagerApi.Implementation.injectDamageLogic(event, instance.lastHurt, false);
+        return DamageManagerApi.Impl.injectDamageLogic(event, instance.lastHurt, false);
     }
 
     /**
@@ -86,7 +85,7 @@ public abstract class MixinLivingEntity {
     }
 
     /**
-     * 修改盔甲是否损失耐久度的判定.
+     * 移除原版盔甲损失耐久度的机制.
      */
     @Redirect(
             method = "actuallyHurt",
@@ -97,23 +96,7 @@ public abstract class MixinLivingEntity {
             )
     )
     private boolean redirectIsBypassesArmor(DamageSource instance, TagKey<DamageType> damageTypeKey) {
-        return DamageManagerApi.Implementation.bypassesHurtEquipment(CraftDamageType.minecraftHolderToBukkit(instance.typeHolder()));
-    }
-
-    /**
-     * 使盔甲耐久度损失可配置.
-     */
-    @Redirect(
-            method = "doHurtEquipment",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Ljava/lang/Math;max(FF)F"
-            )
-    )
-    private float redirectEquipmentDamageCompute(float a, float b) {
-        // a = 1.0f
-        // b = damageAmount / 4.0f
-        return DamageManagerApi.Implementation.computeEquipmentHurtAmount(b * 4f);
+        return false;
     }
 }
 

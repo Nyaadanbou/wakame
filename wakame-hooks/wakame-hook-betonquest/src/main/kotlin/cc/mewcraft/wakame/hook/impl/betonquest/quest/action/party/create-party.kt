@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.hook.impl.betonquest.quest.action.party
 import cc.mewcraft.wakame.integration.party.PartyIntegration
 import cc.mewcraft.wakame.util.adventure.plain
 import net.kyori.adventure.text.Component
+import org.betonquest.betonquest.api.identifier.ConditionIdentifier
 import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
@@ -10,11 +11,10 @@ import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
 import org.betonquest.betonquest.api.profile.ProfileProvider
 import org.betonquest.betonquest.api.quest.QuestTypeApi
+import org.betonquest.betonquest.api.quest.action.OnlineAction
 import org.betonquest.betonquest.api.quest.action.PlayerAction
 import org.betonquest.betonquest.api.quest.action.PlayerActionFactory
-import org.betonquest.betonquest.api.quest.action.online.OnlineAction
 import org.betonquest.betonquest.api.quest.action.online.OnlineActionAdapter
-import org.betonquest.betonquest.api.quest.condition.ConditionID
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import kotlin.jvm.optionals.getOrNull
@@ -31,7 +31,7 @@ class CreatePartyAction(
     private val questTypeApi: QuestTypeApi,
     private val profileProvider: ProfileProvider,
     private val range: Argument<Number>,
-    private val conditions: Argument<List<ConditionID>>,
+    private val conditions: Argument<List<ConditionIdentifier>>,
     private val amount: Argument<Number>?,
     private val logger: BetonQuestLogger,
 ) : OnlineAction {
@@ -95,7 +95,7 @@ class CreatePartyAction(
         profiles: Collection<OnlineProfile>,
         location: Location,
         range: Double,
-        conditions: List<ConditionID>,
+        conditions: List<ConditionIdentifier>,
     ): Map<OnlineProfile, Double> {
         val world = location.world
         val squared = range * range
@@ -134,7 +134,7 @@ class CreatePartyActionFactory(
 
     override fun parsePlayer(instruction: Instruction): PlayerAction {
         val range = instruction.number().get()
-        val conditions = instruction.parse(::ConditionID).list().get()
+        val conditions = instruction.identifier(ConditionIdentifier::class.java).list().get()
         val amount = instruction.number().get("amount").getOrNull()
         val logger = loggerFactory.create(CreatePartyAction::class.java)
         val questPackage = instruction.getPackage()

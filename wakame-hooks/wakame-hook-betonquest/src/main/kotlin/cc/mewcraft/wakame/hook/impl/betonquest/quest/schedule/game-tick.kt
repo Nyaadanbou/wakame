@@ -2,18 +2,16 @@ package cc.mewcraft.wakame.hook.impl.betonquest.quest.schedule
 
 import com.destroystokyo.paper.event.server.ServerTickEndEvent
 import org.betonquest.betonquest.api.QuestException
-import org.betonquest.betonquest.api.config.quest.QuestPackageManager
+import org.betonquest.betonquest.api.identifier.ActionIdentifier
+import org.betonquest.betonquest.api.identifier.ScheduleIdentifier
+import org.betonquest.betonquest.api.instruction.section.SectionInstruction
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.quest.QuestTypeApi
-import org.betonquest.betonquest.api.quest.action.ActionID
 import org.betonquest.betonquest.api.schedule.CatchupStrategy
 import org.betonquest.betonquest.api.schedule.Schedule
-import org.betonquest.betonquest.api.schedule.ScheduleID
 import org.betonquest.betonquest.api.schedule.Scheduler
-import org.betonquest.betonquest.kernel.processor.quest.PlaceholderProcessor
 import org.betonquest.betonquest.schedule.impl.BaseScheduleFactory
 import org.bukkit.Bukkit
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.event.EventHandler
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
@@ -32,8 +30,8 @@ import org.bukkit.plugin.java.JavaPlugin
  * @param intervalTicks how many ticks between each execution (the execution period)
  */
 class GameTickSchedule(
-    scheduleID: ScheduleID,
-    actions: List<ActionID>,
+    scheduleID: ScheduleIdentifier,
+    actions: List<ActionIdentifier>,
     catchup: CatchupStrategy,
     val intervalTicks: Int,
 ) : Schedule(scheduleID, actions, catchup)
@@ -46,14 +44,11 @@ class GameTickSchedule(
  * - time: "20" means execute every 20 ticks (1, 21, 41, 61...)
  * - time: "100" means execute every 100 ticks (1, 101, 201, 301...)
  */
-class GameTickScheduleFactory(
-    variableProcessor: PlaceholderProcessor,
-    packManager: QuestPackageManager,
-) : BaseScheduleFactory<GameTickSchedule>(variableProcessor, packManager) {
+class GameTickScheduleFactory : BaseScheduleFactory<GameTickSchedule>() {
 
     @Throws(QuestException::class)
-    override fun createNewInstance(scheduleID: ScheduleID, config: ConfigurationSection): GameTickSchedule {
-        val scheduleData = parseScheduleData(scheduleID.getPackage(), config)
+    override fun createNewInstance(scheduleID: ScheduleIdentifier, config: SectionInstruction): GameTickSchedule {
+        val scheduleData = parseScheduleData(config)
         val rawTime = scheduleData.time().trim()
         val interval = rawTime.toIntOrNull() ?: throw QuestException("Unable to parse time '$rawTime' as tick interval")
         require(interval > 0) { "Time must be a positive integer tick interval, got '$rawTime'" }

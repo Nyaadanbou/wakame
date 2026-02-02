@@ -41,42 +41,44 @@ object ItemBehaviorTypes {
     val HOLD_LAST_DAMAGE = typeOf("hold_last_damage", HoldLastDamage)
 
     /**
-     * 物品具有该行为时, 会附加 Koish 对原版弓的额外逻辑.
+     * 使物品具有**原版弓**武器行为.
+     *
+     * @see cc.mewcraft.wakame.item.property.ItemPropTypes.MINECRAFT_BOW
      */
     @JvmField
-    val BOW = typeOf("bow", Bow)
+    val MINECRAFT_BOW = typeOf("minecraft_bow", Bow)
 
     /**
-     * 物品具有该行为时, 会附加 Koish 对原版弩的额外逻辑.
+     * 使物品具有**原版弩**武器行为.
      *
-     * @see TODO
+     * @see cc.mewcraft.wakame.item.property.ItemPropTypes.MINECRAFT_CROSSBOW
      */
     @JvmField
-    val CROSSBOW = typeOf("crossbow", Crossbow)
+    val MINECRAFT_CROSSBOW = typeOf("minecraft_crossbow", Crossbow)
 
     /**
-     * 物品具有该行为时, 会附加 Koish 对原版三叉戟的额外逻辑.
+     * 使物品具有**原版重锤**武器行为.
      *
-     * @see TODO
+     * @see cc.mewcraft.wakame.item.property.ItemPropTypes.MINECRAFT_MACE
      */
     @JvmField
-    val TRIDENT = typeOf("trident", Trident)
+    val MINECRAFT_MACE = typeOf("minecraft_mace", Mace)
 
     /**
-     * 物品具有该行为时, 会附加 Koish 对原版重锤的额外逻辑.
+     * 使物品具有**原版近战(斧, 镐, 锄等单体武器)**武器行为.
      *
-     * @see TODO
+     * @see cc.mewcraft.wakame.item.property.ItemPropTypes.MINECRAFT_MELEE
      */
     @JvmField
-    val MACE = typeOf("mace", Mace)
+    val MINECRAFT_MELEE = typeOf("minecraft_melee", Melee)
 
     /**
-     * 作为一般近战武器的逻辑, 如斧等.
+     * 使物品具有**原版三叉戟**武器行为.
      *
-     * @see cc.mewcraft.wakame.item.property.ItemPropTypes.MELEE
+     * @see cc.mewcraft.wakame.item.property.ItemPropTypes.MINECRAFT_TRIDENT
      */
     @JvmField
-    val MELEE = typeOf("melee", Melee)
+    val MINECRAFT_TRIDENT = typeOf("minecraft_trident", Trident)
 
     /**
      * 物品具有该行为时, 可以作为双剑武器.
@@ -93,6 +95,7 @@ object ItemBehaviorTypes {
      */
     @JvmField
     val KATANA = typeOf("katana", Katana)
+
     /**
      * 物品具有该行为时, 可以捕捉和释放生物.
      *
