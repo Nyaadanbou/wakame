@@ -6,7 +6,7 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
  * **原版重锤**武器的配置.
  *
  * @property attackCooldown 攻击后物品冷却.
- * @property attackDamageRatePerFallHeight 每单位下落高度增加的伤害系数.
+ * @property attackDamageRatePerFallHeight 每单位下落高度增加的伤害的系数.
  * @property damageByFallHeightLimit 下落高度增加的额外伤害的上限.
  */
 @ConfigSerializable

@@ -61,7 +61,7 @@ object Crossbow : Weapon {
  *
  * 相较于原版的改动:
  * - 只有造成伤害才会进入冷却.
- * - 可以调整每单位下落高度增加的伤害系数: [cc.mewcraft.wakame.item.property.impl.weapon.Mace.attackDamageRatePerFallHeight].
+ * - 可以调整每单位下落高度增加的伤害的系数: [cc.mewcraft.wakame.item.property.impl.weapon.Mace.attackDamageRatePerFallHeight].
  * - 可以设置下落高度增加的额外伤害的上限: [cc.mewcraft.wakame.item.property.impl.weapon.Mace.damageByFallHeightLimit].
  */
 object Mace : Weapon {
