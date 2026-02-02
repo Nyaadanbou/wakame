@@ -705,7 +705,9 @@ internal object DamageManagerImpl : DamageManagerApi {
             text(")")
         )
 
-        Bukkit.getServer().filterAudience { it is Player }.sendMessage(message)
+        Bukkit.getServer().filterAudience { audience ->
+            audience is Player && audience.hasPermission("koish.logging.damage")
+        }.sendMessage(message)
     }
 
     private enum class Mapping {
