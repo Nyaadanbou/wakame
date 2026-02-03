@@ -62,6 +62,7 @@ preview_menu_settings:
     next_page: "internal/menu/common/default/next_page"
     prev_page: "internal/menu/common/default/prev_page"
     craft: "internal/menu/crafting_station/default/craft"
+    choice: "internal/menu/crafting_station/default/choice"
 
 catalog_menu_settings:
 
