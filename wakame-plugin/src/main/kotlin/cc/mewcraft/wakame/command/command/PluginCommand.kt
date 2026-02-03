@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.command.command
 
 import cc.mewcraft.lazyconfig.access.ConfigAccess
+import cc.mewcraft.wakame.api.event.KoishLoadDataEvent
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategoryRegistryLoader
 import cc.mewcraft.wakame.catalog.item.CatalogItemLootTableRecipeRegistryLoader
 import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
@@ -145,6 +146,10 @@ private object ReloadProcess {
         PlayerAdhocDamageMappings.reload()
 
         ResourcePackLifecycle.reload()
+
+        //
+
+        KoishLoadDataEvent().callEvent()
     }
 
     fun recipes() {

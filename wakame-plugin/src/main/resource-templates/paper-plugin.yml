@@ -55,6 +55,9 @@ dependencies:
     ExtraContexts:
       required: false
       load: OMIT
+    HibiscusCommons:
+      required: false
+      load: AFTER # HibiscusCommons 需要访问 Koish 注册的 Hook
     HuskHomes:
       required: false
       load: OMIT
