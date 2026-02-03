@@ -23,9 +23,11 @@ internal object ConfigsExtractor {
         "damage/player_adhoc_mappings.yml",
         "database.yml",
         "entities.yml",
+        "features.yml",
         "hook/auraskills/stats.yml",
         "hook/brewery/config.yml",
         "levels.yml",
+        "messaging.yml",
         "resourcepack.yml",
     )
 
