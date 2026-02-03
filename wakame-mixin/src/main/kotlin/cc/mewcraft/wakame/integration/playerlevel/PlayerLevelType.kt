@@ -6,15 +6,15 @@ enum class PlayerLevelType {
      */
     VANILLA,
     /**
-     * Level sourced from the AdventureLevel plugin.
-     *
-     * See [AdventureLevel API](https://github.com/Nyaadanbou/adventurelevel).
-     */
-    ADVENTURE,
-    /**
      * Level sourced from the AuraSkills plugin.
      *
      * See [AuraSkills API](https://wiki.aurelium.dev/auraskills/api).
      */
     AURA_SKILLS,
+    /**
+     * Level sourced from the AdventureLevel plugin.
+     *
+     * See [AdventureLevel API](https://github.com/Nyaadanbou/adventurelevel).
+     */
+    ADVENTURE_LEVEL,
 }

@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.entity.player
 
-import cc.mewcraft.lazyconfig.MAIN_CONFIG
-import cc.mewcraft.lazyconfig.access.entry
+import cc.mewcraft.lazyconfig.access.entryOrElse
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
+import cc.mewcraft.wakame.feature.FEATURE_CONFIG
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -66,7 +66,7 @@ internal object UnbreakableArmorStand : Listener {
     private val MESSAGE_COOLDOWN = MetadataKey.createCooldownKey("sneak_to_break_armor_stand_tip")
 
     // config
-    private val requireSneakingToBreakArmorStand: Boolean by MAIN_CONFIG.entry<Boolean>("require_sneaking_to_break_armor_stand")
+    private val requireSneakingToBreakArmorStand: Boolean by FEATURE_CONFIG.entryOrElse<Boolean>(false, "require_sneaking_to_break_armor_stand")
 
     // aux data
     private val itemStacksOnArmorStands: Cache<ArmorStand, Map<EquipmentSlot, ItemStack>> =

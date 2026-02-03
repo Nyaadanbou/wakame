@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.entity.player
 
-import cc.mewcraft.lazyconfig.MAIN_CONFIG
-import cc.mewcraft.lazyconfig.access.entry
+import cc.mewcraft.lazyconfig.access.entryOrElse
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.feature.FEATURE_CONFIG
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -50,7 +50,7 @@ internal object SimpleDeathDropProtect : Listener {
         }
         .build()
 
-    private val onlyOwnerCanPickupDeathDrops: Boolean by MAIN_CONFIG.entry<Boolean>("only_owner_can_pickup_death_drops")
+    private val onlyOwnerCanPickupDeathDrops: Boolean by FEATURE_CONFIG.entryOrElse<Boolean>(false, "only_owner_can_pickup_death_drops")
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun on(event: PlayerDeathEvent) {

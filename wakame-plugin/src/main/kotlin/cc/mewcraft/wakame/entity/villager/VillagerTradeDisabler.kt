@@ -1,39 +1,39 @@
 package cc.mewcraft.wakame.entity.villager
 
-import cc.mewcraft.lazyconfig.MAIN_CONFIG
-import cc.mewcraft.lazyconfig.access.optionalEntry
+import cc.mewcraft.lazyconfig.access.entryOrElse
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
+import cc.mewcraft.wakame.feature.FEATURE_CONFIG
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.util.adventure.BukkitSound
 import cc.mewcraft.wakame.util.registerEvents
 import net.kyori.adventure.key.Key
-import org.bukkit.Sound
+import net.kyori.adventure.sound.Sound
 import org.bukkit.entity.Villager
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerInteractEntityEvent
-import xyz.xenondevs.commons.provider.orElse
+import org.bukkit.event.inventory.InventoryOpenEvent
+import org.bukkit.inventory.MerchantInventory
 
-@Init(
-    stage = InitStage.POST_WORLD,
-)
+@Init(InitStage.POST_WORLD)
 object VillagerTradeDisabler : Listener {
 
     init {
         registerEvents()
     }
 
-    private val DISABLED_WORLDS: Set<Key> by MAIN_CONFIG.optionalEntry<Set<Key>>("disable_villager_trade_in_worlds").orElse(setOf())
+    private val disabledWorlds: Set<Key> by FEATURE_CONFIG.entryOrElse<Set<Key>>(setOf(), "disable_villager_trade_in_worlds")
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-    private fun on(event: PlayerInteractEntityEvent) {
-        val rightClicked = event.rightClicked as? Villager ?: return
-        val rightClickedLocation = rightClicked.location
-        val worldKey = rightClickedLocation.world.key
-        if (worldKey in DISABLED_WORLDS) {
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    private fun on(event: InventoryOpenEvent) {
+        val inventory = event.inventory as? MerchantInventory ?: return
+        val villager = inventory.holder as? Villager ?: return
+        val location = inventory.location
+        val worldKey = location?.world?.key
+        if (worldKey != null && worldKey in disabledWorlds) {
             event.isCancelled = true
-            event.player.playSound(rightClicked, Sound.ENTITY_VILLAGER_NO, 1f, 1f)
+            event.player.playSound(Sound.sound().type(BukkitSound.ENTITY_VILLAGER_NO).source(Sound.Source.NEUTRAL).build(), villager)
             event.player.sendMessage(TranslatableMessages.MSG_VILLAGER_TRADE_DISABLED_IN_THIS_WORLD)
         }
     }

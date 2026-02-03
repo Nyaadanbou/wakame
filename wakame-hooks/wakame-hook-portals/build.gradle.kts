@@ -7,8 +7,8 @@ version = "0.0.1"
 repositories {
     // plugin: Portals
     maven {
-        name = "jitPack"
-        url = uri("https://jitpack.io")
+        name = "thenextlvlReleases"
+        url = uri("https://repo.thenextlvl.net/releases")
     }
 }
 
@@ -16,10 +16,6 @@ dependencies {
     // internal
     compileOnly(project(":wakame-plugin"))
 
-    // libraries
-
     // plugin: Portals
-    compileOnly("com.github.TheNextLvl-net:portals:1.1.5") {
-        isTransitive = false
-    }
+    compileOnly("net.thenextlvl:portals:1.4.0")
 }

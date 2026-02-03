@@ -25,7 +25,7 @@ object AdventureLevelHook {
     private val PLAYER_LEVEL_PROVIDER by MAIN_CONFIG.entry<PlayerLevelType>("player_level_provider")
 
     init {
-        if (PLAYER_LEVEL_PROVIDER == PlayerLevelType.ADVENTURE) {
+        if (PLAYER_LEVEL_PROVIDER == PlayerLevelType.ADVENTURE_LEVEL) {
             PlayerLevelIntegration.setImplementation(AdventurePlayerLevelIntegration)
             PlayerDataLoadingCoordinator.registerExternalStage2Handler("AdventureLevel")
             ResourceLoadingFixHandler.setImplementation(AdventureResourceLoadingFixHandler)
@@ -50,7 +50,7 @@ private object AdventureResourceLoadingFixHandler : ResourceLoadingFixHandler {
 
 private object AdventurePlayerLevelIntegration : PlayerLevelIntegration {
 
-    override val type: PlayerLevelType = PlayerLevelType.ADVENTURE
+    override val type: PlayerLevelType = PlayerLevelType.ADVENTURE_LEVEL
 
     override fun get(uuid: UUID): Int? {
         val api = AdventureLevelProvider.get()
