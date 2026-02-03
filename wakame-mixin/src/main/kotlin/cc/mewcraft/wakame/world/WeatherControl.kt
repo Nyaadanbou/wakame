@@ -1,13 +1,14 @@
 package cc.mewcraft.wakame.world
 
-import cc.mewcraft.lazyconfig.MAIN_CONFIG
-import cc.mewcraft.lazyconfig.access.entry
+import cc.mewcraft.lazyconfig.access.entryOrElse
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.feature.FEATURE_CONFIG
 import cc.mewcraft.wakame.util.cooldown.Cooldown
 import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.world.WeatherControl.execute
+import net.kyori.adventure.util.Ticks
 import org.bukkit.Bukkit
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -23,8 +24,9 @@ import kotlin.reflect.typeOf
  * 控制所有维度的天气.
  */
 object WeatherControl {
-    private val useInterval: Cooldown by MAIN_CONFIG
-        .entry<Long>("world_weather_control_use_interval_ticks")
+
+    private val useInterval: Cooldown by FEATURE_CONFIG
+        .entryOrElse<Long>(600L * Ticks.TICKS_PER_SECOND, "world_weather_control_use_interval_ticks")
         .map(Cooldown::ofTicks)
 
     /**

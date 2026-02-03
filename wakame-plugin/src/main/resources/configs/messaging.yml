@@ -1,0 +1,24 @@
+# 消息队列相关配置
+# 部分功能需要该配置正确才能正常工作
+messaging:
+  # 是否启用消息队列
+  enabled: false
+  # 使用的消息队列: NATS, RABBITMQ, REDIS
+  broker_type: NATS
+  # NATS
+  nats:
+    host: "localhost"
+    port: 4222
+    credentials_file: ""
+  # RabbitMQ
+  rabbitmq:
+    host: "localhost"
+    port: 5672
+    vhost: "/"
+    user: "user"
+    pass: "pass"
+  # Redis
+  redis:
+    host: "localhost"
+    port: 6379
+    pass: ""

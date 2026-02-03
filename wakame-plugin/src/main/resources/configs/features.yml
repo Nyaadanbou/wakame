@@ -1,0 +1,45 @@
+# 映射: 维度技术名字 -> 维度友好名字
+# 目前用于配置 %koish_current_dimension% 占位符的输出
+dimension_key_mappings:
+  minecraft:overworld: 主世界
+  minecraft:nether: 下界
+  minecraft:end: 末地
+
+# 只有物品的所有者可以拾起死亡掉落的物品
+only_owner_can_pickup_death_drops: false
+
+# 要求玩家必须在潜行状态下才能够破坏盔甲架
+require_sneaking_to_break_armor_stand: false
+
+# 世界时间控制器的全局最小使用间隔 (刻)
+world_time_control_use_interval_ticks: 12000
+
+# 世界天气控制器的全局最小使用间隔 (刻)
+world_weather_control_use_interval_ticks: 12000
+
+# 禁止玩家在以下世界中与村民进行交易
+disable_villager_trade_in_worlds:
+  - koish:eden
+  - koish:dune
+  - koish:hollow
+
+# 可以点亮下界传送门的维度名字列表
+nether_portal_functional_dimensions:
+  - koish:hollow
+
+# 玩家明确进入服务器时, 修改其出现在世界里的位置坐标
+teleport_on_join_explicit_server:
+  # 是否启用该功能
+  enabled: false
+  # 执行传送的条件
+  conditions:
+    - { type: server_group, group: xmine }
+  # 传送到的位置列表
+  locations:
+    - { world: koish:eden, x: 2500, y: 128, z: 2500 }
+    - { world: koish:eden, x: 2500, y: 128, z: -2500 }
+    - { world: koish:eden, x: -2500, y: 128, z: 2500 }
+    - { world: koish:eden, x: -2500, y: 128, z: -2500 }
+  # 传送后应用的效果
+  effects:
+    - { type: minecraft:slow_falling, duration: 200, amplifier: 1 }

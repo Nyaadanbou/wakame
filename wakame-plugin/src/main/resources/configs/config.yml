@@ -1,31 +1,6 @@
 # 不要修改!
 version: 1
 
-# 消息队列相关配置
-# 部分功能需要该配置正确才能正常工作
-messaging:
-  # 是否启用消息队列
-  enabled: false
-  # 使用的消息队列: NATS, RABBITMQ, REDIS
-  broker_type: NATS
-  # NATS
-  nats:
-    host: "localhost"
-    port: 4222
-    credentials_file: ""
-  # RabbitMQ
-  rabbitmq:
-    host: "localhost"
-    port: 5672
-    vhost: "/"
-    user: "user"
-    pass: "pass"
-  # Redis
-  redis:
-    host: "localhost"
-    port: 6379
-    pass: ""
-
 # Koish 所使用的经济系统
 # 可用选项:
 #   vanilla: Minecraft 原版经验等级
@@ -36,7 +11,7 @@ economy_provider: vanilla
 # 可用选项:
 #   vanilla: Minecraft 的原版经验等级
 #   aura_skills: AuraSkills 插件的技能等级
-#   adventure: AdventureLevel 插件的冒险等级
+#   adventure_level: AdventureLevel 插件的冒险等级
 player_level_provider: vanilla
 
 # Koish 如何计算玩家的魔法值
@@ -44,18 +19,6 @@ player_level_provider: vanilla
 #   infinity: 无限魔法值
 #   aura_skills: AuraSkills 插件的魔法值
 player_mana_provider: infinity
-
-# 只有物品的所有者可以拾起死亡掉落的物品
-only_owner_can_pickup_death_drops: false
-
-# 要求玩家必须在潜行状态下才能够破坏盔甲架
-require_sneaking_to_break_armor_stand: false
-
-# 世界时间控制器的全局最小使用间隔 (刻)
-world_time_control_use_interval_ticks: 12000
-
-# 世界天气控制器的全局最小使用间隔 (刻)
-world_weather_control_use_interval_ticks: 12000
 
 # Koish 如何计算物品的附魔槽位的基础容量
 # 可用选项:
@@ -100,40 +63,6 @@ item_core_provider: data
 #   type: 从物品类型上读取核心容器
 item_core_container_provider: data
 
-# 禁止玩家在以下世界中与村民进行交易
-disable_villager_trade_in_worlds:
-  - koish:eden
-  - koish:dune
-  - koish:hollow
-
-# 映射: 维度技术名字 -> 维度友好名字
-# 目前用于配置 %koish_current_dimension% 占位符的输出
-dimension_key_mappings:
-  minecraft:overworld: 主世界
-  minecraft:nether: 下界
-  minecraft:end: 末地
-
-# 可以点亮下界传送门的维度名字列表
-nether_portal_functional_dimensions:
-  - koish:hollow
-
-# 玩家明确进入服务器时, 修改其出现在世界里的位置坐标
-teleport_on_join_explicit_server:
-  # 是否启用该功能
-  enabled: false
-  # 执行传送的条件
-  conditions:
-    - { type: server_group, group: xmine }
-  # 传送到的位置列表
-  locations:
-    - { world: koish:eden, x: 2500, y: 128, z: 2500 }
-    - { world: koish:eden, x: 2500, y: 128, z: -2500 }
-    - { world: koish:eden, x: -2500, y: 128, z: 2500 }
-    - { world: koish:eden, x: -2500, y: 128, z: -2500 }
-  # 传送后应用的效果
-  effects:
-    - { type: minecraft:slow_falling, duration: 200, amplifier: 1 }
-
 # 给客户端设置的生命值缩放
 clientbound_health_scale: 20.0
 
@@ -142,9 +71,7 @@ print_stack_on_set_health_scale: false
 
 # 在发送 ClientboundUpdateAttributesPacket 封包时移除掉以下属性
 # 目前仅用于配合伤害系统来“移除” ARMOR 和 ARMOR_TOUGHNESS 这两属性
-# 此功能可以带来几个好处:
-# - 不再需要手动移除掉物品自带的 minecraft:attribute_modifiers 组件
-# - 不再需要使用特制的资源包隐藏掉护甲 HUD
+# 实际生产环境中此功能的作用: 不再需要使用特制的资源包隐藏掉护甲 HUD
 remove_attributes_on_clientbound_update_attributes_packet:
   - minecraft:armor
   - minecraft:armor_toughness

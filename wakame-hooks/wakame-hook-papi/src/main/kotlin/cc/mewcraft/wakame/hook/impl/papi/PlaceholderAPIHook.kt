@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.hook.impl.papi
 
-import cc.mewcraft.lazyconfig.MAIN_CONFIG
-import cc.mewcraft.lazyconfig.access.entry
+import cc.mewcraft.lazyconfig.access.entryOrElse
 import cc.mewcraft.wakame.BootstrapContexts
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
+import cc.mewcraft.wakame.feature.FEATURE_CONFIG
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.integration.playermana.PlayerManaIntegration
@@ -15,7 +15,7 @@ import org.bukkit.entity.Player
 @Hook(plugins = ["PlaceholderAPI"])
 object PlaceholderAPIHook : PlaceholderExpansion() {
 
-    private val dimensionKeyMappings: Map<Key, String> by MAIN_CONFIG.entry<Map<Key, String>>("dimension_key_mappings")
+    private val dimensionKeyMappings: Map<Key, String> by FEATURE_CONFIG.entryOrElse<Map<Key, String>>(mapOf(), "dimension_key_mappings")
 
     init {
         register()

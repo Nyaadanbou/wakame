@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.feature
 
-import cc.mewcraft.lazyconfig.MAIN_CONFIG
 import cc.mewcraft.lazyconfig.access.entry
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.lazyconfig.configurate.serializer.DispatchingSerializer
@@ -27,7 +26,7 @@ object TeleportOnJoin {
     /**
      * 配置文件.
      */
-    val config: TeleportOnJoinConfig by MAIN_CONFIG.entry("teleport_on_join_explicit_server")
+    val config: TeleportOnJoinConfig by FEATURE_CONFIG.entry("teleport_on_join_explicit_server")
 
     /**
      * 请求跨服传送.
