@@ -19,7 +19,7 @@ class EconomyCurrency(
         @JvmStatic
         fun currencies(): Set<EconomyCurrency> {
             return EconomyProvider.get().getLoadedCurrencies()
-                .filter(Currency::isDefaultCurrency)
+                .filterNot(Currency::isDefaultCurrency)
                 .map(::EconomyCurrency)
                 .toHashSet()
         }
