@@ -26,6 +26,7 @@
     "MixinHoverEvent$ShowItem",
     "MixinIngredient",
     "MixinInventory",
+    "MixinItemBody",
     "MixinItemStack$2",
     "MixinLivingEntity",
     "MixinLootPoolEntries",
