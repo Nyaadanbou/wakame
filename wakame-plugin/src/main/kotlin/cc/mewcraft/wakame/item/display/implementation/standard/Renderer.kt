@@ -131,7 +131,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
             koishLore
         } else if (existingLore.isEmpty()) {
             // existingLore 为空 && koishLore 为空
-            return
+            null
         } else if (koishLore.isEmpty()) {
             // existingLore 不为空 && koishLore 为空
             existingLore
@@ -143,9 +143,10 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
                 addAll(koishLore)
             }
         }
-
         // 应用 lore 到物品上
-        item.fastLore(resultantLore)
+        if (resultantLore != null) {
+            item.fastLore(resultantLore)
+        }
 
         // 移除不需要的物品组件
         for (componentType in removeComponents) {
