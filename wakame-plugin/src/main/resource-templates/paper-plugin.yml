@@ -41,9 +41,6 @@ dependencies:
     Economy:
       required: false
       load: OMIT
-    EconomyBridge:
-      required: false
-      load: BEFORE # Koish 需要访问其 ItemManager
     ExcellentShop:
       required: false
       join-classpath: false
@@ -73,6 +70,9 @@ dependencies:
     MythicMobs:
       required: false
       load: OMIT
+    nightcore:
+      required: false
+      load: BEFORE
     PlaceholderAPI:
       required: false
       load: OMIT
