@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.datagen.impl
 
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.lazyconfig.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
 import cc.mewcraft.wakame.item.datagen.ItemMetaEntry
@@ -16,14 +17,32 @@ sealed interface MetaItemModel : ItemMetaEntry<Key> {
 
     companion object {
 
-        @JvmField
-        val SERIALIZER: SimpleSerializer<MetaItemModel> = DispatchingSerializer.createPartial<String, MetaItemModel>(
-            mapOf(
-                "none" to None::class, // 其实完全不写 item_model 的话和这个效果一样
-                "auto" to Auto::class, // 自动使用物品类型的唯一标识作为 `minecraft:item_model`
-                "custom" to Custom::class, // 使用自定义的 `minecraft:item_model`
-            )
-        )
+        /**
+         * ## 格式 1
+         * ```yaml
+         * item_model: <key>
+         * ```
+         *
+         * ## 格式 2
+         * ```yaml
+         * item_model:
+         *   type: <type>
+         *   # ... 其他字段
+         * ```
+         */
+        fun serializer(): SimpleSerializer<MetaItemModel> = SimpleSerializer { type, node ->
+            if (node.isMap) {
+                DispatchingSerializer.createPartial<String, MetaItemModel>(
+                    mapOf(
+                        "none" to None::class, // 其实完全不写 item_model 的话和这个效果一样
+                        "auto" to Auto::class, // 自动使用物品类型的唯一标识作为 `minecraft:item_model`
+                        "custom" to Custom::class, // 使用自定义的 `minecraft:item_model`
+                    )
+                ).deserialize(type, node)
+            } else {
+                Custom(node.require<Key>())
+            }
+        }
     }
 
     @ConfigSerializable

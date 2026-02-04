@@ -23,15 +23,17 @@ dependencies {
     runtimeOnly(project(":wakame-hooks:wakame-hook-breweryx"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-carbonchat"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-chestshop"))
-    // runtimeOnly(project(":wakame-hooks:wakame-hook-chestsort")) // FIXME 仓库已经挂掉并且作者似乎没有修复的打算
+    //runtimeOnly(project(":wakame-hooks:wakame-hook-chestsort")) // FIXME 仓库已经挂掉并且作者似乎没有修复的打算
     runtimeOnly(project(":wakame-hooks:wakame-hook-craftengine"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-economy"))
-    runtimeOnly(project(":wakame-hooks:wakame-hook-economybridge"))
+    //runtimeOnly(project(":wakame-hooks:wakame-hook-economybridge")) // 已合并进 nightcore
+    runtimeOnly(project(":wakame-hooks:wakame-hook-hibiscuscommons"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-husksync"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-huskhomes"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-luckperms"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-mythicdungeons"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-mythicmobs"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-nightcore"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-papi"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-plotsquared"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-portals"))
