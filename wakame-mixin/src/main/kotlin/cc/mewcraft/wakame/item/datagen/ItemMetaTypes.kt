@@ -71,7 +71,7 @@ data object ItemMetaTypes {
     @JvmField
     val ITEM_MODEL: ItemMetaType<MetaItemModel, Key> = typeOf("item_model") {
         serializers {
-            registerExact(MetaItemModel.SERIALIZER)
+            registerExact(MetaItemModel.serializer())
         }
     }
 
