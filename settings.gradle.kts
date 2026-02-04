@@ -36,10 +36,10 @@ include(":wakame-hooks:wakame-hook-betterhud")
 include(":wakame-hooks:wakame-hook-breweryx")
 include(":wakame-hooks:wakame-hook-carbonchat")
 include(":wakame-hooks:wakame-hook-chestshop")
-// include(":wakame-hooks:wakame-hook-chestsort") // FIXME 仓库已经挂掉并且作者似乎没有修复的打算
+//include(":wakame-hooks:wakame-hook-chestsort") // FIXME 仓库已经挂掉并且作者似乎没有修复的打算
 include(":wakame-hooks:wakame-hook-craftengine")
 include(":wakame-hooks:wakame-hook-economy")
-include(":wakame-hooks:wakame-hook-economybridge")
+//include(":wakame-hooks:wakame-hook-economybridge") // 已合并进 nightcore
 include(":wakame-hooks:wakame-hook-hibiscuscommons")
 include(":wakame-hooks:wakame-hook-husksync")
 include(":wakame-hooks:wakame-hook-huskhomes")
