@@ -38,7 +38,7 @@ import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 @Init(
-    stage = InitStage.PRE_WORLD,
+    stage = InitStage.BOOTSTRAP,
     runAfter = [
         AttributeBootstrap2.Pre::class,
     ]

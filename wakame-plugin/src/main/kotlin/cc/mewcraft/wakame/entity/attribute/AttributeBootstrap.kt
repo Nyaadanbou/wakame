@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 internal interface AttributeBootstrap2 {
 
     @Init(
-        stage = InitStage.PRE_WORLD,
+        stage = InitStage.BOOTSTRAP,
         runAfter = [
             ElementRegistryLoader::class, // 调用 Attributes.init() 之前, 所有元素必须已加载完毕
         ]

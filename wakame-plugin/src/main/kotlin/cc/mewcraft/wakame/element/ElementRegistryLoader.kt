@@ -18,7 +18,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import cc.mewcraft.wakame.api.element.Element as ApiElement
 
-@Init(InitStage.PRE_WORLD)
+@Init(InitStage.BOOTSTRAP)
 internal object ElementRegistryLoader : RegistryLoader {
 
     @InitFun

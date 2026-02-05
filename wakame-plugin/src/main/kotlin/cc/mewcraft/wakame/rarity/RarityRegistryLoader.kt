@@ -20,7 +20,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.SerializationException
 
-@Init(InitStage.PRE_WORLD)
+@Init(InitStage.BOOTSTRAP)
 internal object RarityRegistryLoader : RegistryLoader {
 
     @InitFun
