@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.listener
 
-import cc.mewcraft.wakame.hook.impl.betonquest.util.MythicDungeonsBridge
+import cc.mewcraft.wakame.integration.dungeon.DungeonBridge
 import net.playavalon.mythicdungeons.api.events.dungeon.DungeonDisposeEvent
 import net.playavalon.mythicdungeons.api.events.dungeon.DungeonEndEvent
 import net.playavalon.mythicdungeons.api.events.dungeon.PlayerFinishDungeonEvent
@@ -16,30 +16,30 @@ object MythicDungeonsListener : Listener {
     @EventHandler
     private fun on(event: DungeonDisposeEvent) {
         for (player in event.instance.players.toList()) {
-            MythicDungeonsBridge.leaveParty(player.player)
+            DungeonBridge.leaveParty(player.player)
         }
     }
 
     @EventHandler
     private fun on(event: DungeonEndEvent) {
         for (player in event.gamePlayers.toList()) {
-            MythicDungeonsBridge.leaveParty(player.player)
+            DungeonBridge.leaveParty(player.player)
         }
     }
 
     @EventHandler
     private fun on(event: PlayerFinishDungeonEvent) {
-        MythicDungeonsBridge.leaveParty(event.player)
+        DungeonBridge.leaveParty(event.player)
     }
 
     @EventHandler
     private fun on(event: PlayerLeaveDungeonEvent) {
-        MythicDungeonsBridge.leaveParty(event.player)
+        DungeonBridge.leaveParty(event.player)
     }
 
     @EventHandler
     private fun on(event: PlayerQuitEvent) {
-        MythicDungeonsBridge.leaveParty(event.player)
+        DungeonBridge.leaveParty(event.player)
     }
     //</editor-fold>
 }

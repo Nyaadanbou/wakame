@@ -192,6 +192,12 @@ object ItemBehaviorTypes {
     @JvmField
     val TRANSFER = typeOf("transfer", Transfer)
 
+    /**
+     * 物品具有该行为时, 消耗后可以进入地牢/副本.
+     */
+    @JvmField
+    val DUNGEON_ENTRY = typeOf("dungeon_entry", DungeonEntry)
+
     // ------------
     // 方便函数
     // ------------

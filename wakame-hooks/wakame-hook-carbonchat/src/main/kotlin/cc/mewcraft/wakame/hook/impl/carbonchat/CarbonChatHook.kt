@@ -5,6 +5,8 @@ import cc.mewcraft.wakame.integration.party.Party
 import cc.mewcraft.wakame.integration.party.PartyIntegration
 import net.draycia.carbon.api.CarbonChatProvider
 import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import net.draycia.carbon.api.users.Party as InternalParty
@@ -28,6 +30,8 @@ private class CarbonChatParty(
         get() = party.id()
     override val members: Set<UUID>
         get() = party.members()
+    override val players: Set<Player>
+        get() = party.members().mapNotNull(Bukkit::getPlayer).toSet()
 
     override fun addMember(id: UUID) {
         return party.addMember(id)

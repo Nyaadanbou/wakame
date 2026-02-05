@@ -102,6 +102,11 @@ object TranslatableMessages {
     val MSG_ERR_NO_PERMISSION = create("msg_err_no_permission")
     val MSG_ERR_BLOCKED_BY_PROTECTION = create("msg_err_blocked_by_protection")
     val MSG_ERR_CANNOT_SPAWN_ENTITY_HERE = create("msg_err_cannot_spawn_entity_here")
+    val MSG_ERR_NOT_IN_DUNGEON_WORLD = create("msg_err_not_in_dungeon_world")
+    val MSG_ERR_DUNGEON_NOT_FOUND = create("msg_err_dungeon_not_found")
+    val MSG_ERR_ALREADY_AWAITING_DUNGEON = create("msg_err_already_awaiting_dungeon")
+    val MSG_ERR_STRUCTURE_NOT_FOUND_IN_CHUNK = create("msg_err_structure_not_found_in_chunk")
+    val MSG_ERR_NOT_INSIDE_STRUCTURE = create("msg_err_not_inside_structure")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

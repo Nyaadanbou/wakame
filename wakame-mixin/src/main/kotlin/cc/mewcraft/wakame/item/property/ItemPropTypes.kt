@@ -446,6 +446,12 @@ data object ItemPropTypes {
     @JvmField
     val CLIENTBOUND_ITEM_NAME = typeOf<Component>("clientbound/item_name")
 
+    /**
+     * 储存了加入地牢所需的数据.
+     */
+    @JvmField
+    val DUNGEON_ENTRY: ItemPropType<DungeonEntry> = typeOf("dungeon_entry")
+
     // ------------
     // 方便函数
     // ------------
