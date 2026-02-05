@@ -7,6 +7,8 @@ import cc.mewcraft.wakame.config.PermanentStorage
 import cc.mewcraft.wakame.config.PrimaryConfigImpl
 import cc.mewcraft.wakame.lang.LanguageExtractor
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
+import cc.mewcraft.wakame.mixin.support.PreWorldStageTasks
+import cc.mewcraft.wakame.pack.AssetExtractor
 import cc.mewcraft.wakame.util.data.Version
 import cc.mewcraft.wakame.util.data.VersionRange
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
@@ -21,6 +23,7 @@ private val REQUIRED_SERVER_VERSION: VersionRange = Version("1.21.7")..Version("
 internal val PREVIOUS_KOISH_VERSION: Version? = PermanentStorage.retrieveOrNull<Version>("last_version")
 
 internal class KoishBootstrap : PluginBootstrap {
+
     init {
         BootstrapContexts.registerBootstrap(this)
     }
@@ -33,7 +36,16 @@ internal class KoishBootstrap : PluginBootstrap {
     override fun bootstrap(context: BootstrapContext) {
         LoggerProvider.set(context.logger)
 
+        // 初始化 Koish 所使用的路径
+        KoishDataPaths.initialize()
+        LOGGER.info("Initialized object: ${KoishDataPaths::class.simpleName}")
+
+        // 配置文件必须最先初始化, 因为一般来说 Configs[...] 的返回值(下面称配置)都会赋值到 top-level 的 val,
+        // 也就是说这些配置会随着 class 被 classloader 加载时直接实例化,
+        // 而这些配置所对应的文件可能还没有内容 (例如首次使用 Koish 插件时数据文件还未被拷贝到插件的数据目录),
+        // 从而导致读取配置项时找不到需要的配置项, 抛出 NPE
         KoishConfigs.initialize() // 配置文件 API 实例趁早注册
+        LOGGER.info("Initialized object: ${KoishConfigs::class.simpleName}")
         PrimaryConfig.setImplementation(PrimaryConfigImpl())
 
         BootstrapContexts.registerLifecycleManagerOwnedByBootstrap(context.lifecycleManager)
@@ -63,9 +75,6 @@ internal class KoishBootstrap : PluginBootstrap {
         // }
 
         try {
-            // 初始化 Koish 所使用的路径
-            KoishDataPaths.initialize()
-
             if (PREVIOUS_KOISH_VERSION == null || PREVIOUS_KOISH_VERSION != Version("0.0.1-snapshot")) {
                 LegacyDataMigrator.migrate()
             }
@@ -75,16 +84,19 @@ internal class KoishBootstrap : PluginBootstrap {
                 DebugProbes.enableCreationStackTraces = true
             }
 
-            // 配置文件必须最先初始化, 因为一般来说 Configs[...] 的返回值(下面称配置)都会赋值到 top-level 的 val,
-            // 也就是说这些配置会随着 class 被 classloader 加载时直接实例化,
-            // 而这些配置所对应的文件可能还没有内容 (例如首次使用 Koish 插件时数据文件还未被拷贝到插件的数据目录),
-            // 从而导致读取配置项时找不到需要的配置项, 抛出 NPE
+            LOGGER.info("Extracting assets files...")
+            AssetExtractor.extractDefaults()
+            LOGGER.info("Extracting language files...")
             LanguageExtractor.extractDefaults()
-            //AssetExtractor.extractDefaults() // 暂时没资源文件可以提取
 
-            // 初始化所有 InitFun (PRE_WORLD)
+            // 构建 InitFun 的依赖图
             Initializer.initialize()
-            Initializer.performPreWorld()
+
+            // 执行所有 InitFun (BOOTSTRAP)
+            Initializer.performBootstrap()
+
+            // 注册所有 InitFun (PRE_WORLD), 会在 org.bukkit.craftbukkit.CraftServer.loadPlugins 之前运行
+            PreWorldStageTasks.register(Initializer::performPreWorld)
 
             // 让指令注册发生在所有 PRE_WORLD 的 InitFun 之后,
             // 这样如果之前发生了异常那么指令将不会注册,

@@ -17,7 +17,7 @@ import net.kyori.adventure.key.Key
 /**
  * 负责初始化伤害系统的一些内部状态, 如 API 实例.
  */
-@Init(InitStage.PRE_WORLD)
+@Init(InitStage.BOOTSTRAP)
 internal object DamageApiBootstrap {
 
     @InitFun

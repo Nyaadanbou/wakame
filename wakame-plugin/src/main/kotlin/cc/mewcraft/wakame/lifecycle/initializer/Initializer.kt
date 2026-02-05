@@ -25,11 +25,13 @@ internal object Initializer : Listener {
     private val initializables: HashSet<Initializable> = HashSet()
     private val disableables: HashSet<Disableable> = HashSet()
 
+    private val initBootstrapDependencyGraph: MutableGraph<Initializable> = GraphBuilder.directed().allowsSelfLoops(false).build()
     private val initPreWorldDependencyGraph: MutableGraph<Initializable> = GraphBuilder.directed().allowsSelfLoops(false).build()
     private val initPostWorldDependencyGraph: MutableGraph<Initializable> = GraphBuilder.directed().allowsSelfLoops(false).build()
     private val disableDependencyGraph: MutableGraph<Disableable> = GraphBuilder.directed().allowsSelfLoops(false).build()
 
     private lateinit var preWorldScope: CoroutineScope
+    private var bootstrapInitialized = false
     private var preWorldInitialized = false
 
     var isDone = false
@@ -45,6 +47,14 @@ internal object Initializer : Listener {
     /**
      * Performs pre-world initialization.
      */
+    fun performBootstrap(): Unit {
+        LifecycleUtils.runLifecycle(::initBootstrap)
+    }
+
+    /**
+     * Performs pre-world-late initialization.
+     * This is called at the Mixin injection point, after bootstrap but before plugins are loaded.
+     */
     fun performPreWorld(): Unit {
         LifecycleUtils.runLifecycle(::initPreWorld)
     }
@@ -53,7 +63,7 @@ internal object Initializer : Listener {
      * Performs post-world initialization.
      */
     fun performPostWorld(): Unit = LifecycleUtils.runLifecycle {
-        if (preWorldInitialized) {
+        if (bootstrapInitialized && preWorldInitialized) {
             initPostWorld()
         } else {
             LOGGER.error("Skipping post-world initialization because pre-world initialization failed")
@@ -133,12 +143,13 @@ internal object Initializer : Listener {
      * This method can only be invoked during the pre-world initialization phase or before the [initialize] method is called.
      */
     private fun registerTasks(initializables: List<Initializable>, disableables: List<Disableable>) {
-        check(!preWorldInitialized) { "Cannot add additional callables after pre-world initialization!" }
+        check(!bootstrapInitialized) { "Cannot add additional callables after pre-world initialization!" }
 
         // add vertices
         for (initializable in initializables) {
             Initializer.initializables += initializable
             when (initializable.stage) {
+                InternalInitStage.BOOTSTRAP -> initBootstrapDependencyGraph.addNode(initializable)
                 InternalInitStage.PRE_WORLD -> initPreWorldDependencyGraph.addNode(initializable)
                 InternalInitStage.POST_WORLD -> initPostWorldDependencyGraph.addNode(initializable)
             }
@@ -153,6 +164,7 @@ internal object Initializer : Listener {
             initializable.loadDependencies(
                 Initializer.initializables,
                 when (initializable.stage) {
+                    InternalInitStage.BOOTSTRAP -> initBootstrapDependencyGraph
                     InternalInitStage.PRE_WORLD -> initPreWorldDependencyGraph
                     InternalInitStage.POST_WORLD -> initPostWorldDependencyGraph
                 }
@@ -165,10 +177,10 @@ internal object Initializer : Listener {
         // launch initialization it if already started
         if (Initializer::preWorldScope.isInitialized) {
             for (initializable in initializables) {
-                if (initializable.stage != InternalInitStage.PRE_WORLD) {
+                if (initializable.stage != InternalInitStage.BOOTSTRAP) {
                     continue
                 }
-                LifecycleUtils.launch(preWorldScope, initializable, initPreWorldDependencyGraph)
+                LifecycleUtils.launch(preWorldScope, initializable, initBootstrapDependencyGraph)
             }
         }
 
@@ -201,10 +213,24 @@ internal object Initializer : Listener {
     /**
      * Stats the pre-world initialization process.
      */
-    private fun initPreWorld(): Unit = runBlocking {
+    private fun initBootstrap(): Unit = runBlocking {
         LifecycleUtils.runLifecycle {
             coroutineScope {
                 preWorldScope = this
+                LifecycleUtils.launchAll(this, initBootstrapDependencyGraph)
+            }
+        }
+
+        bootstrapInitialized = true
+    }
+
+    /**
+     * Starts the pre-world-late initialization process.
+     * This runs at the Mixin injection point, after bootstrap but before plugins are loaded.
+     */
+    private fun initPreWorld(): Unit = runBlocking {
+        LifecycleUtils.runLifecycle {
+            coroutineScope {
                 LifecycleUtils.launchAll(this, initPreWorldDependencyGraph)
             }
         }

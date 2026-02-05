@@ -382,7 +382,7 @@ internal data class DamageDisplayAnimation(
     val negativeData: AnimationData,
 )
 
-@Init(InitStage.PRE_CONFIG)
+@Init(InitStage.BOOTSTRAP)
 internal object DamageDisplayAnimationSerializer : SimpleSerializer<DamageDisplayAnimation> {
     override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplayAnimation {
         val delay = node.node("delay").require<Long>()
@@ -415,7 +415,7 @@ internal enum class DamageDisplayMode {
     MERGED, SEPARATED
 }
 
-@Init(InitStage.PRE_CONFIG)
+@Init(InitStage.BOOTSTRAP)
 internal object DamageDisplaySettingsSerializer : SimpleSerializer<DamageDisplaySettings> {
 
     override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplaySettings = when (node.require<DamageDisplayMode>()) {

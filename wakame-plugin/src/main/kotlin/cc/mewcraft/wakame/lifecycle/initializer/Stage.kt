@@ -11,7 +11,12 @@ import kotlin.reflect.KClass
 internal enum class InternalInitStage(val isPreWorld: Boolean) {
 
     /**
-     * Before the world is loaded.
+     * Bootstrap stage as specified in Paper API.
+     */
+    BOOTSTRAP(true),
+
+    /**
+     * Before the world is loaded and after bootstrap.
      */
     PRE_WORLD(true),
 
@@ -19,7 +24,6 @@ internal enum class InternalInitStage(val isPreWorld: Boolean) {
      * After the world is loaded.
      */
     POST_WORLD(false),
-
 }
 
 /**
@@ -35,16 +39,16 @@ enum class InitStage(
     runBefore: Set<KClass<*>> = emptySet(),
 ) {
 
-    /**
-     * Before configs are initialized.
-     * Can be used to register custom config serializers via [Configs.registerSerializer].
-     */
-    PRE_CONFIG(InternalInitStage.PRE_WORLD /*runBefore = setOf(Configs::class)*/),
 
     /**
-     * Before the world is loaded.
+     * Bootstrap stage as specified in Paper API.
      */
-    PRE_WORLD(InternalInitStage.PRE_WORLD /*runAfter = setOf(Configs::class)*/),
+    BOOTSTRAP(InternalInitStage.BOOTSTRAP),
+
+    /**
+     * Before the world is loaded and after bootstrap.
+     */
+    PRE_WORLD(InternalInitStage.PRE_WORLD),
 
     /**
      * After the world has been loaded.
@@ -54,14 +58,8 @@ enum class InitStage(
     /**
      * 在 Fleks 加载之前, 用于使用 [cc.mewcraft.wakame.ecs.SystemBootstrapper] 添加系统.
      */
-    PRE_FLEKS(InternalInitStage.POST_WORLD, runBefore = setOf(KoishFleks::class)),
-
-    /**
-     * 在 Fleks 加载之后, 用于删除现有的系统.
-     */
-    POST_FLEKS(InternalInitStage.POST_WORLD, runAfter = setOf(KoishFleks::class));
+    PRE_FLEKS(InternalInitStage.POST_WORLD, runBefore = setOf(KoishFleks::class));
 
     internal val runAfter: Array<String> = runAfter.mapToArray { it.internalName }
     internal val runBefore: Array<String> = runBefore.mapToArray { it.internalName }
-
 }
