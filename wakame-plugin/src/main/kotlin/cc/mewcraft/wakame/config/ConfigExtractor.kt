@@ -10,7 +10,7 @@ import kotlin.io.path.*
  *
  * 欲了解具体的行为逻辑自行查看本单例的实现, 这里不再重复.
  */
-internal object ConfigsExtractor {
+internal object ConfigExtractor {
 
     // 要抽取的文件, 全部位于 zip 的 /configs 之下
     private val FILES_TO_EXTRACT: List<String> = listOf(

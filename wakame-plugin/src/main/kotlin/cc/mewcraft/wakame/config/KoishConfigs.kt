@@ -25,7 +25,7 @@ internal object KoishConfigs : ConfigsBase() {
     }
 
     override fun extractDefaultFiles() {
-        ConfigsExtractor.extractDefaults()
+        ConfigExtractor.extractDefaults()
     }
 
     override fun resolvePath(configId: Key): Path {
