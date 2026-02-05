@@ -48,6 +48,32 @@ object HotfixItemModel {
 
 
 /**
+ * 通过**物品发包**向物品堆叠上添加对应的 minecraft:item_name 组件.
+ *
+ * 此修复动机:
+ * 物品堆叠上的 minecraft:item_name 是一个纯控制视觉效果的组件.
+ * 当物品配置文件中定义了 `item_name` 元数据时, 我们需要将其作为 minecraft:item_name 数据组件发送到客户端.
+ * 这样可以在不修改物品的显示名称(display_name)的情况下自定义物品在客户端的显示名称.
+ *
+ * 更好的方案:
+ * 支持直接修改发送到客户端的物品封包, 在那里, 我们添加 `minecraft:item_name`.
+ */
+@Deprecated("Hotfix")
+object HotfixItemName {
+
+    fun transform(itemstack: ItemStack) {
+        val itemName = itemstack.getProp(ItemPropTypes.CLIENTBOUND_ITEM_NAME)
+        if (itemName != null) {
+            // 如果物品配置文件中指定了 item_name, 则应用该 minecraft:item_name 组件
+            itemstack.setData(DataComponentTypes.ITEM_NAME, itemName)
+            return
+        }
+        // 否则, 不处理该物品 - 保持物品堆叠上原有的 minecraft:item_name 组件
+    }
+}
+
+
+/**
  * 通过**物品发包**修复武器冷却不显示末影珍珠的效果.
  *
  * 此修复动机:

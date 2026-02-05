@@ -439,6 +439,13 @@ data object ItemPropTypes {
     @JvmField
     val CLIENTBOUND_ITEM_MODEL = typeOf<Key>("clientbound/item_model")
 
+    /**
+     * 绑定到客户端侧的物品模型.
+     */
+    @Deprecated("Hotfix")
+    @JvmField
+    val CLIENTBOUND_ITEM_NAME = typeOf<Component>("clientbound/item_name")
+
     // ------------
     // 方便函数
     // ------------
