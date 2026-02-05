@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.database
 
 import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.KoishConfigs
 import cc.mewcraft.wakame.util.test.TestOnly
 import cc.mewcraft.wakame.util.test.TestPath
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
@@ -22,7 +22,7 @@ class DataStorageTest {
         @JvmStatic
         fun setup() {
             KoishDataPaths.initializeForTest(TestPath.TEST)
-            ConfigAccess.setImplementation(Configs)
+            ConfigAccess.setImplementation(KoishConfigs)
             DataStorageInitializer.init()
 
             transaction {

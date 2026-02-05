@@ -13,7 +13,7 @@ import org.jetbrains.annotations.VisibleForTesting
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.nio.file.Path
 
-internal object Configs : ConfigsBase() {
+internal object KoishConfigs : ConfigsBase() {
 
     @VisibleForTesting
     internal fun cleanup() {
