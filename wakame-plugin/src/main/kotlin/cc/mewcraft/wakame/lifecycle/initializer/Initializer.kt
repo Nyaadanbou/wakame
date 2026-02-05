@@ -228,14 +228,4 @@ internal object Initializer : Listener {
         BuiltInMessages.STARTUP_BANNER.send(Bukkit.getServer().consoleSender)
         LOGGER.info(Component.text("Done loading").color(NamedTextColor.AQUA))
     }
-
-    // POST_WORLD 的调用时机移动到了 KoishPlugin#onEnable
-    //@EventHandler
-    //private fun on(event: ServerLoadEvent) {
-    //    if (preWorldInitialized) {
-    //        initPostWorld()
-    //    } else {
-    //        LOGGER.error("Skipping post-world initialization because pre-world initialization failed")
-    //    }
-    //}
 }

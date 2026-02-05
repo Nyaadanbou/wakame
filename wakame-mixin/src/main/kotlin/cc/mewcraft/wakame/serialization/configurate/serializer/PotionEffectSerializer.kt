@@ -22,22 +22,3 @@ import java.lang.reflect.Type
         return PotionEffect(effectType, duration, amplifier, ambient, particles, icon)
     }
 }
-
-// /*internal*/ object PotionEffectTypeSerializer : TypeSerializer<PotionEffectType?> {
-//     override fun deserialize(type: Type, node: ConfigurationNode): PotionEffectType? {
-//         if (node.raw() == null)
-//             return null
-//
-//         return Registry.POTION_EFFECT_TYPE.get(node.get<NamespacedKey>()!!)
-//             ?: throw SerializationException(node, type, "No such potion type: ${node.raw()}")
-//     }
-//
-//     override fun serialize(type: Type, obj: PotionEffectType?, node: ConfigurationNode) {
-//         if (obj == null) {
-//             node.raw(null)
-//             return
-//         }
-//
-//         node.set(obj.key)
-//     }
-// }
