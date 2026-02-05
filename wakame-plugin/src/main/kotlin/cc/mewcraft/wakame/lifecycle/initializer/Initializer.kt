@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.Initializer.initialize
 import cc.mewcraft.wakame.util.data.JarUtils
 import com.google.common.graph.GraphBuilder
 import com.google.common.graph.MutableGraph
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.text.Component
@@ -30,7 +29,6 @@ internal object Initializer : Listener {
     private val initPostWorldDependencyGraph: MutableGraph<Initializable> = GraphBuilder.directed().allowsSelfLoops(false).build()
     private val disableDependencyGraph: MutableGraph<Disableable> = GraphBuilder.directed().allowsSelfLoops(false).build()
 
-    private lateinit var preWorldScope: CoroutineScope
     private var bootstrapInitialized = false
     private var preWorldInitialized = false
 
@@ -174,22 +172,11 @@ internal object Initializer : Listener {
             disableable.loadDependencies(Initializer.disableables, disableDependencyGraph)
         }
 
-        // launch initialization it if already started
-        if (Initializer::preWorldScope.isInitialized) {
-            for (initializable in initializables) {
-                if (initializable.stage != InternalInitStage.BOOTSTRAP) {
-                    continue
-                }
-                LifecycleUtils.launch(preWorldScope, initializable, initBootstrapDependencyGraph)
-            }
-        }
-
         if (BootstrapContexts.IS_DEV_SERVER) {
             dumpGraphs()
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
     private fun dumpGraphs() {
         // TODO 将图库从 guava 迁移至 jgrapht 以实现 dumpGraphs
         //val dir = File("debug/koish/")
@@ -211,12 +198,11 @@ internal object Initializer : Listener {
     }
 
     /**
-     * Stats the pre-world initialization process.
+     * Starts the bootstrap initialization process.
      */
     private fun initBootstrap(): Unit = runBlocking {
         LifecycleUtils.runLifecycle {
             coroutineScope {
-                preWorldScope = this
                 LifecycleUtils.launchAll(this, initBootstrapDependencyGraph)
             }
         }

@@ -13,15 +13,11 @@ import kotlin.reflect.jvm.javaMethod
  */
 internal object LifecycleReflection {
 
-    suspend fun executeSuspendFunction(
-        clazz: KClass<out Any>,
-        functionName: String,
-        completion: CompletableDeferred<Unit>,
-    ) {
+    suspend fun executeSuspendFunction(clazz: KClass<out Any>, functionName: String, completion: CompletableDeferred<Unit>) {
         val function = clazz.functions.first {
             it.javaMethod!!.name == functionName &&
-                it.parameters.size == 1 &&
-                it.parameters[0].kind == KParameter.Kind.INSTANCE
+                    it.parameters.size == 1 &&
+                    it.parameters[0].kind == KParameter.Kind.INSTANCE
         }
         function.isAccessible = true
         function.callSuspend(clazz.objectInstance ?: throw IllegalArgumentException("${clazz.simpleName} is not an object"))

@@ -34,6 +34,12 @@ internal class KoishBootstrap : PluginBootstrap {
     // 1) 加载 NMS 的 classes (因此可以在这里对服务端代码进行 patching)
     // 2) 创建 JavaPlugin 实例 (因此可以直接用 object 来实现 JavaPlugin)
     override fun bootstrap(context: BootstrapContext) {
+        BootstrapContexts.registerLifecycleManagerOwnedByBootstrap(context.lifecycleManager)
+        BootstrapContexts.registerAuthors(context.pluginMeta.authors)
+        BootstrapContexts.registerName(context.pluginMeta.name)
+        BootstrapContexts.registerVersion(Version(context.pluginMeta.version))
+        BootstrapContexts.registerPluginJar(context.pluginSource)
+
         LoggerProvider.set(context.logger)
 
         // 初始化 Koish 所使用的路径
@@ -47,12 +53,6 @@ internal class KoishBootstrap : PluginBootstrap {
         KoishConfigs.initialize() // 配置文件 API 实例趁早注册
         LOGGER.info("Initialized object: ${KoishConfigs::class.simpleName}")
         PrimaryConfig.setImplementation(PrimaryConfigImpl())
-
-        BootstrapContexts.registerLifecycleManagerOwnedByBootstrap(context.lifecycleManager)
-        BootstrapContexts.registerAuthors(context.pluginMeta.authors)
-        BootstrapContexts.registerName(context.pluginMeta.name)
-        BootstrapContexts.registerVersion(Version(context.pluginMeta.version))
-        BootstrapContexts.registerPluginJar(context.pluginSource)
 
         if (BootstrapContexts.IS_DEV_SERVER) {
             LOGGER.warn("Running in dev mode! Never use this on a production server!")
