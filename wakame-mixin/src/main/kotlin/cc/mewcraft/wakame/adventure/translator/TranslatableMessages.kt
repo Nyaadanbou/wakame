@@ -107,6 +107,8 @@ object TranslatableMessages {
     val MSG_ERR_ALREADY_AWAITING_DUNGEON = create("msg_err_already_awaiting_dungeon")
     val MSG_ERR_STRUCTURE_NOT_FOUND_IN_CHUNK = create("msg_err_structure_not_found_in_chunk")
     val MSG_ERR_NOT_INSIDE_STRUCTURE = create("msg_err_not_inside_structure")
+    val MSG_CHANNELING_STARTED = create("msg_channeling_started")
+    val MSG_CHANNELING_STOPPED = create("msg_channeling_stopped")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

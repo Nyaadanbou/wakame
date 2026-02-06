@@ -29,20 +29,26 @@ import org.bukkit.inventory.ItemStack
 object DungeonEntry : ItemBehavior {
 
     private fun playStartingEffects(player: Player, itemstack: ItemStack) {
+        // 添加药水效果
         itemstack.getProp(ItemPropTypes.DUNGEON_ENTRY)
             ?.useEffects
             ?.forEach(player::addPotionEffect)
-        // 粒子效果暂不支持配置文件 (懒得写序列化)
+        // 播放例子效果 (粒子效果暂不支持配置文件, 懒得写序列化)
         ParticleBuilder(Particle.PORTAL)
             .location(player.location)
             .offset(-2.0, 0.5, 2.0)
             .count(256)
             .receivers(32, false)
             .spawn()
+        // 发送消息提示
+        player.sendMessage(TranslatableMessages.MSG_CHANNELING_STARTED)
     }
 
     private fun playFinishingEffects(player: Player, itemstack: ItemStack) {
+        // 播放声音效果
         player.playSound(Sound.sound().type(BukkitSound.BLOCK_PORTAL_TRIGGER).source(Sound.Source.PLAYER).build(), player)
+        // 发送消息提示
+        player.sendMessage(TranslatableMessages.MSG_CHANNELING_STOPPED)
     }
 
     override fun handleUse(context: UseContext): InteractionResult {

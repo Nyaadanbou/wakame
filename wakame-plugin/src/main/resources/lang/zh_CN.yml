@@ -101,6 +101,8 @@ msg_err_dungeon_not_found: "<red>未找到地牢: <arg:0>"
 msg_err_already_awaiting_dungeon: "<red>正在等待进入地牢."
 msg_err_structure_not_found_in_chunk: "<red>当前区块没有结构: <arg:0>."
 msg_err_not_inside_structure: "<red>你不在结构空间内: <arg:0>"
+msg_channeling_started: "<gray>吟唱开始..."
+msg_channeling_stopped: "<gray>吟唱终止."
 
 # 像这样制定一个数字的格式, '#' 是 Java 的 DecimalFormat 的语法
 msg_number_format: "This is a decimal number: <arg:0:'zh-CN':'#'>."
