@@ -41,14 +41,14 @@ object DungeonEntry : ItemBehavior {
             .receivers(32, false)
             .spawn()
         // 发送消息提示
-        player.sendMessage(TranslatableMessages.MSG_CHANNELING_STARTED)
+        player.sendActionBar(TranslatableMessages.MSG_CHANNELING_STARTED)
     }
 
     private fun playFinishingEffects(player: Player, itemstack: ItemStack) {
         // 播放声音效果
         player.playSound(Sound.sound().type(BukkitSound.BLOCK_PORTAL_TRIGGER).source(Sound.Source.PLAYER).build(), player)
         // 发送消息提示
-        player.sendMessage(TranslatableMessages.MSG_CHANNELING_STOPPED)
+        player.sendActionBar(TranslatableMessages.MSG_CHANNELING_STOPPED)
     }
 
     override fun handleUse(context: UseContext): InteractionResult {
