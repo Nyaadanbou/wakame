@@ -17,7 +17,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import java.io.File
 
-@Init(InitStage.PRE_WORLD)
+@Init(InitStage.BOOTSTRAP)
 internal object AttackSpeedRegistryLoader : RegistryLoader {
 
     private val rootDirectory: File = KoishDataPaths.CONFIGS.resolve("attack_speed/").toFile()

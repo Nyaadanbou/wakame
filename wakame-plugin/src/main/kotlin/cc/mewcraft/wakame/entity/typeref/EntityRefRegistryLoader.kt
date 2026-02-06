@@ -12,7 +12,7 @@ import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 
-@Init(InitStage.PRE_WORLD)
+@Init(InitStage.BOOTSTRAP)
 internal object EntityRefRegistryLoader : RegistryLoader {
     private const val FILE_PATH = "entities.yml"
 

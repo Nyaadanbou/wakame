@@ -14,7 +14,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 
 @Init(
-    stage = InitStage.PRE_WORLD,
+    stage = InitStage.BOOTSTRAP,
     runAfter = [
         ElementRegistryLoader::class, // deps: 反序列化时必须知道所有已知的元素类型
     ]

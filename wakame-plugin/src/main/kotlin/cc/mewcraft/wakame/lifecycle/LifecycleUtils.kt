@@ -33,34 +33,9 @@ internal object LifecycleUtils {
     }
 
     /**
-     * Launches [task] of [graph] in the given [scope].
-     */
-    fun <T : Any> launch(
-        scope: CoroutineScope,
-        task: T,
-        graph: Graph<T>,
-    ) {
-        LifecycleExecution.launch(
-            scope = scope,
-            task = task,
-            graph = graph,
-            toExecutable = { node ->
-                when (node) {
-                    is InitializerRunnable<*> -> asExecutable(node)
-                    else -> error("Unhandled task type: $node")
-                }
-            },
-            logging = LOGGING,
-        )
-    }
-
-    /**
      * Launches all vertices of [graph] in the given [scope].
      */
-    fun <T : Any> launchAll(
-        scope: CoroutineScope,
-        graph: Graph<T>,
-    ) {
+    fun <T : Any> launchAll(scope: CoroutineScope, graph: Graph<T>) {
         LifecycleExecution.launchAll(
             scope = scope,
             graph = graph,
@@ -96,15 +71,13 @@ internal object LifecycleUtils {
 
     // Reflections
 
-    suspend fun executeSuspendFunction(
-        clazz: KClass<out Any>,
-        functionName: String,
-        completion: CompletableDeferred<Unit>,
-    ) = LifecycleReflection.executeSuspendFunction(clazz, functionName, completion)
+    suspend fun executeSuspendFunction(clazz: KClass<out Any>, functionName: String, completion: CompletableDeferred<Unit>) =
+        LifecycleReflection.executeSuspendFunction(clazz, functionName, completion)
 
     // Graph
 
-    fun <T : Any> tryPutEdge(graph: MutableGraph<T>, from: T, to: T) = LifecycleGraph.tryPutEdge(graph, from, to)
+    fun <T : Any> tryPutEdge(graph: MutableGraph<T>, from: T, to: T) =
+        LifecycleGraph.tryPutEdge(graph, from, to)
 
     // Annotations
 

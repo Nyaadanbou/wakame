@@ -17,7 +17,7 @@ import com.github.quillraven.fleks.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
-@InternalInit(stage = InternalInitStage.POST_WORLD)
+@InternalInit(InternalInitStage.POST_WORLD)
 internal object KoishFleks : Listener, Fleks, FleksPatcher {
 
     private val SYSTEM_ORDER: List<Identifier> = listOf(

@@ -19,7 +19,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 
 @Init(
-    stage = InitStage.PRE_WORLD,
+    stage = InitStage.BOOTSTRAP,
     runAfter = [
         AttributeFacadeRegistryLoader::class, // deps: 需要直接的数据, 必须在其之后
     ]

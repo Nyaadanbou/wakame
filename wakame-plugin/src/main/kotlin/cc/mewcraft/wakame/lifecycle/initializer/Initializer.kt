@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.Initializer.initialize
 import cc.mewcraft.wakame.util.data.JarUtils
 import com.google.common.graph.GraphBuilder
 import com.google.common.graph.MutableGraph
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.text.Component
@@ -25,11 +24,12 @@ internal object Initializer : Listener {
     private val initializables: HashSet<Initializable> = HashSet()
     private val disableables: HashSet<Disableable> = HashSet()
 
+    private val initBootstrapDependencyGraph: MutableGraph<Initializable> = GraphBuilder.directed().allowsSelfLoops(false).build()
     private val initPreWorldDependencyGraph: MutableGraph<Initializable> = GraphBuilder.directed().allowsSelfLoops(false).build()
     private val initPostWorldDependencyGraph: MutableGraph<Initializable> = GraphBuilder.directed().allowsSelfLoops(false).build()
     private val disableDependencyGraph: MutableGraph<Disableable> = GraphBuilder.directed().allowsSelfLoops(false).build()
 
-    private lateinit var preWorldScope: CoroutineScope
+    private var bootstrapInitialized = false
     private var preWorldInitialized = false
 
     var isDone = false
@@ -45,6 +45,14 @@ internal object Initializer : Listener {
     /**
      * Performs pre-world initialization.
      */
+    fun performBootstrap(): Unit {
+        LifecycleUtils.runLifecycle(::initBootstrap)
+    }
+
+    /**
+     * Performs pre-world-late initialization.
+     * This is called at the Mixin injection point, after bootstrap but before plugins are loaded.
+     */
     fun performPreWorld(): Unit {
         LifecycleUtils.runLifecycle(::initPreWorld)
     }
@@ -53,7 +61,7 @@ internal object Initializer : Listener {
      * Performs post-world initialization.
      */
     fun performPostWorld(): Unit = LifecycleUtils.runLifecycle {
-        if (preWorldInitialized) {
+        if (bootstrapInitialized && preWorldInitialized) {
             initPostWorld()
         } else {
             LOGGER.error("Skipping post-world initialization because pre-world initialization failed")
@@ -133,12 +141,13 @@ internal object Initializer : Listener {
      * This method can only be invoked during the pre-world initialization phase or before the [initialize] method is called.
      */
     private fun registerTasks(initializables: List<Initializable>, disableables: List<Disableable>) {
-        check(!preWorldInitialized) { "Cannot add additional callables after pre-world initialization!" }
+        check(!bootstrapInitialized) { "Cannot add additional callables after pre-world initialization!" }
 
         // add vertices
         for (initializable in initializables) {
             Initializer.initializables += initializable
             when (initializable.stage) {
+                InternalInitStage.BOOTSTRAP -> initBootstrapDependencyGraph.addNode(initializable)
                 InternalInitStage.PRE_WORLD -> initPreWorldDependencyGraph.addNode(initializable)
                 InternalInitStage.POST_WORLD -> initPostWorldDependencyGraph.addNode(initializable)
             }
@@ -153,6 +162,7 @@ internal object Initializer : Listener {
             initializable.loadDependencies(
                 Initializer.initializables,
                 when (initializable.stage) {
+                    InternalInitStage.BOOTSTRAP -> initBootstrapDependencyGraph
                     InternalInitStage.PRE_WORLD -> initPreWorldDependencyGraph
                     InternalInitStage.POST_WORLD -> initPostWorldDependencyGraph
                 }
@@ -162,22 +172,11 @@ internal object Initializer : Listener {
             disableable.loadDependencies(Initializer.disableables, disableDependencyGraph)
         }
 
-        // launch initialization it if already started
-        if (Initializer::preWorldScope.isInitialized) {
-            for (initializable in initializables) {
-                if (initializable.stage != InternalInitStage.PRE_WORLD) {
-                    continue
-                }
-                LifecycleUtils.launch(preWorldScope, initializable, initPreWorldDependencyGraph)
-            }
-        }
-
         if (BootstrapContexts.IS_DEV_SERVER) {
             dumpGraphs()
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
     private fun dumpGraphs() {
         // TODO 将图库从 guava 迁移至 jgrapht 以实现 dumpGraphs
         //val dir = File("debug/koish/")
@@ -199,12 +198,25 @@ internal object Initializer : Listener {
     }
 
     /**
-     * Stats the pre-world initialization process.
+     * Starts the bootstrap initialization process.
+     */
+    private fun initBootstrap(): Unit = runBlocking {
+        LifecycleUtils.runLifecycle {
+            coroutineScope {
+                LifecycleUtils.launchAll(this, initBootstrapDependencyGraph)
+            }
+        }
+
+        bootstrapInitialized = true
+    }
+
+    /**
+     * Starts the pre-world-late initialization process.
+     * This runs at the Mixin injection point, after bootstrap but before plugins are loaded.
      */
     private fun initPreWorld(): Unit = runBlocking {
         LifecycleUtils.runLifecycle {
             coroutineScope {
-                preWorldScope = this
                 LifecycleUtils.launchAll(this, initPreWorldDependencyGraph)
             }
         }
@@ -228,14 +240,4 @@ internal object Initializer : Listener {
         BuiltInMessages.STARTUP_BANNER.send(Bukkit.getServer().consoleSender)
         LOGGER.info(Component.text("Done loading").color(NamedTextColor.AQUA))
     }
-
-    // POST_WORLD 的调用时机移动到了 KoishPlugin#onEnable
-    //@EventHandler
-    //private fun on(event: ServerLoadEvent) {
-    //    if (preWorldInitialized) {
-    //        initPostWorld()
-    //    } else {
-    //        LOGGER.error("Skipping post-world initialization because pre-world initialization failed")
-    //    }
-    //}
 }

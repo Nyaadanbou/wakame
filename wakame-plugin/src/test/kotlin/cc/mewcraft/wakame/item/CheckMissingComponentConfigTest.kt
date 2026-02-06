@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.lazyconfig.access.node
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.KoishConfigs
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.test.TestOnly
 import cc.mewcraft.wakame.util.test.TestPath
@@ -24,14 +24,14 @@ class CheckMissingComponentConfigTest {
 
     @AfterEach
     fun afterEach() {
-        Configs.cleanup() // 清理所有已缓存的实例
+        KoishConfigs.cleanup() // 清理所有已缓存的实例
     }
 
     // 检查所有物品组件类型的配置文件已经出现在 main/items.yml
     @Test
     fun `check all item component config's at main`() {
         KoishDataPaths.initializeForTest(TestPath.MAIN)
-        ConfigAccess.setImplementation(Configs)
+        ConfigAccess.setImplementation(KoishConfigs)
         checkMissingConfigs()
     }
 
@@ -39,7 +39,7 @@ class CheckMissingComponentConfigTest {
     @Test
     fun `check all item component config's at test`() {
         KoishDataPaths.initializeForTest(TestPath.TEST)
-        ConfigAccess.setImplementation(Configs)
+        ConfigAccess.setImplementation(KoishConfigs)
         checkMissingConfigs()
     }
 
@@ -48,7 +48,7 @@ class CheckMissingComponentConfigTest {
         // ConfigurationNode: `components`.
         // 必须完全重新构建 ConfigProvider 的实例,
         // 否则会一直使用 main/test 之一的配置文件
-        val config = Configs[CONFIG_ID].node(NODE_COMPONENTS)
+        val config = KoishConfigs[CONFIG_ID].node(NODE_COMPONENTS)
         // 所有已注册的物品组件类型
         val types = BuiltInRegistries.ITEM_DATA_TYPE
         // 未在配置文件中的物品组件类型

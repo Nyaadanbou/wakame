@@ -1,4 +1,5 @@
 {
+  "required": true,
   "compatibilityLevel": "JAVA_21",
   "package": "cc.mewcraft.wakame.mixin.core",
   "mixins": [
@@ -14,6 +15,7 @@
     "MixinCraftEntityType",
     "MixinCraftingRecipe",
     "MixinCraftPlayer",
+    "MixinCraftServer",
     "MixinCriteriaTriggers",
     "MixinDataComponentPatch$3",
     "MixinDataComponentPatch$Builder",

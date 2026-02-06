@@ -439,6 +439,19 @@ data object ItemPropTypes {
     @JvmField
     val CLIENTBOUND_ITEM_MODEL = typeOf<Key>("clientbound/item_model")
 
+    /**
+     * 绑定到客户端侧的物品模型.
+     */
+    @Deprecated("Hotfix")
+    @JvmField
+    val CLIENTBOUND_ITEM_NAME = typeOf<Component>("clientbound/item_name")
+
+    /**
+     * 储存了加入地牢所需的数据.
+     */
+    @JvmField
+    val DUNGEON_ENTRY: ItemPropType<DungeonEntry> = typeOf("dungeon_entry")
+
     // ------------
     // 方便函数
     // ------------

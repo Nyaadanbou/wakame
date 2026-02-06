@@ -43,7 +43,7 @@ internal abstract class Initializable(
             val runAfterClass = findInitializableClass(all, runAfterName)
                 ?: throw IllegalArgumentException("Could not find initializable class '$runAfterName', which is a runAfter of '$this'")
 
-            val targets = buildSet<Initializable> {
+            val targets = buildSet {
                 add(runAfterClass)
                 if (runAfterClass != initClass) {
                     addAll(runAfterClass.initFunctions)

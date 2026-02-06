@@ -1,13 +1,14 @@
 package cc.mewcraft.wakame
 
-import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.wakame.api.config.PrimaryConfig
 import cc.mewcraft.wakame.command.KoishCommandManager
-import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.KoishConfigs
 import cc.mewcraft.wakame.config.PermanentStorage
 import cc.mewcraft.wakame.config.PrimaryConfigImpl
 import cc.mewcraft.wakame.lang.LanguageExtractor
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
+import cc.mewcraft.wakame.mixin.support.PreWorldStageTasks
+import cc.mewcraft.wakame.pack.AssetExtractor
 import cc.mewcraft.wakame.util.data.Version
 import cc.mewcraft.wakame.util.data.VersionRange
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
@@ -22,6 +23,7 @@ private val REQUIRED_SERVER_VERSION: VersionRange = Version("1.21.7")..Version("
 internal val PREVIOUS_KOISH_VERSION: Version? = PermanentStorage.retrieveOrNull<Version>("last_version")
 
 internal class KoishBootstrap : PluginBootstrap {
+
     init {
         BootstrapContexts.registerBootstrap(this)
     }
@@ -32,14 +34,25 @@ internal class KoishBootstrap : PluginBootstrap {
     // 1) 加载 NMS 的 classes (因此可以在这里对服务端代码进行 patching)
     // 2) 创建 JavaPlugin 实例 (因此可以直接用 object 来实现 JavaPlugin)
     override fun bootstrap(context: BootstrapContext) {
-        LoggerProvider.set(context.logger)
-        ConfigAccess.setImplementation(Configs) // 配置文件 API 实例趁早注册
-
         BootstrapContexts.registerLifecycleManagerOwnedByBootstrap(context.lifecycleManager)
         BootstrapContexts.registerAuthors(context.pluginMeta.authors)
         BootstrapContexts.registerName(context.pluginMeta.name)
         BootstrapContexts.registerVersion(Version(context.pluginMeta.version))
         BootstrapContexts.registerPluginJar(context.pluginSource)
+
+        LoggerProvider.set(context.logger)
+
+        // 初始化 Koish 所使用的路径
+        KoishDataPaths.initialize()
+        LOGGER.info("Initialized object: ${KoishDataPaths::class.simpleName}")
+
+        // 配置文件必须最先初始化, 因为一般来说 Configs[...] 的返回值(下面称配置)都会赋值到 top-level 的 val,
+        // 也就是说这些配置会随着 class 被 classloader 加载时直接实例化,
+        // 而这些配置所对应的文件可能还没有内容 (例如首次使用 Koish 插件时数据文件还未被拷贝到插件的数据目录),
+        // 从而导致读取配置项时找不到需要的配置项, 抛出 NPE
+        KoishConfigs.initialize() // 配置文件 API 实例趁早注册
+        LOGGER.info("Initialized object: ${KoishConfigs::class.simpleName}")
+        PrimaryConfig.setImplementation(PrimaryConfigImpl())
 
         if (BootstrapContexts.IS_DEV_SERVER) {
             LOGGER.warn("Running in dev mode! Never use this on a production server!")
@@ -62,9 +75,6 @@ internal class KoishBootstrap : PluginBootstrap {
         // }
 
         try {
-            // 初始化 Koish 所使用的路径
-            KoishDataPaths.initialize()
-
             if (PREVIOUS_KOISH_VERSION == null || PREVIOUS_KOISH_VERSION != Version("0.0.1-snapshot")) {
                 LegacyDataMigrator.migrate()
             }
@@ -74,18 +84,19 @@ internal class KoishBootstrap : PluginBootstrap {
                 DebugProbes.enableCreationStackTraces = true
             }
 
-            // 配置文件必须最先初始化, 因为一般来说 Configs[...] 的返回值(下面称配置)都会赋值到 top-level 的 val,
-            // 也就是说这些配置会随着 class 被 classloader 加载时直接实例化,
-            // 而这些配置所对应的文件可能还没有内容 (例如首次使用 Koish 插件时数据文件还未被拷贝到插件的数据目录),
-            // 从而导致读取配置项时找不到需要的配置项, 抛出 NPE
-            Configs.initialize()
-            PrimaryConfig.setImplementation(PrimaryConfigImpl())
+            LOGGER.info("Extracting assets files...")
+            AssetExtractor.extractDefaults()
+            LOGGER.info("Extracting language files...")
             LanguageExtractor.extractDefaults()
-            //AssetExtractor.extractDefaults() // 暂时没资源文件可以提取
 
-            // 初始化所有 InitFun (PRE_WORLD)
+            // 构建 InitFun 的依赖图
             Initializer.initialize()
-            Initializer.performPreWorld()
+
+            // 执行所有 InitFun (BOOTSTRAP)
+            Initializer.performBootstrap()
+
+            // 注册所有 InitFun (PRE_WORLD), 会在 org.bukkit.craftbukkit.CraftServer.loadPlugins 之前运行
+            PreWorldStageTasks.register(Initializer::performPreWorld)
 
             // 让指令注册发生在所有 PRE_WORLD 的 InitFun 之后,
             // 这样如果之前发生了异常那么指令将不会注册,
