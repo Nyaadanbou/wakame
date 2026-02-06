@@ -27,12 +27,10 @@ class TpaBlockListener : Listener {
         }
 
         val request = event.request
-
         val requestType = request.type
+
         val recipient = event.recipient
-        //val requesterPos = request.requesterPosition
         val recipientPos = recipient.position
-        //val requesterServer = requesterPos.server
         val recipientServer = recipientPos.server
 
         when (requestType) {

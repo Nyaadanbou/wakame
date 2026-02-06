@@ -274,3 +274,35 @@ castable:
       jump: "<!i><light_purple>跳跃</light_purple>"
       sneak: "<!i><light_purple>潜行</light_purple>"
       sprint: "<!i><light_purple>冲刺</light_purple>"
+
+# id: `network_position`
+network_position:
+  namespace: special
+  # 位面翻译映射
+  server_map:
+    xhome1: "家园位面 #1"
+    xmine1: "冒险位面 #1"
+    xcaps1: "领域位面 #1"
+    xcity1: "主城位面 #1"
+  # 维度翻译映射
+  dimension_map:
+    home: "家园"
+    eden: "伊甸"
+    dune: "流沙"
+    hollow: "寒墟"
+    nether: "下界"
+    end: "末地"
+  # 可用标签
+  # <x> X 坐标
+  # <y> Y 坐标
+  # <z> Z 坐标
+  # <yaw> 朝向 Yaw
+  # <pitch> 朝向 Pitch
+  # <world> 世界名称
+  # <server> 位面名称
+  content:
+    - "<light_purple>该传送锚记录了一个坐标位置"
+    - "<light_purple>右键消耗可以传送到坐标位置"
+    - "<gray>坐标: <yellow>X:<x:zh-CN:#> Y:<y:zh-CN:#> Z:<z:zh-CN:#>"
+    - "<gray>维度: <yellow><world>"
+    - "<gray>位面: <yellow><server>"

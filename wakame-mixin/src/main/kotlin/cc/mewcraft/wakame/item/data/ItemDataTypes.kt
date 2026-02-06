@@ -138,6 +138,12 @@ data object ItemDataTypes {
     @JvmField
     val BREW_RECIPE: ItemDataType<ItemBrewRecipe> = typeOf("brew_recipe")
 
+    /**
+     * 记录了一个网络中的坐标.
+     */
+    @JvmField
+    val NETWORK_POSITION: ItemDataType<NetworkPosition> = typeOf("network_position")
+
     // ------------
     // 方便函数
     // ------------

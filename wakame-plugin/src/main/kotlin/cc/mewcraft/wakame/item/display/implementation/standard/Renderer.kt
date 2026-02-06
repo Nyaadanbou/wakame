@@ -114,6 +114,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         renderCoreContainer(collector, item.coreContainer)
         StandardRenderingHandlerRegistry.RARITY.process(collector, item.rarity2, item.getData(ItemDataTypes.REFORGE_HISTORY) ?: ReforgeHistory.ZERO)
         StandardRenderingHandlerRegistry.ENTITY_BUCKET_INFO.process(collector, item.getData(ItemDataTypes.ENTITY_BUCKET_INFO))
+        StandardRenderingHandlerRegistry.NETWORK_POSITION.process(collector, item.getData(ItemDataTypes.NETWORK_POSITION))
         StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, item.getData(DataComponentTypes.ENCHANTMENTS))
         StandardRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, if (item.hasData(DataComponentTypes.DAMAGE_RESISTANT)) Unit else null)
         StandardRenderingHandlerRegistry.FOOD.process(collector, item.getData(DataComponentTypes.FOOD))
@@ -297,4 +298,9 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
 
     @JvmField
     val CASTABLE: RenderingHandler<Map<String, Castable>, CastableRendererFormat> = configure("castable") { data, format -> format.render(data) }
+
+    @JvmField
+    val NETWORK_POSITION: RenderingHandler<NetworkPosition, NetworkPositionRendererFormat> = configure("network_position") { data, format ->
+        format.render(data)
+    }
 }
