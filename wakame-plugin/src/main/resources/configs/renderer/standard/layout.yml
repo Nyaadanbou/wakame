@@ -61,6 +61,7 @@ primary:
   - special:entity_bucket_info
   - special:fuel
   - special:castable
+  - special:network_position
 
   - (fixed:general)<st><dark_gray>             </dark_gray></st>
   - general:kizami

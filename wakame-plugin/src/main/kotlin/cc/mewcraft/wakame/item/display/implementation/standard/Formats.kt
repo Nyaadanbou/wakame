@@ -12,6 +12,7 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.entity.EntityType
@@ -339,5 +340,35 @@ internal data class CastableRendererFormat(
                 InputCastableTrigger.SPRINT -> sprint
             }
         }
+    }
+}
+
+@ConfigSerializable
+internal data class NetworkPositionRendererFormat(
+    override val namespace: String,
+    @Setting("content")
+    private val content: List<String>,
+    @Setting("server_map")
+    private val serverMap: Map<String, String>,
+    @Setting("dimension_map")
+    private val dimensionMap: Map<String, String>,
+) : RendererFormat.Simple {
+    override val id: String = "network_position"
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory.fixed()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate.literal(namespace, id)
+
+    fun render(data: NetworkPosition): IndexedText {
+        val resolver = TagResolver.builder()
+            .resolver(Formatter.number("x", data.x))
+            .resolver(Formatter.number("y", data.y))
+            .resolver(Formatter.number("z", data.z))
+            .resolver(Formatter.number("yaw", data.yaw))
+            .resolver(Formatter.number("pitch", data.pitch))
+            .resolver(Placeholder.unparsed("world", dimensionMap[data.world] ?: data.world))
+            .resolver(Placeholder.unparsed("server", serverMap[data.server] ?: data.server))
+            .build()
+        val lines = content.map { MiniMessage.miniMessage().deserialize(it, resolver) }
+        return SimpleIndexedText(index, lines)
     }
 }

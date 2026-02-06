@@ -198,6 +198,12 @@ object ItemBehaviorTypes {
     @JvmField
     val DUNGEON_ENTRY = typeOf("dungeon_entry", DungeonEntry)
 
+    /**
+     * 物品具有该行为时, 可以使用以跨服务器传送玩家.
+     */
+    @JvmField
+    val TELEPORT_ANCHOR = typeOf("teleport_anchor", TeleportAnchor)
+
     // ------------
     // 方便函数
     // ------------

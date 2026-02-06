@@ -452,6 +452,12 @@ data object ItemPropTypes {
     @JvmField
     val DUNGEON_ENTRY: ItemPropType<DungeonEntry> = typeOf("dungeon_entry")
 
+    /**
+     * 储存了 [cc.mewcraft.wakame.item.behavior.impl.TeleportAnchor] 行为的全局配置项.
+     */
+    @JvmField
+    val TELEPORT_ANCHOR: ItemPropType<TeleportAnchor> = typeOf("teleport_anchor")
+
     // ------------
     // 方便函数
     // ------------
