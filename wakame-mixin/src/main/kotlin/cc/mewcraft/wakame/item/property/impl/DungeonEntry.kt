@@ -14,5 +14,6 @@ data class DungeonEntry(
     val dungeon: String,
     val structure: Key,
     val partyRadius: Double,
+    val requireSneaking: Boolean = false,
     val useEffects: List<PotionEffect> = emptyList(),
 )
