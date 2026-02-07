@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.display.implementation.crafting_station
 
 import cc.mewcraft.wakame.entity.player.AttackSpeed
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.item.data.impl.ItemCrate
@@ -11,10 +12,6 @@ import cc.mewcraft.wakame.item.display.TextAssembler
 import cc.mewcraft.wakame.item.display.implementation.*
 import cc.mewcraft.wakame.item.display.implementation.common.*
 import cc.mewcraft.wakame.item.display.implementation.standard.AttackSpeedRendererFormat
-import cc.mewcraft.wakame.item.getData
-import cc.mewcraft.wakame.item.getMeta
-import cc.mewcraft.wakame.item.getProp
-import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.ExtraLore
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -103,6 +100,10 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<CraftingStati
 
         // 将修改应用到物品上
         item.fastLore(koishLore)
+
+        HotfixItemModel.transform(item)
+
+        HotfixItemName.transform(item)
     }
 }
 

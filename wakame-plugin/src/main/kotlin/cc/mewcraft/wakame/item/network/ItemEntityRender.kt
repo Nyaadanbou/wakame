@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.network
 
 import cc.mewcraft.wakame.item.extension.rarity2
+import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.hasProp
 import cc.mewcraft.wakame.item.isExactKoish
 import cc.mewcraft.wakame.item.property.ItemPropTypes
@@ -17,7 +18,6 @@ import cc.mewcraft.wakame.network.event.unregisterPacketListener
 import cc.mewcraft.wakame.shadow.world.entity.ShadowEntity
 import cc.mewcraft.wakame.util.NMSUtils
 import cc.mewcraft.wakame.util.adventure.toNMSComponent
-import cc.mewcraft.wakame.util.item.itemName
 import cc.mewcraft.wakame.util.send
 import io.papermc.paper.adventure.PaperAdventure
 import me.lucko.shadow.bukkit.BukkitShadowFactory
@@ -84,7 +84,7 @@ internal object ItemEntityRender : PacketListener {
 
     private fun tryAddCustomNameEntityData(item: Item, entityData: MutableList<SynchedEntityData.DataValue<*>>) {
         // add CustomName
-        entityData.add(SynchedEntityData.DataValue.create(SHADOW_ENTITY.DATA_CUSTOM_NAME, Optional.ofNullable(item.itemStack.itemName?.toNMSComponent())))
+        entityData.add(SynchedEntityData.DataValue.create(SHADOW_ENTITY.DATA_CUSTOM_NAME, Optional.ofNullable(item.itemStack.getProp(ItemPropTypes.CLIENTBOUND_ITEM_NAME)?.toNMSComponent())))
         // add CustomNameVisible
         entityData.add(SynchedEntityData.DataValue.create(SHADOW_ENTITY.DATA_CUSTOM_NAME_VISIBLE, true))
     }

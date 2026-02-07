@@ -193,9 +193,9 @@ public interface MetadataMap {
      * Removes the given key from this map
      *
      * @param key the key to remove
-     * @return true if a value was removed from the map
+     * @return the previous value, or null if none was present
      */
-    boolean remove(MetadataKey<?> key);
+    <T> @Nullable T remove(MetadataKey<T> key);
 
     /**
      * Clears the map

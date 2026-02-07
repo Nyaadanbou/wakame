@@ -12,6 +12,9 @@ interface DungeonBridge {
 
     // Dungeon Management
 
+    /**
+     * 检查是否存在指定标识符的地牢.
+     */
     fun hasDungeon(id: String): Result<Boolean>
 
     // Player Management
@@ -23,7 +26,7 @@ interface DungeonBridge {
      * @param dungeon 地牢的标识符
      * @return 进入地牢的结果
      */
-    fun play(player: Player, dungeon: String): Result<Unit>
+    fun play(player: Player, dungeon: String): Result<Boolean>
 
     /**
      * 让一组玩家进入指定的地牢. 第一个玩家将作为队长 (如果实现支持).
@@ -32,7 +35,7 @@ interface DungeonBridge {
      * @param dungeon 地牢的标识符
      * @return 进入地牢的结果
      */
-    fun play(players: List<Player>, dungeon: String): Result<Unit>
+    fun play(players: List<Player>, dungeon: String): Result<Boolean>
 
     /**
      * 将玩家从倒计时队列中移除.
@@ -68,8 +71,8 @@ interface DungeonBridge {
 
         private var implementation: DungeonBridge = object : DungeonBridge {
             override fun hasDungeon(id: String): Result<Boolean> = Result.failure(NotImplementedError())
-            override fun play(player: Player, dungeon: String): Result<Unit> = Result.failure(NotImplementedError())
-            override fun play(players: List<Player>, dungeon: String): Result<Unit> = Result.failure(NotImplementedError())
+            override fun play(player: Player, dungeon: String): Result<Boolean> = Result.failure(NotImplementedError())
+            override fun play(players: List<Player>, dungeon: String): Result<Boolean> = Result.failure(NotImplementedError())
             override fun unqueue(player: Player): Result<Unit> = Result.failure(NotImplementedError())
             override fun isAwaitingDungeon(player: Player): Result<Boolean> = Result.failure(NotImplementedError())
             override fun isInsideDungeon(player: Player): Result<Boolean> = Result.failure(NotImplementedError())
@@ -84,8 +87,8 @@ interface DungeonBridge {
 
         override fun inited(): Boolean = implementation.inited()
         override fun hasDungeon(id: String): Result<Boolean> = implementation.hasDungeon(id)
-        override fun play(player: Player, dungeon: String): Result<Unit> = implementation.play(player, dungeon)
-        override fun play(players: List<Player>, dungeon: String): Result<Unit> = implementation.play(players, dungeon)
+        override fun play(player: Player, dungeon: String): Result<Boolean> = implementation.play(player, dungeon)
+        override fun play(players: List<Player>, dungeon: String): Result<Boolean> = implementation.play(players, dungeon)
         override fun unqueue(player: Player): Result<Unit> = implementation.unqueue(player)
         override fun isAwaitingDungeon(player: Player): Result<Boolean> = implementation.isAwaitingDungeon(player)
         override fun isInsideDungeon(player: Player): Result<Boolean> = implementation.isInsideDungeon(player)

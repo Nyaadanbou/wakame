@@ -19,14 +19,14 @@ class MythicDungeonBridge : DungeonBridge {
         return runCatching { mdApi.dungeonManager.get(id) != null }
     }
 
-    override fun play(player: Player, dungeon: String): Result<Unit> {
+    override fun play(player: Player, dungeon: String): Result<Boolean> {
         return runCatching {
             ensureReady(player)
             mdApi.sendToDungeon(player, dungeon)
         }
     }
 
-    override fun play(players: List<Player>, dungeon: String): Result<Unit> {
+    override fun play(players: List<Player>, dungeon: String): Result<Boolean> {
         return runCatching {
             val mythicParty = createParty0(players)
             val leader = mythicParty.leader
@@ -42,7 +42,7 @@ class MythicDungeonBridge : DungeonBridge {
     }
 
     override fun isAwaitingDungeon(player: Player): Result<Boolean> {
-        return runCatching { mdApi.getMythicPlayer(player)?.isAwaitingDungeon ?: false }
+        return runCatching { mdApi.isPartyQueuedForDungeon(player) != null }
     }
 
     override fun isInsideDungeon(player: Player): Result<Boolean> {
