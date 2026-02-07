@@ -129,7 +129,9 @@ object DungeonEntry : ItemBehavior {
             return cleanupExistingMembersAndReturn(player, BehaviorResult.FINISH_AND_CANCEL)
         }
 
+        // 刷新冷却, 避免开启地牢后短时间内再次尝试开启
         testUseCooldown(player)
+
         return BehaviorResult.FINISH
     }
 
