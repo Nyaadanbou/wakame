@@ -58,6 +58,13 @@ object DungeonEntry : ItemBehavior {
         return InteractionResult.PASS
     }
 
+    override fun handleUseEntity(context: UseEntityContext): InteractionResult {
+        if (context.triggersEntityInteract) return InteractionResult.PASS
+        val dungeonEntry = context.itemstack.getProp(ItemPropTypes.DUNGEON_ENTRY) ?: return InteractionResult.FAIL_AND_CANCEL
+        if (!handleStartUsing(context.player, dungeonEntry)) return InteractionResult.FAIL_AND_CANCEL
+        return InteractionResult.PASS
+    }
+
     override fun handleStopUse(context: StopUseContext): BehaviorResult {
         val dungeonEntry = context.itemstack.getProp(ItemPropTypes.DUNGEON_ENTRY) ?: return BehaviorResult.FINISH_AND_CANCEL
         handleStopUsing(context.player, dungeonEntry)
