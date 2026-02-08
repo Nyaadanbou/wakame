@@ -43,6 +43,13 @@ private constructor(
         private val pool: ConcurrentHashMap<Identifier, SlotDisplay> = ConcurrentHashMap()
 
         /**
+         * 清空缓存.
+         */
+        fun invalidateCache() {
+            pool.clear()
+        }
+
+        /**
          * 返回一个以物品 [id] 作为基底的 [SlotDisplay].
          *
          * @param id `namespace:path` 形式的字符串, 必须是有效的 [KoishItem.id]
@@ -66,7 +73,6 @@ private constructor(
                 SlotDisplay(BuiltInRegistries.ITEM.getEntryOrThrow(xid))
             }
         }
-
     }
 
     /**
@@ -106,9 +112,7 @@ private constructor(
             lore?.let { item.setData(DataComponentTypes.LORE, ItemLore.lore(it)) }
             return item
         }
-
     }
-
 }
 
 @DslMarker
