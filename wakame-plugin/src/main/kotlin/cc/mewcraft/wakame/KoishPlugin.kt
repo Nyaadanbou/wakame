@@ -23,6 +23,7 @@ internal object KoishPlugin : JavaPlugin(), IKoish {
 
     override fun onLoad() {
         PluginProvider.set(this)
+        KoishProvider.register(this)
     }
 
     override fun onEnable() {
@@ -34,7 +35,6 @@ internal object KoishPlugin : JavaPlugin(), IKoish {
         Initializer.performPostWorld()
         Initializer.registerEvents()
 
-        KoishProvider.register(this)
         BootstrapContexts.setPluginReady(true)
     }
 
