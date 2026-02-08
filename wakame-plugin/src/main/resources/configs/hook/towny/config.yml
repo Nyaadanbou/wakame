@@ -1,0 +1,43 @@
+# 城镇列表菜单设置
+town_list_menu:
+  title: "全部城镇 (当前位面)"
+  # ?: hint
+  # .: background
+  # <: prev_page
+  # >: next_page
+  # x: entry
+  structure:
+    - ". . . . ? . . . ."
+    - ". x x x x x x x ."
+    - ". x x x x x x x ."
+    - ". x x x x x x x ."
+    - ". x x x x x x x ."
+    - "< . . . . . . . >"
+  icons:
+    background: "internal/menu/common/default/background"
+    prev_page: "internal/menu/common/default/prev_page"
+    next_page: "internal/menu/common/default/next_page"
+    hint: "internal/menu/towny/townlist/hint"
+    entry: "internal/menu/towny/townlist/entry"
+
+# 国家列表菜单设置
+nation_list_menu:
+  title: "全部国家 (当前位面)"
+  # ?: hint
+  # .: background
+  # <: prev_page
+  # >: next_page
+  # x: entry
+  structure:
+    - ". . . . ? . . . ."
+    - ". x x x x x x x ."
+    - ". x x x x x x x ."
+    - ". x x x x x x x ."
+    - ". x x x x x x x ."
+    - "< . . . . . . . >"
+  icons:
+    background: "internal/menu/common/default/background"
+    prev_page: "internal/menu/common/default/prev_page"
+    next_page: "internal/menu/common/default/next_page"
+    hint: "internal/menu/towny/nationlist/hint"
+    entry: "internal/menu/towny/nationlist/entry"

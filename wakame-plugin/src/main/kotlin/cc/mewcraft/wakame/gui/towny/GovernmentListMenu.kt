@@ -1,0 +1,131 @@
+package cc.mewcraft.wakame.gui.towny
+
+import cc.mewcraft.wakame.gui.BasicMenuSettings
+import cc.mewcraft.wakame.integration.towny.Government
+import cc.mewcraft.wakame.item.resolveToItemWrapper
+import net.kyori.adventure.text.Component
+import org.bukkit.entity.Player
+import org.bukkit.event.inventory.ClickType
+import org.bukkit.event.inventory.InventoryClickEvent
+import xyz.xenondevs.invui.gui.PagedGui
+import xyz.xenondevs.invui.gui.structure.Markers
+import xyz.xenondevs.invui.item.Item
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.impl.AbstractItem
+import xyz.xenondevs.invui.item.impl.controlitem.PageItem
+import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.invui.window.type.context.setTitle
+
+sealed class GovernmentListMenu {
+
+    abstract fun open()
+}
+
+abstract class PagedGovernmentListMenu(
+    protected val viewer: Player,
+) : GovernmentListMenu() {
+
+    protected abstract val settings: BasicMenuSettings
+
+    protected abstract fun getGovernments(): List<Government>
+
+    private val pagedGui: PagedGui<Item> = PagedGui.items { builder ->
+        builder.setStructure(*settings.structure)
+        builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+        builder.addIngredient('.', BackgroundItem())
+        builder.addIngredient('<', PrevItem())
+        builder.addIngredient('>', NextItem())
+        builder.addIngredient('?', HintItem())
+        builder.setContent(buildContents())
+    }
+
+    private val window: Window = Window.single()
+        .setGui(pagedGui)
+        .setTitle(settings.title)
+        .build(viewer)
+
+    private fun buildContents(): List<Item> {
+        val governments = getGovernments()
+        return governments.mapIndexed { index, gov ->
+            GovernmentEntryItem(gov, index)
+        }
+    }
+
+    override fun open() {
+        window.open()
+    }
+
+    inner class BackgroundItem : AbstractItem() {
+
+        override fun getItemProvider(): ItemProvider {
+            return settings.getSlotDisplay("background").resolveToItemWrapper()
+        }
+
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+            // no-op
+        }
+    }
+
+    inner class PrevItem : PageItem(false) {
+
+        override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
+            if (!getGui().hasPreviousPage()) {
+                return settings.getSlotDisplay("background").resolveToItemWrapper()
+            }
+            return settings.getSlotDisplay("prev_page").resolveToItemWrapper {
+                standard {
+                    component("current_page", Component.text(pagedGui.currentPage + 1))
+                    component("total_page", Component.text(pagedGui.pageAmount))
+                }
+            }
+        }
+    }
+
+    inner class NextItem : PageItem(true) {
+
+        override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
+            if (!getGui().hasNextPage()) {
+                return settings.getSlotDisplay("background").resolveToItemWrapper()
+            }
+            return settings.getSlotDisplay("next_page").resolveToItemWrapper {
+                standard {
+                    component("current_page", Component.text(pagedGui.currentPage + 1))
+                    component("total_page", Component.text(pagedGui.pageAmount))
+                }
+            }
+        }
+    }
+
+    /**
+     * `提示占位`的图标.
+     */
+    inner class HintItem : AbstractItem() {
+
+        override fun getItemProvider(): ItemProvider {
+            return settings.getSlotDisplay("hint").resolveToItemWrapper()
+        }
+
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+            // no-op
+        }
+    }
+
+    inner class GovernmentEntryItem(
+        private val government: Government,
+        private val index: Int,
+    ) : AbstractItem() {
+
+        override fun getItemProvider(): ItemProvider {
+            return settings.getSlotDisplay("entry").resolveToItemWrapper {
+                standard {
+                    component("name", government.name)
+                    component("index", Component.text(index + 1))
+                }
+            }
+        }
+
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+            // reserved for future detail page
+        }
+    }
+}

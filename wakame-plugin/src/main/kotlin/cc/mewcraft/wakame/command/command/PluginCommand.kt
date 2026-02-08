@@ -20,10 +20,7 @@ import cc.mewcraft.wakame.entity.typeref.EntityRefRegistryLoader
 import cc.mewcraft.wakame.gui.BasicGuiInitializer
 import cc.mewcraft.wakame.gui.catalog.item.CatalogItemMenuStacks
 import cc.mewcraft.wakame.init.RecipeInitializer
-import cc.mewcraft.wakame.item.CustomItemRegistryLoader
-import cc.mewcraft.wakame.item.ItemProxyRegistryLoader
-import cc.mewcraft.wakame.item.ItemTagManager
-import cc.mewcraft.wakame.item.KoishStackGenerator
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.display.implementation.crafting_station.CraftingStationItemRenderer
 import cc.mewcraft.wakame.item.display.implementation.merging_table.MergingTableItemRenderer
 import cc.mewcraft.wakame.item.display.implementation.repairing_table.RepairingTableItemRenderer
@@ -119,6 +116,7 @@ private object ReloadProcess {
         CustomItemRegistryLoader.reload()
         ItemProxyRegistryLoader.reload()
 
+        SlotDisplay.invalidateCache()
         BasicGuiInitializer.reload()
 
         CraftingStationRegistry.reload()

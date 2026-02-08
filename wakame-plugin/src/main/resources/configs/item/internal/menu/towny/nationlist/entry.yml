@@ -1,0 +1,4 @@
+base: map
+slot_display_name: "<aqua><name> <dark_gray>#<index>"
+slot_display_lore:
+  - "<gray>点击查看详情"
