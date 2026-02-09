@@ -11,6 +11,7 @@ import com.palmergames.bukkit.towny.`object`.TownyObject
 import com.palmergames.bukkit.towny.`object`.metadata.ByteDataField
 import com.palmergames.bukkit.towny.`object`.metadata.LongDataField
 import net.kyori.adventure.text.Component
+import org.bukkit.entity.Player
 import java.util.*
 import cc.mewcraft.wakame.integration.towny.Nation as KoishNation
 import cc.mewcraft.wakame.integration.towny.Town as KoishTown
@@ -106,6 +107,11 @@ private class TownyTown(
     override fun deposit(amount: Double) {
         handle.account.deposit(amount, "Koish")
     }
+
+    override fun teleport(player: Player) {
+        val spawn = handle.spawnOrNull ?: return
+        player.teleportAsync(spawn)
+    }
 }
 
 private class TownyNation(
@@ -132,5 +138,10 @@ private class TownyNation(
 
     override fun deposit(amount: Double) {
         handle.account.deposit(amount, "Koish")
+    }
+
+    override fun teleport(player: Player) {
+        val spawn = handle.spawnOrNull ?: return
+        player.teleportAsync(spawn)
     }
 }

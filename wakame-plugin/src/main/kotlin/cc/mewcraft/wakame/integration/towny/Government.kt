@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.integration.towny
 
 import net.kyori.adventure.text.Component
+import org.bukkit.entity.Player
 
 /**
  * 代表一个组织: [Town] 或 [Nation].
@@ -33,4 +34,9 @@ interface Government {
      * 从该组织的银行里取钱.
      */
     fun deposit(amount: Double)
+
+    /**
+     * 传送玩家到该组织的中心.
+     */
+    fun teleport(player: Player)
 }

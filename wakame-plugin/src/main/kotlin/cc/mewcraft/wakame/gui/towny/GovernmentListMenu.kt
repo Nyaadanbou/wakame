@@ -3,6 +3,9 @@ package cc.mewcraft.wakame.gui.towny
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.integration.towny.Government
 import cc.mewcraft.wakame.item.resolveToItemWrapper
+import cc.mewcraft.wakame.util.cooldown.Cooldown
+import cc.mewcraft.wakame.util.metadata.metadata
+import cc.mewcraft.wakame.util.metadata.metadataCooldownKey
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -15,6 +18,7 @@ import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.controlitem.PageItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
+import java.util.concurrent.TimeUnit
 
 sealed class GovernmentListMenu {
 
@@ -24,6 +28,10 @@ sealed class GovernmentListMenu {
 abstract class PagedGovernmentListMenu(
     protected val viewer: Player,
 ) : GovernmentListMenu() {
+
+    companion object {
+        private val KEY_TELEPORT_COOLDOWN = metadataCooldownKey("government_list_menu:teleport_cooldown")
+    }
 
     protected abstract val uiSettings: BasicMenuSettings
 
@@ -127,7 +135,10 @@ abstract class PagedGovernmentListMenu(
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            // reserved for future detail page
+            val cooldown = player.metadata().getOrPut(KEY_TELEPORT_COOLDOWN) { Cooldown.of(5, TimeUnit.SECONDS) }
+            if (cooldown.test()) {
+                government.teleport(player)
+            }
         }
     }
 }
