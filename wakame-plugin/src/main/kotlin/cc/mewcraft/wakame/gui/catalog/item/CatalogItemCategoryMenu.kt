@@ -9,7 +9,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.gui.PagedGui
-import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
@@ -53,7 +52,7 @@ internal class CatalogItemCategoryMenu(
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
         builder.addIngredient('b', BackItem())
-        builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+        builder.addIngredient('x', category.contentMarker)
         // TODO 可以缓存, 只有重载时会变化
         // 类别菜单所展示的物品
         builder.setContent(category.items.map { itemRef -> DisplayItem(itemRef) })
