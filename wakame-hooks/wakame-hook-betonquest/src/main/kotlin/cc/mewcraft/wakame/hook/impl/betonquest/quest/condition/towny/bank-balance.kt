@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.towny
 
 import cc.mewcraft.wakame.hook.impl.betonquest.util.ComparisonOp
+import cc.mewcraft.wakame.hook.impl.betonquest.util.FriendlyEnumParser
 import cc.mewcraft.wakame.integration.towny.GovernmentType
 import cc.mewcraft.wakame.integration.towny.TownyLocal
 import org.betonquest.betonquest.api.instruction.Argument
@@ -53,7 +54,7 @@ class GovernmentBankBalanceFactory(
     override fun parsePlayer(instruction: Instruction): PlayerCondition {
         val logger = loggerFactory.create(GovernmentBankBalance::class.java)
         val amount = instruction.number().atLeast(0).get()
-        val operation = instruction.enumeration(ComparisonOp::class.java).get()
+        val operation = instruction.parse(FriendlyEnumParser<ComparisonOp>()).get()
         val govType = instruction.enumeration(GovernmentType::class.java).get()
         return GovernmentBankBalance(logger, amount, operation, govType)
     }
