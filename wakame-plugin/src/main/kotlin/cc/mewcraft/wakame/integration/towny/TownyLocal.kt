@@ -23,9 +23,24 @@ interface TownyLocal {
     fun joinsMarketNetwork(government: Government)
 
     /**
+     * 标记 [government] 已经离开市场网络.
+     */
+    fun leavesMarketNetwork(government: Government)
+
+    /**
+     * 返回 [government] 是否已经加入市场网络.
+     */
+    fun hasJoinedMarketNetwork(government: Government): Boolean
+
+    /**
      * 标记 [government] 已经支付市场网络税.
      */
     fun paysMarketNetworkTax(government: Government)
+
+    /**
+     * 返回 [government] 是否已经支付市场网络税.
+     */
+    fun hasPaidMarketNetworkTax(government: Government): Boolean
 
     /**
      * 返回是否为镇长.
@@ -53,7 +68,10 @@ interface TownyLocal {
             override fun getTowns(): Collection<Town> = emptyList()
             override fun getNations(): Collection<Nation> = emptyList()
             override fun joinsMarketNetwork(government: Government) = Unit
+            override fun leavesMarketNetwork(government: Government) = Unit
+            override fun hasJoinedMarketNetwork(government: Government): Boolean = false
             override fun paysMarketNetworkTax(government: Government) = Unit
+            override fun hasPaidMarketNetworkTax(government: Government): Boolean = false
             override fun isMayor(playerId: UUID): Boolean = false
             override fun isKing(playerId: UUID): Boolean = false
             override fun getTown(playerId: UUID): Town? = null
@@ -67,7 +85,10 @@ interface TownyLocal {
         override fun getTowns(): Collection<Town> = implementation.getTowns()
         override fun getNations(): Collection<Nation> = implementation.getNations()
         override fun joinsMarketNetwork(government: Government): Unit = implementation.joinsMarketNetwork(government)
+        override fun leavesMarketNetwork(government: Government): Unit = implementation.leavesMarketNetwork(government)
+        override fun hasJoinedMarketNetwork(government: Government): Boolean = implementation.hasJoinedMarketNetwork(government)
         override fun paysMarketNetworkTax(government: Government) = implementation.paysMarketNetworkTax(government)
+        override fun hasPaidMarketNetworkTax(government: Government): Boolean = implementation.hasPaidMarketNetworkTax(government)
         override fun isMayor(playerId: UUID): Boolean = implementation.isMayor(playerId)
         override fun isKing(playerId: UUID): Boolean = implementation.isKing(playerId)
         override fun getTown(playerId: UUID): Town? = implementation.getTown(playerId)

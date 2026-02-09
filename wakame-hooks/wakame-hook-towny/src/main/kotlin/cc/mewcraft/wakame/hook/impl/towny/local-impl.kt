@@ -33,10 +33,25 @@ class TownyTownyLocal : TownyLocal {
         townyObject.addMetaData(byteDataField)
     }
 
+    override fun leavesMarketNetwork(government: Government) {
+        val townyObject = (government as TownyHandle).handle
+        townyObject.removeMetaData(EntryFilter.JoinedMarketNetwork.METADATA_KEY_JOINED_MARKET_NETWORK)
+    }
+
+    override fun hasJoinedMarketNetwork(government: Government): Boolean {
+        val townyObject = (government as TownyHandle).handle
+        return townyObject.hasMeta(EntryFilter.JoinedMarketNetwork.METADATA_KEY_JOINED_MARKET_NETWORK, ByteDataField::class.java)
+    }
+
     override fun paysMarketNetworkTax(government: Government) {
         val townyObject = (government as TownyHandle).handle
         val longDataField = LongDataField(EntryFilter.MarketNetworkTaxPeriod.METADATA_KEY_MARKET_NETWORK_TAX_PERIOD, System.currentTimeMillis())
         townyObject.addMetaData(longDataField)
+    }
+
+    override fun hasPaidMarketNetworkTax(government: Government): Boolean {
+        val townyObject = (government as TownyHandle).handle
+        return townyObject.hasMeta(EntryFilter.MarketNetworkTaxPeriod.METADATA_KEY_MARKET_NETWORK_TAX_PERIOD, LongDataField::class.java)
     }
 
     override fun isMayor(playerId: UUID): Boolean {
