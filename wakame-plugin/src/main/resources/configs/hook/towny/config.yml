@@ -2,11 +2,15 @@
 town_list_menu:
   # 条目过滤
   entry_filter:
+    # 城镇需要为破产状态
+    - type: bankrupt
+      invert: true  # invert: true 可反转语义
+    # 城镇需要为 "public"
+    - type: public
+      invert: false
     # 城镇需要已经加入市场网络
     - type: joined_market_network
-    # 城镇需要多久缴纳一次会费
-    - type: market_network_tax_period
-      period: 168h
+      invert: false
   # UI 设置
   ui_settings:
     # UI 标题
@@ -36,11 +40,9 @@ town_list_menu:
 nation_list_menu:
   # 条目过滤
   entry_filter:
-    # 国家需要已经加入市场网络
-    - type: joined_market_network
-    # 国家需要多久缴纳一次会费
-    - type: market_network_tax_period
-      period: 168h
+    # 国家需要为 "public"
+    - type: public
+      invert: false
   # UI 设置
   ui_settings:
     # UI 标题

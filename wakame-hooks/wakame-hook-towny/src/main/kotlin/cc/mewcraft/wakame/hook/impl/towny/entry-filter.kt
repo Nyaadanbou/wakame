@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.hook.impl.towny
 
-import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
-import cc.mewcraft.lazyconfig.configurate.register
 import cc.mewcraft.lazyconfig.configurate.registerExact
 import cc.mewcraft.lazyconfig.configurate.serializer.DispatchingSerializer
+import com.palmergames.bukkit.towny.`object`.Government
+import com.palmergames.bukkit.towny.`object`.Town
 import com.palmergames.bukkit.towny.`object`.TownyObject
 import com.palmergames.bukkit.towny.`object`.metadata.ByteDataField
 import com.palmergames.bukkit.towny.`object`.metadata.LongDataField
@@ -18,33 +18,56 @@ interface EntryFilter {
             .registerExact(
                 DispatchingSerializer.createPartial(
                     mapOf(
+                        "public" to Public::class,
+                        "bankrupt" to Bankrupt::class,
                         "joined_market_network" to JoinedMarketNetwork::class,
                         "market_network_tax_period" to MarketNetworkTaxPeriod::class,
                     )
                 )
             )
-            .register(JoinedMarketNetwork.serializer())
             .build()
     }
 
     fun test(townyObject: TownyObject): Boolean
 
-    class JoinedMarketNetwork : EntryFilter {
+    @ConfigSerializable
+    data class Bankrupt(
+        val invert: Boolean = false,
+    ) : EntryFilter {
+        override fun test(townyObject: TownyObject): Boolean {
+            val bool = townyObject is Town && townyObject.isBankrupt
+            return invert xor bool
+        }
+    }
+
+    @ConfigSerializable
+    data class Public(
+        val invert: Boolean = false,
+    ) : EntryFilter {
+        override fun test(townyObject: TownyObject): Boolean {
+            val bool = townyObject is Government && townyObject.isPublic
+            return invert xor bool
+        }
+    }
+
+    @ConfigSerializable
+    data class JoinedMarketNetwork(
+        val invert: Boolean = false,
+    ) : EntryFilter {
         companion object {
             const val METADATA_KEY_JOINED_MARKET_NETWORK = "joined_market_network"
-
-            fun serializer(): SimpleSerializer<JoinedMarketNetwork> =
-                SimpleSerializer { node, obj -> JoinedMarketNetwork() }
         }
 
         override fun test(townyObject: TownyObject): Boolean {
-            return townyObject.hasMeta<ByteDataField>(METADATA_KEY_JOINED_MARKET_NETWORK)
+            val bool = townyObject.hasMeta<ByteDataField>(METADATA_KEY_JOINED_MARKET_NETWORK)
+            return invert xor bool
         }
     }
 
     @ConfigSerializable
     data class MarketNetworkTaxPeriod(
         val period: Duration,
+        val invert: Boolean = false,
     ) : EntryFilter {
         companion object {
             const val METADATA_KEY_MARKET_NETWORK_TAX_PERIOD = "market_network_tax_period"
@@ -52,7 +75,8 @@ interface EntryFilter {
 
         override fun test(townyObject: TownyObject): Boolean {
             val meta = townyObject.getMeta<LongDataField>(METADATA_KEY_MARKET_NETWORK_TAX_PERIOD) ?: return false
-            return System.currentTimeMillis() - meta.value <= period.toMillis()
+            val bool = System.currentTimeMillis() - meta.value <= period.toMillis()
+            return invert xor bool
         }
     }
 }
