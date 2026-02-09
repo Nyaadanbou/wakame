@@ -1,10 +1,9 @@
 package cc.mewcraft.wakame.gui.towny
 
-import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.lazyconfig.access.entryOrElse
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.integration.towny.GovernmentListProvider
 import cc.mewcraft.wakame.integration.towny.Town
+import cc.mewcraft.wakame.integration.towny.TownyLocal
 import cc.mewcraft.wakame.util.Identifiers
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
@@ -17,11 +16,8 @@ class TownListMenu(
 ) : PagedGovernmentListMenu(
     viewer = viewer,
 ) {
-
     companion object {
-
-        private val townyConfig = ConfigAccess["hook/towny/config"]
-        private val menuSettings by townyConfig.entryOrElse(
+        private val uiSettings by townyHookConfig.entryOrElse(
             BasicMenuSettings(
                 title = Component.text("全部城镇 (当前位面)"),
                 structure = arrayOf(
@@ -39,14 +35,14 @@ class TownListMenu(
                     "hint" to Identifiers.of("internal/menu/towny/townlist/hint"),
                     "entry" to Identifiers.of("internal/menu/towny/townlist/entry"),
                 )
-            ), "town_list_menu"
+            ), "town_list_menu", "ui_settings"
         )
     }
 
-    override val settings: BasicMenuSettings
-        get() = menuSettings
+    override val uiSettings: BasicMenuSettings
+        get() = Companion.uiSettings
 
     override fun getGovernments(): List<Town> {
-        return GovernmentListProvider.getTowns().toList()
+        return TownyLocal.getTowns().toList()
     }
 }

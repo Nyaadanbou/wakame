@@ -10,10 +10,9 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
+private val townyApi = TownyAPI.getInstance()
+
 object TownyProtectionIntegration : ProtectionIntegration {
-
-    private val townyApi = TownyAPI.getInstance()
-
     override fun getExecutionMode(): ProtectionIntegration.ExecutionMode {
         return ProtectionIntegration.ExecutionMode.SERVER
     }

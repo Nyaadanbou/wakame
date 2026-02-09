@@ -25,12 +25,12 @@ abstract class PagedGovernmentListMenu(
     protected val viewer: Player,
 ) : GovernmentListMenu() {
 
-    protected abstract val settings: BasicMenuSettings
+    protected abstract val uiSettings: BasicMenuSettings
 
     protected abstract fun getGovernments(): List<Government>
 
     private val pagedGui: PagedGui<Item> = PagedGui.items { builder ->
-        builder.setStructure(*settings.structure)
+        builder.setStructure(*uiSettings.structure)
         builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         builder.addIngredient('.', BackgroundItem())
         builder.addIngredient('<', PrevItem())
@@ -41,14 +41,16 @@ abstract class PagedGovernmentListMenu(
 
     private val window: Window = Window.single()
         .setGui(pagedGui)
-        .setTitle(settings.title)
+        .setTitle(uiSettings.title)
         .build(viewer)
 
     private fun buildContents(): List<Item> {
         val governments = getGovernments()
-        return governments.mapIndexed { index, gov ->
-            GovernmentEntryItem(gov, index)
-        }
+        return governments
+            .filter { gov -> gov.canShow }
+            .mapIndexed { index, gov ->
+                GovernmentEntryItem(gov, index)
+            }
     }
 
     override fun open() {
@@ -58,7 +60,7 @@ abstract class PagedGovernmentListMenu(
     inner class BackgroundItem : AbstractItem() {
 
         override fun getItemProvider(): ItemProvider {
-            return settings.getSlotDisplay("background").resolveToItemWrapper()
+            return uiSettings.getSlotDisplay("background").resolveToItemWrapper()
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -70,9 +72,9 @@ abstract class PagedGovernmentListMenu(
 
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             if (!getGui().hasPreviousPage()) {
-                return settings.getSlotDisplay("background").resolveToItemWrapper()
+                return uiSettings.getSlotDisplay("background").resolveToItemWrapper()
             }
-            return settings.getSlotDisplay("prev_page").resolveToItemWrapper {
+            return uiSettings.getSlotDisplay("prev_page").resolveToItemWrapper {
                 standard {
                     component("current_page", Component.text(pagedGui.currentPage + 1))
                     component("total_page", Component.text(pagedGui.pageAmount))
@@ -85,9 +87,9 @@ abstract class PagedGovernmentListMenu(
 
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             if (!getGui().hasNextPage()) {
-                return settings.getSlotDisplay("background").resolveToItemWrapper()
+                return uiSettings.getSlotDisplay("background").resolveToItemWrapper()
             }
-            return settings.getSlotDisplay("next_page").resolveToItemWrapper {
+            return uiSettings.getSlotDisplay("next_page").resolveToItemWrapper {
                 standard {
                     component("current_page", Component.text(pagedGui.currentPage + 1))
                     component("total_page", Component.text(pagedGui.pageAmount))
@@ -102,7 +104,7 @@ abstract class PagedGovernmentListMenu(
     inner class HintItem : AbstractItem() {
 
         override fun getItemProvider(): ItemProvider {
-            return settings.getSlotDisplay("hint").resolveToItemWrapper()
+            return uiSettings.getSlotDisplay("hint").resolveToItemWrapper()
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -116,7 +118,7 @@ abstract class PagedGovernmentListMenu(
     ) : AbstractItem() {
 
         override fun getItemProvider(): ItemProvider {
-            return settings.getSlotDisplay("entry").resolveToItemWrapper {
+            return uiSettings.getSlotDisplay("entry").resolveToItemWrapper {
                 standard {
                     component("name", government.name)
                     component("index", Component.text(index + 1))
