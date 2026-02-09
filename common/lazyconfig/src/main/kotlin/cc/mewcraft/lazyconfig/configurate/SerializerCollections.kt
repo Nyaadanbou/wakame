@@ -6,6 +6,7 @@ import cc.mewcraft.lazyconfig.configurate.mapper.KoishObjectMapper
 import cc.mewcraft.lazyconfig.configurate.serializer.*
 import org.spongepowered.configurate.serialize.Scalars
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
+import kotlin.time.Duration
 
 /**
  * 这些序列化器可以处理 Java/Kotlin 标准库里的数据类型.
@@ -40,5 +41,6 @@ val STANDARD_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.bu
     .register(SetSerializer::accepts, SetSerializer())
     .register(ConfigurationNodeSerializer.TYPE, ConfigurationNodeSerializer())
     .register(Unit::class, UnitSerializer)
+    .register(Duration::class, DurationSerializer)
     .register(PathSerializer.TYPE, PathSerializer.INSTANCE)
     .build()
