@@ -18,6 +18,28 @@ interface TownyLocal {
     fun getNations(): Collection<Nation>
 
     /**
+     * 返回玩家所属的 [Town], 如果没有则返回 null.
+     */
+    fun getTown(playerId: UUID): Town?
+
+    /**
+     * 返回玩家所属的 [Nation], 如果没有则返回 null.
+     */
+    fun getNation(playerId: UUID): Nation?
+
+    /**
+     * 返回是否为镇长.
+     */
+    fun isMayor(playerId: UUID): Boolean
+
+    /**
+     * 返回是否为国王.
+     */
+    fun isKing(playerId: UUID): Boolean
+
+    // Market Network
+
+    /**
      * 标记 [government] 已加入市场网络.
      */
     fun joinsMarketNetwork(government: Government)
@@ -42,40 +64,21 @@ interface TownyLocal {
      */
     fun hasPaidMarketNetworkTax(government: Government): Boolean
 
-    /**
-     * 返回是否为镇长.
-     */
-    fun isMayor(playerId: UUID): Boolean
-
-    /**
-     * 返回是否为国王.
-     */
-    fun isKing(playerId: UUID): Boolean
-
-    /**
-     * 返回玩家所属的 [Town], 如果没有则返回 null.
-     */
-    fun getTown(playerId: UUID): Town?
-
-    /**
-     * 返回玩家所属的 [Nation], 如果没有则返回 null.
-     */
-    fun getNation(playerId: UUID): Nation?
 
     companion object Impl : TownyLocal {
 
         private var implementation: TownyLocal = object : TownyLocal {
             override fun getTowns(): Collection<Town> = emptyList()
             override fun getNations(): Collection<Nation> = emptyList()
+            override fun getTown(playerId: UUID): Town? = null
+            override fun getNation(playerId: UUID): Nation? = null
+            override fun isMayor(playerId: UUID): Boolean = false
+            override fun isKing(playerId: UUID): Boolean = false
             override fun joinsMarketNetwork(government: Government) = Unit
             override fun leavesMarketNetwork(government: Government) = Unit
             override fun hasJoinedMarketNetwork(government: Government): Boolean = false
             override fun paysMarketNetworkTax(government: Government) = Unit
             override fun hasPaidMarketNetworkTax(government: Government): Boolean = false
-            override fun isMayor(playerId: UUID): Boolean = false
-            override fun isKing(playerId: UUID): Boolean = false
-            override fun getTown(playerId: UUID): Town? = null
-            override fun getNation(playerId: UUID): Nation? = null
         }
 
         fun setImplementation(provider: TownyLocal) {
@@ -84,14 +87,14 @@ interface TownyLocal {
 
         override fun getTowns(): Collection<Town> = implementation.getTowns()
         override fun getNations(): Collection<Nation> = implementation.getNations()
+        override fun getTown(playerId: UUID): Town? = implementation.getTown(playerId)
+        override fun getNation(playerId: UUID): Nation? = implementation.getNation(playerId)
+        override fun isMayor(playerId: UUID): Boolean = implementation.isMayor(playerId)
+        override fun isKing(playerId: UUID): Boolean = implementation.isKing(playerId)
         override fun joinsMarketNetwork(government: Government): Unit = implementation.joinsMarketNetwork(government)
         override fun leavesMarketNetwork(government: Government): Unit = implementation.leavesMarketNetwork(government)
         override fun hasJoinedMarketNetwork(government: Government): Boolean = implementation.hasJoinedMarketNetwork(government)
         override fun paysMarketNetworkTax(government: Government) = implementation.paysMarketNetworkTax(government)
         override fun hasPaidMarketNetworkTax(government: Government): Boolean = implementation.hasPaidMarketNetworkTax(government)
-        override fun isMayor(playerId: UUID): Boolean = implementation.isMayor(playerId)
-        override fun isKing(playerId: UUID): Boolean = implementation.isKing(playerId)
-        override fun getTown(playerId: UUID): Town? = implementation.getTown(playerId)
-        override fun getNation(playerId: UUID): Nation? = implementation.getNation(playerId)
     }
 }

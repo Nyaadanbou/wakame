@@ -16,6 +16,12 @@ interface Government {
     val name: Component
 
     /**
+     * 返回该组织的公告板, 每个元素代表一行.
+     * 公告板会展示在各个列表里, 可由玩家自行调整.
+     */
+    var board: List<String>
+
+    /**
      * 返回该组织的银行余额.
      */
     val balance: Double

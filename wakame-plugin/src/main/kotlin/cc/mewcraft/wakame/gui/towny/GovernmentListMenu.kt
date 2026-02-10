@@ -131,6 +131,7 @@ abstract class PagedGovernmentListMenu(
                     component("name", government.name)
                     component("index", Component.text(index + 1))
                 }
+                folded("board", government.board.map(Component::text))
             }
         }
 

@@ -55,11 +55,11 @@ interface EntryFilter {
         val invert: Boolean = false,
     ) : EntryFilter {
         companion object {
-            const val METADATA_KEY_JOINED_MARKET_NETWORK = "joined_market_network"
+            const val KEY_JOINED_MARKET_NETWORK = "joined_market_network"
         }
 
         override fun test(townyObject: TownyObject): Boolean {
-            val bool = townyObject.hasMeta<ByteDataField>(METADATA_KEY_JOINED_MARKET_NETWORK)
+            val bool = townyObject.hasMeta<ByteDataField>(KEY_JOINED_MARKET_NETWORK)
             return invert xor bool
         }
     }
@@ -70,11 +70,11 @@ interface EntryFilter {
         val invert: Boolean = false,
     ) : EntryFilter {
         companion object {
-            const val METADATA_KEY_MARKET_NETWORK_TAX_PERIOD = "market_network_tax_period"
+            const val KEY_MARKET_NETWORK_TAX_PERIOD = "market_network_tax_period"
         }
 
         override fun test(townyObject: TownyObject): Boolean {
-            val meta = townyObject.getMeta<LongDataField>(METADATA_KEY_MARKET_NETWORK_TAX_PERIOD) ?: return false
+            val meta = townyObject.getMeta<LongDataField>(KEY_MARKET_NETWORK_TAX_PERIOD) ?: return false
             val bool = System.currentTimeMillis() - meta.value <= period.toMillis()
             return invert xor bool
         }

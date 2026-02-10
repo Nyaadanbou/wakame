@@ -1,6 +1,9 @@
 # 城镇列表菜单设置
 town_list_menu:
-  # 条目过滤
+  # 默认公告板
+  default_board:
+    - "镇长很懒，公告板空空如也"
+  # 条目过滤器
   entry_filter:
     # 城镇需要为破产状态
     - type: bankrupt
@@ -38,7 +41,10 @@ town_list_menu:
 
 # 国家列表菜单设置
 nation_list_menu:
-  # 条目过滤
+  # 默认公告板
+  default_board:
+    - "国王很懒，公告板空空如也"
+  # 条目过滤器
   entry_filter:
     # 国家需要为 "public"
     - type: public

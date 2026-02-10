@@ -1,3 +1,5 @@
+@file:JvmName("TownyNetwork")
+
 package cc.mewcraft.wakame.hook.impl.towny
 
 import cc.mewcraft.messaging2.ServerInfoProvider

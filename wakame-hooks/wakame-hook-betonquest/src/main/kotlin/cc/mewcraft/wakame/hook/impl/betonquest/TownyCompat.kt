@@ -1,9 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.betonquest
 
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.towny.JoinsMarketNetworkFactory
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.towny.LeavesMarketNetworkFactory
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.towny.OperateGovernmentBankFactory
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.towny.PaysMarketNetworkTaxFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.towny.*
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.towny.GovernmentBankBalanceFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.towny.HasJoinedMarketNetworkFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.towny.HasPaidMarketNetworkTaxFactory
@@ -35,6 +32,7 @@ object TownyCompat {
         actionRegistry.register("leavesMarketNetwork", LeavesMarketNetworkFactory(loggerFactory))
         actionRegistry.register("paysMarketNetworkTax", PaysMarketNetworkTaxFactory(loggerFactory))
         actionRegistry.register("operateGovernmentBank", OperateGovernmentBankFactory(loggerFactory))
+        actionRegistry.register("updateGovernmentBoard", UpdateGovernmentBoardFactory(loggerFactory))
 
         // Objective
         val objectiveRegistry = plugin.questRegistries.objective()
