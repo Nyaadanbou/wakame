@@ -30,7 +30,7 @@ import java.util.function.Consumer;
 @NullMarked
 public class KoishLootItem extends LootPoolSingletonContainer {
     public static final MapCodec<KoishLootItem> CODEC = RecordCodecBuilder.mapCodec(
-            instance -> instance.group(ResourceLocation.CODEC.fieldOf("id").forGetter(entry -> entry.id))
+            instance -> instance.group(ResourceLocation.CODEC.fieldOf("name").forGetter(entry -> entry.id))
                     .and(singletonFields(instance))
                     .apply(instance, KoishLootItem::new)
     );
