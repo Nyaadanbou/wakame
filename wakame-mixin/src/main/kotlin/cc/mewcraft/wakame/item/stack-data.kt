@@ -1,4 +1,5 @@
 @file:JvmName("KoishStackData")
+@file:Suppress("VerboseNullabilityAndEmptiness")
 
 package cc.mewcraft.wakame.item
 
@@ -153,9 +154,23 @@ val MojangStack.isProxyKoish: Boolean
  */
 val MojangStack.koishItem: KoishItem?
     // 最终版本
-    //get() = get(ExtraDataComponents.ITEM_KEY)?.itemType
+    //get() {
+    //    val itemType = get(ExtraDataComponents.ITEM_KEY)?.itemType
+    //    if (itemType == null || itemType.isEmpty()) {
+    //        this.count = 0
+    //        return null
+    //    }
+    //    return itemType
+    //}
     // FIXME 临时版本, 用于过渡
-    get() = get(ExtraDataComponents.ITEM_KEY)?.itemType ?: get(ExtraDataComponents.DATA_CONTAINER)?.get(ItemDataTypes.ID)?.itemType ?: item.itemProxy
+    get() {
+        val itemType = get(ExtraDataComponents.ITEM_KEY)?.itemType ?: get(ExtraDataComponents.DATA_CONTAINER)?.get(ItemDataTypes.ID)?.itemType ?: item.itemProxy
+        if (itemType == null || itemType.isEmpty()) {
+            this.count = 0
+            return null
+        }
+        return itemType
+    }
 
 /**
  * 获取该物品堆叠的 *Koish 物品类型*.
@@ -172,9 +187,23 @@ val MojangStack.koishItem: KoishItem?
  */
 val MojangStack.exactKoishItem: KoishItem?
     // 最终版本
-    //get() = get(ExtraDataComponents.ITEM_KEY)?.itemType
+    //get() {
+    //    val itemType = get(ExtraDataComponents.ITEM_KEY)?.itemType
+    //    if (itemType == null || itemType.isEmpty()) {
+    //        this.count = 0
+    //        return null
+    //    }
+    //    return itemType
+    //}
     // FIXME 临时版本
-    get() = get(ExtraDataComponents.ITEM_KEY)?.itemType ?: get(ExtraDataComponents.DATA_CONTAINER)?.get(ItemDataTypes.ID)?.itemType
+    get() {
+        val itemType = get(ExtraDataComponents.ITEM_KEY)?.itemType ?: get(ExtraDataComponents.DATA_CONTAINER)?.get(ItemDataTypes.ID)?.itemType
+        if (itemType == null || itemType.isEmpty()) {
+            this.count = 0
+            return null
+        }
+        return itemType
+    }
 
 /**
  * 获取该物品堆叠的套皮物品的实例.

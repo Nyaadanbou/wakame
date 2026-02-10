@@ -2,8 +2,11 @@ package cc.mewcraft.wakame.mixin.support
 
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.lazyconfig.configurate.require
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item.KoishItem
+import cc.mewcraft.wakame.item.KoishItemProxy
 import cc.mewcraft.wakame.registry.BuiltInRegistries
+import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
@@ -56,8 +59,16 @@ private constructor(
 
     // 将 RegistryEntry 设置为成员, 以省去运行时从 Registry 查询的性能开销
     val itemType: KoishItem by when (id.namespace()) {
-        KOISH_NAMESPACE -> BuiltInRegistries.ITEM.createEntry(id)
-        MINECRAFT_NAMESPACE -> BuiltInRegistries.ITEM_PROXY.createEntry(id)
+        KOISH_NAMESPACE -> runCatching { BuiltInRegistries.ITEM.createEntry(id) }.getOrElse {
+            LOGGER.error("Failed to find ${KoishItem::class.simpleName} entry with id: $id, using empty item instead")
+            RegistryEntry.Direct(KoishItem.EMPTY)
+        }
+
+        MINECRAFT_NAMESPACE -> runCatching { BuiltInRegistries.ITEM_PROXY.createEntry(id) }.getOrElse {
+            LOGGER.error("Failed to find ${KoishItemProxy::class.simpleName} entry with id: $id, using empty item proxy instead")
+            RegistryEntry.Direct(KoishItemProxy.EMPTY)
+        }
+
         else -> error("Unrecognized namespace of item type: $id")
     }
 
