@@ -44,7 +44,7 @@ internal object AttackSpeedRegistryLoader : RegistryLoader {
                 val entryVal = parseEntry(entryId, rootNode)
                 action(entryId, entryVal)
             } catch (e: Exception) {
-                LOGGER.error("Failed to load attack speed from file: ${f.toRelativeString(rootDirectory)}", e)
+                LOGGER.error("Failed to register attack speed from file: ${f.toRelativeString(rootDirectory)}", e)
             }
         }
     }

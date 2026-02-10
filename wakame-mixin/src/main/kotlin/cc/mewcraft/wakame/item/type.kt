@@ -9,7 +9,10 @@ import cc.mewcraft.wakame.item.property.ItemPropContainer
 import cc.mewcraft.wakame.item.property.ItemPropType
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KOISH_NAMESPACE
+import cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE
 import cc.mewcraft.wakame.util.adventure.toSimpleString
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -44,6 +47,21 @@ open class KoishItem(
     val behaviors: ItemBehaviorContainer,
 ) : Examinable {
 
+    companion object {
+
+        @JvmField
+        val EMPTY: KoishItem = KoishItem(
+            Key.key(KOISH_NAMESPACE, "internal/empty"),
+            ItemMetaContainer.EMPTY,
+            ItemPropContainer.EMPTY,
+            ItemBehaviorContainer.EMPTY,
+        )
+    }
+
+    open fun isEmpty(): Boolean {
+        return this === EMPTY
+    }
+
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
         ExaminableProperty.of("id", id),
     )
@@ -59,7 +77,6 @@ open class KoishItem(
     override fun hashCode(): Int {
         return id.hashCode()
     }
-
 }
 
 /**
@@ -88,6 +105,22 @@ class KoishItemProxy(
     val data: ItemDataContainer,
 ) : KoishItem(id, dataConfig, properties, behaviors) {
 
+    companion object {
+
+        @JvmField
+        val EMPTY: KoishItemProxy = KoishItemProxy(
+            Key.key(MINECRAFT_NAMESPACE, "internal/empty"),
+            ItemMetaContainer.EMPTY,
+            ItemPropContainer.EMPTY,
+            ItemBehaviorContainer.EMPTY,
+            ItemDataContainer.EMPTY,
+        )
+    }
+
+    override fun isEmpty(): Boolean {
+        return this === EMPTY
+    }
+
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
         ExaminableProperty.of("id", id),
     )
@@ -103,5 +136,4 @@ class KoishItemProxy(
     override fun hashCode(): Int {
         return id.hashCode()
     }
-
 }

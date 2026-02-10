@@ -444,7 +444,7 @@ data object ItemPropTypes {
      */
     @Deprecated("Hotfix")
     @JvmField
-    val CLIENTBOUND_ITEM_NAME = typeOf<Component>("clientbound/item_name")
+    val CLIENTBOUND_ITEM_NAME = typeOf<String>("clientbound/item_name")
 
     /**
      * 储存了加入地牢所需的数据.

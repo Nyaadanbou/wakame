@@ -90,7 +90,8 @@ object RecipeInitializer {
             uncheckedRecipes[recipeId] = minecraftRecipe
 
         } catch (e: Throwable) {
-            IdePauser.pauseInIde(IllegalStateException("Can't load vanilla recipe: '${path.relativeTo(recipeDirectory)}'", e))
+            IdePauser.pauseInIde(e)
+            LOGGER.error("Failed to register vanilla recipe: '${path.relativeTo(recipeDirectory)}'")
         }
     }
 
@@ -102,7 +103,8 @@ object RecipeInitializer {
                 recipe.addToManager()
                 checkedRecipes[key] = recipe
             } catch (e: Throwable) {
-                IdePauser.pauseInIde(IllegalStateException("Can't register vanilla recipe: '$key'", e))
+                IdePauser.pauseInIde(e)
+                LOGGER.error("Failed to register vanilla recipe: '${key.asString()}'")
             }
         }
 

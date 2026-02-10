@@ -14,10 +14,8 @@ object IdePauser {
     @JvmStatic
     fun <T : Throwable> pauseInIde(t: T): T {
         if (SharedConstants.isRunningInIde) {
-            LOGGER.error("Trying to throw a fatal exception, pausing in IDE", t)
+            LOGGER.error("Trying to throw a fatal exception, pausing in IDE")
             doPause(t)
-        } else {
-            LOGGER.warn("Suppressing a fatal exception since not in IDE", t)
         }
         return t
     }

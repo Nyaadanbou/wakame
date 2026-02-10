@@ -94,9 +94,8 @@ internal object CraftingStationRegistry {
                 rawRecipes[key] = recipe
 
             } catch (e: Throwable) {
-                val message = "Can't load station recipe: '${file.relativeTo(recipeDir)}'"
-                IdePauser.pauseInIde(IllegalArgumentException(message, e))
-                LOGGER.warn(message, e)
+                IdePauser.pauseInIde(e)
+                LOGGER.warn("Failed to register station recipe: '${file.relativeTo(recipeDir)}'")
             }
         }
     }
@@ -127,7 +126,8 @@ internal object CraftingStationRegistry {
                     stations[stationId] = station
 
                 } catch (e: Throwable) {
-                    IdePauser.pauseInIde(IllegalStateException("Can't register station: '${file.relativeTo(stationDir)}'", e))
+                    IdePauser.pauseInIde(e)
+                    LOGGER.error("Failed to register crafting station config: '${file.relativeTo(stationDir)}'")
                 }
             }
 

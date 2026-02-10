@@ -3,9 +3,12 @@
 
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.wakame.item.extension.rarity2
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.UseCooldown
+import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.inventory.ItemStack
 
 
@@ -62,13 +65,16 @@ object HotfixItemModel {
 object HotfixItemName {
 
     fun transform(itemstack: ItemStack) {
-        val itemName = itemstack.getProp(ItemPropTypes.CLIENTBOUND_ITEM_NAME)
-        if (itemName != null) {
-            // 如果物品配置文件中指定了 item_name, 则应用该 minecraft:item_name 组件
-            itemstack.setData(DataComponentTypes.ITEM_NAME, itemName)
-            return
+        val clientboundItemName = itemstack.getProp(ItemPropTypes.CLIENTBOUND_ITEM_NAME)
+        if (clientboundItemName != null) {
+            val rarity = itemstack.rarity2
+            if (rarity != null) {
+                itemstack.setData(DataComponentTypes.ITEM_NAME, MiniMessage.miniMessage().deserialize(clientboundItemName, Placeholder.styling("rarity_style", *rarity.unwrap().displayStyles)))
+            } else {
+                itemstack.setData(DataComponentTypes.ITEM_NAME, MiniMessage.miniMessage().deserialize(clientboundItemName))
+            }
         }
-        // 否则, 不处理该物品 - 保持物品堆叠上原有的 minecraft:item_name 组件
+        return
     }
 }
 

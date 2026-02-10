@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.serializer.NamedTextColorSerializer
+import cc.mewcraft.wakame.util.IdePauser
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.RangeParser
@@ -55,7 +56,8 @@ internal object RarityRegistryLoader : RegistryLoader {
                 val entry = parseRarityEntry(rarityId, rootNode)
                 registryAction(entry.first, entry.second)
             } catch (e: Exception) {
-                LOGGER.error("Failed to load rarity from file: ${f.toRelativeString(rootDirectory)}", e)
+                IdePauser.pauseInIde(e)
+                LOGGER.error("Failed to register rarity from file: ${f.toRelativeString(rootDirectory)}")
             }
         }
     }
@@ -70,7 +72,8 @@ internal object RarityRegistryLoader : RegistryLoader {
                 val entry = parseMappingEntry(nodeKey, node)
                 action(entry.first, entry.second)
             } catch (e: Exception) {
-                LOGGER.error("Failed to load level to rarity mapping from node: $nodeKey", e)
+                IdePauser.pauseInIde(e)
+                LOGGER.error("Failed to register level to rarity mapping from node: $nodeKey")
             }
         }
     }

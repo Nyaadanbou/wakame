@@ -43,7 +43,7 @@ internal object RecyclingStationSerializer {
 
                 // 反序列化配置文件
                 val priceInstance = rootNode.get<PriceInstance>() ?: run {
-                    LOGGER.warn("Failed to load price instance for item: $itemKey")
+                    LOGGER.warn("Failed to register price instance for item: $itemKey")
                     return@mapNotNull null
                 }
 

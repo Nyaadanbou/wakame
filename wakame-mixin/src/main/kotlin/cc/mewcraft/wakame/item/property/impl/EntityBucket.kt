@@ -13,6 +13,7 @@ data class EntityBucket(
     val itemNameFormat: String = "<entity_type>桶",
     val canCaptureBabies: Boolean = false,
     val allowedEntityTypes: Set<Key> = emptySet(),
+    val consumeOnRelease: Boolean = true,
 ) {
     companion object {
         val SUPPORT_ENTITY_TYPES: Set<NamespacedKey> = listOf(

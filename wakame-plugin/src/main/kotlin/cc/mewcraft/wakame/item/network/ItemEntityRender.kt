@@ -84,7 +84,7 @@ internal object ItemEntityRender : PacketListener {
 
     private fun tryAddCustomNameEntityData(item: Item, entityData: MutableList<SynchedEntityData.DataValue<*>>) {
         // add CustomName
-        entityData.add(SynchedEntityData.DataValue.create(SHADOW_ENTITY.DATA_CUSTOM_NAME, Optional.ofNullable(item.itemStack.getProp(ItemPropTypes.CLIENTBOUND_ITEM_NAME)?.toNMSComponent())))
+        entityData.add(SynchedEntityData.DataValue.create(SHADOW_ENTITY.DATA_CUSTOM_NAME, Optional.ofNullable(item.itemStack.getProp(ItemPropTypes.NAME)?.toNMSComponent())))
         // add CustomNameVisible
         entityData.add(SynchedEntityData.DataValue.create(SHADOW_ENTITY.DATA_CUSTOM_NAME_VISIBLE, true))
     }
