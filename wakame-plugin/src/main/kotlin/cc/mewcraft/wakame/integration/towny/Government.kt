@@ -45,4 +45,31 @@ interface Government {
      * 传送玩家到该组织的中心.
      */
     fun teleport(player: Player)
+
+    // Market Network
+
+    /**
+     * 标记该组织已加入商铺网络.
+     */
+    fun joinsMarketNetwork()
+
+    /**
+     * 标记该组织已经离开商铺网络.
+     */
+    fun leavesMarketNetwork()
+
+    /**
+     * 返回该组织是否已经加入商铺网络.
+     */
+    fun hasJoinedMarketNetwork(): Boolean
+
+    /**
+     * 标记该组织已经支付商铺网络税.
+     */
+    fun paysMarketNetworkTax()
+
+    /**
+     * 返回该组织是否已经支付商铺网络税.
+     */
+    fun hasPaidMarketNetworkTax(): Boolean
 }

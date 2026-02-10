@@ -17,17 +17,11 @@ class LeavesMarketNetwork(
 
     override fun execute(profile: Profile) {
         val playerId = profile.playerUUID
-        when (govType.getValue(profile)) {
-            GovernmentType.TOWN -> {
-                val town = TownyLocal.getTown(playerId) ?: return
-                TownyLocal.leavesMarketNetwork(town)
-            }
-
-            GovernmentType.NATION -> {
-                val nation = TownyLocal.getNation(playerId) ?: return
-                TownyLocal.leavesMarketNetwork(nation)
-            }
-        }
+        val government = when (govType.getValue(profile)) {
+            GovernmentType.TOWN -> TownyLocal.getTown(playerId)
+            GovernmentType.NATION -> TownyLocal.getNation(playerId)
+        } ?: return
+        government.leavesMarketNetwork()
     }
 }
 

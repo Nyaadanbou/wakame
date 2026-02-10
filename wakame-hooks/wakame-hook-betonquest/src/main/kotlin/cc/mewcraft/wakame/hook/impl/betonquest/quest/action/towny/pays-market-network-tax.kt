@@ -17,17 +17,11 @@ class PaysMarketNetworkTax(
 
     override fun execute(profile: Profile) {
         val playerId = profile.playerUUID
-        when (govType.getValue(profile)) {
-            GovernmentType.TOWN -> {
-                val town = TownyLocal.getTown(playerId) ?: return
-                TownyLocal.paysMarketNetworkTax(town)
-            }
-
-            GovernmentType.NATION -> {
-                val nation = TownyLocal.getNation(playerId) ?: return
-                TownyLocal.paysMarketNetworkTax(nation)
-            }
-        }
+        val government = when (govType.getValue(profile)) {
+            GovernmentType.TOWN -> TownyLocal.getTown(playerId)
+            GovernmentType.NATION -> TownyLocal.getNation(playerId)
+        } ?: return
+        government.paysMarketNetworkTax()
     }
 }
 

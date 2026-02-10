@@ -31,33 +31,6 @@ class TownyTownyLocal : TownyLocal {
         return townyApi.nations.map(::TownyNation)
     }
 
-    override fun joinsMarketNetwork(government: Government) {
-        val townyObject = (government as TownyGovernment<*>).townyObject
-        val byteDataField = ByteDataField(EntryFilter.JoinedMarketNetwork.KEY_JOINED_MARKET_NETWORK, 0)
-        townyObject.addMetaData(byteDataField)
-    }
-
-    override fun leavesMarketNetwork(government: Government) {
-        val townyObject = (government as TownyGovernment<*>).townyObject
-        townyObject.removeMetaData(EntryFilter.JoinedMarketNetwork.KEY_JOINED_MARKET_NETWORK)
-    }
-
-    override fun hasJoinedMarketNetwork(government: Government): Boolean {
-        val townyObject = (government as TownyGovernment<*>).townyObject
-        return townyObject.hasMeta(EntryFilter.JoinedMarketNetwork.KEY_JOINED_MARKET_NETWORK, ByteDataField::class.java)
-    }
-
-    override fun paysMarketNetworkTax(government: Government) {
-        val townyObject = (government as TownyGovernment<*>).townyObject
-        val longDataField = LongDataField(EntryFilter.MarketNetworkTaxPeriod.KEY_MARKET_NETWORK_TAX_PERIOD, System.currentTimeMillis())
-        townyObject.addMetaData(longDataField)
-    }
-
-    override fun hasPaidMarketNetworkTax(government: Government): Boolean {
-        val townyObject = (government as TownyGovernment<*>).townyObject
-        return townyObject.hasMeta(EntryFilter.MarketNetworkTaxPeriod.KEY_MARKET_NETWORK_TAX_PERIOD, LongDataField::class.java)
-    }
-
     override fun isMayor(playerId: UUID): Boolean {
         val resident = townyApi.getResident(playerId) ?: return false
         return resident.isMayor
@@ -81,13 +54,37 @@ class TownyTownyLocal : TownyLocal {
     }
 }
 
-private sealed class TownyGovernment<T : TownyObject>(
+private sealed class AbstractGovernment<T : TownyObject>(
     val townyObject: T,
-) : Government
+) : Government {
+
+    // Market network operations (shared)
+    override fun joinsMarketNetwork() {
+        val byteDf = ByteDataField(EntryFilter.JoinedMarketNetwork.KEY_JOINED_MARKET_NETWORK, 0)
+        townyObject.addMetaData(byteDf)
+    }
+
+    override fun leavesMarketNetwork() {
+        townyObject.removeMetaData(EntryFilter.JoinedMarketNetwork.KEY_JOINED_MARKET_NETWORK)
+    }
+
+    override fun hasJoinedMarketNetwork(): Boolean {
+        return townyObject.hasMeta(EntryFilter.JoinedMarketNetwork.KEY_JOINED_MARKET_NETWORK, ByteDataField::class.java)
+    }
+
+    override fun paysMarketNetworkTax() {
+        val longDf = LongDataField(EntryFilter.MarketNetworkTaxPeriod.KEY_MARKET_NETWORK_TAX_PERIOD, System.currentTimeMillis())
+        townyObject.addMetaData(longDf)
+    }
+
+    override fun hasPaidMarketNetworkTax(): Boolean {
+        return townyObject.hasMeta(EntryFilter.MarketNetworkTaxPeriod.KEY_MARKET_NETWORK_TAX_PERIOD, LongDataField::class.java)
+    }
+}
 
 private class TownyTown(
     townyObject: Town,
-) : KoishTown, TownyGovernment<Town>(townyObject) {
+) : AbstractGovernment<Town>(townyObject), KoishTown {
     companion object {
         private const val KEY_GOVERNMENT_BOARD = "government_board"
 
@@ -135,7 +132,7 @@ private class TownyTown(
 
 private class TownyNation(
     townyObject: Nation,
-) : KoishNation, TownyGovernment<Nation>(townyObject) {
+) : AbstractGovernment<Nation>(townyObject), KoishNation {
     companion object {
         private const val KEY_GOVERNMENT_BOARD = "government_board"
 

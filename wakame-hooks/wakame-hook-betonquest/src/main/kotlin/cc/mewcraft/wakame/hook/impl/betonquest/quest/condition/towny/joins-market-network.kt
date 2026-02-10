@@ -21,7 +21,7 @@ class HasJoinedMarketNetwork(
             GovernmentType.TOWN -> TownyLocal.getTown(playerId)
             GovernmentType.NATION -> TownyLocal.getNation(playerId)
         } ?: return false
-        return TownyLocal.hasJoinedMarketNetwork(government)
+        return government.hasJoinedMarketNetwork()
     }
 }
 

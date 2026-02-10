@@ -21,7 +21,7 @@ class HasPaidMarketNetworkTax(
             GovernmentType.TOWN -> TownyLocal.getTown(playerId)
             GovernmentType.NATION -> TownyLocal.getNation(playerId)
         } ?: return false
-        return TownyLocal.hasPaidMarketNetworkTax(government)
+        return government.hasPaidMarketNetworkTax()
     }
 }
 
