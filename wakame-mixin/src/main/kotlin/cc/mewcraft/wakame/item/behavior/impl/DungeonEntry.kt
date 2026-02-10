@@ -100,6 +100,13 @@ object DungeonEntry : ItemBehavior {
             player.sendMessage(TranslatableMessages.MSG_ERR_ALREADY_AWAITING_DUNGEON)
             return BehaviorResult.FINISH_AND_CANCEL
         }
+        if (DungeonBridge.isInsideDungeon(player).getOrElse { ex ->
+                LOGGER.error("Failed to check if player ${player.name} is inside dungeon", ex)
+                return BehaviorResult.FINISH_AND_CANCEL
+            }
+        ) {
+            return BehaviorResult.FINISH_AND_CANCEL
+        }
         val placedStructure = player.chunk.structures.firstOrNull {
             val structure = it.structure
             val structureType = structure.structureType
@@ -175,6 +182,13 @@ object DungeonEntry : ItemBehavior {
             }
         ) {
             player.sendMessage(TranslatableMessages.MSG_ERR_ALREADY_AWAITING_DUNGEON)
+            return false
+        }
+        if (DungeonBridge.isInsideDungeon(player).getOrElse { ex ->
+                LOGGER.error("Failed to check if player ${player.name} is inside dungeon", ex)
+                return false
+            }
+        ) {
             return false
         }
         val partyMembers = getPartyMembers(player, dungeonEntry)
