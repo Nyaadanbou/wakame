@@ -60,11 +60,13 @@ private constructor(
     // 将 RegistryEntry 设置为成员, 以省去运行时从 Registry 查询的性能开销
     val itemType: KoishItem by when (id.namespace()) {
         KOISH_NAMESPACE -> runCatching { BuiltInRegistries.ITEM.createEntry(id) }.getOrElse {
+            objectPool.remove(id) // 可以释放内存?
             LOGGER.error("Failed to find ${KoishItem::class.simpleName} entry with id: $id, using empty item instead")
             RegistryEntry.Direct(KoishItem.EMPTY)
         }
 
         MINECRAFT_NAMESPACE -> runCatching { BuiltInRegistries.ITEM_PROXY.createEntry(id) }.getOrElse {
+            objectPool.remove(id)
             LOGGER.error("Failed to find ${KoishItemProxy::class.simpleName} entry with id: $id, using empty item proxy instead")
             RegistryEntry.Direct(KoishItemProxy.EMPTY)
         }

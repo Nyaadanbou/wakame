@@ -164,8 +164,8 @@ val MojangStack.koishItem: KoishItem?
     //}
     // FIXME 临时版本, 用于过渡
     get() {
-        val itemType = get(ExtraDataComponents.ITEM_KEY)?.itemType ?: get(ExtraDataComponents.DATA_CONTAINER)?.get(ItemDataTypes.ID)?.itemType ?: item.itemProxy
-        if (itemType == null || itemType.isEmpty()) {
+        val itemType = get(ExtraDataComponents.ITEM_KEY)?.itemType ?: get(ExtraDataComponents.DATA_CONTAINER)?.get(ItemDataTypes.ID)?.itemType ?: item.itemProxy ?: return null
+        if (itemType.isEmpty()) {
             this.count = 0
             return null
         }
@@ -197,8 +197,8 @@ val MojangStack.exactKoishItem: KoishItem?
     //}
     // FIXME 临时版本
     get() {
-        val itemType = get(ExtraDataComponents.ITEM_KEY)?.itemType ?: get(ExtraDataComponents.DATA_CONTAINER)?.get(ItemDataTypes.ID)?.itemType
-        if (itemType == null || itemType.isEmpty()) {
+        val itemType = get(ExtraDataComponents.ITEM_KEY)?.itemType ?: get(ExtraDataComponents.DATA_CONTAINER)?.get(ItemDataTypes.ID)?.itemType ?: return null
+        if (itemType.isEmpty()) {
             this.count = 0
             return null
         }
