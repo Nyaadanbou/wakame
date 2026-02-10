@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.behavior.impl
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.item.behavior.InteractionResult
@@ -14,10 +15,7 @@ import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.removeData
 import cc.mewcraft.wakame.item.setData
 import cc.mewcraft.wakame.util.adventure.plain
-import cc.mewcraft.wakame.util.metadata.Empty
-import cc.mewcraft.wakame.util.metadata.ExpiringValue
-import cc.mewcraft.wakame.util.metadata.MetadataKey
-import cc.mewcraft.wakame.util.metadata.metadata
+import cc.mewcraft.wakame.util.metadata.*
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.CustomModelData
 import net.kyori.adventure.text.Component
@@ -39,7 +37,7 @@ import java.util.concurrent.TimeUnit
 object EntityBucket : ItemBehavior {
 
     // 用于防止玩家在同一 tick 同时捕捉和放生生物
-    private val JUST_BUCKETED_ENTITY: MetadataKey<Empty> = MetadataKey.createEmptyKey("just_bucketed_entity")
+    private val JUST_BUCKETED_ENTITY: MetadataKey<Empty> = metadataEmptyKey("just_bucketed_entity")
 
     // 当玩家手持一个生物桶右键方块顶部时
     override fun handleUseOn(context: UseOnContext): InteractionResult {
@@ -73,15 +71,25 @@ object EntityBucket : ItemBehavior {
 
         // 还原物品状态, 也就是使其变成空桶时的状态
         if (player.gameMode != GameMode.CREATIVE) {
-            itemstack.resetData(DataComponentTypes.CUSTOM_MODEL_DATA)
-            itemstack.resetData(DataComponentTypes.MAX_STACK_SIZE)
-            itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_DATA)
-            itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_INFO)
+            val entityBucket = itemstack.getProp(ItemPropTypes.ENTITY_BUCKET) ?: run {
+                LOGGER.warn("ItemStack has ItemDataTypes.ENTITY_BUCKET_DATA but no ItemPropTypes.ENTITY_BUCKET, something is wrong with this item. Context: $context. ItemStack: $itemstack")
+                return InteractionResult.FAIL
+            }
+            if (entityBucket.consumeOnRelease) {
+                itemstack.subtract(1)
+            }
+            if (itemstack.isEmpty.not()) {
+                // 否则就重置这个 ItemStack 的数据组件
+                itemstack.resetData(DataComponentTypes.CUSTOM_MODEL_DATA)
+                itemstack.resetData(DataComponentTypes.MAX_STACK_SIZE)
+                itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_DATA)
+                itemstack.removeData(ItemDataTypes.ENTITY_BUCKET_INFO)
 
-            val prevItemName = itemstack.getData(ItemDataTypes.PREVIOUS_ITEM_NAME)
-            if (prevItemName != null) {
-                itemstack.removeData(ItemDataTypes.PREVIOUS_ITEM_NAME)
-                itemstack.setData(DataComponentTypes.ITEM_NAME, prevItemName)
+                val prevItemName = itemstack.getData(ItemDataTypes.PREVIOUS_ITEM_NAME)
+                if (prevItemName != null) {
+                    itemstack.removeData(ItemDataTypes.PREVIOUS_ITEM_NAME)
+                    itemstack.setData(DataComponentTypes.ITEM_NAME, prevItemName)
+                }
             }
         }
 
