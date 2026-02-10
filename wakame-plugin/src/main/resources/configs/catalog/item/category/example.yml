@@ -29,6 +29,10 @@ menu_settings:
     next_page: "internal/menu/catalog/default/next_page"
     back: "internal/menu/common/default/back"
 
+# 类别内容的排列方向
+content_marker: VERTICAL
+
+# 类别内容
 items:
   - minecraft:cake
   - minecraft:cooked_beef

@@ -8,14 +8,14 @@ package cc.mewcraft.wakame.item.behavior
 interface ItemBehavior {
 
     /**
-     * 玩家手持该物品对方块按下使用键 (默认为鼠标右键) 进行交互时, 执行的行为.
-     */
-    fun handleUseOn(context: UseOnContext): InteractionResult = InteractionResult.PASS
-
-    /**
      * 玩家手持该物品对空气按下使用键 (默认为鼠标右键) 进行交互时, 执行的行为.
      */
     fun handleUse(context: UseContext): InteractionResult = InteractionResult.PASS
+
+    /**
+     * 玩家手持该物品对方块按下使用键 (默认为鼠标右键) 进行交互时, 执行的行为.
+     */
+    fun handleUseOn(context: UseOnContext): InteractionResult = InteractionResult.PASS
 
     /**
      * 玩家手持该物品对实体按下使用键 (默认为鼠标右键) 进行交互时, 执行的行为.

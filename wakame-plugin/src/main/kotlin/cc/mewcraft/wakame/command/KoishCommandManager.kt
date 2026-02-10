@@ -51,9 +51,11 @@ internal object KoishCommandManager {
                 command(CraftCommand)
                 command(DebugCommand)
                 command(ItemCommand)
+                command(NationListCommand)
                 command(PluginCommand)
                 command(ReforgeCommand)
                 command(ResourcepackCommand)
+                command(TownListCommand)
                 command(TownyNetworkCommand)
             }
         } catch (e: Exception) {

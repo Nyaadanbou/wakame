@@ -13,6 +13,8 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
+import xyz.xenondevs.invui.gui.structure.Marker
+import xyz.xenondevs.invui.gui.structure.Markers
 import java.lang.reflect.Type
 
 /**
@@ -22,9 +24,15 @@ data class CatalogItemCategory(
     val id: Identifier,
     val icon: Identifier,
     val menuSettings: BasicMenuSettings,
+    val contentMarker: Marker,
     val permission: String?,
     val items: List<ItemRef>,
-)
+) {
+    enum class ContentMarker {
+        HORIZONTAL,
+        VERTICAL,
+    }
+}
 
 /**
  * [CatalogItemCategory] 的序列化器.
@@ -39,6 +47,10 @@ internal object CategorySerializer : SimpleSerializer<CatalogItemCategory> {
         val icon = node.node("icon").require<Key>()
         val permission = node.node("permission").get<String>()
         val settings = node.node("menu_settings").require<BasicMenuSettings>()
+        val contentMarker = when (node.node("content_marker").get<CatalogItemCategory.ContentMarker>(CatalogItemCategory.ContentMarker.HORIZONTAL)) {
+            CatalogItemCategory.ContentMarker.HORIZONTAL -> Markers.CONTENT_LIST_SLOT_HORIZONTAL
+            CatalogItemCategory.ContentMarker.VERTICAL -> Markers.CONTENT_LIST_SLOT_VERTICAL
+        }
 
         // val itemIds = node.node("items").getList<ItemX>(emptyList())
         // 不像上面这样写的原因: 若列表中的某个 id 有问题, 将跳过这个 id 而不是抛异常
@@ -52,7 +64,7 @@ internal object CategorySerializer : SimpleSerializer<CatalogItemCategory> {
             }
             itemList.add(item)
         }
-        return CatalogItemCategory(id, icon, settings, permission, itemList)
+        return CatalogItemCategory(id, icon, settings, contentMarker, permission, itemList)
     }
 }
 

@@ -38,4 +38,10 @@ object CommandPermissions {
 
     // Extra: Towny Network
     val TOWNY_NETWORK = Permission.of("koish.command.extra.towny.network")
+
+    // Extra: Towny Town List
+    val TOWN_LIST = Permission.of("koish.command.extra.towny.townlist")
+
+    // Extra: Towny Nation List
+    val NATION_LIST = Permission.of("koish.command.extra.towny.nationlist")
 }

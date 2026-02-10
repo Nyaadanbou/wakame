@@ -1,0 +1,75 @@
+# 城镇列表菜单设置
+town_list_menu:
+  # 默认公告板
+  default_board:
+    - "镇长很懒，公告板空空如也"
+  # 条目过滤器
+  entry_filter:
+    # 城镇需要为破产状态
+    - type: bankrupt
+      invert: true  # invert: true 可反转语义
+    # 城镇需要为 "public"
+    - type: public
+      invert: false
+    # 城镇需要已经加入市场网络
+    - type: joined_market_network
+      invert: false
+  # UI 设置
+  ui_settings:
+    # UI 标题
+    title: "全部城镇 (当前位面)"
+    # UI 布局
+    # ?: hint
+    # .: background
+    # <: prev_page
+    # >: next_page
+    # x: entry
+    structure:
+      - ". . . . ? . . . ."
+      - ". x x x x x x x ."
+      - ". x x x x x x x ."
+      - ". x x x x x x x ."
+      - ". x x x x x x x ."
+      - "< . . . . . . . >"
+    # UI 图标
+    icons:
+      background: "internal/menu/common/default/background"
+      prev_page: "internal/menu/common/default/prev_page"
+      next_page: "internal/menu/common/default/next_page"
+      hint: "internal/menu/towny/townlist/hint"
+      entry: "internal/menu/towny/townlist/entry"
+
+# 国家列表菜单设置
+nation_list_menu:
+  # 默认公告板
+  default_board:
+    - "国王很懒，公告板空空如也"
+  # 条目过滤器
+  entry_filter:
+    # 国家需要为 "public"
+    - type: public
+      invert: false
+  # UI 设置
+  ui_settings:
+    # UI 标题
+    title: "全部国家 (当前位面)"
+    # UI 布局
+    # ?: hint
+    # .: background
+    # <: prev_page
+    # >: next_page
+    # x: entry
+    structure:
+      - ". . . . ? . . . ."
+      - ". x x x x x x x ."
+      - ". x x x x x x x ."
+      - ". x x x x x x x ."
+      - ". x x x x x x x ."
+      - "< . . . . . . . >"
+    # UI 图标
+    icons:
+      background: "internal/menu/common/default/background"
+      prev_page: "internal/menu/common/default/prev_page"
+      next_page: "internal/menu/common/default/next_page"
+      hint: "internal/menu/towny/nationlist/hint"
+      entry: "internal/menu/towny/nationlist/entry"

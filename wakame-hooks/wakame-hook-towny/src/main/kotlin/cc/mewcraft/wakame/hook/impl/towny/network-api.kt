@@ -1,4 +1,6 @@
-package cc.mewcraft.wakame.hook.impl.towny.messaging
+@file:JvmName("TownyNetwork")
+
+package cc.mewcraft.wakame.hook.impl.towny
 
 import cc.mewcraft.messaging2.ServerInfoProvider
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages

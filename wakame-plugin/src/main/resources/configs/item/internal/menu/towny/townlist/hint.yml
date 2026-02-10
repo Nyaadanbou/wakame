@@ -1,0 +1,4 @@
+base: paper
+slot_display_name: "<yellow>商铺网络 (城镇)"
+slot_display_lore:
+  - "<gray>这里展示了所有已加入商铺网络的城镇"
