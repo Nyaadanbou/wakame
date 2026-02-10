@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame.hook.impl.betonquest
 
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.towny.*
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.towny.JoinsMarketNetworkFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.towny.LeavesMarketNetworkFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.towny.OperateGovernmentBankFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.towny.UpdateGovernmentBoardFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.towny.GovernmentBankBalanceFactory
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.towny.HasJoinedMarketNetworkFactory
-import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.towny.HasPaidMarketNetworkTaxFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.towny.JoinedMarketNetworkFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.towny.TownyRankFactory
 import cc.mewcraft.wakame.integration.Hook
 import org.betonquest.betonquest.BetonQuest
@@ -23,14 +25,12 @@ object TownyCompat {
         val conditionRegistry = plugin.questRegistries.condition()
         conditionRegistry.register("townyRank", TownyRankFactory(loggerFactory))
         conditionRegistry.register("bankBalance", GovernmentBankBalanceFactory(loggerFactory))
-        conditionRegistry.register("hasJoinedMarketNetwork", HasJoinedMarketNetworkFactory(loggerFactory))
-        conditionRegistry.register("hasPaidMarketNetworkTax", HasPaidMarketNetworkTaxFactory(loggerFactory))
+        conditionRegistry.register("joinedMarketNetwork", JoinedMarketNetworkFactory(loggerFactory))
 
         // Action
         val actionRegistry = plugin.questRegistries.action()
         actionRegistry.register("joinsMarketNetwork", JoinsMarketNetworkFactory(loggerFactory))
         actionRegistry.register("leavesMarketNetwork", LeavesMarketNetworkFactory(loggerFactory))
-        actionRegistry.register("paysMarketNetworkTax", PaysMarketNetworkTaxFactory(loggerFactory))
         actionRegistry.register("operateGovernmentBank", OperateGovernmentBankFactory(loggerFactory))
         actionRegistry.register("updateGovernmentBoard", UpdateGovernmentBoardFactory(loggerFactory))
 

@@ -13,7 +13,7 @@ import org.bukkit.entity.Player
  */
 class TownListMenu(
     viewer: Player,
-) : PagedGovernmentListMenu(
+) : GovernmentListMenu(
     viewer = viewer,
 ) {
     companion object {

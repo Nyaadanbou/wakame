@@ -23,7 +23,7 @@ object TownyHook : ProtectionIntegration by TownyProtectionIntegration {
         // 只要反序列化发生的时机晚于该函数调用就可以正常反序列化
         ConfigAccess.registerSerializer(KOISH_NAMESPACE, EntryFilter.serializer())
 
-        TownyLocal.setImplementation(TownyTownyLocal())
+        TownyLocal.setImplementation(TownyLocalImpl())
 
         with(TownyNetworkImpl) {
             registerEvents()

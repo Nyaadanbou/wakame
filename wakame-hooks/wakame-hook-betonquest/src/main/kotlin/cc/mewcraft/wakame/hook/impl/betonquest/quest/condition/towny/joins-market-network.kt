@@ -10,7 +10,7 @@ import org.betonquest.betonquest.api.profile.Profile
 import org.betonquest.betonquest.api.quest.condition.PlayerCondition
 import org.betonquest.betonquest.api.quest.condition.PlayerConditionFactory
 
-class HasJoinedMarketNetwork(
+class JoinedMarketNetwork(
     private val logger: BetonQuestLogger,
     private val govType: Argument<GovernmentType>,
 ) : PlayerCondition {
@@ -25,13 +25,13 @@ class HasJoinedMarketNetwork(
     }
 }
 
-class HasJoinedMarketNetworkFactory(
+class JoinedMarketNetworkFactory(
     private val loggerFactory: BetonQuestLoggerFactory,
 ) : PlayerConditionFactory {
 
     override fun parsePlayer(instruction: Instruction): PlayerCondition {
         val logger = loggerFactory.create(GovernmentBankBalance::class.java)
         val govType = instruction.enumeration(GovernmentType::class.java).get()
-        return HasJoinedMarketNetwork(logger, govType)
+        return JoinedMarketNetwork(logger, govType)
     }
 }

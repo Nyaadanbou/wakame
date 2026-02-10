@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.gui.towny
 
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.integration.towny.Government
+import cc.mewcraft.wakame.integration.towny.MenuListEntry
 import cc.mewcraft.wakame.item.resolveToItemWrapper
 import cc.mewcraft.wakame.util.cooldown.Cooldown
 import cc.mewcraft.wakame.util.metadata.metadata
@@ -20,14 +20,9 @@ import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
 import java.util.concurrent.TimeUnit
 
-sealed class GovernmentListMenu {
-
-    abstract fun open()
-}
-
-abstract class PagedGovernmentListMenu(
+sealed class GovernmentListMenu(
     protected val viewer: Player,
-) : GovernmentListMenu() {
+) {
 
     companion object {
         private val KEY_TELEPORT_COOLDOWN = metadataCooldownKey("government_list_menu:teleport_cooldown")
@@ -35,7 +30,7 @@ abstract class PagedGovernmentListMenu(
 
     protected abstract val uiSettings: BasicMenuSettings
 
-    protected abstract fun getGovernments(): List<Government>
+    protected abstract fun getGovernments(): List<MenuListEntry>
 
     private val pagedGui: PagedGui<Item> = PagedGui.items { builder ->
         builder.setStructure(*uiSettings.structure)
@@ -61,7 +56,7 @@ abstract class PagedGovernmentListMenu(
             }
     }
 
-    override fun open() {
+    fun open() {
         window.open()
     }
 
@@ -121,7 +116,7 @@ abstract class PagedGovernmentListMenu(
     }
 
     inner class GovernmentEntryItem(
-        private val government: Government,
+        private val government: MenuListEntry,
         private val index: Int,
     ) : AbstractItem() {
 

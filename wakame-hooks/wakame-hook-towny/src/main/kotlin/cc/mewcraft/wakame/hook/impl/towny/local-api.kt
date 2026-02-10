@@ -4,31 +4,28 @@ package cc.mewcraft.wakame.hook.impl.towny
 
 import cc.mewcraft.lazyconfig.access.entryOrElse
 import cc.mewcraft.wakame.gui.towny.townyHookConfig
-import cc.mewcraft.wakame.integration.towny.Government
-import cc.mewcraft.wakame.integration.towny.TownyLocal
+import cc.mewcraft.wakame.integration.towny.*
 import com.palmergames.bukkit.towny.TownyAPI
-import com.palmergames.bukkit.towny.`object`.Nation
-import com.palmergames.bukkit.towny.`object`.Town
 import com.palmergames.bukkit.towny.`object`.TownyObject
 import com.palmergames.bukkit.towny.`object`.metadata.ByteDataField
-import com.palmergames.bukkit.towny.`object`.metadata.LongDataField
 import com.palmergames.bukkit.towny.`object`.metadata.StringDataField
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import java.util.*
-import cc.mewcraft.wakame.integration.towny.Nation as KoishNation
-import cc.mewcraft.wakame.integration.towny.Town as KoishTown
+import com.palmergames.bukkit.towny.`object`.Government as TownyGovernment
+import com.palmergames.bukkit.towny.`object`.Nation as TownyNation
+import com.palmergames.bukkit.towny.`object`.Town as TownyTown
 
 private val townyApi: TownyAPI
     get() = TownyAPI.getInstance()
 
-class TownyTownyLocal : TownyLocal {
-    override fun getTowns(): Collection<KoishTown> {
-        return townyApi.towns.map(::TownyTown)
+class TownyLocalImpl : TownyLocal {
+    override fun getTowns(): Collection<Town> {
+        return townyApi.towns.map(::TownImpl)
     }
 
-    override fun getNations(): Collection<KoishNation> {
-        return townyApi.nations.map(::TownyNation)
+    override fun getNations(): Collection<Nation> {
+        return townyApi.nations.map(::NationImpl)
     }
 
     override fun isMayor(playerId: UUID): Boolean {
@@ -41,139 +38,113 @@ class TownyTownyLocal : TownyLocal {
         return resident.isKing
     }
 
-    override fun getTown(playerId: UUID): KoishTown? {
+    override fun getTown(playerId: UUID): Town? {
         val resident = townyApi.getResident(playerId) ?: return null
         val town = resident.town ?: return null
-        return TownyTown(town)
+        return TownImpl(town)
     }
 
-    override fun getNation(playerId: UUID): KoishNation? {
+    override fun getNation(playerId: UUID): Nation? {
         val resident = townyApi.getResident(playerId) ?: return null
         val nation = resident.nation ?: return null
-        return TownyNation(nation)
+        return NationImpl(nation)
     }
 }
 
-private sealed class AbstractGovernment<T : TownyObject>(
-    val townyObject: T,
-) : Government {
+interface GovernmentLike<T : TownyGovernment> {
+    val government: T
+}
 
-    // Market network operations (shared)
+internal class GovernmentComponent(
+    val government: TownyGovernment,
+) : Government {
+    override val balance: Double
+        get() = government.account.holdingBalance
+
+    override fun withdraw(amount: Double) {
+        government.account.withdraw(amount, "Koish")
+    }
+
+    override fun deposit(amount: Double) {
+        government.account.deposit(amount, "Koish")
+    }
+}
+
+internal class MenuListEntryComponent(
+    private val government: TownyGovernment,
+    private val defaultBoard: List<String>,
+    private val entryFilter: List<EntryFilter>,
+) : MenuListEntry {
+    companion object {
+        private const val KEY_GOVERNMENT_BOARD = "government_board"
+    }
+
+    override val name: Component
+        get() = Component.text(government.name)
+
+    override var board: List<String>
+        get() {
+            val stringDf = government.getMeta<StringDataField>(KEY_GOVERNMENT_BOARD) ?: return defaultBoard
+            val strings = stringDf.value.split("\n")
+            return strings
+        }
+        set(value) {
+            val stringDf = StringDataField(KEY_GOVERNMENT_BOARD, value.joinToString("\n"))
+            government.addMetaData(stringDf)
+        }
+
+    override val canShow: Boolean
+        get() = entryFilter.all { it.test(government) }
+
+    override fun teleport(player: Player) {
+        val spawn = government.spawnOrNull ?: return
+        player.teleportAsync(spawn)
+    }
+}
+
+internal class MarketNetworkEntityComponent(
+    private val townyObject: TownyObject,
+) : MarketNetworkEntity {
+    companion object {
+        const val KEY_JOINED_MARKET_NETWORK = "joined_market_network"
+    }
+
     override fun joinsMarketNetwork() {
-        val byteDf = ByteDataField(EntryFilter.JoinedMarketNetwork.KEY_JOINED_MARKET_NETWORK, 0)
+        val byteDf = ByteDataField(KEY_JOINED_MARKET_NETWORK, 0)
         townyObject.addMetaData(byteDf)
     }
 
     override fun leavesMarketNetwork() {
-        townyObject.removeMetaData(EntryFilter.JoinedMarketNetwork.KEY_JOINED_MARKET_NETWORK)
+        townyObject.removeMetaData(KEY_JOINED_MARKET_NETWORK)
     }
 
     override fun hasJoinedMarketNetwork(): Boolean {
-        return townyObject.hasMeta(EntryFilter.JoinedMarketNetwork.KEY_JOINED_MARKET_NETWORK, ByteDataField::class.java)
-    }
-
-    override fun paysMarketNetworkTax() {
-        val longDf = LongDataField(EntryFilter.MarketNetworkTaxPeriod.KEY_MARKET_NETWORK_TAX_PERIOD, System.currentTimeMillis())
-        townyObject.addMetaData(longDf)
-    }
-
-    override fun hasPaidMarketNetworkTax(): Boolean {
-        return townyObject.hasMeta(EntryFilter.MarketNetworkTaxPeriod.KEY_MARKET_NETWORK_TAX_PERIOD, LongDataField::class.java)
+        return townyObject.hasMeta(KEY_JOINED_MARKET_NETWORK, ByteDataField::class.java)
     }
 }
 
-private class TownyTown(
-    townyObject: Town,
-) : AbstractGovernment<Town>(townyObject), KoishTown {
+private class TownImpl(
+    override val government: TownyTown,
+) : Town,
+    GovernmentLike<TownyTown>,
+    Government by GovernmentComponent(government),
+    MenuListEntry by MenuListEntryComponent(government, defaultBoard, entryFilter),
+    MarketNetworkEntity by MarketNetworkEntityComponent(government) {
     companion object {
-        private const val KEY_GOVERNMENT_BOARD = "government_board"
-
-        private val defaultBoard: List<String> by townyHookConfig.entryOrElse(
-            default = listOf(),
-            path = arrayOf("town_list_menu", "default_board")
-        )
-
-        private val entryFilter: List<EntryFilter> by townyHookConfig.entryOrElse(
-            default = listOf(),
-            path = arrayOf("town_list_menu", "entry_filter")
-        )
-    }
-
-    override val name: Component
-        get() = Component.text(townyObject.name)
-    override var board: List<String>
-        get() {
-            val meta = townyObject.getMeta<StringDataField>(KEY_GOVERNMENT_BOARD) ?: return defaultBoard
-            val texts = meta.value.split("\n")
-            return texts
-        }
-        set(value) {
-            val stringDf = StringDataField(KEY_GOVERNMENT_BOARD, value.joinToString("\n"))
-            townyObject.addMetaData(stringDf)
-        }
-    override val balance: Double
-        get() = townyObject.account.holdingBalance
-    override val canShow: Boolean // `all ` 逻辑
-        get() = entryFilter.all { it.test(townyObject) }
-
-    override fun withdraw(amount: Double) {
-        townyObject.account.withdraw(amount, "Koish")
-    }
-
-    override fun deposit(amount: Double) {
-        townyObject.account.deposit(amount, "Koish")
-    }
-
-    override fun teleport(player: Player) {
-        val spawn = townyObject.spawnOrNull ?: return
-        player.teleportAsync(spawn)
+        private val defaultBoard: List<String> by townyHookConfig.entryOrElse(listOf(), "town_list_menu", "default_board")
+        private val entryFilter: List<EntryFilter> by townyHookConfig.entryOrElse(listOf(), "town_list_menu", "entry_filter")
     }
 }
 
-private class TownyNation(
-    townyObject: Nation,
-) : AbstractGovernment<Nation>(townyObject), KoishNation {
+private class NationImpl(
+    override val government: TownyNation,
+) : Nation,
+    GovernmentLike<TownyNation>,
+    Government by GovernmentComponent(government),
+    MenuListEntry by MenuListEntryComponent(government, defaultBoard, entryFilter),
+    MarketNetworkEntity by MarketNetworkEntityComponent(government) {
     companion object {
-        private const val KEY_GOVERNMENT_BOARD = "government_board"
-
-        private val defaultBoard: List<String> by townyHookConfig.entryOrElse(
-            default = listOf(),
-            path = arrayOf("town_list_menu", "default_board")
-        )
-
-        private val entryFilter: List<EntryFilter> by townyHookConfig.entryOrElse(
-            default = listOf(),
-            path = arrayOf("nation_list_menu", "entry_filter")
-        )
-    }
-
-    override val name: Component
-        get() = Component.text(townyObject.name)
-    override var board: List<String>
-        get() {
-            val meta = townyObject.getMeta<StringDataField>(KEY_GOVERNMENT_BOARD) ?: return defaultBoard
-            val texts = meta.value.split("\n")
-            return texts
-        }
-        set(value) {
-            val stringDf = StringDataField(KEY_GOVERNMENT_BOARD, value.joinToString("\n"))
-            townyObject.addMetaData(stringDf)
-        }
-    override val balance: Double
-        get() = townyObject.account.holdingBalance
-    override val canShow: Boolean
-        get() = entryFilter.all { it.test(townyObject) }
-
-    override fun withdraw(amount: Double) {
-        townyObject.account.withdraw(amount, "Koish")
-    }
-
-    override fun deposit(amount: Double) {
-        townyObject.account.deposit(amount, "Koish")
-    }
-
-    override fun teleport(player: Player) {
-        val spawn = townyObject.spawnOrNull ?: return
-        player.teleportAsync(spawn)
+        private val defaultBoard: List<String> by townyHookConfig.entryOrElse(listOf(), "nation_list_menu", "default_board")
+        private val entryFilter: List<EntryFilter> by townyHookConfig.entryOrElse(listOf(), "nation_list_menu", "entry_filter")
     }
 }
