@@ -47,7 +47,7 @@ internal object CatalogItemCategoryRegistryLoader : RegistryLoader {
                 registryAction(id, category)
                 LOGGER.info("Registered item catalog category: $id")
             } catch (e: Throwable) {
-                LOGGER.error("Failed to load item catalog category from file: ${file.relativeTo(dir)}", e)
+                LOGGER.error("Failed to register item catalog category from file: ${file.relativeTo(dir)}", e)
             }
         }
     }

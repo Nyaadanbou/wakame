@@ -72,7 +72,7 @@ internal object KizamiRegistryLoader : RegistryLoader {
                 registryAction(entryId, entryVal)
             } catch (e: Throwable) {
                 IdePauser.pauseInIde(e)
-                LOGGER.error("Failed to load kizami from file: ${f.relativeTo(rootDirectory)}")
+                LOGGER.error("Failed to register kizami from file: ${f.relativeTo(rootDirectory)}")
             }
         }
     }

@@ -82,7 +82,7 @@ internal object CustomItemRegistryLoader : RegistryLoader {
                 consumer(itemId, itemValue)
             } catch (e: Exception) {
                 IdePauser.pauseInIde(e)
-                LOGGER.error("Failed to load koish item config: {}", f.path)
+                LOGGER.error("Failed to register koish item from file: {}", f.path)
             }
         }
     }
@@ -135,7 +135,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
                 consumer(itemId, itemValue)
             } catch (e: Exception) {
                 IdePauser.pauseInIde(e)
-                LOGGER.error("Failed to load koish item proxy config: {}", f.path)
+                LOGGER.error("Failed to register koish item proxy from file: {}", f.path)
             }
         }
     }

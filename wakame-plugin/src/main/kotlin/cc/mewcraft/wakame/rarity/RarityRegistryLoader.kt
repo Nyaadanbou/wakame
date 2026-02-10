@@ -57,7 +57,7 @@ internal object RarityRegistryLoader : RegistryLoader {
                 registryAction(entry.first, entry.second)
             } catch (e: Exception) {
                 IdePauser.pauseInIde(e)
-                LOGGER.error("Failed to load rarity from file: ${f.toRelativeString(rootDirectory)}")
+                LOGGER.error("Failed to register rarity from file: ${f.toRelativeString(rootDirectory)}")
             }
         }
     }
@@ -73,7 +73,7 @@ internal object RarityRegistryLoader : RegistryLoader {
                 action(entry.first, entry.second)
             } catch (e: Exception) {
                 IdePauser.pauseInIde(e)
-                LOGGER.error("Failed to load level to rarity mapping from node: $nodeKey")
+                LOGGER.error("Failed to register level to rarity mapping from node: $nodeKey")
             }
         }
     }

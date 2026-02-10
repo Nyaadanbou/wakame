@@ -57,7 +57,7 @@ internal object ElementRegistryLoader : RegistryLoader {
                 registryAction(entryPair.first, entryPair.second)
             } catch (e: Throwable) {
                 IdePauser.pauseInIde(e)
-                LOGGER.error("Failed to load element from file: ${f.toRelativeString(rootDirectory)}")
+                LOGGER.error("Failed to register element from file: ${f.toRelativeString(rootDirectory)}")
             }
         }
     }

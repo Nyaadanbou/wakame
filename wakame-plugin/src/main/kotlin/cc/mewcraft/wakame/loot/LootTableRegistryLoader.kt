@@ -68,7 +68,7 @@ internal object LootTableRegistryLoader : RegistryLoader {
                 registryAction(lootTableId, rootNode.require(lootTableTypeToken))
             } catch (e: Throwable) {
                 IdePauser.pauseInIde(e)
-                LOGGER.warn("Failed to load loot table: '$lootTableId', Path: '${file.path}'")
+                LOGGER.warn("Failed to register loot table '$lootTableId' from file '${file.path}'")
             }
         }
     }
