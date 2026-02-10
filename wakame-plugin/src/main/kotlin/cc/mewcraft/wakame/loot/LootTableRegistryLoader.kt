@@ -13,6 +13,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
+import cc.mewcraft.wakame.util.IdePauser
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
@@ -56,18 +57,18 @@ internal object LootTableRegistryLoader : RegistryLoader {
             val lootTableId = Identifiers.of(path)
             try {
                 // 获取配置文件文件夹指定的类型.
-                val sType = when (namespace) {
+                val javaType = when (namespace) {
                     "core" -> Core::class.java // LootPool<Core>
                     "element" -> TypeFactory.parameterizedClass(RegistryEntry::class.java, Element::class.java) // LootPool<RegistryEntry<Element>>
                     "kizami" -> TypeFactory.parameterizedClass(RegistryEntry::class.java, Kizami::class.java) // LootPool<RegistryEntry<Kizami>>
                     else -> continue
                 }
-                val lootTableType = TypeFactory.parameterizedClass(LootTable::class.java, sType) // LootTable<S>
+                val lootTableType = TypeFactory.parameterizedClass(LootTable::class.java, javaType) // LootTable<S>
                 val lootTableTypeToken = TypeToken.get(lootTableType) as TypeToken<LootTable<Any>> // LootTable<S>
                 registryAction(lootTableId, rootNode.require(lootTableTypeToken))
-            } catch (t: Throwable) {
-                LOGGER.warn("Failed to load loot table: '$lootTableId', Path: '${file.path}'", t)
-                continue
+            } catch (e: Throwable) {
+                IdePauser.pauseInIde(e)
+                LOGGER.warn("Failed to load loot table: '$lootTableId', Path: '${file.path}'")
             }
         }
     }

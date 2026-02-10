@@ -97,7 +97,8 @@ internal object CatalogItemLootTableRecipeRegistryLoader : RegistryLoader {
                         }
                     }
                 } catch (e: Throwable) {
-                    IdePauser.pauseInIde(IllegalStateException("Can't load catalog loot table recipes in file: '${file.relativeTo(lootTableDir)}'", e))
+                    IdePauser.pauseInIde(e)
+                    LOGGER.error("Failed to register catalog loot table recipes in file: '${file.relativeTo(lootTableDir)}'")
                 }
             }
 

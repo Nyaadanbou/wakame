@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
+import cc.mewcraft.wakame.util.IdePauser
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.configurate.yamlLoader
@@ -54,8 +55,9 @@ internal object ElementRegistryLoader : RegistryLoader {
                 val entryId = f.relativeTo(entryDataDirectory).invariantSeparatorsPath.substringBeforeLast('.')
                 val entryPair = parseEntry(entryId, rootNode)
                 registryAction(entryPair.first, entryPair.second)
-            } catch (e: Exception) {
-                LOGGER.error("Failed to load element from file: ${f.toRelativeString(rootDirectory)}", e)
+            } catch (e: Throwable) {
+                IdePauser.pauseInIde(e)
+                LOGGER.error("Failed to load element from file: ${f.toRelativeString(rootDirectory)}")
             }
         }
     }

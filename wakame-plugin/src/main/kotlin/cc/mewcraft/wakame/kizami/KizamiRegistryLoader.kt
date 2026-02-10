@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
+import cc.mewcraft.wakame.util.IdePauser
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.configurate.yamlLoader
@@ -69,8 +70,9 @@ internal object KizamiRegistryLoader : RegistryLoader {
                 val entryId = Identifiers.of(f.relativeTo(entryDataDirectory).invariantSeparatorsPath.substringBeforeLast('.'))
                 val entryVal = parseEntry(entryId, rootNode)
                 registryAction(entryId, entryVal)
-            } catch (e: Exception) {
-                LOGGER.error("Failed to load kizami from file: ${f.relativeTo(rootDirectory)}", e)
+            } catch (e: Throwable) {
+                IdePauser.pauseInIde(e)
+                LOGGER.error("Failed to load kizami from file: ${f.relativeTo(rootDirectory)}")
             }
         }
     }

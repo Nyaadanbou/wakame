@@ -81,8 +81,8 @@ internal object CustomItemRegistryLoader : RegistryLoader {
                 val itemValue = loadValue(itemId, rootNode)
                 consumer(itemId, itemValue)
             } catch (e: Exception) {
-                LOGGER.error("Failed to load custom item config: {}", f.path)
                 IdePauser.pauseInIde(e)
+                LOGGER.error("Failed to load koish item config: {}", f.path)
             }
         }
     }
@@ -134,8 +134,8 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
                 val itemValue = loadValue(itemId, rootNode)
                 consumer(itemId, itemValue)
             } catch (e: Exception) {
-                LOGGER.error("Failed to load item proxy config: {}", f.path)
                 IdePauser.pauseInIde(e)
+                LOGGER.error("Failed to load koish item proxy config: {}", f.path)
             }
         }
     }

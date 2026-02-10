@@ -31,7 +31,7 @@ sealed interface ItemDataContainer {
 
     companion object {
 
-        @JvmStatic
+        @JvmField
         val EMPTY: ItemDataContainer = EmptyItemDataContainer
 
         /**
