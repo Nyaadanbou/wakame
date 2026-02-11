@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.betonquest
 
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.koish.LockFreezeTicksActionFactory
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.koish.ReplaceCrateKeyActionFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.koish.SetFreezeTicksActionFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.koish.TeleportOnJoinActionFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.action.party.CreatePartyActionFactory
@@ -42,6 +43,7 @@ object BetonQuestHook {
         actionRegistry.register("lockfreezeticks", LockFreezeTicksActionFactory(loggerFactory))
         actionRegistry.register("setfreezeticks", SetFreezeTicksActionFactory(loggerFactory))
         actionRegistry.register("teleportonjoin", TeleportOnJoinActionFactory(loggerFactory))
+        actionRegistry.register("replaceCrateKey", ReplaceCrateKeyActionFactory(loggerFactory))
 
         // Objective
         val objectiveRegistry = plugin.questRegistries.objective()
