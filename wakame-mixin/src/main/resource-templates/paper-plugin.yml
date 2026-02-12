@@ -6,4 +6,3 @@ authors: [ Nailm ]
 horizon:
   mixins: [ "mixins.koish.json" ]
   wideners: [ "widener.at" ]
-  load-datapack-entry: true
