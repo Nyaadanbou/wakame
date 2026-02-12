@@ -458,6 +458,12 @@ data object ItemPropTypes {
     @JvmField
     val TELEPORT_ANCHOR: ItemPropType<TeleportAnchor> = typeOf("teleport_anchor")
 
+    /**
+     * 储存了盲盒钥匙的数据.
+     */
+    @JvmField
+    val CRATE_KEY_REPLACEMENT = typeOf<String>("crate_key_replacement")
+
     // ------------
     // 方便函数
     // ------------

@@ -115,6 +115,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         StandardRenderingHandlerRegistry.RARITY.process(collector, item.rarity2, item.getData(ItemDataTypes.REFORGE_HISTORY) ?: ReforgeHistory.ZERO)
         StandardRenderingHandlerRegistry.ENTITY_BUCKET_INFO.process(collector, item.getData(ItemDataTypes.ENTITY_BUCKET_INFO))
         StandardRenderingHandlerRegistry.NETWORK_POSITION.process(collector, item.getData(ItemDataTypes.NETWORK_POSITION))
+        StandardRenderingHandlerRegistry.CRATE_KEY_REPLACED.process(collector, if (item.hasData(ItemDataTypes.CRATE_KEY_REPLACED)) Unit else null)
         StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, item.getData(DataComponentTypes.ENCHANTMENTS))
         StandardRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, if (item.hasData(DataComponentTypes.DAMAGE_RESISTANT)) Unit else null)
         StandardRenderingHandlerRegistry.FOOD.process(collector, item.getData(DataComponentTypes.FOOD))
@@ -294,6 +295,11 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
             Placeholder.component("burn_time", Component.text(data.burnTime)),
             Placeholder.component("consume", Component.text(data.consume))
         )
+    }
+
+    @JvmField
+    val CRATE_KEY_REPLACED: RenderingHandler<Unit, SingleValueRendererFormat> = configure("crate_key_replaced") { _, format ->
+        format.render()
     }
 
     @JvmField

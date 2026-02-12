@@ -62,6 +62,7 @@ primary:
   - special:fuel
   - special:castable
   - special:network_position
+  - special:crate_key_replaced
 
   - (fixed:general)<st><dark_gray>             </dark_gray></st>
   - general:kizami

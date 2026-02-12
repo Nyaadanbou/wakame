@@ -306,3 +306,8 @@ network_position:
     - "<gray>坐标: <yellow>X:<x:zh-CN:#> Y:<y:zh-CN:#> Z:<z:zh-CN:#>"
     - "<gray>维度: <yellow><world>"
     - "<gray>位面: <yellow><server>"
+
+# id: `crate_key_replaced`
+crate_key_replaced:
+  namespace: special
+  tooltip: "<light_purple>盲盒钥匙已激活"

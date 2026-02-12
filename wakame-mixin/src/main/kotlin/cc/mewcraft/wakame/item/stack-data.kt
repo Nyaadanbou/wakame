@@ -60,6 +60,7 @@ fun ItemStack.hasData(type: ItemDataType<*>): Boolean = toNMS().hasData(type)
 fun <T> ItemStack.getData(type: ItemDataType<out T>): T? = toNMS().getData(type)
 fun <T> ItemStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T = toNMS().getDataOrDefault(type, fallback)
 fun <T> ItemStack.setData(type: ItemDataType<in T>, value: T): T? = toNMS().setData(type, value)
+fun <T> ItemStack.setData(type: ItemDataType<Unit>): Boolean = toNMS().setData(type)
 fun <T> ItemStack.removeData(type: ItemDataType<out T>): T? = toNMS().removeData(type)
 
 /* ItemMeta */

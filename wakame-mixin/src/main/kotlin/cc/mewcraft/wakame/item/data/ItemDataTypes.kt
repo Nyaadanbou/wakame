@@ -144,6 +144,12 @@ data object ItemDataTypes {
     @JvmField
     val NETWORK_POSITION: ItemDataType<NetworkPosition> = typeOf("network_position")
 
+    /**
+     * 标记盲盒钥匙已经被替换.
+     */
+    @JvmField
+    val CRATE_KEY_REPLACED: ItemDataType<Unit> = typeOf("crate_key_replaced")
+
     // ------------
     // 方便函数
     // ------------
