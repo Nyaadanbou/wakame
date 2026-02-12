@@ -10,7 +10,7 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.*
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.util.Brightness
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.PositionMoveRotation
@@ -136,7 +136,7 @@ class Hologram(
             // item
             display.itemStack = MojangStack.fromBukkitCopy(data.item)
         } else if (display is MojangDisplay.BlockDisplay && data is BlockHologramData) {
-            val block = BuiltInRegistries.BLOCK.get(ResourceLocation.bySeparator("minecraft:" + data.block.name.lowercase(), ':')).get().value()
+            val block = BuiltInRegistries.BLOCK.get(Identifier.bySeparator("minecraft:" + data.block.name.lowercase(), ':')).get().value()
             display.blockState = block.defaultBlockState()
         }
 

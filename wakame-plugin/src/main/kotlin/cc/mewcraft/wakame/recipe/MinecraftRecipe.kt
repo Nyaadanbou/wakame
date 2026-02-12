@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.lazyconfig.configurate.require
-import cc.mewcraft.wakame.adventure.key.Identified
+import cc.mewcraft.wakame.adventure.key.KoishKeyed
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.util.*
 import cc.mewcraft.wakame.util.adventure.toSimpleString
@@ -47,7 +47,7 @@ import net.minecraft.world.item.equipment.trim.TrimPattern as MojangTrimPattern
 /**
  * 配方 (对 nms 配方的包装).
  */
-sealed interface MinecraftRecipe : Identified, Examinable {
+sealed interface MinecraftRecipe : KoishKeyed, Examinable {
     val result: RecipeResult
 
     /**
@@ -664,7 +664,7 @@ internal class RecipeTypeBridge<T : MinecraftRecipe>(
  * 方便函数.
  */
 private fun KoishKey.createResourceKey(): MojangResourceKey<Recipe<*>> {
-    return MojangResourceKey.create(Registries.RECIPE, this.toResourceLocation())
+    return MojangResourceKey.create(Registries.RECIPE, this.toIdentifier())
 }
 
 /**

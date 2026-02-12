@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.AttributeProvider
 import cc.mewcraft.wakame.util.KoishKey
-import cc.mewcraft.wakame.util.StringIdentifiable
+import cc.mewcraft.wakame.util.StringRepresentable
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 
@@ -34,6 +34,6 @@ object KoishCodecs {
     }, Attribute::id).stable()
 
     @JvmField
-    val ATTRIBUTE_MODIFIER_OPERATION: Codec<AttributeModifier.Operation> = StringIdentifiable.createCodec(AttributeModifier.Operation::values)
+    val ATTRIBUTE_MODIFIER_OPERATION: Codec<AttributeModifier.Operation> = StringRepresentable.fromValues(AttributeModifier.Operation::values)
 
 }

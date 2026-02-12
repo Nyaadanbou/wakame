@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.entity.attribute
 
-import cc.mewcraft.wakame.util.StringIdentifiable
+import cc.mewcraft.wakame.util.StringRepresentable
 import it.unimi.dsi.fastutil.objects.Object2ReferenceArrayMap
 import net.kyori.adventure.key.Key
 
@@ -17,12 +17,12 @@ data class AttributeModifier(
     enum class Operation(
         val id: Int,
         val key: String,
-    ) : StringIdentifiable {
+    ) : StringRepresentable {
         ADD(0, "add"),
         MULTIPLY_BASE(1, "multiply_base"),
         MULTIPLY_TOTAL(2, "multiply_total");
 
-        override val stringId: String = this.key
+        override fun serializedName(): String = this.key
 
         companion object {
 

@@ -4,7 +4,7 @@ main: cc.mewcraft.wakame.KoishPlugin
 bootstrapper: cc.mewcraft.wakame.KoishBootstrap
 loader: cc.mewcraft.wakame.KoishLoader
 description: "{{ description }}"
-api-version: 1.21.8
+api-version: 1.21.11
 author: Nailm
 dependencies:
   server:

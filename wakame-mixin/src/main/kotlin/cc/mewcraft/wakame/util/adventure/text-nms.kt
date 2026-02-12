@@ -1,12 +1,13 @@
 package cc.mewcraft.wakame.util.adventure
 
-import cc.mewcraft.wakame.util.toResourceLocation
+import cc.mewcraft.wakame.util.toIdentifier
 import com.mojang.serialization.JsonOps
 import io.papermc.paper.adventure.PaperAdventure
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextDecoration
 import net.minecraft.network.chat.ComponentSerialization
+import net.minecraft.network.chat.FontDescription
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
 import java.util.*
@@ -41,7 +42,7 @@ fun MojangComponent.withoutPreFormatting(): MojangComponent {
 fun Style.toNmsStyle(): net.minecraft.network.chat.Style {
     var style = net.minecraft.network.chat.Style.EMPTY
     color()?.let { style = style.withColor(it.value()) }
-    font()?.let { style = style.withFont(it.toResourceLocation()) }
+    font()?.let { style = style.withFont(FontDescription.Resource(it.toIdentifier())) }
 
     when (decoration(TextDecoration.BOLD)) {
         TextDecoration.State.TRUE -> style = style.withBold(true)

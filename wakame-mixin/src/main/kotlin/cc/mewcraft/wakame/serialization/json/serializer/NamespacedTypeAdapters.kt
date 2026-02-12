@@ -7,7 +7,7 @@ import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import net.kyori.adventure.key.Key
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.bukkit.NamespacedKey
 import java.lang.reflect.*
 import java.lang.reflect.Array
@@ -19,7 +19,7 @@ internal object NamespacedTypeAdapters : TypeAdapterFactory {
     override fun <T : Any?> create(gson: Gson?, typeToken: TypeToken<T?>?): TypeAdapter<T?>? {
         return when (val representedClass = typeToken?.type?.representedClass?.kotlin) {
             NamespacedKey::class -> NamespacedKeyTypeAdapter
-            ResourceLocation::class -> ResourceLocationTypeAdapter
+            Identifier::class -> IdentifierTypeAdapter
             else -> if (representedClass?.isSubclassOf(Key::class) == true) GenericKeyTypeAdapter else null
 
         } as TypeAdapter<T?>?
@@ -50,14 +50,14 @@ internal object NamespacedTypeAdapters : TypeAdapterFactory {
 
     }
 
-    private object ResourceLocationTypeAdapter : TypeAdapter<ResourceLocation>() {
+    private object IdentifierTypeAdapter : TypeAdapter<Identifier>() {
 
-        override fun write(writer: JsonWriter, value: ResourceLocation) {
+        override fun write(writer: JsonWriter, value: Identifier) {
             writer.value(value.toString())
         }
 
-        override fun read(reader: JsonReader): ResourceLocation {
-            return ResourceLocation.parse(reader.nextString())
+        override fun read(reader: JsonReader): Identifier {
+            return Identifier.parse(reader.nextString())
         }
 
     }

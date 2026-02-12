@@ -4,7 +4,7 @@ package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.lazyconfig.access.optionalEntry
-import cc.mewcraft.wakame.adventure.key.Identified
+import cc.mewcraft.wakame.adventure.key.KoishKeyed
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
@@ -28,7 +28,7 @@ val GLOBAL_ATTRIBUTE_CONFIG = ConfigAccess["attributes"]
  *
  * 使用 [AttributeProvider] 来获取实例.
  */
-interface Attribute : Identified {
+interface Attribute : KoishKeyed {
 
     /**
      * 本属性的唯一标识.
@@ -140,7 +140,7 @@ protected constructor(
         return value
     }
 
-    val key: KoishKey = Key.key("attribute", id)
+    override val key: KoishKey = Key.key("attribute", id)
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(

@@ -17,7 +17,7 @@ dependencies {
     koishLoader(local.commons.tuple)
     koishLoader(local.configurate.yaml)
     koishLoader(local.configurate.gson)
-    koishLoader(local.configurate.extra.dfu8)
+    koishLoader(local.configurate.extra.dfu9)
     koishLoader(local.configurate.extra.kotlin)
     koishLoader(local.messenger)
     koishLoader(local.messenger.nats)

@@ -5,8 +5,8 @@ import cc.mewcraft.wakame.util.KoishKeys;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.kyori.adventure.key.Key;
-import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.advancements.criterion.ItemPredicate;
+import net.minecraft.advancements.criterion.MinMaxBounds;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Objects;

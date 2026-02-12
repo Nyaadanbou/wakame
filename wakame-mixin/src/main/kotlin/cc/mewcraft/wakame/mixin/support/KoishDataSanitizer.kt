@@ -126,7 +126,7 @@ object KoishDataSanitizer {
     }
 }
 
-private fun <T> ItemStack.updateIfNecessary(type: DataComponentType<T>, pass2: (T) -> Boolean, updater: (T) -> T) {
+private fun <T : Any> ItemStack.updateIfNecessary(type: DataComponentType<T>, pass2: (T) -> Boolean, updater: (T) -> T) {
     val component = this.get(type)
     if (component != null && pass2(component)) {
         val updated = updater(component)
@@ -136,7 +136,7 @@ private fun <T> ItemStack.updateIfNecessary(type: DataComponentType<T>, pass2: (
     }
 }
 
-private fun <T> DataComponentPatch.Builder.updateIfNecessary(type: DataComponentType<T>, pass2: (T) -> Boolean, updater: (T) -> T) {
+private fun <T : Any> DataComponentPatch.Builder.updateIfNecessary(type: DataComponentType<T>, pass2: (T) -> Boolean, updater: (T) -> T) {
     val optional: Optional<T>? = (this as `ExtraDataComponentPatch$Builder`).`koish$get`(type)
     if (optional != null && optional.isPresent) {
         val component: T = optional.get()

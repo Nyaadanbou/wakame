@@ -5,7 +5,7 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.kyori.adventure.key.Key;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -30,18 +30,18 @@ import java.util.function.Consumer;
 @NullMarked
 public class KoishLootItem extends LootPoolSingletonContainer {
     public static final MapCodec<KoishLootItem> CODEC = RecordCodecBuilder.mapCodec(
-            instance -> instance.group(ResourceLocation.CODEC.fieldOf("name").forGetter(entry -> entry.id))
+            instance -> instance.group(Identifier.CODEC.fieldOf("name").forGetter(entry -> entry.id))
                     .and(singletonFields(instance))
                     .apply(instance, KoishLootItem::new)
     );
-    private final ResourceLocation id;
+    private final Identifier id;
 
-    private KoishLootItem(ResourceLocation id, int weight, int quality, List<LootItemCondition> conditions, List<LootItemFunction> functions) {
+    private KoishLootItem(Identifier id, int weight, int quality, List<LootItemCondition> conditions, List<LootItemFunction> functions) {
         super(weight, quality, conditions, functions);
         this.id = id;
     }
 
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return id;
     }
 

@@ -47,7 +47,7 @@ dependencies {
     runtimeOnly(local.commons.tuple)
     runtimeOnly(local.configurate.yaml)
     runtimeOnly(local.configurate.gson)
-    runtimeOnly(local.configurate.extra.dfu8)
+    runtimeOnly(local.configurate.extra.dfu9)
     runtimeOnly(local.configurate.extra.kotlin)
 
     // 跨进程通讯

@@ -17,7 +17,7 @@ dependencies {
     koishLoader(local.commons.tuple)
     koishLoader(local.configurate.yaml)
     koishLoader(local.configurate.gson)
-    koishLoader(local.configurate.extra.dfu8)
+    koishLoader(local.configurate.extra.dfu9)
     koishLoader(local.configurate.extra.kotlin)
     koishLoader(local.fastutil) // 与 paper 不同: velocity 运行时并不包含此依赖, 但 messaging 需要这个
     koishLoader(local.messenger)

@@ -117,7 +117,7 @@ private object AttributeSupplierSerializer {
         // The builders that have been deserialized successfully so far
         val builders = mutableMapOf<Key, AttributeSupplierBuilder>()
 
-        // Transform the keys of the children map to ResourceLocation
+        // Transform the keys of the children map to Identifier
         val nodeMap = rootNode.childrenMap().transformKeys<KoishKey>()
 
         // An extension to reduce duplicates

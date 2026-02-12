@@ -6,7 +6,7 @@
 package cc.mewcraft.wakame.context.param
 
 import cc.mewcraft.wakame.context.intention.ContextIntention
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 class Requirement<V : Any>(
     val validator: (V) -> Boolean,
@@ -33,7 +33,7 @@ sealed interface ContextParamType<V : Any> {
     /**
      * The ID of this parameter type.
      */
-    val id: ResourceLocation
+    val id: Identifier
 
     /**
      * A list of requirements that must be fulfilled for a value of this parameter type to be valid.
@@ -47,10 +47,10 @@ sealed interface ContextParamType<V : Any> {
     companion object {
 
         internal fun <V : Any> builder(name: String): ContextParamTypeBuilder<V> {
-            return builder(ResourceLocation.fromNamespaceAndPath("neko", name))
+            return builder(Identifier.fromNamespaceAndPath("neko", name))
         }
 
-        fun <V : Any> builder(id: ResourceLocation): ContextParamTypeBuilder<V> {
+        fun <V : Any> builder(id: Identifier): ContextParamTypeBuilder<V> {
             return ContextParamTypeBuilder(id)
         }
 
@@ -71,7 +71,7 @@ sealed interface DefaultingContextParamType<V : Any> : ContextParamType<V> {
 }
 
 internal open class ContextParamTypeImpl<V : Any>(
-    override val id: ResourceLocation,
+    override val id: Identifier,
     override val requirements: List<Requirement<V>>,
     override val autofillers: List<Autofiller<V>>,
     override val copy: (V) -> V,
@@ -82,14 +82,14 @@ internal open class ContextParamTypeImpl<V : Any>(
 }
 
 internal class DefaultingContextParamTypeImpl<V : Any>(
-    id: ResourceLocation,
+    id: Identifier,
     override val defaultValue: V,
     requirements: List<Requirement<V>>,
     autofillers: List<Autofiller<V>>,
     copy: (V) -> V,
 ) : ContextParamTypeImpl<V>(id, requirements, autofillers, copy), DefaultingContextParamType<V>
 
-class ContextParamTypeBuilder<V : Any> internal constructor(private val id: ResourceLocation) {
+class ContextParamTypeBuilder<V : Any> internal constructor(private val id: Identifier) {
 
     private val requirements = ArrayList<Requirement<V>>()
     private val autofillers = ArrayList<Autofiller<V>>()

@@ -53,7 +53,7 @@ internal object CatalogItemLootTableRecipeRegistryLoader : RegistryLoader {
         val lootTableRegistryLookup: HolderLookup.RegistryLookup<MojangLootTable> = lookupProvider.lookupOrThrow(Registries.LOOT_TABLE)
         MINECRAFT_LOOT_TABLE_MAP.clear()
         MINECRAFT_LOOT_TABLE_MAP.putAll(lootTableRegistryLookup.listElements().asSequence().associate { holder ->
-            holder.key().location().toString() to holder.value()
+            holder.key().identifier().toString() to holder.value()
         })
     }
 

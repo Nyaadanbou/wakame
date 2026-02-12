@@ -10,8 +10,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.*;
@@ -37,11 +37,11 @@ import java.util.function.Consumer;
 @NullMarked
 public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
-    public static final Codec<EntityType<?>> CODEC = ResourceLocation.CODEC.comapFlatMap(EntityTypeWrapper::encode, EntityTypeWrapper::decode);
+    public static final Codec<EntityType<?>> CODEC = Identifier.CODEC.comapFlatMap(EntityTypeWrapper::encode, EntityTypeWrapper::decode);
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String NAMESPACE = "mythicmobs";
 
-    private static <T extends Entity> DataResult<EntityType<T>> parse(ResourceLocation id) {
+    private static <T extends Entity> DataResult<EntityType<T>> parse(Identifier id) {
         if (id.getNamespace().equals(NAMESPACE)) {
             return DataResult.success(new EntityTypeWrapper<>(id));
         } else {
@@ -49,15 +49,15 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
         }
     }
 
-    private static DataResult<? extends EntityType<?>> encode(ResourceLocation id) {
-        if (id.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)) {
+    private static DataResult<? extends EntityType<?>> encode(Identifier id) {
+        if (id.getNamespace().equals(Identifier.DEFAULT_NAMESPACE)) {
             return DataResult.success(BuiltInRegistries.ENTITY_TYPE.getValue(id));
         } else {
             return parse(id);
         }
     }
 
-    private static ResourceLocation decode(EntityType<?> entityType) {
+    private static Identifier decode(EntityType<?> entityType) {
         if (entityType instanceof EntityTypeWrapper<?> wrapper) {
             return wrapper.id;
         } else {
@@ -67,19 +67,35 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
     //
 
-    private final ResourceLocation id;
+    private final Identifier id;
     @Nullable
     private EntityType<T> delegate;
 
-    private EntityTypeWrapper(ResourceLocation id) {
-        super(null, null, false, false, false, false, ImmutableSet.of(), EntityDimensions.scalable(0f, 0f), 0f, 0, 0, "", Optional.empty(), FeatureFlagSet.of());
+    private EntityTypeWrapper(Identifier id) {
+        super(
+                null,
+                null,
+                false,
+                false,
+                false,
+                false,
+                ImmutableSet.of(),
+                EntityDimensions.scalable(0f, 0f),
+                0f,
+                0,
+                0,
+                "",
+                Optional.empty(),
+                FeatureFlagSet.of(),
+                false
+        );
         this.id = id;
 
         // 注册当前实例到全局 EntityTypeWrapperObjects, 用于之后热更新 this.delegate
         EntityTypeWrapperObjects.INSTANCE.register(this);
     }
 
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return id;
     }
 

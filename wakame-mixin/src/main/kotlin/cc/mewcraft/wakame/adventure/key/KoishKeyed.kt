@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.util.KoishKey
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 
-interface Identified : Keyed {
+interface KoishKeyed : Keyed {
     /**
      * @see key
      */

@@ -4,7 +4,7 @@ description: Adds key-value context support to LuckPerms
 authors: [ Nailm ]
 main: cc.mewcraft.extracontexts.paper.ExtraContextsPaperPlugin
 loader: cc.mewcraft.extracontexts.paper.ExtraContextsPaperLoader
-api-version: 1.21.8
+api-version: 1.21.11
 dependencies:
   server:
     LuckPerms:

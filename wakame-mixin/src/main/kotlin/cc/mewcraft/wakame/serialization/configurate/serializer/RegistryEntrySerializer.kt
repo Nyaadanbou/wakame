@@ -5,9 +5,10 @@ import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.registry.Registry
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.MojangIdentifier
 import cc.mewcraft.wakame.util.MojangRegistry
-import cc.mewcraft.wakame.util.MojangResourceLocation
 import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
+import cc.mewcraft.wakame.util.getValueOrThrow
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import org.bukkit.Keyed
@@ -95,7 +96,7 @@ internal class MojangRegistryValueEntrySerializer<T : Any>(
     private val registry: MojangRegistry<T>,
 ) : SimpleSerializer<T> {
     override fun deserialize(type: Type, node: ConfigurationNode): T {
-        return registry.getValueOrThrow(MojangResourceLocation.parse(node.require<String>()))
+        return registry.getValueOrThrow(MojangIdentifier.parse(node.require<String>()))
     }
 
     override fun serialize(type: Type, obj: T?, node: ConfigurationNode) {

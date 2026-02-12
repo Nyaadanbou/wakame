@@ -6,11 +6,12 @@ import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityComponentContext
 import com.mojang.serialization.Codec
+import com.mojang.serialization.MapCodec
 
 data object EnchantmentAntigravShotEffect : EnchantmentListenerBasedEffect {
 
     @JvmField
-    val CODEC: Codec<EnchantmentAntigravShotEffect> = Codec.unit { this }
+    val CODEC: Codec<EnchantmentAntigravShotEffect> = MapCodec.unitCodec(this)
 
     context(_: EntityComponentContext)
     override fun apply(entity: Entity, level: Int, slot: ItemSlot) {

@@ -11,7 +11,7 @@ object LootTableUtils {
      */
     fun getMojangLootTable(id: KoishKey): MojangLootTable {
         return MINECRAFT_SERVER.reloadableRegistries().getLootTable(
-            ResourceKey.create(Registries.LOOT_TABLE, id.toResourceLocation())
+            ResourceKey.create(Registries.LOOT_TABLE, id.toIdentifier())
         )
     }
 }

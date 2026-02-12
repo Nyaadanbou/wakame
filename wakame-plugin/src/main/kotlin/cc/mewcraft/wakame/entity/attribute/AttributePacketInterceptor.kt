@@ -17,7 +17,7 @@ import cc.mewcraft.wakame.util.NMSUtils
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.staticShadow
 import net.minecraft.network.syncher.SynchedEntityData
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.bukkit.entity.Player
 
 @Init(InitStage.POST_WORLD)
@@ -25,7 +25,7 @@ internal object AttributePacketInterceptor : PacketListener {
 
     private val SHADOW_PLAYER: ShadowPlayer = BukkitShadowFactory.global().staticShadow()
 
-    private val REMOVE_ATTRIBUTES_ON_CLIENTBOUND_UPDATE_ATTRIBUTES_PACKET: Set<ResourceLocation> by MAIN_CONFIG.entryOrElse(setOf(), "remove_attributes_on_clientbound_update_attributes_packet")
+    private val REMOVE_ATTRIBUTES_ON_CLIENTBOUND_UPDATE_ATTRIBUTES_PACKET: Set<Identifier> by MAIN_CONFIG.entryOrElse(setOf(), "remove_attributes_on_clientbound_update_attributes_packet")
     private val REMOVE_ABSORPTION_ON_CLIENTBOUND_SET_ENTITY_DATA_PACKET: Boolean by MAIN_CONFIG.entryOrElse(true, "remove_absorption_on_clientbound_set_entity_data_packet")
 
     @InitFun

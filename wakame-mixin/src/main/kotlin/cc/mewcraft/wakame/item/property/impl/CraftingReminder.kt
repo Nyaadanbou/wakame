@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSe
 import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toNMS
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import kotlin.reflect.KType
@@ -68,7 +68,7 @@ data class ItemReminder(
             return koishItem.createItemStack(amount).toNMS()
         } else {
             if (id.namespace() == KoishKey.MINECRAFT_NAMESPACE) {
-                val resourceLocation = ResourceLocation.withDefaultNamespace(id.value())
+                val resourceLocation = Identifier.withDefaultNamespace(id.value())
                 // identifier 对应的原版物品未找到的话, 会返回空气且无警告
                 val item = MojangBuiltInRegistries.ITEM.getValue(resourceLocation)
                 return MojangStack(item, amount)

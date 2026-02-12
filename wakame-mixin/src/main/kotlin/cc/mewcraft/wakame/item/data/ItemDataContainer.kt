@@ -8,13 +8,13 @@ import cc.mewcraft.wakame.datafix.ItemDataFixer
 import cc.mewcraft.wakame.item.data.ItemDataContainer.Companion.build
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.serialization.configurate.serializer.CompressedEnumValueSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.IdentifierSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.KoishKeySerializer
 import cc.mewcraft.wakame.util.typeTokenOf
 import com.mojang.serialization.Codec
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.jetbrains.annotations.ApiStatus
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.extra.dfu.v8.DfuSerializers
+import org.spongepowered.configurate.extra.dfu.v9.DfuSerializers
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
@@ -51,7 +51,7 @@ sealed interface ItemDataContainer {
             // 添加显式声明的 TypeSerializer
             serials.registerAll(makeDirectSerializers())
             // 添加间接依赖的 TypeSerializer (注册新的物品数据类型时, 如果有间接依赖的类型, 在这里添加即可)
-            serials.register(IdentifierSerializer)
+            serials.register(KoishKeySerializer)
             // 优先使用带压缩的枚举类序列化实现
             serials.register(CompressedEnumValueSerializer)
             // 添加 Configurate 内置的 TypeSerializer.

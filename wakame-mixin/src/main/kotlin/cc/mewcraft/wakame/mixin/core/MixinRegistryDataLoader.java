@@ -12,14 +12,15 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.server.dialog.Dialog;
 import net.minecraft.world.damagesource.DamageType;
-import net.minecraft.world.entity.animal.CatVariant;
-import net.minecraft.world.entity.animal.ChickenVariant;
-import net.minecraft.world.entity.animal.CowVariant;
-import net.minecraft.world.entity.animal.PigVariant;
+import net.minecraft.world.entity.animal.chicken.ChickenVariant;
+import net.minecraft.world.entity.animal.cow.CowVariant;
+import net.minecraft.world.entity.animal.feline.CatVariant;
 import net.minecraft.world.entity.animal.frog.FrogVariant;
+import net.minecraft.world.entity.animal.nautilus.ZombieNautilusVariant;
+import net.minecraft.world.entity.animal.pig.PigVariant;
 import net.minecraft.world.entity.animal.wolf.WolfSoundVariant;
 import net.minecraft.world.entity.animal.wolf.WolfVariant;
-import net.minecraft.world.entity.decoration.PaintingVariant;
+import net.minecraft.world.entity.decoration.painting.PaintingVariant;
 import net.minecraft.world.item.Instrument;
 import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -29,6 +30,7 @@ import net.minecraft.world.item.equipment.trim.TrimPattern;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.entity.BannerPattern;
 import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.timeline.Timeline;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -60,6 +62,7 @@ public class MixinRegistryDataLoader {
             InvokerRegistryData.create(Registries.CAT_VARIANT, CatVariant.NETWORK_CODEC, true),
             InvokerRegistryData.create(Registries.COW_VARIANT, CowVariant.NETWORK_CODEC, true),
             InvokerRegistryData.create(Registries.CHICKEN_VARIANT, ChickenVariant.NETWORK_CODEC, true),
+            InvokerRegistryData.create(Registries.ZOMBIE_NAUTILUS_VARIANT, ZombieNautilusVariant.NETWORK_CODEC, true),
             InvokerRegistryData.create(Registries.PAINTING_VARIANT, PaintingVariant.DIRECT_CODEC, true),
             InvokerRegistryData.create(Registries.DIMENSION_TYPE, DimensionType.DIRECT_CODEC),
             InvokerRegistryData.create(Registries.DAMAGE_TYPE, DamageType.DIRECT_CODEC),
@@ -83,6 +86,7 @@ public class MixinRegistryDataLoader {
             InvokerRegistryData.create(Registries.INSTRUMENT, Instrument.DIRECT_CODEC),
             InvokerRegistryData.create(Registries.TEST_ENVIRONMENT, TestEnvironmentDefinition.DIRECT_CODEC),
             InvokerRegistryData.create(Registries.TEST_INSTANCE, GameTestInstance.DIRECT_CODEC),
-            InvokerRegistryData.create(Registries.DIALOG, Dialog.DIRECT_CODEC)
+            InvokerRegistryData.create(Registries.DIALOG, Dialog.DIRECT_CODEC),
+            InvokerRegistryData.create(Registries.TIMELINE, Timeline.NETWORK_CODEC)
     );
 }
