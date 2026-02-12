@@ -1,8 +1,0 @@
-name: Koish-Mixin
-version: "{{ version }}"
-main: cc.mewcraft.koish.KoishMixinPlugin
-api-version: 1.21.11
-authors: [ Nailm ]
-horizon:
-  mixins: [ "mixins.koish.json" ]
-  wideners: [ "widener.at" ]

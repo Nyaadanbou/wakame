@@ -9,14 +9,6 @@ group = "cc.mewcraft.koish"
 version = "0.0.1-snapshot"
 description = "This JAR contains the dependencies for other subprojects."
 
-repositories {
-    mavenLocal {
-        content {
-            includeGroup("io.canvasmc.horizon")
-        }
-    }
-}
-
 dependencies {
     // 写在最前面:
     // 在本 mixin project 中添加为 implementation 的依赖意味着
@@ -63,12 +55,17 @@ dependencies {
     runtimeOnly(local.caffeine)
 }
 
-//horizon {
-//
-//}
+horizon {
+    splitPluginSourceSets()
+}
 
 sourceSets {
     main {
+        blossom {
+            configure(project)
+        }
+    }
+    named("plugin") {
         blossom {
             configure(project)
         }

@@ -5,3 +5,7 @@ plugins {
 }
 
 val local = the<LibrariesForLocal>()
+
+dependencies {
+    compileOnly(local.paper)
+}

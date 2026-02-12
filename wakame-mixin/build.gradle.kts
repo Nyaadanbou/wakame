@@ -9,14 +9,6 @@ group = "cc.mewcraft.koish"
 version = "0.0.1-snapshot"
 description = "The core gameplay implementation of Xiaomi's server (ignite mod)"
 
-repositories {
-    mavenLocal {
-        content {
-            includeGroup("io.canvasmc.horizon")
-        }
-    }
-}
-
 dependencies {
     // Horizon API
     horizon.horizonApi(local.versions.horizon.core)
@@ -34,10 +26,11 @@ paperweight {
     // - koish-mixin 属于 “root project”, 即很多其他 project 依赖于这个 project;
     // - 为了避免 server dependency 的代码重复出现在 IJ 的代码索引里, 如查看 definition;
     // 所以将 server dependency 添加到 COMPILE_ONLY_API_CONFIGURATION.
-    addServerDependencyTo.add(project.configurations.named(JavaPlugin.COMPILE_ONLY_API_CONFIGURATION_NAME))
+    //addServerDependencyTo.add(project.configurations.named(JavaPlugin.COMPILE_ONLY_API_CONFIGURATION_NAME))
 }
 
 horizon {
+    splitPluginSourceSets()
     accessTransformerFiles.from(
         file("src/main/resource-templates/widener.at")
     )
@@ -45,6 +38,11 @@ horizon {
 
 sourceSets {
     main {
+        blossom {
+            configure(project)
+        }
+    }
+    named("plugin") {
         blossom {
             configure(project)
         }

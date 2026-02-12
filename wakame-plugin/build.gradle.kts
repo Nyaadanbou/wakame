@@ -1,6 +1,7 @@
 plugins {
     id("koish.core-conventions")
     id("cc.mewcraft.copy-jar-docker")
+    id("io.canvasmc.weaver.userdev")
 }
 
 group = "cc.mewcraft.koish"
@@ -8,6 +9,9 @@ version = "0.0.1-snapshot"
 description = "The core gameplay implementation of Xiaomi's server (paper plugin)"
 
 dependencies {
+    // Paper API + NMS
+    paperweight.paperDevBundle(local.versions.paper)
+
     /* internal */
 
     // api + mixin: 运行时由 mod 提供

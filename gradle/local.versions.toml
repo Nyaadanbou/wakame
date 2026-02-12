@@ -16,8 +16,8 @@ paperweight = "2.0.0-beta.17"
 shadow = "9.2.2"
 spotless = "7.0.4"
 weaver = "2.3.12"
-horizon = "1.0.0-beta.10"
-horizon-core = "1.0.0-beta.local"
+horizon = "1.0.0-rc1.26"
+horizon-core = "1.0.0-rc1.32"
 
 # Shaded dependencies
 
