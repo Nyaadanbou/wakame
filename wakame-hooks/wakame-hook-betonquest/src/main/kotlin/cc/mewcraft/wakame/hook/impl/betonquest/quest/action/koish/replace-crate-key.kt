@@ -21,6 +21,8 @@ class ReplaceCrateKeyAction(
 ) : OnlineAction {
 
     companion object {
+        // 这个 PDC_KEY 的值需要根据 ExcellentCrates 的具体实现随时调整:
+        // https://github.com/nulli0n/ExcellentCrates-spigot/blob/master/src/main/java/su/nightexpress/excellentcrates/config/Keys.java#L10
         private const val PDC_KEY = "excellentcrates:crate_key.id"
     }
 
