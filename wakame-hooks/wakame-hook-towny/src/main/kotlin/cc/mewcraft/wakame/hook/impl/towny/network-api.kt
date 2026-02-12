@@ -187,8 +187,6 @@ private object TownyTeleportImpl {
     }
 
     fun on(event: AsyncPlayerSpawnLocationEvent) {
-        // TODO #441 切换成 AsyncPlayerSpawnLocationEvent 并确保线程安全
-
         // 当玩家进入服务器时:
         // 根据正在排队的传送请求, 将玩家传送到他的城镇/国家传送点
 
