@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import org.bukkit.entity.Player
 import org.slf4j.Logger
 
@@ -130,7 +130,7 @@ private constructor(
      * 初始化物品生成的上下文.
      */
     private fun initializeContext(
-        itemId: Identifier,
+        itemId: KoishKey,
         itemLevel: Int,
         itemRarity: RegistryEntry<Rarity>,
         itemElements: Set<RegistryEntry<Element>>,

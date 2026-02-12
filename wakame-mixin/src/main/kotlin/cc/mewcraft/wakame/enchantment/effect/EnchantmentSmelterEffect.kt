@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import cc.mewcraft.wakame.serialization.codec.BukkitCodecs
 import cc.mewcraft.wakame.serialization.codec.KoishCodecs
 import cc.mewcraft.wakame.serialization.codec.setOf
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityComponentContext
 import com.mojang.serialization.Codec
@@ -24,7 +24,7 @@ data class EnchantmentSmelterEffect(
     /**
      * Sound to play on smelting.
      */
-    val sound: Identifier,
+    val sound: KoishKey,
     /**
      * List of blocks / items that are immune to the Smelter effect.
      * TODO #365: 支持自定义物品 (使用 Set<ItemRef>)
@@ -38,7 +38,7 @@ data class EnchantmentSmelterEffect(
         val CODEC: Codec<EnchantmentSmelterEffect> = RecordCodecBuilder.create { instance ->
             instance.group(
                 Codec.BOOL.optionalFieldOf("disable_on_crouch", true).forGetter(EnchantmentSmelterEffect::disableOnCrouch),
-                KoishCodecs.IDENTIFIER.fieldOf("sound").forGetter(EnchantmentSmelterEffect::sound),
+                KoishCodecs.KOISH_KEY.fieldOf("sound").forGetter(EnchantmentSmelterEffect::sound),
                 BukkitCodecs.MATERIAL.setOf().fieldOf("exempted_items").forGetter(EnchantmentSmelterEffect::exemptedItems)
             ).apply(instance, ::EnchantmentSmelterEffect)
         }

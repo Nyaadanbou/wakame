@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.registry.entry
 
 import cc.mewcraft.wakame.registry.ReactiveRegistryEntry
 import cc.mewcraft.wakame.registry.RegistryKey
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
 import com.mojang.datafixers.util.Either
 import org.jetbrains.annotations.ApiStatus
@@ -51,7 +51,7 @@ interface RegistryEntry<T> {
     fun reactive(): ReactiveRegistryEntry<T>
 
     fun matchesKey(key: RegistryKey<T>): Boolean
-    fun matchesId(id: Identifier): Boolean
+    fun matchesId(id: KoishKey): Boolean
     fun matches(entry: RegistryEntry<T>): Boolean
 
     /**
@@ -81,13 +81,13 @@ interface RegistryEntry<T> {
      *
      * 当容器数据的命名空间为 [cc.mewcraft.wakame.util.KOISH_NAMESPACE] 时, 返回值部分不包含命名空间.
      * 否则返回完整的 `命名空间:路径` 形式. 在已知 [getIdAsString] 的情况下,
-     * 逆操作 ([cc.mewcraft.wakame.util.Identifiers.of]) 也完全遵循该规则.
+     * 逆操作 ([cc.mewcraft.wakame.util.KoishKeys.of]) 也完全遵循该规则.
      *
-     * 例如从 [Identifier] 转换为 [getIdAsString]:
+     * 例如从 [KoishKey] 转换为 [getIdAsString]:
      * - `"koish:ice"` -> `"ice"` (命名空间为 "koish" 将省略命名空间)
      * - `"kawaii:cute"` -> `"kawaii:cute"` (命名空间不是 "koish" 将保留完整路径)
      *
-     * 例如从 [getIdAsString] 转换为 [Identifier]:
+     * 例如从 [getIdAsString] 转换为 [KoishKey]:
      * - `"ice"` -> `"koish:ice"` (省略命名空间时, 将自动设置为 "koish")
      * - `"kawaii:cute"` -> `"kawaii:cute"` (存在命名空间时, 将保留完整路径)
      */
@@ -132,7 +132,7 @@ interface RegistryEntry<T> {
             return reactive ?: provider(value).also { reactive = it }
         }
 
-        override fun matchesId(id: Identifier): Boolean = false
+        override fun matchesId(id: KoishKey): Boolean = false
         override fun matchesKey(key: RegistryKey<T>): Boolean = false
         override fun matches(entry: RegistryEntry<T>): Boolean = this.value == entry.unwrap()
         override fun getKeyOrValue(): Either<RegistryKey<T>, T> = Either.right(this.value)
@@ -198,7 +198,7 @@ interface RegistryEntry<T> {
         }
 
         override fun matchesKey(key: RegistryKey<T>): Boolean = this.key === key
-        override fun matchesId(id: Identifier): Boolean = this.key.value == id
+        override fun matchesId(id: KoishKey): Boolean = this.key.value == id
         override fun matches(entry: RegistryEntry<T>): Boolean = this === entry || (entry is Reference<*> && this.key == entry.key)
 
         override fun hashCode(): Int {

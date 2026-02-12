@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.extension.transformKeys
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.configurate.yamlLoader
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
@@ -33,7 +33,7 @@ internal object AttributeSupplierRegistryLoader : RegistryLoader {
         consumeData(BuiltInRegistries.ATTRIBUTE_SUPPLIER::update)
     }
 
-    private fun consumeData(registryAction: (Identifier, AttributeSupplier) -> Unit) {
+    private fun consumeData(registryAction: (KoishKey, AttributeSupplier) -> Unit) {
         val loader = yamlLoader { withDefaults() }
         val rootNode = loader.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText()).node("entity_attributes")
         val dataMap = AttributeSupplierSerializer.deserialize(rootNode)
@@ -113,12 +113,12 @@ private object AttributeSupplierSerializer {
      * ```
      * @return the deserialized objects
      */
-    fun deserialize(rootNode: ConfigurationNode): Map<Identifier, AttributeSupplier> {
+    fun deserialize(rootNode: ConfigurationNode): Map<KoishKey, AttributeSupplier> {
         // The builders that have been deserialized successfully so far
         val builders = mutableMapOf<Key, AttributeSupplierBuilder>()
 
         // Transform the keys of the children map to ResourceLocation
-        val nodeMap = rootNode.childrenMap().transformKeys<Identifier>()
+        val nodeMap = rootNode.childrenMap().transformKeys<KoishKey>()
 
         // An extension to reduce duplicates
         fun AttributeSupplierBuilder.add(
@@ -153,7 +153,7 @@ private object AttributeSupplierSerializer {
 
         // Creates a builder from the given data
         fun parseBuilder(
-            builders: Map<Identifier, AttributeSupplierBuilder>,
+            builders: Map<KoishKey, AttributeSupplierBuilder>,
             parentKey: Key?,
             valuesMap: Map<String, ConfigurationNode>,
         ): AttributeSupplierBuilder {

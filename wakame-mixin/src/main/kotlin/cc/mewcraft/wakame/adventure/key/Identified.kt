@@ -1,14 +1,14 @@
 package cc.mewcraft.wakame.adventure.key
 
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 
 interface Identified : Keyed {
     /**
-     * @see identifier
+     * @see key
      */
-    val identifier: Identifier
+    val key: KoishKey
 
-    override fun key(): Key = identifier
+    override fun key(): Key = key
 }

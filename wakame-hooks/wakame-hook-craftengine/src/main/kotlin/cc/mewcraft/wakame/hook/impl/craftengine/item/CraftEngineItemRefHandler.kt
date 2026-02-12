@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.hook.impl.craftengine.item
 import cc.mewcraft.wakame.hook.impl.craftengine.CKey
 import cc.mewcraft.wakame.hook.impl.craftengine.toCraftEngine
 import cc.mewcraft.wakame.item.ItemRefHandler
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import io.papermc.paper.datacomponent.DataComponentTypes
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -20,15 +20,15 @@ class CraftEngineItemRefHandler : ItemRefHandler<BukkitCustomItem> {
 
     override val systemName: String = "CraftEngine"
 
-    override fun accepts(id: Identifier): Boolean {
+    override fun accepts(id: KoishKey): Boolean {
         return getInternalType(id) != null
     }
 
-    override fun getId(stack: ItemStack): Identifier? {
+    override fun getId(stack: ItemStack): KoishKey? {
         return convertKeyToRef(CraftEngineItems.getCustomItemId(stack))
     }
 
-    override fun getName(id: Identifier): Component? {
+    override fun getName(id: KoishKey): Component? {
         // CraftEngine 无法直接从 ID 获取得到物品的名字
         // 我们只能先生成一个 ItemStack 然后再从中获取名字
         val item = getInternalType(id)?.buildItemStack(1) ?: return null
@@ -36,11 +36,11 @@ class CraftEngineItemRefHandler : ItemRefHandler<BukkitCustomItem> {
         return data
     }
 
-    override fun getInternalType(id: Identifier): BukkitCustomItem? {
+    override fun getInternalType(id: KoishKey): BukkitCustomItem? {
         return convertRefToKey(id)?.let(CraftEngineItems::byId) as? BukkitCustomItem
     }
 
-    override fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack? {
+    override fun createItemStack(id: KoishKey, amount: Int, player: Player?): ItemStack? {
         return if (player != null) {
             getInternalType(id)?.buildItem(player.toCraftEngine())?.item?.asQuantity(amount)
         } else {

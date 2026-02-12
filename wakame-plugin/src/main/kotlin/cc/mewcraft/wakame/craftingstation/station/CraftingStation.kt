@@ -42,7 +42,7 @@ internal class SimpleCraftingStation(
     private val recipes: MutableMap<Key, Recipe> = mutableMapOf()
 
     override fun addRecipe(recipe: Recipe): Boolean {
-        val success = recipes.putIfAbsent(recipe.identifier, recipe)
+        val success = recipes.putIfAbsent(recipe.key, recipe)
         if (success != null) {
             LOGGER.warn("Duplicate key. Station recipe will not be added.")
             return false

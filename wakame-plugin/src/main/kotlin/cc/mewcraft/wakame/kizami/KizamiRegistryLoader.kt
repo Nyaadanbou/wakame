@@ -11,8 +11,8 @@ import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.util.IdePauser
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.configurate.yamlLoader
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
@@ -38,7 +38,7 @@ internal object KizamiRegistryLoader : RegistryLoader {
         consumeData(BuiltInRegistries.KIZAMI::update)
     }
 
-    private fun consumeData(registryAction: (Identifier, Kizami) -> Unit) {
+    private fun consumeData(registryAction: (KoishKey, Kizami) -> Unit) {
         val rootDirectory = getFileInConfigDirectory("kizami/")
 
         // 获取铭刻的全局设置文件
@@ -67,7 +67,7 @@ internal object KizamiRegistryLoader : RegistryLoader {
         entryDataDirectory.walk().drop(1).filter { it.isFile && it.extension == "yml" }.forEach { f ->
             try {
                 val rootNode = loader.buildAndLoadString(f.readText())
-                val entryId = Identifiers.of(f.relativeTo(entryDataDirectory).invariantSeparatorsPath.substringBeforeLast('.'))
+                val entryId = KoishKeys.of(f.relativeTo(entryDataDirectory).invariantSeparatorsPath.substringBeforeLast('.'))
                 val entryVal = parseEntry(entryId, rootNode)
                 registryAction(entryId, entryVal)
             } catch (e: Throwable) {
@@ -105,7 +105,7 @@ internal object KizamiRegistryLoader : RegistryLoader {
      *         k2: v2
      * ```
      */
-    private fun parseEntry(id: Identifier, node: ConfigurationNode): Kizami {
+    private fun parseEntry(id: KoishKey, node: ConfigurationNode): Kizami {
         val name = node.node("name").get<Component>(Component.text(id.asString()))
         val styles = node.node("styles").get<Array<StyleBuilderApplicable>>(emptyArray())
 

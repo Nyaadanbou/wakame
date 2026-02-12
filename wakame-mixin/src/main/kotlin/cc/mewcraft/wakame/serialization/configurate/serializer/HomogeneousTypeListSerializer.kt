@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.serialization.configurate.serializer
 
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.applyIfNull
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
@@ -36,7 +36,7 @@ sealed class HomogeneousTypeListSerializer<T : Keyed>(
 
     private fun resolveTag(tagEntry: String): List<T> {
         val tagName = tagEntry.substringAfter('#')
-        val tagKey = TagKey.create(registryKey, Identifier.key(tagName))
+        val tagKey = TagKey.create(registryKey, KoishKey.key(tagName))
         val registry = getRegistry()
 
         return registry.getTag(tagKey)
@@ -47,7 +47,7 @@ sealed class HomogeneousTypeListSerializer<T : Keyed>(
     }
 
     private fun resolveDirect(entry: String): T? {
-        return getRegistry().get(Identifier.key(entry)).applyIfNull { logEntryError(entry) }
+        return getRegistry().get(KoishKey.key(entry)).applyIfNull { logEntryError(entry) }
     }
 
     private fun getRegistry(): Registry<T> =

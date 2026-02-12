@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import com.google.common.collect.MapMaker
 import java.util.concurrent.ConcurrentMap
 
@@ -18,24 +18,24 @@ import java.util.concurrent.ConcurrentMap
  */
 class RegistryKey<T>
 private constructor(
-    val registry: Identifier, // e.g. "koish:item", "koish:element"
-    val value: Identifier, // depends on the entries in registry
+    val registry: KoishKey, // e.g. "koish:item", "koish:element"
+    val value: KoishKey, // depends on the entries in registry
 ) {
     companion object {
         // 确保值的全局唯一性
         private val INSTANCES: ConcurrentMap<InternKey, RegistryKey<*>> = MapMaker().weakValues().makeMap()
 
-        fun <T> of(registryName: Identifier, value: Identifier): RegistryKey<T> {
+        fun <T> of(registryName: KoishKey, value: KoishKey): RegistryKey<T> {
             @Suppress("UNCHECKED_CAST")
             return INSTANCES.computeIfAbsent(InternKey(registryName, value)) { pair -> RegistryKey<T>(pair.registry, pair.value) } as RegistryKey<T>
         }
 
-        fun <T> of(registryKey: RegistryKey<out Registry<T>>, value: Identifier): RegistryKey<T> {
+        fun <T> of(registryKey: RegistryKey<out Registry<T>>, value: KoishKey): RegistryKey<T> {
             return of(registryKey.value, value)
         }
 
         // 创建的 ResourceKey 位于 koish:root
-        fun <T> ofRegistry(registryName: Identifier): RegistryKey<T> {
+        fun <T> ofRegistry(registryName: KoishKey): RegistryKey<T> {
             return of(BuiltInRegistryKeys.ROOT_REGISTRY_NAME, registryName)
         }
     }
@@ -64,5 +64,5 @@ private constructor(
         return "RegistryKey[$registry / ${value}]"
     }
 
-    private data class InternKey(val registry: Identifier, val value: Identifier)
+    private data class InternKey(val registry: KoishKey, val value: KoishKey)
 }

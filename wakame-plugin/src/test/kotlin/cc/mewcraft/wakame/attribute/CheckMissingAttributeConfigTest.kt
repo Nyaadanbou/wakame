@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.config.KoishConfigs
 import cc.mewcraft.wakame.element.ElementRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.test.TestOnly
 import cc.mewcraft.wakame.util.test.TestPath
 import org.junit.jupiter.api.AfterEach
@@ -45,7 +45,7 @@ class CheckMissingAttributeConfigTest {
 
         val rootNode = config.get()
         val idsPresentInRegistry = BuiltInRegistries.ATTRIBUTE_FACADE.ids
-        val idsPresentInConfig = rootNode.childrenMap().keys.map(Any::toString).map(Identifiers::of)
+        val idsPresentInConfig = rootNode.childrenMap().keys.map(Any::toString).map(KoishKeys::of)
         val missingIdsInConfig = idsPresentInRegistry subtract idsPresentInConfig.toSet()
 
         if (missingIdsInConfig.isNotEmpty()) {

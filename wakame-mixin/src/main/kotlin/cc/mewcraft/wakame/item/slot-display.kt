@@ -7,8 +7,8 @@ import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.ItemLore
 import net.kyori.adventure.text.Component
@@ -40,7 +40,7 @@ private constructor(
 
     companion object {
 
-        private val pool: ConcurrentHashMap<Identifier, SlotDisplay> = ConcurrentHashMap()
+        private val pool: ConcurrentHashMap<KoishKey, SlotDisplay> = ConcurrentHashMap()
 
         /**
          * 清空缓存.
@@ -55,7 +55,7 @@ private constructor(
          * @param id `namespace:path` 形式的字符串, 必须是有效的 [KoishItem.id]
          */
         fun get(id: String): SlotDisplay {
-            return get(Identifiers.of(id))
+            return get(KoishKeys.of(id))
         }
 
         /**
@@ -63,7 +63,7 @@ private constructor(
          *
          * @param id 有效的 [KoishItem.id]
          */
-        fun get(id: Identifier): SlotDisplay {
+        fun get(id: KoishKey): SlotDisplay {
             if (!BuiltInRegistries.ITEM.containsId(id)) {
                 // 不缓存不存在的物品 id, 始终记录错误并返回新的 SlotDisplay
                 LOGGER.error("'$id' not found in the item registry, fallback to default one")

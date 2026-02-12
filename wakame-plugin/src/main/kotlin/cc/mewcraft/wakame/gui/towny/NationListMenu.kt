@@ -4,7 +4,7 @@ import cc.mewcraft.lazyconfig.access.entryOrElse
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.integration.towny.Nation
 import cc.mewcraft.wakame.integration.towny.TownyLocal
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKeys
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 
@@ -29,11 +29,11 @@ class NationListMenu(
                     "< . . . . . . . >",
                 ),
                 icons = hashMapOf(
-                    "background" to Identifiers.of("internal/menu/common/default/background"),
-                    "prev_page" to Identifiers.of("internal/menu/common/default/prev_page"),
-                    "next_page" to Identifiers.of("internal/menu/common/default/next_page"),
-                    "hint" to Identifiers.of("internal/menu/towny/nationlist/hint"),
-                    "entry" to Identifiers.of("internal/menu/towny/nationlist/entry"),
+                    "background" to KoishKeys.of("internal/menu/common/default/background"),
+                    "prev_page" to KoishKeys.of("internal/menu/common/default/prev_page"),
+                    "next_page" to KoishKeys.of("internal/menu/common/default/next_page"),
+                    "hint" to KoishKeys.of("internal/menu/towny/nationlist/hint"),
+                    "entry" to KoishKeys.of("internal/menu/towny/nationlist/entry"),
                 )
             ), "nation_list_menu", "ui_settings"
         )

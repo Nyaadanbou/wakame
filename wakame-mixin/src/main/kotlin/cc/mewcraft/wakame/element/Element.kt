@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.element
 
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.PlayerFriendlyNamed
 import cc.mewcraft.wakame.util.adventure.plain
 import cc.mewcraft.wakame.util.adventure.toSimpleString
@@ -25,7 +25,7 @@ constructor(
 ) : Keyed, Examinable, PlayerFriendlyNamed {
 
     override fun key(): Key {
-        return BuiltInRegistries.ELEMENT.getId(this) ?: Identifiers.of("unregistered")
+        return BuiltInRegistries.ELEMENT.getId(this) ?: KoishKeys.of("unregistered")
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(

@@ -13,7 +13,7 @@ import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import io.papermc.paper.datacomponent.item.TooltipDisplay
 import io.papermc.paper.datacomponent.item.UseCooldown
 import net.kyori.adventure.key.Key
@@ -103,7 +103,7 @@ data object ItemMetaTypes {
     val USE_COOLDOWN: ItemMetaType<MetaUseCooldown, UseCooldown> = typeOf("use_cooldown")
 
     @JvmField
-    val COOLDOWN_GROUP: ItemMetaType<MetaCooldownGroup, Identifier> = typeOf("cooldown_group")
+    val COOLDOWN_GROUP: ItemMetaType<MetaCooldownGroup, KoishKey> = typeOf("cooldown_group")
 
     @JvmField
     val BREW_RECIPE: ItemMetaType<MetaBrewRecipe, String> = typeOf("brew_recipe") {

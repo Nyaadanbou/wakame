@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.entity.player
 
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.PlayerFriendlyNamed
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Keyed
@@ -26,8 +26,8 @@ constructor(
     val cooldown: Int,
 ) : Keyed, Examinable, PlayerFriendlyNamed {
 
-    override fun key(): Identifier {
-        return BuiltInRegistries.ATTACK_SPEED.getId(this) ?: Identifiers.of("unregistered")
+    override fun key(): KoishKey {
+        return BuiltInRegistries.ATTACK_SPEED.getId(this) ?: KoishKeys.of("unregistered")
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> {

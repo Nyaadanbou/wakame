@@ -1,7 +1,7 @@
 package cc.mewcraft.bettergui.modifier
 
 import cc.mewcraft.wakame.item.KoishItemRefHandler
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKeys
 import me.hsgamer.hscore.common.StringReplacer
 import me.hsgamer.hscore.minecraft.item.ItemModifier
 import org.bukkit.inventory.ItemStack
@@ -13,7 +13,7 @@ class KoishItemModifier : ItemModifier<ItemStack> {
     override fun modify(original: ItemStack, uuid: UUID?, stringReplacer: StringReplacer): ItemStack {
         if (!::itemId.isInitialized) return original
         val itemId2 = stringReplacer.replaceOrOriginal(itemId, uuid)
-        val identifier = Identifiers.tryParse(itemId2) ?: return original
+        val identifier = KoishKeys.tryParse(itemId2) ?: return original
         val itemstack = KoishItemRefHandler.createItemStack(identifier, 1, null) ?: return original
         return itemstack
     }

@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.core.ItemRefMock
 import cc.mewcraft.wakame.init.RecipeInitializer
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.item.ItemRefBootstrap
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.test.TestOnly
 import cc.mewcraft.wakame.util.test.TestPath
 import io.mockk.every
@@ -26,7 +26,7 @@ class VanillaRecipeSerializationTest {
             KoishDataPaths.initializeForTest(TestPath.TEST)
 
             mockkObject(ItemRef)
-            every { ItemRef.create(any<Identifier>()) } answers { ItemRefMock(firstArg<Identifier>()) }
+            every { ItemRef.create(any<KoishKey>()) } answers { ItemRefMock(firstArg<KoishKey>()) }
 
             ItemRefBootstrap.init()
             RecipeInitializer.preLoad()

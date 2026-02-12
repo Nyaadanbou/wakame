@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.craftingstation.recipe
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.adventure.key.Identified
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
@@ -64,7 +64,7 @@ internal sealed interface Recipe : Identified, Examinable {
  * 合成站配方的实现.
  */
 internal class SimpleRecipe(
-    override val identifier: Identifier,
+    val key: KoishKey,
     override val input: List<RecipeChoice>,
     override val output: RecipeResult,
 ) : Recipe {
@@ -78,7 +78,7 @@ internal class SimpleRecipe(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("identifier", identifier),
+        ExaminableProperty.of("identifier", key),
         ExaminableProperty.of("input", input),
         ExaminableProperty.of("output", output),
     )

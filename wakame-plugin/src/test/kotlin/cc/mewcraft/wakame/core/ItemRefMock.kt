@@ -1,27 +1,27 @@
 package cc.mewcraft.wakame.core
 
 import cc.mewcraft.wakame.item.ItemRef
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 class ItemRefMock(
-    override val id: Identifier,
+    override val id: KoishKey,
 ) : ItemRef {
     constructor(uid: String) : this(
-        Identifiers.of(uid)
+        KoishKeys.of(uid)
     )
 
     constructor(namespace: String, path: String) : this(
-        Identifiers.of(namespace, path)
+        KoishKeys.of(namespace, path)
     )
 
     override val name: Component
         get() = throw UnsupportedOperationException()
 
-    override fun matches(id: Identifier): Boolean {
+    override fun matches(id: KoishKey): Boolean {
         return this.id == id
     }
 

@@ -9,8 +9,8 @@ import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.serializer.NamedTextColorSerializer
 import cc.mewcraft.wakame.util.IdePauser
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.RangeParser
 import cc.mewcraft.wakame.util.configurate.yamlLoader
 import com.google.common.collect.ImmutableRangeMap
@@ -40,7 +40,7 @@ internal object RarityRegistryLoader : RegistryLoader {
         consumeMappingData(BuiltInRegistries.LEVEL_TO_RARITY_MAPPING::update)
     }
 
-    private fun consumeRarityData(registryAction: (Identifier, Rarity) -> Unit) {
+    private fun consumeRarityData(registryAction: (KoishKey, Rarity) -> Unit) {
         val rootDirectory = getFileInConfigDirectory("rarity/")
         val entryDirectory = rootDirectory.resolve("entries/")
         val loader = yamlLoader {
@@ -62,7 +62,7 @@ internal object RarityRegistryLoader : RegistryLoader {
         }
     }
 
-    private fun consumeMappingData(action: (Identifier, LevelToRarityMapping) -> Unit) {
+    private fun consumeMappingData(action: (KoishKey, LevelToRarityMapping) -> Unit) {
         val loader = yamlLoader {
             withDefaults()
         }
@@ -89,8 +89,8 @@ internal object RarityRegistryLoader : RegistryLoader {
      *   weight: 1
      * ```
      */
-    private fun parseRarityEntry(nodeKey: Any, node: ConfigurationNode): Pair<Identifier, Rarity> {
-        val id = Identifiers.of(nodeKey.toString())
+    private fun parseRarityEntry(nodeKey: Any, node: ConfigurationNode): Pair<KoishKey, Rarity> {
+        val id = KoishKeys.of(nodeKey.toString())
         val name = node.node("name").get<Component>(Component.text(id.asString()))
         val styles = node.node("styles").get<Array<StyleBuilderApplicable>>(emptyArray())
         val weight = node.node("weight").get<Int>(0)
@@ -129,8 +129,8 @@ internal object RarityRegistryLoader : RegistryLoader {
      *     ...
      * ```
      */
-    private fun parseMappingEntry(nodeKey: Any, node: ConfigurationNode): Pair<Identifier, LevelToRarityMapping> {
-        val id = Identifiers.of(nodeKey.toString())
+    private fun parseMappingEntry(nodeKey: Any, node: ConfigurationNode): Pair<KoishKey, LevelToRarityMapping> {
+        val id = KoishKeys.of(nodeKey.toString())
         val rangeMapBuilder = ImmutableRangeMap.builder<Int, LevelToRarityMapping.Entry>()
         for ((_, childNode) in node.childrenMap()) {
             val levelNode = childNode.node("level").require<String>()
@@ -140,7 +140,7 @@ internal object RarityRegistryLoader : RegistryLoader {
             val levelRange = RangeParser.parseIntRange(levelNode)
             val levelMapping = LevelToRarityMapping.Entry.build {
                 for ((nodeKey2, node2) in weightNode.childrenMap()) {
-                    val rarityTypeId = Identifiers.of(nodeKey2.toString())
+                    val rarityTypeId = KoishKeys.of(nodeKey2.toString())
                     val rarityType = BuiltInRegistries.RARITY.createEntry(rarityTypeId)
                     val rarityWeight = node2.require<Double>()
                     weight[rarityType] = rarityWeight

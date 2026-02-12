@@ -2,7 +2,7 @@
 
 package cc.mewcraft.wakame.serialization.configurate.serializer
 
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.javaTypeOf
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
@@ -19,7 +19,7 @@ import org.spongepowered.configurate.serialize.SerializationException
 }
 
 /*internal*/ fun <E : Any> ConfigurationNode.getTypedKey(registryKey: RegistryKey<E>): TypedKey<E>? {
-    val id = get<Identifier>()
+    val id = get<KoishKey>()
     if (id == null) return null
     return TypedKey.create(registryKey, id)
 }

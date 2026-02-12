@@ -8,8 +8,8 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.configurate.yamlLoader
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
@@ -32,7 +32,7 @@ internal object AttackSpeedRegistryLoader : RegistryLoader {
         BuiltInRegistries.ATTACK_SPEED.freeze()
     }
 
-    private fun consumeData(action: (Identifier, AttackSpeed) -> Unit) {
+    private fun consumeData(action: (KoishKey, AttackSpeed) -> Unit) {
         val loader = yamlLoader {
             withDefaults()
         }
@@ -40,7 +40,7 @@ internal object AttackSpeedRegistryLoader : RegistryLoader {
         entryDataDirectory.walk().drop(1).filter { it.isFile && it.extension == "yml" }.forEach { f ->
             try {
                 val rootNode = loader.buildAndLoadString(f.readText())
-                val entryId = Identifiers.of(f.relativeTo(entryDataDirectory).invariantSeparatorsPath.substringBeforeLast('.'))
+                val entryId = KoishKeys.of(f.relativeTo(entryDataDirectory).invariantSeparatorsPath.substringBeforeLast('.'))
                 val entryVal = parseEntry(entryId, rootNode)
                 action(entryId, entryVal)
             } catch (e: Exception) {
@@ -49,7 +49,7 @@ internal object AttackSpeedRegistryLoader : RegistryLoader {
         }
     }
 
-    private fun parseEntry(id: Identifier, node: ConfigurationNode): AttackSpeed {
+    private fun parseEntry(id: KoishKey, node: ConfigurationNode): AttackSpeed {
         val name = node.node("name").get<Component>(Component.text(id.asString()))
         val styles = node.node("styles").get<Array<StyleBuilderApplicable>>(emptyArray())
         val cooldown = node.node("cooldown").require<Int>()

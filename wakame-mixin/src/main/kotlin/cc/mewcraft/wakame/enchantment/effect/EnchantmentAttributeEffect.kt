@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import cc.mewcraft.wakame.serialization.codec.KoishCodecs
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import com.google.common.collect.HashMultimap
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -14,7 +14,7 @@ import org.bukkit.entity.Player
 
 @JvmRecord
 data class EnchantmentAttributeEffect(
-    val id: Identifier,
+    val id: KoishKey,
     val attribute: Attribute,
     val amount: LevelBasedValue,
     val operation: AttributeModifier.Operation,
@@ -25,7 +25,7 @@ data class EnchantmentAttributeEffect(
         @JvmField
         val CODEC: MapCodec<EnchantmentAttributeEffect> = RecordCodecBuilder.mapCodec { instance ->
             instance.group(
-                KoishCodecs.IDENTIFIER.fieldOf("id").forGetter(EnchantmentAttributeEffect::id),
+                KoishCodecs.KOISH_KEY.fieldOf("id").forGetter(EnchantmentAttributeEffect::id),
                 KoishCodecs.ATTRIBUTE.fieldOf("attribute").forGetter(EnchantmentAttributeEffect::attribute),
                 LevelBasedValue.CODEC.fieldOf("amount").forGetter(EnchantmentAttributeEffect::amount),
                 KoishCodecs.ATTRIBUTE_MODIFIER_OPERATION.fieldOf("operation").forGetter(EnchantmentAttributeEffect::operation)
@@ -42,8 +42,8 @@ data class EnchantmentAttributeEffect(
         AttributeMapAccess.INSTANCE.get(player).removeModifiers(makeAttributeMap(level, slot))
     }
 
-    private fun getModifierId(suffix: String): Identifier {
-        return Identifier.key(this.id.namespace(), this.id.value() + "/" + suffix)
+    private fun getModifierId(suffix: String): KoishKey {
+        return KoishKey.key(this.id.namespace(), this.id.value() + "/" + suffix)
     }
 
     private fun getModifier(value: Int, suffix: ItemSlot): AttributeModifier {

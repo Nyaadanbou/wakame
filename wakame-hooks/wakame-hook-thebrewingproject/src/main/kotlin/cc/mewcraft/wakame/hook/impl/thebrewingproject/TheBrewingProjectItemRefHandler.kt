@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.thebrewingproject
 
 import cc.mewcraft.wakame.item.ItemRefHandler
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import dev.jsinco.brewery.api.brew.Brew
 import dev.jsinco.brewery.api.brew.BrewQuality
 import dev.jsinco.brewery.api.recipe.Recipe
@@ -29,28 +29,28 @@ object TheBrewingProjectItemRefHandler : ItemRefHandler<Recipe<ItemStack>> {
     private val tbpApi: TheBrewingProjectApi
         get() = TheBrewingProject.getInstance()
 
-    override fun accepts(id: Identifier): Boolean {
+    override fun accepts(id: KoishKey): Boolean {
         if (id.namespace() != NAMESPACE) return false
         val recipeId: String = id.value().extractRecipeId()
         val recipe: Recipe<ItemStack>? = tbpApi.recipeRegistry.getRecipe(recipeId).getOrNull()
         return recipe != null
     }
 
-    override fun getId(stack: ItemStack): Identifier? {
+    override fun getId(stack: ItemStack): KoishKey? {
         val brew: Brew = BrewAdapter.fromItem(stack).getOrNull() ?: return null
         val closestRecipe: Recipe<ItemStack> = brew.closestRecipe(tbpApi.recipeRegistry).getOrNull() ?: return null
         val brewQuality: BrewQuality = brew.quality(closestRecipe).getOrNull() ?: return null
         return Key.key(NAMESPACE, "${closestRecipe.recipeName}/${brewQuality.ordinal}")
     }
 
-    override fun getName(id: Identifier): Component? {
+    override fun getName(id: KoishKey): Component? {
         if (id.namespace() != NAMESPACE) return null
         val recipeId: String = id.value().extractRecipeId()
         val recipe: Recipe<ItemStack> = tbpApi.recipeRegistry.getRecipe(recipeId).getOrNull() ?: return null
         return Component.text(recipe.recipeName)
     }
 
-    override fun getInternalType(id: Identifier): Recipe<ItemStack>? {
+    override fun getInternalType(id: KoishKey): Recipe<ItemStack>? {
         // Brewery API 没办法从 id 拿到一个具有特定 quality 的 BRecipe,
         // 因为 Recipe 本身就包含了一个 recipe 可能出现的所有 quality.
         // 而不同的 quality 在我们的定义下属于不同的 ItemRef,
@@ -59,7 +59,7 @@ object TheBrewingProjectItemRefHandler : ItemRefHandler<Recipe<ItemStack>> {
         return null
     }
 
-    override fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack? {
+    override fun createItemStack(id: KoishKey, amount: Int, player: Player?): ItemStack? {
         if (id.namespace() != NAMESPACE) return null
         val value: String = id.value()
         val recipeId: String = value.extractRecipeId()

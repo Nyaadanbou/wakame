@@ -5,7 +5,7 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.item.toJsonString
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
@@ -20,7 +20,7 @@ import org.spongepowered.configurate.serialize.SerializationException
 // ------------
 
 /**
- * 本接口代表一个*物品类型*的引用. 引用的形式为 [Identifier].
+ * 本接口代表一个*物品类型*的引用. 引用的形式为 [KoishKey].
  *
  * ### 引用 & 物品类型 & 物品堆叠
  * 本接口的所有属性和函数的行为, 均只考虑对于各个物品系统内部而言的*物品类型*, 不会判断物品堆叠上产生的额外数据.
@@ -47,7 +47,7 @@ interface ItemRef {
          */
         @JvmField
         val SERIALIZER: SimpleSerializer<ItemRef> = SimpleSerializer { type, node ->
-            val id = node.require<Identifier>()
+            val id = node.require<KoishKey>()
             create(id) ?: throw SerializationException(
                 node,
                 type,
@@ -63,7 +63,7 @@ interface ItemRef {
          * 该函数可能的使用场景:
          * 游戏处于运行状态时, 需要接收来自玩家的输入 (在此场景下, 服务器管理员也算玩家).
          */
-        fun create(id: Identifier): ItemRef? {
+        fun create(id: KoishKey): ItemRef? {
             return ItemRefManager.createChecked(id)
         }
 
@@ -92,7 +92,7 @@ interface ItemRef {
      * 用来区分不同 [ItemRef] 的唯一标识.
      * 其命名空间用来识别引用所属的物品系统.
      */
-    val id: Identifier
+    val id: KoishKey
 
     /**
      * 获取一个表示该物品类型的物品名字. 该名字可以展示给玩家, 并被玩家所理解.
@@ -102,7 +102,7 @@ interface ItemRef {
     /**
      * 判断传入的 [id] 是否和当前 [ItemRef] 匹配.
      */
-    fun matches(id: Identifier): Boolean
+    fun matches(id: KoishKey): Boolean
 
     /**
      * 判断传入的 [ref] 是否和当前 [ItemRef] 匹配.
@@ -155,13 +155,13 @@ interface ItemRefHandler<T> {
      * 而 Koish 能做的就是尽可能的晚的调用下面这些函数.
      * 目前已经做了的事情包括: 让合成配方的注册发生在游戏的第一个 tick, 而非 JavaPlugin#onEnable 中.
      */
-    fun accepts(id: Identifier): Boolean
+    fun accepts(id: KoishKey): Boolean
 
     /**
      * 获取传入的 [ItemStack] 在该系统之下的物品类型 id.
      * 如果该系统无法识别传入的 [ItemStack] 则应该返回 null.
      */
-    fun getId(stack: ItemStack): Identifier?
+    fun getId(stack: ItemStack): KoishKey?
 
     /**
      * 获取物品 id 对应的物品类型名字, 用于直接展示给玩家.
@@ -169,13 +169,13 @@ interface ItemRefHandler<T> {
      * 实现应该假设 id 永远是有效 id.
      * 对于无效的 id 应该返回 null (bug).
      */
-    fun getName(id: Identifier): Component?
+    fun getName(id: KoishKey): Component?
 
     /**
      * 在该系统下获取 id 对应的物品类型 T.
      * 对于无效的 id 应该返回 null (bug).
      */
-    fun getInternalType(id: Identifier): T?
+    fun getInternalType(id: KoishKey): T?
 
     /**
      * 从 [id] 和基于可能存在的 [player] 创建一个新的 [ItemStack].
@@ -183,7 +183,7 @@ interface ItemRefHandler<T> {
      * 实现应该假设 id 永远是有效 id.
      * 对于无效的 id 应该返回 null (bug).
      */
-    fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack?
+    fun createItemStack(id: KoishKey, amount: Int, player: Player?): ItemStack?
 
     /**
      * 判断两个物品 id 是否一致.
@@ -191,7 +191,7 @@ interface ItemRefHandler<T> {
      * 实现应该假设 [xId] 永远是有效 id, 但对于 [yId] 可以假设其为无效 id.
      * 对于无效的 [xId] 可以直接抛出异常 (bug).
      */
-    fun matches(xId: Identifier, yId: Identifier): Boolean {
+    fun matches(xId: KoishKey, yId: KoishKey): Boolean {
         return xId == yId
     }
 
@@ -201,7 +201,7 @@ interface ItemRefHandler<T> {
      * ItemRef 只是个形如 `"x:y"` 的 id.
      * 所以同上, 只不过是对于 [ItemRef].
      */
-    fun matches(xId: Identifier, yRef: ItemRef): Boolean {
+    fun matches(xId: KoishKey, yRef: ItemRef): Boolean {
         val yId = yRef.id
         return matches(xId, yId)
     }
@@ -211,7 +211,7 @@ interface ItemRefHandler<T> {
      *
      * 同上, 只不过是对于 [ItemStack].
      */
-    fun matches(xId: Identifier, yStack: ItemStack): Boolean {
+    fun matches(xId: KoishKey, yStack: ItemStack): Boolean {
         val yId = getId(yStack) ?: return false
         return matches(xId, yId)
     }
@@ -219,7 +219,7 @@ interface ItemRefHandler<T> {
     /**
      * 方便函数, 用于当物品类型不存在时, 统一抛出异常的逻辑.
      */
-    fun throwItemTypeNotFound(id: Identifier): Nothing {
+    fun throwItemTypeNotFound(id: KoishKey): Nothing {
         val cause = IllegalArgumentException("Cannot find a item type in '$systemName' item system by: $id. This is a bug!")
         throw ItemStackGenerationException(id, cause)
     }
@@ -233,7 +233,7 @@ interface ItemRefHandler<T> {
  *  [ItemRef] 的一般实现.
  */
 private data class ItemRefImpl(
-    override val id: Identifier,
+    override val id: KoishKey,
 ) : ItemRef {
 
     // 将在验证成功后赋值变为非空
@@ -252,7 +252,7 @@ private data class ItemRefImpl(
     override val name: Component
         get() = handlerOrThrow.getName(id) ?: handlerOrThrow.throwItemTypeNotFound(id)
 
-    override fun matches(id: Identifier): Boolean {
+    override fun matches(id: KoishKey): Boolean {
         // 虽然可以在这里 `this.id == id`, 但使用 handlerOrThrow 是为了满足 API 的定义, 也就是: 调用未检查的 ItemRef 实例函数应该抛出异常
         return handlerOrThrow.matches(this.id, id)
     }
@@ -277,14 +277,14 @@ private data class ItemRefImpl(
 private object ItemRefManager {
 
     // 缓存的 [ItemRef] 实例
-    private val itemRefs: HashMap<Identifier, ItemRefImpl> = HashMap()
+    private val itemRefs: HashMap<KoishKey, ItemRefImpl> = HashMap()
 
-    fun createChecked(id: Identifier): ItemRef? {
+    fun createChecked(id: KoishKey): ItemRef? {
         val handler = getHandler(id) ?: return null
         return itemRefs.computeIfAbsent(id, ::ItemRefImpl).also { it.handler = handler }
     }
 
-    fun getHandler(id: Identifier): ItemRefHandler<*>? {
+    fun getHandler(id: KoishKey): ItemRefHandler<*>? {
         return getHandler { handler -> handler.accepts(id) }
     }
 

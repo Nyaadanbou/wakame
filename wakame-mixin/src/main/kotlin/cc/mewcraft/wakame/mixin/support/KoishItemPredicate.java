@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.mixin.support;
 
 import cc.mewcraft.wakame.item.KoishStackData;
-import cc.mewcraft.wakame.util.IdentifierTools;
+import cc.mewcraft.wakame.util.KoishKeys;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.kyori.adventure.key.Key;
@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 public record KoishItemPredicate(Key item, MinMaxBounds.Ints count) implements Predicate<ItemStack> {
     public static final Codec<KoishItemPredicate> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
-                            IdentifierTools.CODEC.fieldOf("item").forGetter(KoishItemPredicate::item),
+                            KoishKeys.CODEC.fieldOf("item").forGetter(KoishItemPredicate::item),
                             MinMaxBounds.Ints.CODEC.optionalFieldOf("count", MinMaxBounds.Ints.ANY).forGetter(KoishItemPredicate::count)
                     )
                     .apply(instance, KoishItemPredicate::new)

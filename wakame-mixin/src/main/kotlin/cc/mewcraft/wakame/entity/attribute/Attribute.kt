@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.adventure.key.Identified
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -140,7 +140,7 @@ protected constructor(
         return value
     }
 
-    override val identifier: Identifier = Key.key("attribute", id)
+    val key: KoishKey = Key.key("attribute", id)
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(

@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.api.Koish
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.Registry
 import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toNMS
 import net.minecraft.resources.ResourceLocation
@@ -57,7 +57,7 @@ object CraftingReminderTypes {
  */
 @ConfigSerializable
 data class ItemReminder(
-    val id: Identifier,
+    val id: KoishKey,
     val amount: Int = 1,
 ) : CraftingReminder {
     override val type: CraftingReminderType = CraftingReminderTypes.ITEM
@@ -67,7 +67,7 @@ data class ItemReminder(
         if (koishItem != null) {
             return koishItem.createItemStack(amount).toNMS()
         } else {
-            if (id.namespace() == Identifier.MINECRAFT_NAMESPACE) {
+            if (id.namespace() == KoishKey.MINECRAFT_NAMESPACE) {
                 val resourceLocation = ResourceLocation.withDefaultNamespace(id.value())
                 // identifier 对应的原版物品未找到的话, 会返回空气且无警告
                 val item = MojangBuiltInRegistries.ITEM.getValue(resourceLocation)

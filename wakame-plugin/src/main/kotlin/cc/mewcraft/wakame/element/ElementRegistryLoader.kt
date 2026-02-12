@@ -9,8 +9,8 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.util.IdePauser
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.configurate.yamlLoader
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -35,7 +35,7 @@ internal object ElementRegistryLoader : RegistryLoader {
         consumeData(BuiltInRegistries.ELEMENT::update)
     }
 
-    private fun consumeData(registryAction: (Identifier, Element) -> Unit) {
+    private fun consumeData(registryAction: (KoishKey, Element) -> Unit) {
         val rootDirectory = KoishDataPaths.CONFIGS.resolve("element/").toFile()
 
         // 获取元素的全局配置文件
@@ -62,8 +62,8 @@ internal object ElementRegistryLoader : RegistryLoader {
         }
     }
 
-    private fun parseEntry(nodeKey: Any, node: ConfigurationNode): Pair<Identifier, Element> {
-        val id = Identifiers.of(nodeKey.toString())
+    private fun parseEntry(nodeKey: Any, node: ConfigurationNode): Pair<KoishKey, Element> {
+        val id = KoishKeys.of(nodeKey.toString())
         val displayName = node.node("name").get<Component>(Component.text(id.asString()))
         val displayStyles = node.node("styles").get<Array<StyleBuilderApplicable>>(emptyArray())
 
