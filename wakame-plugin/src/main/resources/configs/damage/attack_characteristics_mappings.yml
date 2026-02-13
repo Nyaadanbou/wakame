@@ -591,6 +591,17 @@ magma_cube:
         neutral: { min: 9.0, max: 9.0 }
       critical_strike_metadata:
         chance: 0.0
+nautilus:
+  melee:
+    predicates:
+      damage_type:
+        - mob_attack
+    damage_metadata:
+      type: direct
+      damage_bundle:
+        neutral: { min: 4.5, max: 4.5 }
+      critical_strike_metadata:
+        chance: 0.0
 ocelot:
   melee:
     predicates:
@@ -611,6 +622,27 @@ panda:
       type: direct
       damage_bundle:
         neutral: { min: 9.0, max: 9.0 }
+      critical_strike_metadata:
+        chance: 0.0
+parched:
+  arrow:
+    predicates:
+      direct_entity_type:
+        - arrow
+    damage_metadata:
+      type: direct
+      damage_bundle:
+        neutral: { min: 4.0, max: 8.0 }
+      critical_strike_metadata:
+        chance: 0.0
+  melee:
+    predicates:
+      damage_type:
+        - mob_attack
+    damage_metadata:
+      type: direct
+      damage_bundle:
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
 phantom:
@@ -1039,6 +1071,17 @@ zoglin:
       critical_strike_metadata:
         chance: 0.0
 zombie:
+  melee:
+    predicates:
+      damage_type:
+        - mob_attack
+    damage_metadata:
+      type: direct
+      damage_bundle:
+        neutral: { min: 4.5, max: 4.5 }
+      critical_strike_metadata:
+        chance: 0.0
+zombie_nautilus:
   melee:
     predicates:
       damage_type:
