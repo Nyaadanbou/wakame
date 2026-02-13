@@ -310,3 +310,48 @@ private object ItemRefManager {
         return null
     }
 }
+
+/**
+ * [ItemRef] 的集合.
+ * 便于多态反序列化.
+ * TODO 未完成
+ */
+interface ItemRefSet {
+
+    fun resolve(): Set<ItemRef>
+
+    fun contains(itemRef: ItemRef): Boolean
+}
+
+private data class Single(val itemRef: ItemRef) : ItemRefSet {
+
+    override fun resolve(): Set<ItemRef> {
+        return setOf(itemRef)
+    }
+
+    override fun contains(itemRef: ItemRef): Boolean {
+        return this.itemRef == itemRef
+    }
+}
+
+private data class Explicit(val itemRefs: Set<ItemRef>) : ItemRefSet {
+
+    override fun resolve(): Set<ItemRef> {
+        return itemRefs
+    }
+
+    override fun contains(itemRef: ItemRef): Boolean {
+        return itemRefs.contains(itemRef)
+    }
+}
+
+private data class Tag(val tagId: Identifier) : ItemRefSet {
+
+    override fun resolve(): Set<ItemRef> {
+        return KoishTagManagerApi.getValues(tagId)
+    }
+
+    override fun contains(itemRef: ItemRef): Boolean {
+        return resolve().contains(itemRef)
+    }
+}

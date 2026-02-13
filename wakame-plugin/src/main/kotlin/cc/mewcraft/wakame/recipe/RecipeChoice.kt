@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.item.ItemRef
-import cc.mewcraft.wakame.item.ItemTagManager
+import cc.mewcraft.wakame.item.KoishTagManager
 import cc.mewcraft.wakame.mixin.support.KoishIngredient
 import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.MojangIngredient
@@ -72,13 +72,13 @@ data class MultiItemRecipeChoice(
 /**
  * 包含特定标签中所有物品的配方输入.
  * 此标签非原版标签, 而是 Koish 系统维护的一套标签系统.
- * @see cc.mewcraft.wakame.item.ItemTagManager
+ * @see cc.mewcraft.wakame.item.KoishTagManager
  */
 data class TagRecipeChoice(
     val tagId: KoishKey,
 ) : RecipeChoice {
     override fun toMojangIngredient(): MojangIngredient {
-        val items = ItemTagManager.getValues(tagId)
+        val items = KoishTagManager.getValues(tagId)
         // 找不到标签或标签为空, 则抛异常使相关配方注册失败
         // 一方面方便定位问题, 另一方面服务端本身也不允许创建空原料, 也会抛异常
         if (items.isEmpty()) {
