@@ -345,7 +345,7 @@ private data class Explicit(val itemRefs: Set<ItemRef>) : ItemRefSet {
     }
 }
 
-private data class Tag(val tagId: Identifier) : ItemRefSet {
+private data class Tag(val tagId: KoishKey) : ItemRefSet {
 
     override fun resolve(): Set<ItemRef> {
         return KoishTagManagerApi.getValues(tagId)

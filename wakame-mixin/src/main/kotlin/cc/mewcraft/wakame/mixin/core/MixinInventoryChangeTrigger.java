@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.mixin.core;
 import cc.mewcraft.wakame.item.KoishStackData;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.minecraft.advancements.critereon.InventoryChangeTrigger;
-import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.criterion.InventoryChangeTrigger;
+import net.minecraft.advancements.criterion.ItemPredicate;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,7 +24,7 @@ public abstract class MixinInventoryChangeTrigger {
             method = "matches",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/advancements/critereon/ItemPredicate;test(Lnet/minecraft/world/item/ItemStack;)Z"
+                    target = "Lnet/minecraft/advancements/criterion/ItemPredicate;test(Lnet/minecraft/world/item/ItemStack;)Z"
             )
     )
     private boolean wrapTest(ItemPredicate predicate, ItemStack stack, Operation<Boolean> original) {
@@ -47,7 +47,7 @@ public abstract class MixinInventoryChangeTrigger {
             method = "lambda$matches$2",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/advancements/critereon/ItemPredicate;test(Lnet/minecraft/world/item/ItemStack;)Z"
+                    target = "Lnet/minecraft/advancements/criterion/ItemPredicate;test(Lnet/minecraft/world/item/ItemStack;)Z"
             )
     )
     private static boolean wrapTestInLambda(ItemPredicate predicate, ItemStack stack, Operation<Boolean> original) {
