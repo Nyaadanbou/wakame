@@ -28,6 +28,7 @@
     "MixinHoverEvent$ShowItem",
     "MixinIngredient",
     "MixinInventory",
+    "MixinInventoryChangeTrigger",
     "MixinItemBody",
     "MixinItemStack$2",
     "MixinLivingEntity",

@@ -20,7 +20,11 @@ import cc.mewcraft.wakame.entity.typeref.EntityRefRegistryLoader
 import cc.mewcraft.wakame.gui.BasicGuiInitializer
 import cc.mewcraft.wakame.gui.catalog.item.CatalogItemMenuStacks
 import cc.mewcraft.wakame.init.RecipeInitializer
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.CustomItemRegistryLoader
+import cc.mewcraft.wakame.item.ItemProxyRegistryLoader
+import cc.mewcraft.wakame.item.KoishStackGenerator
+import cc.mewcraft.wakame.item.KoishTagManager
+import cc.mewcraft.wakame.item.SlotDisplay
 import cc.mewcraft.wakame.item.display.implementation.crafting_station.CraftingStationItemRenderer
 import cc.mewcraft.wakame.item.display.implementation.merging_table.MergingTableItemRenderer
 import cc.mewcraft.wakame.item.display.implementation.repairing_table.RepairingTableItemRenderer
@@ -115,6 +119,7 @@ private object ReloadProcess {
         KoishStackGenerator.cleanup()
         CustomItemRegistryLoader.reload()
         ItemProxyRegistryLoader.reload()
+        KoishTagManager.reload()
 
         SlotDisplay.invalidateCache()
         BasicGuiInitializer.reload()
@@ -151,7 +156,6 @@ private object ReloadProcess {
     }
 
     fun recipes() {
-        ItemTagManager.reload()
         RecipeInitializer.reload()
     }
 }
