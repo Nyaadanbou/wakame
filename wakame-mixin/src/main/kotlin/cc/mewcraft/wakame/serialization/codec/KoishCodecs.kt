@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.serialization.codec
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.AttributeProvider
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.StringIdentifiable
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.StringRepresentable
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 
@@ -14,15 +14,15 @@ import com.mojang.serialization.DataResult
 object KoishCodecs {
 
     @JvmField
-    val IDENTIFIER: Codec<Identifier> = Codec.STRING.comapFlatMap({ key ->
+    val KOISH_KEY: Codec<KoishKey> = Codec.STRING.comapFlatMap({ key ->
         try {
             // 因为 Codec 一般用于 NMS, 而 NMS 里命名空间通常默认是“minecraft”,
             // 特别是数据包的命名空间, 所以这里遵循 NMS 的传统也默认为“minecraft”.
-            DataResult.success(Identifier.key(key))
+            DataResult.success(KoishKey.key(key))
         } catch (e: IllegalArgumentException) {
             DataResult.error { "Invalid key: '$key' (${e.message})" }
         }
-    }, Identifier::toString).stable()
+    }, KoishKey::toString).stable()
 
     @JvmField
     val ATTRIBUTE: Codec<Attribute> = Codec.STRING.comapFlatMap({ id ->
@@ -34,6 +34,6 @@ object KoishCodecs {
     }, Attribute::id).stable()
 
     @JvmField
-    val ATTRIBUTE_MODIFIER_OPERATION: Codec<AttributeModifier.Operation> = StringIdentifiable.createCodec(AttributeModifier.Operation::values)
+    val ATTRIBUTE_MODIFIER_OPERATION: Codec<AttributeModifier.Operation> = StringRepresentable.fromValues(AttributeModifier.Operation::values)
 
 }

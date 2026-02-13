@@ -31,11 +31,11 @@ import cc.mewcraft.wakame.loot.entry.LootPoolEntryType
 import cc.mewcraft.wakame.loot.predicate.LootPredicateType
 import cc.mewcraft.wakame.rarity.LevelToRarityMapping
 import cc.mewcraft.wakame.rarity.Rarity
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKeys
 
 object BuiltInRegistryKeys {
     @JvmField
-    val ROOT_REGISTRY_NAME = Identifiers.of("built_in")
+    val ROOT_REGISTRY_NAME = KoishKeys.of("built_in")
 
     ///
 
@@ -132,6 +132,6 @@ object BuiltInRegistryKeys {
     ///
 
     private fun <T> createRegistryKey(name: String): RegistryKey<out Registry<T>> {
-        return RegistryKey.of(ROOT_REGISTRY_NAME, Identifiers.of(name))
+        return RegistryKey.of(ROOT_REGISTRY_NAME, KoishKeys.of(name))
     }
 }

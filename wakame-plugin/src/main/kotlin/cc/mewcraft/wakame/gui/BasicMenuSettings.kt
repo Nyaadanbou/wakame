@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.gui
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item.SlotDisplay
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.adventure.plain
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -29,7 +29,7 @@ data class BasicMenuSettings(
      * - v = 萌芽物品的唯一标识
      */
     // FIXME 用 kotlin.collections.Map 会导致 configurate 无法序列化
-    val icons: HashMap<String, Identifier>,
+    val icons: HashMap<String, KoishKey>,
 ) {
 
     /**

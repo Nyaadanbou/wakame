@@ -31,7 +31,7 @@ import cc.mewcraft.wakame.context.param.DefaultContextParamTypes.SOURCE_WORLD
 import cc.mewcraft.wakame.context.param.DefaultContextParamTypes.TOOL_ITEM_STACK
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.world.BlockPos
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.bukkit.*
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Entity
@@ -225,13 +225,13 @@ object DefaultContextParamTypes {
      * - [BLOCK_TYPE_NEKO] if Neko block
      * - [BLOCK_TYPE_VANILLA] if vanilla block
      */
-    val BLOCK_TYPE: ContextParamType<ResourceLocation> =
-        ContextParamType.builder<ResourceLocation>("block_type")
+    val BLOCK_TYPE: ContextParamType<Identifier> =
+        ContextParamType.builder<Identifier>("block_type")
             .optionalIn(BlockPlace, BlockBreak, BlockInteract)
             // FIXME
             // .autofilledBy(::BLOCK_TYPE_NEKO) { it.id }
             // .autofilledBy(::BLOCK_TYPE_VANILLA) { BuiltInRegistries.BLOCK.getKey(it.nmsBlock) }
-            // .autofilledBy(::BLOCK_ITEM_STACK) { ResourceLocation.parse(ItemUtils.getId(it)) }
+            // .autofilledBy(::BLOCK_ITEM_STACK) { Identifier.parse(ItemUtils.getId(it)) }
             .build()
 
     /**

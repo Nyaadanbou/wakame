@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.serialization.configurate
 
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.spongepowered.configurate.RepresentationHint
 import kotlin.reflect.KClass
@@ -11,13 +11,13 @@ import kotlin.reflect.KClass
 object RepresentationHints {
 
     @JvmField
-    val KIZAMI_ID = create<Identifier>("kizami_id")
+    val KIZAMI_ID = create<KoishKey>("kizami_id")
 
     @JvmField
-    val CATAGORY_ID = create<Identifier>("category_id")
+    val CATAGORY_ID = create<KoishKey>("category_id")
 
     @JvmField
-    val MINECRAFT_RECIPE_ID = create<Identifier>("minecraft_recipe_id")
+    val MINECRAFT_RECIPE_ID = create<KoishKey>("minecraft_recipe_id")
 
     private fun <T : Any> create(key: String, type: KClass<T>): RepresentationHint<T> {
         return RepresentationHint.of(key, type.java)

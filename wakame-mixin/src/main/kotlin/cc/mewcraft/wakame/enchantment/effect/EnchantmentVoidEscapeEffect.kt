@@ -6,11 +6,12 @@ import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityComponentContext
 import com.mojang.serialization.Codec
+import com.mojang.serialization.MapCodec
 
 data object EnchantmentVoidEscapeEffect : EnchantmentListenerBasedEffect {
 
     @JvmField
-    val CODEC: Codec<EnchantmentVoidEscapeEffect> = Codec.unit { this }
+    val CODEC: Codec<EnchantmentVoidEscapeEffect> = MapCodec.unitCodec(this)
 
     context(_: EntityComponentContext)
     override fun apply(entity: Entity, level: Int, slot: ItemSlot) {

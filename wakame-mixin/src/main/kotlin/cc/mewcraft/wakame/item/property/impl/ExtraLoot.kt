@@ -32,7 +32,7 @@ sealed interface ExtraLootEntry {
     /**
      * 战利品表的唯一标识符.
      */
-    val lootTableId: Identifier
+    val lootTableId: KoishKey
 
     fun dropItemsNaturally(lootParams: MojangLootParams, dropLocation: Location) {
         // 实时获取战利品表
@@ -53,12 +53,12 @@ interface BlockExtraLootEntry : ExtraLootEntry {
 
     companion object Serializer : SimpleSerializer<BlockExtraLootEntry> {
         override fun deserialize(type: Type, node: ConfigurationNode): BlockExtraLootEntry? {
-            val lootTableId = node.node("loot_table").require<Identifier>()
+            val lootTableId = node.node("loot_table").require<KoishKey>()
             if (node.hasChild("tag")) {
-                val blockTagId = node.node("tag").require<Identifier>()
+                val blockTagId = node.node("tag").require<KoishKey>()
                 return BlockTagExtraLootEntry(lootTableId, blockTagId)
             } else {
-                val blockIds = node.node("blocks").getList<Identifier>(emptyList()).toSet()
+                val blockIds = node.node("blocks").getList<KoishKey>(emptyList()).toSet()
                 return BlockSetExtraLootEntry(lootTableId, blockIds)
             }
         }
@@ -67,11 +67,11 @@ interface BlockExtraLootEntry : ExtraLootEntry {
 
 /**
  * 与方块有关的额外战利品条目.
- * 序列化得到方块 [Identifier] 集合.
+ * 序列化得到方块 [KoishKey] 集合.
  */
 data class BlockSetExtraLootEntry(
-    override val lootTableId: Identifier,
-    val blockIds: Set<Identifier>,
+    override val lootTableId: KoishKey,
+    val blockIds: Set<KoishKey>,
 ) : BlockExtraLootEntry {
     override fun matches(block: Block): Boolean {
         return blockIds.contains(UniversalBlocks.getBlockId(block))
@@ -83,8 +83,8 @@ data class BlockSetExtraLootEntry(
  * 序列化得到方块标签.
  */
 data class BlockTagExtraLootEntry(
-    override val lootTableId: Identifier,
-    val blockTagId: Identifier,
+    override val lootTableId: KoishKey,
+    val blockTagId: KoishKey,
 ) : BlockExtraLootEntry {
     val tagKey = TagKey.create(RegistryKey.BLOCK, blockTagId)
 
@@ -98,8 +98,8 @@ interface EntityExtraLootEntry : ExtraLootEntry {
 
     companion object Serializer : SimpleSerializer<EntityExtraLootEntry> {
         override fun deserialize(type: Type, node: ConfigurationNode): EntityExtraLootEntry? {
-            val lootTableId = node.node("loot_table").require<Identifier>()
-            val entityIds = node.node("entities").getList<Identifier>(emptyList()).toSet()
+            val lootTableId = node.node("loot_table").require<KoishKey>()
+            val entityIds = node.node("entities").getList<KoishKey>(emptyList()).toSet()
             return EntitySetExtraLootEntry(lootTableId, entityIds)
         }
     }
@@ -107,11 +107,11 @@ interface EntityExtraLootEntry : ExtraLootEntry {
 
 /**
  * 与实体有关的额外战利品条目.
- * 序列化得到实体 [Identifier] 集合.
+ * 序列化得到实体 [KoishKey] 集合.
  */
 data class EntitySetExtraLootEntry(
-    override val lootTableId: Identifier,
-    val entityIds: Set<Identifier>,
+    override val lootTableId: KoishKey,
+    val entityIds: Set<KoishKey>,
 ) : EntityExtraLootEntry {
     override fun matches(entity: Entity): Boolean {
         return entityIds.contains(entity.type.key())

@@ -1,0 +1,18 @@
+{
+  "name": "Koish-Bundled-Libraries",
+  "version": "0.0.1-SNAPSHOT",
+  "description": "Internal libraries for Koish",
+  "entrypoints": [],
+  "transformers": [],
+  "authors": [
+    "Nailm"
+  ],
+  "load_datapack_entry": false,
+  "mixins": [],
+  "wideners": [],
+  "dependencies": {
+    "server": {},
+    "bootstrap": {},
+    "horizon": {}
+  }
+}

@@ -33,9 +33,9 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     // Guava
     .register(IntRangeGuavaSerializer)
     // Namespaced
-    .register(IdentifierSerializer)
+    .register(KoishKeySerializer)
     .register(NamespacedKeySerializer)
-    .register(ResourceLocationSerializer)
+    .register(IdentifierSerializer)
     // Math
     .register(Vector3fSerializer)
     // Bukkit Object

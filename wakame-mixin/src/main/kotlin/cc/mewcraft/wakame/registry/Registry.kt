@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.registry.entry.RegistryEntryOwner
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.Keyable
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.collection.IndexedIterable
 import cc.mewcraft.wakame.util.dfu.DataResults
 import com.mojang.serialization.Codec
@@ -22,7 +22,7 @@ import kotlin.random.Random
  *
  * @see RegistryEntry
  * @see RegistryKey
- * @see Identifier
+ * @see KoishKey
  */
 interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
 
@@ -33,10 +33,10 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
         // 注册数据 //
 
         fun <T> register(registry: Registry<in T>, id: String, entry: T): T {
-            return register(registry, Identifiers.of(id), entry)
+            return register(registry, KoishKeys.of(id), entry)
         }
 
-        fun <V, T : V> register(registry: Registry<V>, id: Identifier, entry: T): T {
+        fun <V, T : V> register(registry: Registry<V>, id: KoishKey, entry: T): T {
             return register(registry, RegistryKey.of(registry.key, id), entry)
         }
 
@@ -49,7 +49,7 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
             return (registry as WritableRegistry<T>).add(key, entry)
         }
 
-        fun <T> registerReference(registry: Registry<T>, id: Identifier, entry: T): RegistryEntry.Reference<T> {
+        fun <T> registerReference(registry: Registry<T>, id: KoishKey, entry: T): RegistryEntry.Reference<T> {
             return registerReference(registry, RegistryKey.of(registry.key, id), entry)
         }
 
@@ -59,7 +59,7 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
          * 创建一个注册表, 位于根命名空间下.
          */
         fun <T> of(id: String): SimpleRegistry<T> {
-            return SimpleRegistry(RegistryKey.ofRegistry(Identifiers.of(id)))
+            return SimpleRegistry(RegistryKey.ofRegistry(KoishKeys.of(id)))
         }
     }
 
@@ -80,7 +80,7 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
         )
 
     private val referenceEntryCodec: Codec<RegistryEntry.Reference<T>>
-        get() = Identifiers.CODEC.comapFlatMap(
+        get() = KoishKeys.CODEC.comapFlatMap(
             // 如果该 id 已经存在一个 entry, 那么直接返回已存在的, 否则就尝试创建一个 intrusive entry
             { id -> this.getEntry(id)?.let { DataResult.success(it) } ?: DataResult.success(this.createEntry(id)) },
             { entry -> entry.getKey().value }
@@ -96,15 +96,15 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
     fun freeze(): Registry<T>
 
     operator fun get(key: RegistryKey<T>): T?
-    operator fun get(id: Identifier): T?
-    operator fun get(id: String): T? = get(Identifiers.of(id))
+    operator fun get(id: KoishKey): T?
+    operator fun get(id: String): T? = get(KoishKeys.of(id))
     fun getOrThrow(key: RegistryKey<T>): T = get(key) ?: throw IllegalArgumentException("Missing key in ${this.key}: $key")
-    fun getOrThrow(id: Identifier): T = get(id) ?: throw IllegalArgumentException("Missing id in ${this.key}: $id")
-    fun getOrThrow(id: String): T = getOrThrow(Identifiers.of(id))
+    fun getOrThrow(id: KoishKey): T = get(id) ?: throw IllegalArgumentException("Missing id in ${this.key}: $id")
+    fun getOrThrow(id: String): T = getOrThrow(KoishKeys.of(id))
 
     override fun <U> keys(ops: DynamicOps<U>): Sequence<U> = ids.asSequence().map { ops.createString(it.toString()) }
 
-    fun getId(value: T): Identifier?
+    fun getId(value: T): KoishKey?
     fun getKey(value: T): RegistryKey<T>?
 
     // override fun getId(value: T?): Int // 当父接口的签名为 T 时, 子接口的签名不能为 T?. 反过来可以
@@ -112,7 +112,7 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
     fun getDefaultEntry(): RegistryEntry.Reference<T>?
     fun getRandomEntry(random: Random): RegistryEntry.Reference<T>?
 
-    val ids: Set<Identifier>
+    val ids: Set<KoishKey>
     val keys: Set<RegistryKey<T>>
     val entrySet: Set<Map.Entry<RegistryKey<T>, T>>
 
@@ -121,8 +121,8 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
         get() = entrySequence.map(RegistryEntry.Reference<T>::unwrap)
 
     fun containsKey(key: RegistryKey<T>): Boolean
-    fun containsId(id: Identifier): Boolean
-    fun containsId(id: String): Boolean = containsId(Identifiers.of(id))
+    fun containsId(id: KoishKey): Boolean
+    fun containsId(id: String): Boolean = containsId(KoishKeys.of(id))
 
     /**
      * 创建一个侵入式的 [RegistryEntry.Reference] 实例并返回.
@@ -152,8 +152,8 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
      * 而有些 [RegistryEntry] 是由 [Registry.createEntry] 创建的, 由这种方式创建的 [RegistryEntry] 一开始没有绑定数据.
      * 没有绑定数据的 [RegistryEntry] 会在 [WritableRegistry.add] 执行时(通常是加载配置文件时)将数据绑定好.
      */
-    fun createEntry(id: Identifier): RegistryEntry.Reference<T>
-    fun createEntry(id: String): RegistryEntry.Reference<T> = createEntry(Identifiers.of(id))
+    fun createEntry(id: KoishKey): RegistryEntry.Reference<T>
+    fun createEntry(id: String): RegistryEntry.Reference<T> = createEntry(KoishKeys.of(id))
 
     /**
      * 验证注册表的数据是否正确.
@@ -165,12 +165,12 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
 
     fun getEntry(rawId: Int): RegistryEntry.Reference<T>?
     fun getEntry(key: RegistryKey<T>): RegistryEntry.Reference<T>?
-    fun getEntry(id: Identifier): RegistryEntry.Reference<T>?
-    fun getEntry(id: String): RegistryEntry.Reference<T>? = getEntry(Identifiers.of(id))
+    fun getEntry(id: KoishKey): RegistryEntry.Reference<T>?
+    fun getEntry(id: String): RegistryEntry.Reference<T>? = getEntry(KoishKeys.of(id))
     fun getEntryOrThrow(rawId: Int): RegistryEntry.Reference<T> = getEntry(rawId) ?: throw IllegalStateException("Missing raw id in registry ${this.key}: $rawId")
     fun getEntryOrThrow(key: RegistryKey<T>): RegistryEntry.Reference<T> = getEntry(key) ?: throw IllegalStateException("Missing key in registry ${this.key}: $key")
-    fun getEntryOrThrow(id: Identifier): RegistryEntry.Reference<T> = getEntry(id) ?: throw IllegalStateException("Missing id in registry ${this.key}: $id")
-    fun getEntryOrThrow(id: String): RegistryEntry.Reference<T> = getEntryOrThrow(Identifiers.of(id))
+    fun getEntryOrThrow(id: KoishKey): RegistryEntry.Reference<T> = getEntry(id) ?: throw IllegalStateException("Missing id in registry ${this.key}: $id")
+    fun getEntryOrThrow(id: String): RegistryEntry.Reference<T> = getEntryOrThrow(KoishKeys.of(id))
 
     fun wrapAsEntry(value: T): RegistryEntry<T>
 
@@ -197,19 +197,19 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
 
 interface WritableRegistry<T> : Registry<T> {
     fun update(key: RegistryKey<T>, value: T): RegistryEntry.Reference<T>
-    fun update(id: Identifier, value: T): RegistryEntry.Reference<T> = update(RegistryKey.of(this.key, id), value)
-    fun update(id: String, value: T): RegistryEntry.Reference<T> = update(Identifiers.of(id), value)
+    fun update(id: KoishKey, value: T): RegistryEntry.Reference<T> = update(RegistryKey.of(this.key, id), value)
+    fun update(id: String, value: T): RegistryEntry.Reference<T> = update(KoishKeys.of(id), value)
 
     fun upsert(key: RegistryKey<T>, value: T): RegistryEntry.Reference<T> {
         return if (containsKey(key)) update(key, value) else add(key, value)
     }
 
-    fun upsert(id: Identifier, value: T): RegistryEntry.Reference<T> = upsert(RegistryKey.of(this.key, id), value)
-    fun upsert(id: String, value: T): RegistryEntry.Reference<T> = upsert(Identifiers.of(id), value)
+    fun upsert(id: KoishKey, value: T): RegistryEntry.Reference<T> = upsert(RegistryKey.of(this.key, id), value)
+    fun upsert(id: String, value: T): RegistryEntry.Reference<T> = upsert(KoishKeys.of(id), value)
 
     fun add(key: RegistryKey<T>, value: T): RegistryEntry.Reference<T>
-    fun add(id: Identifier, value: T): RegistryEntry.Reference<T> = add(RegistryKey.of(this.key, id), value)
-    fun add(id: String, value: T): RegistryEntry.Reference<T> = add(Identifiers.of(id), value)
+    fun add(id: KoishKey, value: T): RegistryEntry.Reference<T> = add(RegistryKey.of(this.key, id), value)
+    fun add(id: String, value: T): RegistryEntry.Reference<T> = add(KoishKeys.of(id), value)
 
     /**
      * 仅在注册表初始化之前调用.
@@ -222,18 +222,18 @@ interface WritableRegistry<T> : Registry<T> {
 
 interface DynamicRegistry<T> : WritableRegistry<T> {
     fun remove(key: RegistryKey<T>): RegistryEntry.Reference<T>
-    fun remove(id: Identifier): RegistryEntry.Reference<T> = remove(RegistryKey.of(this.key, id))
-    fun remove(id: String): RegistryEntry.Reference<T> = remove(Identifiers.of(id))
+    fun remove(id: KoishKey): RegistryEntry.Reference<T> = remove(RegistryKey.of(this.key, id))
+    fun remove(id: String): RegistryEntry.Reference<T> = remove(KoishKeys.of(id))
 }
 
 interface DefaultedRegistry<T> : Registry<T> {
-    val defaultId: Identifier
+    val defaultId: KoishKey
 
     fun getOrDefault(key: RegistryKey<T>): T
-    fun getOrDefault(id: Identifier): T
+    fun getOrDefault(id: KoishKey): T
     fun getOrDefault(id: String): T
     fun getOrDefault(rawId: Int): T
-    fun getIdOrDefault(value: T): Identifier
+    fun getIdOrDefault(value: T): KoishKey
     fun getKeyOrDefault(value: T): RegistryKey<T>
 
     override fun getDefaultEntry(): RegistryEntry.Reference<T>

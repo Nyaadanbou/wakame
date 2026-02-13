@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.PlayerFriendlyNamed
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
@@ -41,7 +41,7 @@ constructor(
 ) : Keyed, Examinable, PlayerFriendlyNamed {
 
     override fun key(): Key {
-        return BuiltInRegistries.KIZAMI.getId(this) ?: Identifiers.of("unregistered")
+        return BuiltInRegistries.KIZAMI.getId(this) ?: KoishKeys.of("unregistered")
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> {

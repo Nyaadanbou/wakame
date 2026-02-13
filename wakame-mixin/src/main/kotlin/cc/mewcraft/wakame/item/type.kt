@@ -8,8 +8,8 @@ import cc.mewcraft.wakame.item.datagen.ItemMetaContainer
 import cc.mewcraft.wakame.item.property.ItemPropContainer
 import cc.mewcraft.wakame.item.property.ItemPropType
 import cc.mewcraft.wakame.item.property.ItemPropTypes
-import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
@@ -41,7 +41,7 @@ import java.util.stream.Stream
  * @see cc.mewcraft.wakame.registry.BuiltInRegistries.ITEM 包含本类型实例的注册表
  */
 open class KoishItem(
-    val id: Identifier,
+    val id: KoishKey,
     val dataConfig: ItemMetaContainer,
     val properties: ItemPropContainer,
     val behaviors: ItemBehaviorContainer,
@@ -98,7 +98,7 @@ fun <T> KoishItem.getPropOrDefault(type: ItemPropType<T>, default: T): T = prope
  * @see cc.mewcraft.wakame.registry.BuiltInRegistries.ITEM_PROXY 包含本类型实例的注册表
  */
 class KoishItemProxy(
-    id: Identifier,
+    id: KoishKey,
     dataConfig: ItemMetaContainer,
     properties: ItemPropContainer,
     behaviors: ItemBehaviorContainer,

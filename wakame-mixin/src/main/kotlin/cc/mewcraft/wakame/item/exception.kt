@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 
 /**
  * 代表在生成一个 ItemStack 时发生了错误.
@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.util.Identifier
  * @param item 物品的唯一标识
  */
 class ItemStackGenerationException(
-    val item: Identifier,
+    val item: KoishKey,
     cause: Throwable? = null,
 ) : RuntimeException(
     "Failed to generate item stack for item $item", cause

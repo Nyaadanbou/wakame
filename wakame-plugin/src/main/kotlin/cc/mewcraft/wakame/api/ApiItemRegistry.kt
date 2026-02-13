@@ -4,13 +4,13 @@ import cc.mewcraft.wakame.api.item.KoishItem
 import cc.mewcraft.wakame.api.item.KoishItemRegistry
 import cc.mewcraft.wakame.item.koishItem
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKeys
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
 
 object ApiItemRegistry : KoishItemRegistry {
     override fun get(id: String): KoishItem {
-        return get(Identifiers.of(id))
+        return get(KoishKeys.of(id))
     }
 
     override fun get(id: Key): KoishItem {
@@ -23,7 +23,7 @@ object ApiItemRegistry : KoishItemRegistry {
 
     override fun getOrNull(id: String?): KoishItem? {
         if (id == null) return null
-        return getOrNull(Identifiers.of(id))
+        return getOrNull(KoishKeys.of(id))
     }
 
     override fun getOrNull(id: Key?): KoishItem? {

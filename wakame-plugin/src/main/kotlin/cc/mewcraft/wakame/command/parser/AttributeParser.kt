@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.command.parser
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent
@@ -37,7 +37,7 @@ class AttributeParser<C : Any> : ArgumentParser<C, Attribute>, BlockingSuggestio
     }
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {
-        return BuiltInRegistries.ATTRIBUTE.ids.map(Identifier::value)
+        return BuiltInRegistries.ATTRIBUTE.ids.map(KoishKey::value)
     }
 }
 

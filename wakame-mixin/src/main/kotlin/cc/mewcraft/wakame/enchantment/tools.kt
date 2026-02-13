@@ -21,10 +21,10 @@ import org.bukkit.inventory.ItemStack
 fun Enchantment.getEffectList(): DataComponentMap =
     handle.effects()
 
-fun <T> Enchantment.getEffect(type: DataComponentType<T>): T? =
+fun <T : Any> Enchantment.getEffect(type: DataComponentType<T>): T? =
     handle.effects().get(type)
 
-fun <T> Enchantment.getEffectList(type: DataComponentType<List<T>>): List<T> =
+fun <T : Any> Enchantment.getEffectList(type: DataComponentType<List<T>>): List<T> =
     handle.getEffects(type)
 
 fun Enchantment.getListenerBasedEffects(): Sequence<EnchantmentListenerBasedEffect> =

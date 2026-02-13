@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.ecs.bridge.EComponent
 import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.serverPlayer
 import io.papermc.paper.adventure.PaperAdventure
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
@@ -49,35 +49,35 @@ sealed interface ItemCooldownContainer : EComponent<ItemCooldownContainer> {
     /**
      * “激活”指定冷却. 如果已存在将覆盖原有的冷却状态.
      */
-    fun activate(id: Identifier, ticks: Int)
+    fun activate(id: KoishKey, ticks: Int)
 
     /**
      * “激活”指定冷却. 如果已存在将覆盖原有的冷却状态.
      * 如果 [entry] 为 `null` 将使用默认的冷却时间.
      */
-    fun activate(id: Identifier, entry: RegistryEntry<AttackSpeed>?)
+    fun activate(id: KoishKey, entry: RegistryEntry<AttackSpeed>?)
 
     /**
      * 查询指定冷却是否为“激活”状态.
      */
-    fun isActive(id: Identifier): Boolean
+    fun isActive(id: KoishKey): Boolean
 
     /**
      * 返回指定冷却的剩余冷却时间与总冷却时间的比例 (0.0-1.0).
      * 值为 1.0 表示冷却刚刚激活, 值为 0.0 表示冷却已成未激活.
      */
-    fun getRemainingRatio(id: Identifier): Float
+    fun getRemainingRatio(id: KoishKey): Float
 
     /**
      * 获取指定冷却的剩余时间, 单位: tick.
      * 即: 离冷却变为“未激活”状态的剩余时间.
      */
-    fun getRemainingTicks(id: Identifier): Int
+    fun getRemainingTicks(id: KoishKey): Int
 
     /**
      * 重置指定冷却的状态, 使其直接变为“未激活”.
      */
-    fun reset(id: Identifier)
+    fun reset(id: KoishKey)
 }
 
 // ------------
@@ -95,21 +95,21 @@ private class MinecraftItemCooldownContainer(
     private val delegate: ItemCooldowns
         get() = player.serverPlayer.cooldowns
 
-    override fun activate(id: Identifier, ticks: Int) {
+    override fun activate(id: KoishKey, ticks: Int) {
         val resLoc = PaperAdventure.asVanilla(id)
         delegate.addCooldown(resLoc, ticks, true)
     }
 
-    override fun activate(id: Identifier, entry: RegistryEntry<AttackSpeed>?) {
+    override fun activate(id: KoishKey, entry: RegistryEntry<AttackSpeed>?) {
         val entry2 = entry ?: BuiltInRegistries.ATTACK_SPEED.getDefaultEntry()
         activate(id, entry2.unwrap().cooldown)
     }
 
-    override fun isActive(id: Identifier): Boolean {
+    override fun isActive(id: KoishKey): Boolean {
         return getRemainingRatio(id) > 0f
     }
 
-    override fun getRemainingRatio(id: Identifier): Float {
+    override fun getRemainingRatio(id: KoishKey): Float {
         val resLoc = PaperAdventure.asVanilla(id)
         val cooldownMap = delegate
         val cooldownInst = cooldownMap.cooldowns[resLoc]
@@ -122,7 +122,7 @@ private class MinecraftItemCooldownContainer(
         }
     }
 
-    override fun getRemainingTicks(id: Identifier): Int {
+    override fun getRemainingTicks(id: KoishKey): Int {
         val resLoc = PaperAdventure.asVanilla(id)
         val cooldownMap = delegate
         val cooldownInst = cooldownMap.cooldowns[resLoc]
@@ -133,7 +133,7 @@ private class MinecraftItemCooldownContainer(
         }
     }
 
-    override fun reset(id: Identifier) {
+    override fun reset(id: KoishKey) {
         val resLoc = PaperAdventure.asVanilla(id)
         delegate.removeCooldown(resLoc)
     }
@@ -148,33 +148,33 @@ private class StandaloneItemCooldownContainer : ItemCooldownContainer {
      * - K: 冷却的索引
      * - V: 冷却变为"未激活"的游戏刻
      */
-    private val inactiveTimestamps = Object2IntOpenHashMap<Identifier>()
+    private val inactiveTimestamps = Object2IntOpenHashMap<KoishKey>()
 
-    override fun activate(id: Identifier, ticks: Int) {
+    override fun activate(id: KoishKey, ticks: Int) {
         inactiveTimestamps[id] = Bukkit.getServer().currentTick + ticks
     }
 
-    override fun activate(id: Identifier, entry: RegistryEntry<AttackSpeed>?) {
+    override fun activate(id: KoishKey, entry: RegistryEntry<AttackSpeed>?) {
         val entry2 = entry ?: BuiltInRegistries.ATTACK_SPEED.getDefaultEntry()
         activate(id, entry2.unwrap().cooldown)
     }
 
-    override fun isActive(id: Identifier): Boolean {
+    override fun isActive(id: KoishKey): Boolean {
         return inactiveTimestamps.getInt(id) > Bukkit.getServer().currentTick
     }
 
-    override fun getRemainingRatio(id: Identifier): Float {
+    override fun getRemainingRatio(id: KoishKey): Float {
         val remainingTicks = getRemainingTicks(id)
         val totalCooldown = inactiveTimestamps.getInt(id) - Bukkit.getServer().currentTick + remainingTicks
         return if (totalCooldown <= 0) 0f else remainingTicks.toFloat() / totalCooldown
     }
 
-    override fun getRemainingTicks(id: Identifier): Int {
+    override fun getRemainingTicks(id: KoishKey): Int {
         val diff = inactiveTimestamps.getInt(id) - Bukkit.getServer().currentTick
         return if (diff < 0) 0 else diff
     }
 
-    override fun reset(id: Identifier) {
+    override fun reset(id: KoishKey) {
         inactiveTimestamps.put(id, 0)
     }
 }

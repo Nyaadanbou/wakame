@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -21,8 +21,8 @@ import java.lang.reflect.Type
  * 物品图鉴中展示的一个物品类别.
  */
 data class CatalogItemCategory(
-    val id: Identifier,
-    val icon: Identifier,
+    val id: KoishKey,
+    val icon: KoishKey,
     val menuSettings: BasicMenuSettings,
     val contentMarker: Marker,
     val permission: String?,
@@ -57,7 +57,7 @@ internal object CategorySerializer : SimpleSerializer<CatalogItemCategory> {
         val itemIds = node.node("items").getList<String>(emptyList())
         val itemList = mutableListOf<ItemRef>()
         for (itemId in itemIds) {
-            val item = ItemRef.create(Identifiers.of(itemId))
+            val item = ItemRef.create(KoishKeys.of(itemId))
             if (item == null) {
                 LOGGER.warn("Cannot deserialize string '$itemId' into ItemRef, skipped adding it to category: '$itemId'")
                 continue

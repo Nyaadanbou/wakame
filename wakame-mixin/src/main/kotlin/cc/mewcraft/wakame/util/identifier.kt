@@ -16,31 +16,29 @@ const val MINECRAFT_NAMESPACE = "minecraft"
 /**
  * 代表一个特定资源的位置 (命名空间:路径).
  */
-typealias Identifier = Key
-
-typealias Identifiers = IdentifierTools
+typealias KoishKey = Key
 
 /**
- * 包含 [Identifier] 的静态函数.
+ * 包含 [KoishKey] 的静态函数.
  */
-object IdentifierTools {
+object KoishKeys {
 
     @JvmField
-    val CODEC: Codec<Identifier> = Codec.STRING.comapFlatMap(Identifiers::validate, Identifier::asMinimalStringKoish)
+    val CODEC: Codec<KoishKey> = Codec.STRING.comapFlatMap(KoishKeys::validate, KoishKey::asMinimalStringKoish)
 
     /**
-     * 从形如 `player`, `foo:player` 的字符串创建一个 [Identifier].
+     * 从形如 `player`, `foo:player` 的字符串创建一个 [KoishKey].
      * 如果字符串不包含命名空间与路径的分隔符 [Key.DEFAULT_SEPARATOR]
      * 则自动将其命名空间设置为 [KOISH_NAMESPACE].
      *
      * @param id the string
      * @return the identifier
      */
-    fun of(id: String): Identifier {
+    fun of(id: String): KoishKey {
         val index = id.indexOf(Key.DEFAULT_SEPARATOR);
         val namespace = if (index >= 1) id.substring(0, index) else KOISH_NAMESPACE
         val path = if (index >= 0) id.substring(index + 1) else id
-        return Identifier.key(namespace, path)
+        return KoishKey.key(namespace, path)
     }
 
     /**
@@ -52,8 +50,8 @@ object IdentifierTools {
      * @return the identifier
      * @throws InvalidKeyException
      */
-    fun of(namespace: String, path: String): Identifier {
-        return Identifier.key(namespace, path)
+    fun of(namespace: String, path: String): KoishKey {
+        return KoishKey.key(namespace, path)
     }
 
     /**
@@ -62,8 +60,8 @@ object IdentifierTools {
      * @param path the path
      * @return the identifier
      */
-    fun ofKoish(path: String): Identifier {
-        return Identifier.key(KOISH_NAMESPACE, path)
+    fun ofKoish(path: String): KoishKey {
+        return KoishKey.key(KOISH_NAMESPACE, path)
     }
 
     /**
@@ -74,7 +72,7 @@ object IdentifierTools {
      * @param id the string
      * @return the identifier
      */
-    fun tryParse(id: String): Identifier? {
+    fun tryParse(id: String): KoishKey? {
         return runCatching { of(id) }.getOrNull()
     }
 
@@ -86,7 +84,7 @@ object IdentifierTools {
      * @param path the path
      * @return the identifier
      */
-    fun tryParse(namespace: String, path: String): Identifier? {
+    fun tryParse(namespace: String, path: String): KoishKey? {
         return runCatching { of(namespace, path) }.getOrNull()
     }
 
@@ -102,8 +100,8 @@ object IdentifierTools {
      * @return the identifier
      * @throws InvalidKeyException if the string [id] is not a valid identifier
      */
-    fun splitOn(id: String, delimiter: Char): Identifier {
-        return Identifier.key(id, delimiter)
+    fun splitOn(id: String, delimiter: Char): KoishKey {
+        return KoishKey.key(id, delimiter)
     }
 
     /**
@@ -113,17 +111,16 @@ object IdentifierTools {
      * @param delimiter the character to split the namespace and path
      * @return the identifier
      */
-    fun trySplitOn(id: String, delimiter: Char): Identifier? {
-        return runCatching { Identifier.key(id, delimiter) }.getOrNull()
+    fun trySplitOn(id: String, delimiter: Char): KoishKey? {
+        return runCatching { KoishKey.key(id, delimiter) }.getOrNull()
     }
 
     /**
      * 用于方便创建 [Codec].
      */
-    fun validate(string: String): DataResult<Identifier> = try {
+    fun validate(string: String): DataResult<KoishKey> = try {
         DataResult.success(of(string))
     } catch (e: Exception) {
         DataResult.error { "Not a valid resource location: '$string' ${e.message}" }
     }
-
 }

@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.command.parser
 
 import cc.mewcraft.wakame.item.KoishItem
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent
@@ -38,7 +38,7 @@ class ItemParser<C : Any> : ArgumentParser<C, KoishItem>, BlockingSuggestionProv
     }
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {
-        return BuiltInRegistries.ITEM.ids.map(Identifier::asString)
+        return BuiltInRegistries.ITEM.ids.map(KoishKey::asString)
     }
 }
 

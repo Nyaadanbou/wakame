@@ -1,31 +1,31 @@
 package cc.mewcraft.wakame.serialization.configurate.serializer
 
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import net.kyori.adventure.key.InvalidKeyException
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.bukkit.NamespacedKey
 import org.spongepowered.configurate.serialize.ScalarSerializer
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 import java.util.function.Predicate
 
-/*internal*/ object IdentifierSerializer : ScalarSerializer<Identifier>(Identifier::class.java) {
-    override fun deserialize(type: Type, obj: Any): Identifier {
+object KoishKeySerializer : ScalarSerializer<KoishKey>(KoishKey::class.java) {
+    override fun deserialize(type: Type, obj: Any): KoishKey {
         return try {
-            Identifiers.of(obj.toString()) // 默认使用 "koish" 命名空间
+            KoishKeys.of(obj.toString()) // 默认使用 "koish" 命名空间
         } catch (e: InvalidKeyException) {
             throw SerializationException(type, "Invalid key: '$obj'", e)
         }
     }
 
-    override fun serialize(item: Identifier, typeSupported: Predicate<Class<*>>?): Any {
+    override fun serialize(item: KoishKey, typeSupported: Predicate<Class<*>>?): Any {
         return item.toString()
     }
 }
 
-/*internal*/ object NamespacedKeySerializer : ScalarSerializer<NamespacedKey>(NamespacedKey::class.java) {
+object NamespacedKeySerializer : ScalarSerializer<NamespacedKey>(NamespacedKey::class.java) {
     override fun deserialize(type: Type, obj: Any): NamespacedKey {
         val string = obj.toString()
         val index = string.indexOf(':');
@@ -39,13 +39,13 @@ import java.util.function.Predicate
     }
 }
 
-object ResourceLocationSerializer : ScalarSerializer<ResourceLocation>(ResourceLocation::class.java) {
-    override fun deserialize(type: Type, obj: Any): ResourceLocation {
+object IdentifierSerializer : ScalarSerializer<Identifier>(Identifier::class.java) {
+    override fun deserialize(type: Type, obj: Any): Identifier {
         val string = obj.toString()
-        return ResourceLocation.parse(string)
+        return Identifier.parse(string)
     }
 
-    override fun serialize(item: ResourceLocation, typeSupported: Predicate<Class<*>>): Any {
+    override fun serialize(item: Identifier, typeSupported: Predicate<Class<*>>): Any {
         return item.toString()
     }
 }

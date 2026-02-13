@@ -9,9 +9,9 @@ object LootTableUtils {
      * 从 `id` 获取 Mojang 战利品表实例.
      * @return 对应的战利品表实例, 未找到则返回 [net.minecraft.world.level.storage.loot.LootTable.EMPTY].
      */
-    fun getMojangLootTable(id: Identifier): MojangLootTable {
+    fun getMojangLootTable(id: KoishKey): MojangLootTable {
         return MINECRAFT_SERVER.reloadableRegistries().getLootTable(
-            ResourceKey.create(Registries.LOOT_TABLE, id.toResourceLocation())
+            ResourceKey.create(Registries.LOOT_TABLE, id.toIdentifier())
         )
     }
 }

@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.craftingstation.recipe.ItemResult
 import cc.mewcraft.wakame.craftingstation.station.CraftingStationRegistry
 import cc.mewcraft.wakame.craftingstation.station.SimpleCraftingStation
 import cc.mewcraft.wakame.item.ItemRef
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.test.TestOnly
 import cc.mewcraft.wakame.util.test.TestPath
 import io.mockk.every
@@ -29,7 +29,7 @@ class StationSerializationTest {
         fun setup() {
             KoishDataPaths.initializeForTest(TestPath.TEST)
             mockkObject(ItemRef)
-            every { ItemRef.create(any<Identifier>()) } answers { ItemRefMock(firstArg<Identifier>()) }
+            every { ItemRef.create(any<KoishKey>()) } answers { ItemRefMock(firstArg<KoishKey>()) }
         }
 
         @JvmStatic

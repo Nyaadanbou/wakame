@@ -16,7 +16,7 @@ interface UniversalBlocks {
 
     fun isCustomBlock(block: Block): Boolean
 
-    fun getBlockId(block: Block): Identifier
+    fun getBlockId(block: Block): KoishKey
 
     fun isTagged(block: Block, tagKey: TagKey<BlockType>): Boolean
 
@@ -30,7 +30,7 @@ interface UniversalBlocks {
                 return false
             }
 
-            override fun getBlockId(block: Block): Identifier {
+            override fun getBlockId(block: Block): KoishKey {
                 return block.type.key()
             }
 
@@ -53,7 +53,7 @@ interface UniversalBlocks {
             return implementation.isCustomBlock(block)
         }
 
-        override fun getBlockId(block: Block): Identifier {
+        override fun getBlockId(block: Block): KoishKey {
             return implementation.getBlockId(block)
         }
 

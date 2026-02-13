@@ -9,11 +9,11 @@ import cc.mewcraft.wakame.api.event.player.PlayerResourceLoadEvent
 import cc.mewcraft.wakame.messaging.MessagingManager
 import cc.mewcraft.wakame.messaging.handler.TeleportOnJoinPacketHandler
 import cc.mewcraft.wakame.messaging.packet.TeleportOnJoinRequestPacket
+import io.papermc.paper.event.player.AsyncPlayerSpawnLocationEvent
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.potion.PotionEffect
-import org.spigotmc.event.player.PlayerSpawnLocationEvent
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import java.util.*
 
@@ -45,16 +45,15 @@ object TeleportOnJoin {
 
 class TeleportOnJoinListener : Listener {
 
-    // TODO 等升级到 Paper 1.21.11 时更换为 AsyncPlayerSpawnLocationEvent
     @EventHandler
-    fun on(event: PlayerSpawnLocationEvent) {
-        val playerId = event.player.uniqueId
+    fun on(event: AsyncPlayerSpawnLocationEvent) {
+        val playerId = event.connection.profile.id ?: return
         if (!TeleportOnJoinPacketHandler.has(playerId)) return
         val config = TeleportOnJoin.config
         if (config.enabled && config.conditions.all { condition -> condition.test(playerId) }) {
             // 设置传送位置
             event.spawnLocation = config.target
-            LOGGER.info("Set spawn location for ${event.player.name} on join")
+            LOGGER.info("Set spawn location for ${event.connection.profile.name} on join")
         }
     }
 

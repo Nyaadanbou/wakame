@@ -10,8 +10,8 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.DynamicRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.configurate.yamlLoader
 import kotlin.io.path.*
 
@@ -30,11 +30,11 @@ internal object CatalogItemCategoryRegistryLoader : RegistryLoader {
         applyDataToRegistry(DynamicRegistries.ITEM_CATEGORY::update)
     }
 
-    private fun applyDataToRegistry(registryAction: (Identifier, CatalogItemCategory) -> Unit) {
+    private fun applyDataToRegistry(registryAction: (KoishKey, CatalogItemCategory) -> Unit) {
         val dir = KoishDataPaths.CONFIGS.resolve("catalog/item/category/")
         for (file in dir.walk().filter { it.extension == "yml" }) {
             try {
-                val id = Identifiers.of(file.nameWithoutExtension)
+                val id = KoishKeys.of(file.nameWithoutExtension)
                 val loader = yamlLoader {
                     withDefaults()
                     serializers {

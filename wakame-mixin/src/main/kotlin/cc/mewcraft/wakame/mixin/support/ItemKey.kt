@@ -7,9 +7,9 @@ import cc.mewcraft.wakame.item.KoishItem
 import cc.mewcraft.wakame.item.KoishItemProxy
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE
 import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
 import com.mojang.serialization.Codec
@@ -26,7 +26,7 @@ import java.lang.reflect.Type
 @ConsistentCopyVisibility
 data class ItemKey
 private constructor(
-    val id: Identifier,
+    val id: KoishKey,
 ) {
 
     companion object {
@@ -35,7 +35,7 @@ private constructor(
         val CODEC: Codec<ItemKey> = Codec.STRING.comapFlatMap(
             { string ->
                 try {
-                    DataResult.success(of(Identifiers.of(string)))
+                    DataResult.success(of(KoishKeys.of(string)))
                 } catch (_: InvalidKeyException) {
                     DataResult.error { "Invalid identifier string: $string" }
                 }
@@ -44,10 +44,10 @@ private constructor(
         )
 
         @JvmStatic
-        private val objectPool: HashMap<Identifier, ItemKey> = HashMap()
+        private val objectPool: HashMap<KoishKey, ItemKey> = HashMap()
 
         @JvmStatic
-        fun of(id: Identifier): ItemKey {
+        fun of(id: KoishKey): ItemKey {
             return objectPool.computeIfAbsent(id, ::ItemKey)
         }
 
@@ -81,7 +81,7 @@ private constructor(
     // 该序列化操作使用对象池来返回 ItemId 的实例
     private object Serializer : SimpleSerializer<ItemKey> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemKey {
-            return of(node.require<Identifier>())
+            return of(node.require<KoishKey>())
         }
 
         override fun serialize(type: Type, obj: ItemKey?, node: ConfigurationNode) {

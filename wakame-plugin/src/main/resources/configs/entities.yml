@@ -132,6 +132,10 @@ entity_attributes:
     parent: minecraft:living
     values: { }
 
+  minecraft:camel_husk:
+    parent: minecraft:living
+    values: { }
+
   minecraft:cat:
     parent: minecraft:living
     values: { }
@@ -145,6 +149,10 @@ entity_attributes:
     values: { }
 
   minecraft:cod:
+    parent: minecraft:living
+    values: { }
+
+  minecraft:copper_golem:
     parent: minecraft:living
     values: { }
 
@@ -252,6 +260,10 @@ entity_attributes:
     parent: minecraft:living
     values: { }
 
+  minecraft:mannequin:
+    parent: minecraft:living
+    values: { }
+
   minecraft:mooshroom:
     parent: minecraft:living
     values: { }
@@ -260,11 +272,19 @@ entity_attributes:
     parent: minecraft:living
     values: { }
 
+  minecraft:nautilus:
+    parent: minecraft:living
+    values: { }
+
   minecraft:ocelot:
     parent: minecraft:living
     values: { }
 
   minecraft:panda:
+    parent: minecraft:living
+    values: { }
+
+  minecraft:parched:
     parent: minecraft:living
     values: { }
 
@@ -421,6 +441,10 @@ entity_attributes:
     values: { }
 
   minecraft:zombie_horse:
+    parent: minecraft:living
+    values: { }
+
+  minecraft:zombie_nautilus:
     parent: minecraft:living
     values: { }
 

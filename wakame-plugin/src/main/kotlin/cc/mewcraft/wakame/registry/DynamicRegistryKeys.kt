@@ -2,11 +2,11 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
 import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKeys
 
 object DynamicRegistryKeys {
     @JvmField
-    val ROOT_REGISTRY_NAME = Identifiers.of("dynamic")
+    val ROOT_REGISTRY_NAME = KoishKeys.of("dynamic")
 
     ///
 
@@ -19,6 +19,6 @@ object DynamicRegistryKeys {
     ///
 
     private fun <T> createRegistryKey(name: String): RegistryKey<out Registry<T>> {
-        return RegistryKey.of(ROOT_REGISTRY_NAME, Identifiers.of(name))
+        return RegistryKey.of(ROOT_REGISTRY_NAME, KoishKeys.of(name))
     }
 }

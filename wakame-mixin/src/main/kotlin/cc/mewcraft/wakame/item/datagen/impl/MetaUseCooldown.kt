@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.datagen.impl
 import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
 import cc.mewcraft.wakame.item.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item.datagen.ItemMetaResult
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toBukkit
 import io.papermc.paper.datacomponent.DataComponentTypes
@@ -13,7 +13,7 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
 @ConfigSerializable
 data class MetaUseCooldown(
     val seconds: Float,
-    val cooldownGroup: Identifier?,
+    val cooldownGroup: KoishKey?,
 ) : ItemMetaEntry<UseCooldown> {
 
     override fun randomized(): Boolean {

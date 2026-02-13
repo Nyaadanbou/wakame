@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.hook.impl.craftengine.block
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.hook.impl.craftengine.CKey
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.UniversalBlocks
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
@@ -22,13 +22,13 @@ object CraftEngineUniversalBlocks : UniversalBlocks {
         return CraftEngineBlocks.isCustomBlock(block)
     }
 
-    override fun getBlockId(block: Block): Identifier {
+    override fun getBlockId(block: Block): KoishKey {
         val immutableBlockState = CraftEngineBlocks.getCustomBlockState(block)
         if (immutableBlockState == null) {
             return block.type.key()
         } else {
             val ceKey = immutableBlockState.owner().value().id()
-            return Identifiers.of(ceKey.namespace, ceKey.value)
+            return KoishKeys.of(ceKey.namespace, ceKey.value)
         }
     }
 

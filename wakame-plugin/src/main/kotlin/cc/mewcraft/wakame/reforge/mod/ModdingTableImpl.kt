@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.getData
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.bindInstance
 import net.kyori.adventure.key.Key
@@ -33,26 +33,26 @@ internal object WtfModdingTable : ModdingTable {
             ". . . < . > . . .",
         ),
         icons = hashMapOf(
-            "background" to Identifiers.of("internal/menu/common/default/background"),
-            "prev_page" to Identifiers.of("internal/menu/common/default/prev_page"),
-            "next_page" to Identifiers.of("internal/menu/common/default/next_page"),
-            "input_ok" to Identifiers.of("internal/menu/modding_table/default/input_ok"),
-            "input_empty" to Identifiers.of("internal/menu/modding_table/default/input_empty"),
-            "output_ok_confirmed" to Identifiers.of("internal/menu/modding_table/default/output_ok_confirmed"),
-            "output_ok_unconfirmed" to Identifiers.of("internal/menu/modding_table/default/output_ok_unconfirmed"),
-            "output_empty" to Identifiers.of("internal/menu/modding_table/default/output_empty"),
-            "output_failure" to Identifiers.of("internal/menu/modding_table/default/output_failure"),
-            "output_insufficient_resource" to Identifiers.of("internal/menu/modding_table/default/output_insufficient_resource"),
+            "background" to KoishKeys.of("internal/menu/common/default/background"),
+            "prev_page" to KoishKeys.of("internal/menu/common/default/prev_page"),
+            "next_page" to KoishKeys.of("internal/menu/common/default/next_page"),
+            "input_ok" to KoishKeys.of("internal/menu/modding_table/default/input_ok"),
+            "input_empty" to KoishKeys.of("internal/menu/modding_table/default/input_empty"),
+            "output_ok_confirmed" to KoishKeys.of("internal/menu/modding_table/default/output_ok_confirmed"),
+            "output_ok_unconfirmed" to KoishKeys.of("internal/menu/modding_table/default/output_ok_unconfirmed"),
+            "output_empty" to KoishKeys.of("internal/menu/modding_table/default/output_empty"),
+            "output_failure" to KoishKeys.of("internal/menu/modding_table/default/output_failure"),
+            "output_insufficient_resource" to KoishKeys.of("internal/menu/modding_table/default/output_insufficient_resource"),
         )
     )
     override val replaceMenuSettings: BasicMenuSettings = BasicMenuSettings(
         title = Component.text("DO_NOT_USE"),
         structure = arrayOf("a * b"),
         icons = hashMapOf(
-            "compatibility_view" to Identifiers.of("internal/menu/modding_table/default/compatibility_view"),
-            "core_view" to Identifiers.of("internal/menu/modding_table/default/core_view"),
-            "core_unusable" to Identifiers.of("internal/menu/modding_table/default/core_unusable"),
-            "core_usable" to Identifiers.of("internal/menu/modding_table/default/core_usable"),
+            "compatibility_view" to KoishKeys.of("internal/menu/modding_table/default/compatibility_view"),
+            "core_view" to KoishKeys.of("internal/menu/modding_table/default/core_view"),
+            "core_unusable" to KoishKeys.of("internal/menu/modding_table/default/core_unusable"),
+            "core_usable" to KoishKeys.of("internal/menu/modding_table/default/core_usable"),
         )
     )
 

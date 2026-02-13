@@ -7,15 +7,9 @@ import com.mojang.datafixers.util.Pair
 import io.netty.buffer.Unpooled
 import net.minecraft.core.Holder
 import net.minecraft.network.FriendlyByteBuf
-import net.minecraft.network.protocol.game.ClientboundBossEventPacket
-import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket
-import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket
-import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket
-import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket
+import net.minecraft.network.protocol.game.*
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket.AttributeSnapshot
-import net.minecraft.network.protocol.game.ServerboundInteractPacket
-import net.minecraft.network.protocol.game.ServerboundPlaceRecipePacket
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.EquipmentSlot
@@ -60,10 +54,10 @@ fun ClientboundUpdateAttributesPacket(entityId: Int, values: List<AttributeSnaps
     return CLIENTBOUND_UPDATE_ATTRIBUTES_PACKET_CONSTRUCTOR.invoke(entityId, values) as ClientboundUpdateAttributesPacket
 }
 
-fun ServerboundPlaceRecipePacket(containerId: Int, recipe: ResourceLocation, shiftDown: Boolean): ServerboundPlaceRecipePacket {
+fun ServerboundPlaceRecipePacket(containerId: Int, recipe: Identifier, shiftDown: Boolean): ServerboundPlaceRecipePacket {
     val buf = FriendlyByteBuf(Unpooled.buffer())
     buf.writeByte(containerId)
-    buf.writeResourceLocation(recipe)
+    buf.writeIdentifier(recipe)
     buf.writeBoolean(shiftDown)
     return ServerboundPlaceRecipePacket.STREAM_CODEC.decode(buf)
 }

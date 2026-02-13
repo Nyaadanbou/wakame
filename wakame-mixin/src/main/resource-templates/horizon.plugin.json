@@ -1,0 +1,22 @@
+{
+  "name": "Koish-Mod",
+  "version": "0.0.1-SNAPSHOT",
+  "description": "The server modding part of Koish",
+  "entrypoints": [],
+  "transformers": [],
+  "authors": [
+    "Nailm"
+  ],
+  "load_datapack_entry": false,
+  "mixins": [
+    "mixins.koish.json"
+  ],
+  "wideners": [
+    "widener.at"
+  ],
+  "dependencies": {
+    "server": {},
+    "bootstrap": {},
+    "horizon": {}
+  }
+}

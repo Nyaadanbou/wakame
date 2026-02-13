@@ -14,8 +14,8 @@ import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.IdePauser
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.configurate.yamlLoader
 import io.leangen.geantyref.TypeFactory
@@ -42,7 +42,7 @@ internal object LootTableRegistryLoader : RegistryLoader {
         consumeData(BuiltInRegistries.LOOT_TABLE::update)
     }
 
-    private fun consumeData(registryAction: (Identifier, LootTable<*>) -> Unit) {
+    private fun consumeData(registryAction: (KoishKey, LootTable<*>) -> Unit) {
         val dataDir = getFileInConfigDirectory("loot_table/")
 
         val loader = yamlLoader {
@@ -54,7 +54,7 @@ internal object LootTableRegistryLoader : RegistryLoader {
 
         for ((file, namespace, path) in NamespacedFileTreeWalker(dataDir, fileExtension = "yml", includeFullPath = true, includeNamespacePath = true)) {
             val rootNode = loader.buildAndLoadString(file.readText())
-            val lootTableId = Identifiers.of(path)
+            val lootTableId = KoishKeys.of(path)
             try {
                 // 获取配置文件文件夹指定的类型.
                 val javaType = when (namespace) {

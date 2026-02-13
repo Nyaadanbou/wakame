@@ -18,7 +18,7 @@ import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.typeTokenOf
 import cc.mewcraft.wakame.world.WeatherControl
 import net.kyori.adventure.key.Key
@@ -131,7 +131,7 @@ data object ItemPropTypes {
      * 物品所属的冷却组.
      */
     @JvmField
-    val COOLDOWN_GROUP: ItemPropType<Identifier> = typeOf("cooldown_group")
+    val COOLDOWN_GROUP: ItemPropType<KoishKey> = typeOf("cooldown_group")
 
     /**
      * 攻击速度.
@@ -279,7 +279,7 @@ data object ItemPropTypes {
      * 目前来说, 仅用于配方系统中原料的创建.
      */
     @JvmField
-    val ITEM_TAG: ItemPropType<Set<Identifier>> = typeOf("tag")
+    val ITEM_TAG: ItemPropType<Set<KoishKey>> = typeOf("tag")
 
     /**
      * 物品放置出来的普通方块.
@@ -289,7 +289,7 @@ data object ItemPropTypes {
      * @see cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes.PLACE_BLOCK
      */
     @JvmField
-    val PLACE_BLOCK = typeOf<Identifier>("place_block")
+    val PLACE_BLOCK = typeOf<KoishKey>("place_block")
 
     /**
      * 物品放置出来的流体碰撞方块.
@@ -309,7 +309,7 @@ data object ItemPropTypes {
      * @see cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes.PLACE_DOUBLE_HIGH_BLOCK
      */
     @JvmField
-    val PLACE_DOUBLE_HIGH_BLOCK = typeOf<Identifier>("place_double_high_block")
+    val PLACE_DOUBLE_HIGH_BLOCK = typeOf<KoishKey>("place_double_high_block")
 
     /**
      * 与物品类型绑定的物品等级.

@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.typeId
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toNMS
 import org.bukkit.entity.Player
@@ -29,7 +29,7 @@ fun ItemStack.removeCooldown(player: Player) = toNMS().removeCooldown(player)
 // ------------
 
 // Implemented according to: https://github.com/Nyaadanbou/wakame/issues/369
-private fun MojangStack.acquireCooldownGroup(): Identifier {
+private fun MojangStack.acquireCooldownGroup(): KoishKey {
     return getProp(ItemPropTypes.COOLDOWN_GROUP) ?: typeId
 }
 

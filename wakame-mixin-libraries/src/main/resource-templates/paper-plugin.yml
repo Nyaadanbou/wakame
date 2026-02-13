@@ -1,6 +1,0 @@
-name: Koish-Libs
-version: "{{ version }}"
-main: cc.mewcraft.koish.KoishLibsPlugin
-api-version: 1.21.8
-authors: [ Nailm ]
-horizon: {}

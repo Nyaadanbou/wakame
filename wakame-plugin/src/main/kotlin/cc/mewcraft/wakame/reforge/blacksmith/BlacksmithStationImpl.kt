@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.reforge.recycle.RecyclingStation
 import cc.mewcraft.wakame.reforge.recycle.WtfRecyclingStation
 import cc.mewcraft.wakame.reforge.repair.RepairingTable
 import cc.mewcraft.wakame.reforge.repair.WtfRepairingTable
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKeys
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -22,9 +22,9 @@ internal data object WtfBlacksmithStation : BlacksmithStation {
             ". . . . . . . . ."
         ),
         icons = hashMapOf(
-            "background" to Identifiers.of("internal/menu/common/default/background"),
-            "select_repairing" to Identifiers.of("internal/menu/blacksmith/default/select_repairing"),
-            "select_recycling" to Identifiers.of("internal/menu/blacksmith/default/select_recycling"),
+            "background" to KoishKeys.of("internal/menu/common/default/background"),
+            "select_repairing" to KoishKeys.of("internal/menu/blacksmith/default/select_repairing"),
+            "select_recycling" to KoishKeys.of("internal/menu/blacksmith/default/select_recycling"),
         )
     )
     override val recyclingMenuSettings: BasicMenuSettings = BasicMenuSettings(
@@ -34,11 +34,11 @@ internal data object WtfBlacksmithStation : BlacksmithStation {
             "i i i i i . x"
         ),
         icons = hashMapOf(
-            "background" to Identifiers.of("internal/menu/common/default/background"),
-            "recycle_when_empty" to Identifiers.of("internal/menu/blacksmith/default/recycle_when_empty"),
-            "recycle_when_error" to Identifiers.of("internal/menu/blacksmith/default/recycle_when_error"),
-            "recycle_when_confirmed" to Identifiers.of("internal/menu/blacksmith/default/recycle_when_confirmed"),
-            "recycle_when_unconfirmed" to Identifiers.of("internal/menu/blacksmith/default/recycle_when_unconfirmed"),
+            "background" to KoishKeys.of("internal/menu/common/default/background"),
+            "recycle_when_empty" to KoishKeys.of("internal/menu/blacksmith/default/recycle_when_empty"),
+            "recycle_when_error" to KoishKeys.of("internal/menu/blacksmith/default/recycle_when_error"),
+            "recycle_when_confirmed" to KoishKeys.of("internal/menu/blacksmith/default/recycle_when_confirmed"),
+            "recycle_when_unconfirmed" to KoishKeys.of("internal/menu/blacksmith/default/recycle_when_unconfirmed"),
         )
     )
     override val repairingMenuSettings: BasicMenuSettings = BasicMenuSettings(
@@ -48,8 +48,8 @@ internal data object WtfBlacksmithStation : BlacksmithStation {
             "* * * * * . ."
         ),
         icons = hashMapOf(
-            "background" to Identifiers.of("internal/menu/common/default/background"),
-            "background2" to Identifiers.of("internal/menu/blacksmith/default/background2"),
+            "background" to KoishKeys.of("internal/menu/common/default/background"),
+            "background2" to KoishKeys.of("internal/menu/blacksmith/default/background2"),
         )
     )
 

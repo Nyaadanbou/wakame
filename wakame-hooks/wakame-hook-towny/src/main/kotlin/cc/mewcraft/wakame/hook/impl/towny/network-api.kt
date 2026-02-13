@@ -18,13 +18,13 @@ import com.google.common.cache.RemovalCause
 import com.google.common.cache.RemovalNotification
 import com.palmergames.bukkit.towny.TownyAPI
 import com.palmergames.bukkit.towny.`object`.Resident
+import io.papermc.paper.event.player.AsyncPlayerSpawnLocationEvent
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerTeleportEvent
-import org.spigotmc.event.player.PlayerSpawnLocationEvent
 import java.time.Duration
 import java.util.*
 
@@ -61,7 +61,7 @@ object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkPacketHandler, Li
         TownyTeleportImpl.handle(packet)
 
     @EventHandler
-    private fun on(event: PlayerSpawnLocationEvent) =
+    private fun on(event: AsyncPlayerSpawnLocationEvent) =
         TownyTeleportImpl.on(event)
 }
 
@@ -186,13 +186,11 @@ private object TownyTeleportImpl {
         }
     }
 
-    fun on(event: PlayerSpawnLocationEvent) {
-        // TODO #441 切换成 AsyncPlayerSpawnLocationEvent 并确保线程安全
-
+    fun on(event: AsyncPlayerSpawnLocationEvent) {
         // 当玩家进入服务器时:
         // 根据正在排队的传送请求, 将玩家传送到他的城镇/国家传送点
 
-        val playerId = event.player.uniqueId
+        val playerId = event.connection.profile.id ?: return
         val resident = townyApi.getResident(playerId) ?: return
         handleNetworkTownSpawn(playerId, resident, event::setSpawnLocation)
         handleNetworkNationSpawn(playerId, resident, event::setSpawnLocation)
@@ -234,7 +232,7 @@ private object TownyTeleportImpl {
         player.teleportAsync(spawn, PlayerTeleportEvent.TeleportCause.PLUGIN)
     }
 
-    private fun <V> notifyRequestExpiration(notification: RemovalNotification<UUID, V>) {
+    private fun <V : Any> notifyRequestExpiration(notification: RemovalNotification<UUID, V>) {
         val k = notification.key
         val v = notification.value
         val c = notification.cause

@@ -7,8 +7,8 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
@@ -38,25 +38,25 @@ internal object ItemRefBootstrap {
 
     override val systemName: String = "Minecraft"
 
-    override fun accepts(id: Identifier): Boolean {
+    override fun accepts(id: KoishKey): Boolean {
         return Material.matchMaterial(id.asString()) != null
     }
 
-    override fun getId(stack: ItemStack): Identifier? {
+    override fun getId(stack: ItemStack): KoishKey? {
         return stack.type.key
     }
 
-    override fun getName(id: Identifier): Component? {
+    override fun getName(id: KoishKey): Component? {
         val type = getInternalType(id) ?: return null
         return Component.translatable(type)
     }
 
-    override fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack? {
+    override fun createItemStack(id: KoishKey, amount: Int, player: Player?): ItemStack? {
         val type = getInternalType(id) ?: return null
         return ItemStack(type).apply { this.amount = amount }
     }
 
-    override fun getInternalType(id: Identifier): Material? {
+    override fun getInternalType(id: KoishKey): Material? {
         return Material.matchMaterial(id.asString())
     }
 
@@ -70,28 +70,28 @@ internal object ItemRefBootstrap {
 
     override val systemName: String = "Koish"
 
-    override fun accepts(id: Identifier): Boolean {
+    override fun accepts(id: KoishKey): Boolean {
         return BuiltInRegistries.ITEM.containsId(id)
     }
 
-    override fun getId(stack: ItemStack): Identifier? {
+    override fun getId(stack: ItemStack): KoishKey? {
         // 对于 Koish 物品, 返回非空
         // 对于 原版套皮/纯原版/其他 物品, 返回空
         return stack.koishTypeId
     }
 
-    override fun getName(id: Identifier): Component? {
+    override fun getName(id: KoishKey): Component? {
         val type = getInternalType(id) ?: return null
         return type.name
     }
 
-    override fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack? {
+    override fun createItemStack(id: KoishKey, amount: Int, player: Player?): ItemStack? {
         val type = getInternalType(id) ?: return null
         val item = KoishStackGenerator.generate(type, ItemGenerationContext(type, 0f, 0))
         return item
     }
 
-    override fun getInternalType(id: Identifier): KoishItem? {
+    override fun getInternalType(id: KoishKey): KoishItem? {
         return BuiltInRegistries.ITEM[id]
     }
 

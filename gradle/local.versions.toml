@@ -8,7 +8,7 @@ copy-jar-build = "0.0.2-snapshot"
 copy-jar-docker = "0.0.1-snapshot"
 gremlin = "0.0.9"
 indra = "3.1.3"
-kotlin = "2.3.0"
+kotlin = "2.3.10"
 kotlinx-coroutines = "1.10.2"
 libraries-repository = "0.0.4-snapshot"
 nyaadanbou-repository = "0.0.1-snapshot"
@@ -16,8 +16,8 @@ paperweight = "2.0.0-beta.17"
 shadow = "9.2.2"
 spotless = "7.0.4"
 weaver = "2.3.12"
-horizon = "1.0.0-beta.10"
-horizon-core = "1.0.0-beta.local"
+horizon = "1.0.0-rc1.26"
+horizon-core = "1.0.0-rc1.32"
 
 # Shaded dependencies
 
@@ -44,27 +44,26 @@ snakeyaml-engine = "2.8"
 
 # Server dependencies
 
-adventure = "4.24.0"
-asm = "9.8"
-fastutil = "8.5.15"
-guava = "33.3.1-jre"
-ignite = "1.1.0"
+adventure = "4.25.0"
+asm = "9.9.1"
+fastutil = "8.5.18"
+guava = "33.5.0-jre"
 jedis = "7.0.0"
 messenger = "1.1.0-SNAPSHOT"
 mixin = "0.8.7"
 mixin-extras = "0.4.1"
 nats = "2.23.0"
-netty = "4.1.115.Final"
-paper = "1.21.8-R0.1-SNAPSHOT"
+netty = "4.2.7.Final"
+paper = "1.21.11-R0.1-SNAPSHOT"
 rabbitmq = "5.27.0"
 shadow-bukkit = "1.21.3-SNAPSHOT"
 shadow-nbt = "1.21.3-SNAPSHOT"
-velocity = "3.4.0-SNAPSHOT"
+velocity = "3.5.0-SNAPSHOT"
 zstdjni = "1.5.7-5"
 
 # Test dependencies
 
-datafixerupper = "8.0.16"
+datafixerupper = "9.0.19"
 jdbc-sqlite = "3.50.2.0"
 mockk = "1.13.10"
 logback-classic = "1.5.6"
@@ -137,6 +136,7 @@ commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflecti
 commons-tuple = { group = "xyz.xenondevs.commons", name = "commons-tuple", version.ref = "commons" }
 configurate-extra-dfu4 = { group = "cc.mewcraft.configurate", name = "configurate-extra-dfu4", version.ref = "configurate" }
 configurate-extra-dfu8 = { group = "cc.mewcraft.configurate", name = "configurate-extra-dfu8", version.ref = "configurate" }
+configurate-extra-dfu9 = { group = "cc.mewcraft.configurate", name = "configurate-extra-dfu9", version.ref = "configurate" }
 configurate-extra-kotlin = { group = "cc.mewcraft.configurate", name = "configurate-extra-kotlin", version.ref = "configurate" }
 configurate-gson = { group = "cc.mewcraft.configurate", name = "configurate-gson", version.ref = "configurate" }
 configurate-yaml = { group = "cc.mewcraft.configurate", name = "configurate-yaml", version.ref = "configurate" }
@@ -198,7 +198,6 @@ netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
 snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version.ref = "snakeyaml-engine" }
 #
 
-ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-debug = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-debug", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }

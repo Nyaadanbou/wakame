@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import cc.mewcraft.wakame.serialization.codec.BukkitCodecs
 import cc.mewcraft.wakame.serialization.codec.KoishCodecs
 import cc.mewcraft.wakame.serialization.codec.setOf
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityComponentContext
 import com.mojang.serialization.Codec
@@ -18,7 +18,7 @@ import org.bukkit.Material
 data class EnchantmentVeinminerEffect(
     val longestChainMining: LevelBasedValue,
     val allowedBlockTypes: Set<Material>,
-    val blockBreakSound: Identifier,
+    val blockBreakSound: KoishKey,
 ) : EnchantmentListenerBasedEffect {
 
     companion object {
@@ -28,7 +28,7 @@ data class EnchantmentVeinminerEffect(
             instance.group(
                 LevelBasedValue.CODEC.fieldOf("longest_chain_mining").forGetter(EnchantmentVeinminerEffect::longestChainMining),
                 BukkitCodecs.MATERIAL.setOf().fieldOf("allowed_block_types").forGetter(EnchantmentVeinminerEffect::allowedBlockTypes),
-                KoishCodecs.IDENTIFIER.fieldOf("block_break_sound").forGetter(EnchantmentVeinminerEffect::blockBreakSound)
+                KoishCodecs.KOISH_KEY.fieldOf("block_break_sound").forGetter(EnchantmentVeinminerEffect::blockBreakSound)
             ).apply(instance, ::EnchantmentVeinminerEffect)
         }
 

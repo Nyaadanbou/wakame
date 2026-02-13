@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.brewery
 
 import cc.mewcraft.wakame.registry.Registry
 import cc.mewcraft.wakame.registry.WritableRegistry
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKeys
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 import org.bukkit.Color
@@ -65,7 +65,7 @@ class BarrelWoodType(
 ) : Keyed {
 
     override fun key(): Key {
-        return REGISTRY.getId(this) ?: Identifiers.of("unregistered")
+        return REGISTRY.getId(this) ?: KoishKeys.of("unregistered")
     }
 
     override fun toString(): String {

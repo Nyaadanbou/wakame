@@ -3,9 +3,7 @@ plugins {
 }
 
 repositories {
-    // 为了导入:
-    // - "io.canvasmc.horizon" (等其 release 后就不需要了）
-    // - "nyaadanbou-repository-project"
+    // 为了导入 "nyaadanbou-repository-project"
     mavenLocal()
 
     // 常用公共仓库
@@ -38,7 +36,6 @@ dependencies {
     implementation(local.plugin.shadow)
     implementation(local.plugin.gremlin.gradle)
     implementation(local.plugin.indra.common)
-    //implementation(local.plugin.paperweight.userdev)
     implementation(local.plugin.weaver)
     implementation(local.plugin.horizon)
 }

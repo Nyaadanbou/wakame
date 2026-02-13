@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.DynamicRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.util.IdePauser
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.MINECRAFT_SERVER
 import cc.mewcraft.wakame.util.MojangLootTable
 import cc.mewcraft.wakame.util.configurate.yamlLoader
@@ -53,11 +53,11 @@ internal object CatalogItemLootTableRecipeRegistryLoader : RegistryLoader {
         val lootTableRegistryLookup: HolderLookup.RegistryLookup<MojangLootTable> = lookupProvider.lookupOrThrow(Registries.LOOT_TABLE)
         MINECRAFT_LOOT_TABLE_MAP.clear()
         MINECRAFT_LOOT_TABLE_MAP.putAll(lootTableRegistryLookup.listElements().asSequence().associate { holder ->
-            holder.key().location().toString() to holder.value()
+            holder.key().identifier().toString() to holder.value()
         })
     }
 
-    private fun applyDataToRegistry(registryAction: (Identifier, CatalogItemLootTableRecipe) -> Unit) {
+    private fun applyDataToRegistry(registryAction: (KoishKey, CatalogItemLootTableRecipe) -> Unit) {
         val lootTableDir = KoishDataPaths.CONFIGS.resolve("catalog/item/loot_table/")
 
         // 所有要在图鉴中展示的战利品表的路径
@@ -109,7 +109,7 @@ internal object CatalogItemLootTableRecipeRegistryLoader : RegistryLoader {
                 ?: BasicMenuSettings(Component.text("Untitled"), emptyArray(), hashMapOf())
 
             registryAction(
-                Identifier.key(lootTableId),
+                KoishKey.key(lootTableId),
                 CatalogItemLootTableRecipe(
                     lootTableId = lootTableId,
                     lootTable = MINECRAFT_LOOT_TABLE_MAP[lootTableId]!!,

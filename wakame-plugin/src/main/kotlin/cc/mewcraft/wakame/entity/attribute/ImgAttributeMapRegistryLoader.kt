@@ -5,8 +5,8 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.jetbrains.annotations.ApiStatus
 
@@ -31,9 +31,9 @@ internal object ImgAttributeMapRegistryLoader {
         consumeData(BuiltInRegistries.IMG_ATTRIBUTE_MAP::update)
     }
 
-    private fun consumeData(registryAction: (Identifier, ImaginaryAttributeMap) -> Unit) {
+    private fun consumeData(registryAction: (KoishKey, ImaginaryAttributeMap) -> Unit) {
         intrusiveRegisteredIds.forEach { registeredId ->
-            val entryId = Identifiers.of(registeredId)
+            val entryId = KoishKeys.of(registeredId)
             val entryVal = createData(registeredId)
             registryAction(entryId, entryVal)
         }

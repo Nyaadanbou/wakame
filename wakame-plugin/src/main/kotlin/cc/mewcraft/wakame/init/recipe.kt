@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.recipe.*
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.util.IdePauser
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.configurate.yamlLoader
 import cc.mewcraft.wakame.util.data.isYaml
 import cc.mewcraft.wakame.util.eventbus.MapEventBus
@@ -81,7 +81,7 @@ object RecipeInitializer {
     private fun loadKoishRecipe(path: Path) {
         try {
             val rootNode = ymlLoaderBuilder.buildAndLoadString(path.readText())
-            val recipeId = Identifiers.ofKoish(path.relativeTo(recipeDirectory).toString())
+            val recipeId = KoishKeys.ofKoish(path.relativeTo(recipeDirectory).toString())
             // 注入 key 节点
             rootNode.hint(RepresentationHints.MINECRAFT_RECIPE_ID, recipeId)
             // 反序列化 Recipe

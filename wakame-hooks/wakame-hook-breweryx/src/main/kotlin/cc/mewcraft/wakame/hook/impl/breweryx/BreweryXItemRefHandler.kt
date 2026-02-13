@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.hook.impl.breweryx
 
 import cc.mewcraft.wakame.item.ItemRefHandler
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import com.dre.brewery.api.BreweryApi
 import com.dre.brewery.recipe.BRecipe
 import net.kyori.adventure.text.Component
@@ -25,7 +25,7 @@ object BreweryXItemRefHandler : ItemRefHandler<BRecipe> {
 
     override val systemName: String = "BreweryX"
 
-    override fun accepts(id: Identifier): Boolean {
+    override fun accepts(id: KoishKey): Boolean {
         // 这里没有判断 quality 是因为似乎没有特别直接的办法得知一个 quality 是否存在
 
         if (id.namespace() != NAMESPACE) return false
@@ -35,14 +35,14 @@ object BreweryXItemRefHandler : ItemRefHandler<BRecipe> {
         return recipe != null
     }
 
-    override fun getId(stack: ItemStack): Identifier? {
+    override fun getId(stack: ItemStack): KoishKey? {
         val brew = BreweryApi.getBrew(stack) ?: return null
         val recipeId = brew.currentRecipe.id
         val quality = brew.quality
-        return Identifiers.of(NAMESPACE, "$recipeId/$quality")
+        return KoishKeys.of(NAMESPACE, "$recipeId/$quality")
     }
 
-    override fun getName(id: Identifier): Component? {
+    override fun getName(id: KoishKey): Component? {
         if (id.namespace() != NAMESPACE) return null
         val value = id.value()
         val recipeId = value.extractRecipeId() ?: return null
@@ -52,7 +52,7 @@ object BreweryXItemRefHandler : ItemRefHandler<BRecipe> {
         return Component.text(recipeName)
     }
 
-    override fun getInternalType(id: Identifier): BRecipe? {
+    override fun getInternalType(id: KoishKey): BRecipe? {
         // Brewery API 没办法从 id 拿到一个具有特定 quality 的 BRecipe,
         // 因为 BRecipe 本身就包含了一个 recipe 可能出现的所有 quality.
         // 而不同的 quality 在我们的定义下是属于不同的 ItemRef 的.
@@ -61,7 +61,7 @@ object BreweryXItemRefHandler : ItemRefHandler<BRecipe> {
         return null
     }
 
-    override fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack? {
+    override fun createItemStack(id: KoishKey, amount: Int, player: Player?): ItemStack? {
         if (id.namespace() != NAMESPACE) return null
         val value = id.value()
         val recipeId = value.extractRecipeId() ?: return null

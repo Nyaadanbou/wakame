@@ -4,9 +4,9 @@ import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.registry.Registry
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.MojangIdentifier
 import cc.mewcraft.wakame.util.MojangRegistry
-import cc.mewcraft.wakame.util.MojangResourceLocation
 import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
 import cc.mewcraft.wakame.util.getValueOrThrow
 import io.papermc.paper.registry.RegistryAccess
@@ -46,7 +46,7 @@ internal class RegistryHolderEntrySerializer<T : Any>(
     private val registry: Registry<T>,
 ) : SimpleSerializer<RegistryEntry<T>> {
     override fun deserialize(type: Type, node: ConfigurationNode): RegistryEntry<T> {
-        return registry.createEntry(node.require<Identifier>())
+        return registry.createEntry(node.require<KoishKey>())
     }
 
     override fun serialize(type: Type, obj: RegistryEntry<T>?, node: ConfigurationNode) {
@@ -73,7 +73,7 @@ internal class BukkitRegistryEntryValueSerializer<T : Keyed>(
         //  不同的 ScalarSerializer 实现, 一个是在运行时使用的 (现在这个),
         //  一个是在测试环境摹刻出来的 (前提是 T 必须允许被继承/实现).
         return node.get<String>()
-            ?.let { Identifier.key(it) }
+            ?.let { KoishKey.key(it) }
             ?.let { registry.get(it) }
             ?: registry.first()
     }
@@ -96,7 +96,7 @@ internal class MojangRegistryValueEntrySerializer<T : Any>(
     private val registry: MojangRegistry<T>,
 ) : SimpleSerializer<T> {
     override fun deserialize(type: Type, node: ConfigurationNode): T {
-        return registry.getValueOrThrow(MojangResourceLocation.parse(node.require<String>()))
+        return registry.getValueOrThrow(MojangIdentifier.parse(node.require<String>()))
     }
 
     override fun serialize(type: Type, obj: T?, node: ConfigurationNode) {

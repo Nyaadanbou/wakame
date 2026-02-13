@@ -17,8 +17,8 @@ import cc.mewcraft.wakame.loot.LootTableRegistryLoader
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.util.IdePauser
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.configurate.yamlLoader
 import cc.mewcraft.wakame.util.runTask
 import io.papermc.paper.registry.RegistryAccess
@@ -65,7 +65,7 @@ internal object CustomItemRegistryLoader : RegistryLoader {
         consumeData(BuiltInRegistries.ITEM::update)
     }
 
-    private fun consumeData(consumer: (Identifier, KoishItem) -> Unit) {
+    private fun consumeData(consumer: (KoishKey, KoishItem) -> Unit) {
         val loader = yamlLoader {
             withDefaults()
             serializers { registerAll(SERIALIZERS) }
@@ -77,7 +77,7 @@ internal object CustomItemRegistryLoader : RegistryLoader {
         dataDir.walk().drop(1).filter { it.isFile && it.extension == "yml" }.forEach { f ->
             try {
                 val rootNode = loader.buildAndLoadString(f.readText())
-                val itemId = Identifiers.of(f.relativeTo(dataDir).invariantSeparatorsPath.substringBeforeLast('.'))
+                val itemId = KoishKeys.of(f.relativeTo(dataDir).invariantSeparatorsPath.substringBeforeLast('.'))
                 val itemValue = loadValue(itemId, rootNode)
                 consumer(itemId, itemValue)
             } catch (e: Exception) {
@@ -87,7 +87,7 @@ internal object CustomItemRegistryLoader : RegistryLoader {
         }
     }
 
-    private fun loadValue(id: Identifier, node: ConfigurationNode): KoishItem {
+    private fun loadValue(id: KoishKey, node: ConfigurationNode): KoishItem {
         val dataConfig = node.require<ItemMetaContainer>()
         val properties = node.require<ItemPropContainer>()
         val behaviors = node.require<ItemBehaviorContainer>()
@@ -118,7 +118,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         consumeData(BuiltInRegistries.ITEM_PROXY::update)
     }
 
-    private fun consumeData(consumer: (Identifier, KoishItemProxy) -> Unit) {
+    private fun consumeData(consumer: (KoishKey, KoishItemProxy) -> Unit) {
         val loader = yamlLoader {
             withDefaults()
             serializers { registerAll(SERIALIZERS) }
@@ -130,7 +130,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         for (f in dataDir.walk().drop(1).filter { it.isFile && it.extension == "yml" }) {
             try {
                 val rootNode = loader.buildAndLoadString(f.readText())
-                val itemId = Identifiers.of(Identifier.MINECRAFT_NAMESPACE, f.relativeTo(dataDir).invariantSeparatorsPath.substringBeforeLast('.'))
+                val itemId = KoishKeys.of(KoishKey.MINECRAFT_NAMESPACE, f.relativeTo(dataDir).invariantSeparatorsPath.substringBeforeLast('.'))
                 val itemValue = loadValue(itemId, rootNode)
                 consumer(itemId, itemValue)
             } catch (e: Exception) {
@@ -140,7 +140,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         }
     }
 
-    private fun loadValue(id: Identifier, node: ConfigurationNode): KoishItemProxy {
+    private fun loadValue(id: KoishKey, node: ConfigurationNode): KoishItemProxy {
         val dataConfig = node.require<ItemMetaContainer>()
         val properties = node.require<ItemPropContainer>()
         val behaviors = node.require<ItemBehaviorContainer>()
@@ -161,7 +161,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         }
     }
 
-    private fun isMinecraftItem(id: Identifier): Boolean {
+    private fun isMinecraftItem(id: KoishKey): Boolean {
         val registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ITEM)
         return registry.get(id) != null
     }

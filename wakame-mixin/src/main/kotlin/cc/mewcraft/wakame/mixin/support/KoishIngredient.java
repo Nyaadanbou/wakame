@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.util.item.ExtensionsKt;
 import com.mojang.logging.LogUtils;
 import net.kyori.adventure.key.Key;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -58,7 +58,7 @@ public interface KoishIngredient {
             return ExtensionsKt.toNMS(koishItem.createItemStack());
         } else {
             if (identifier.namespace().equals(Key.MINECRAFT_NAMESPACE)) {
-                ResourceLocation resourceLocation = ResourceLocation.withDefaultNamespace(identifier.value());
+                Identifier resourceLocation = Identifier.withDefaultNamespace(identifier.value());
                 Item item = BuiltInRegistries.ITEM.getValue(resourceLocation);
                 if (item != Items.AIR) {
                     return new ItemStack(item);

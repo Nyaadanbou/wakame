@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.integration.permission.PermissionManager
 import cc.mewcraft.wakame.item.SlotDisplay
 import cc.mewcraft.wakame.item.resolveToItemWrapper
 import cc.mewcraft.wakame.registry.DynamicRegistries
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -35,7 +35,7 @@ class CatalogItemMainMenu(
     /**
      * [CategoryItem] 的缓存.
      */
-    private val categoryCache: HashMap<Identifier, CategoryItem> = HashMap()
+    private val categoryCache: HashMap<KoishKey, CategoryItem> = HashMap()
 
     /**
      * 菜单的 [BasicMenuSettings].

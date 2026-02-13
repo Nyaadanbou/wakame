@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.mixin.support
 
 import cc.mewcraft.wakame.LOGGER
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.entity.EntityType
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
@@ -21,7 +21,7 @@ object MythicBootstrapBridge {
     //
 
     private var inited: Boolean = false
-    private val data: HashMap<ResourceLocation, EntityType<*>> = HashMap()
+    private val data: HashMap<Identifier, EntityType<*>> = HashMap()
 
     /**
      * 初始化.
@@ -54,7 +54,7 @@ object MythicBootstrapBridge {
     /**
      * 根据 [id] 获取对应的 [EntityType].
      */
-    fun getEntityType(id: ResourceLocation): EntityType<*>? {
+    fun getEntityType(id: Identifier): EntityType<*>? {
         if (inited.not()) {
             init()
         }
@@ -79,19 +79,19 @@ object MythicBootstrapBridge {
      *
      * @param file MythicMobs 的生物配置文件
      */
-    private fun read(file: File): Map<ResourceLocation, EntityType<*>> {
-        val ret = HashMap<ResourceLocation, EntityType<*>>()
+    private fun read(file: File): Map<Identifier, EntityType<*>> {
+        val ret = HashMap<Identifier, EntityType<*>>()
         val root = YamlConfigurationLoader.builder().buildAndLoadString(file.readText())
 
         // 遍历根节点的所有键 (每个键都是一个 <id>)
         for ((nodeKey, node) in root.childrenMap().mapKeys { (k, _) -> k.toString() }) {
             // 检查 <id> 是否是合法的命名空间, 只有合法时才处理
-            if (!ResourceLocation.isValidPath(nodeKey)) {
+            if (!Identifier.isValidPath(nodeKey)) {
                 continue
             }
             val typeString = node.node("Type").string ?: continue
             val entityType = try {
-                val rl = ResourceLocation.withDefaultNamespace(typeString.lowercase())
+                val rl = Identifier.withDefaultNamespace(typeString.lowercase())
                 val hr = BuiltInRegistries.ENTITY_TYPE.get(rl)
                 if (hr.isEmpty) {
                     LOGGER.warn("Unknown entity type '$typeString' found in file: ${file.path}")
@@ -104,7 +104,7 @@ object MythicBootstrapBridge {
                 null
             }
             if (entityType != null) {
-                val id = ResourceLocation.fromNamespaceAndPath(NAMESPACE, nodeKey)
+                val id = Identifier.fromNamespaceAndPath(NAMESPACE, nodeKey)
                 ret[id] = entityType
             }
         }

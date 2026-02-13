@@ -13,7 +13,7 @@ import cc.mewcraft.wakame.item.property.ItemPropContainer
 import cc.mewcraft.wakame.item.property.ItemPropType
 import cc.mewcraft.wakame.mixin.support.ExtraDataComponents
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toNMS
 import net.minecraft.world.item.Item
@@ -31,8 +31,8 @@ import org.bukkit.inventory.ItemStack
 
 val Material.itemProxy: KoishItemProxy? get() = BuiltInRegistries.ITEM_PROXY[key()]
 fun Material.hasItemProxy(): Boolean = itemProxy != null
-val ItemStack.typeId: Identifier get() = toNMS().typeId
-val ItemStack.koishTypeId: Identifier? get() = toNMS().koishTypeId
+val ItemStack.typeId: KoishKey get() = toNMS().typeId
+val ItemStack.koishTypeId: KoishKey? get() = toNMS().koishTypeId
 val ItemStack.isKoish: Boolean get() = toNMS().isKoish
 val ItemStack.isExactKoish: Boolean get() = toNMS().isExactKoish
 val ItemStack.isProxyKoish: Boolean get() = toNMS().isProxyKoish
@@ -96,25 +96,25 @@ fun Item.hasItemProxy(): Boolean =
     CraftItemType.minecraftToBukkit(this).hasItemProxy()
 
 /**
- * 获取该物品堆叠的物品类型的 [Identifier].
+ * 获取该物品堆叠的物品类型的 [KoishKey].
  *
  * - 如果该物品堆叠是一个 *Koish 物品* , 则命名空间为 `koish`
  * - 如果该物品堆叠是一个 *原版(或 Koish 套皮)物品*, 则命名空间为 `minecraft`
  * - 如果该物品堆叠来自其他物品系统, 将被当作是一个 *原版物品*, 命名空间为 `minecraft` // TODO 支持 ItemRef
  */
-val MojangStack.typeId: Identifier
+val MojangStack.typeId: KoishKey
     // 最终版本
     //get() = get(ExtraDataComponents.ITEM_KEY)?.id ?: CraftItemType.minecraftToBukkit(item).key()
     // FIXME 临时版本, 用于过渡
     get() = get(ExtraDataComponents.ITEM_KEY)?.id ?: get(ExtraDataComponents.DATA_CONTAINER)?.get(ItemDataTypes.ID)?.id ?: CraftItemType.minecraftToBukkit(item).key()
 
 /**
- * 获取该物品堆叠的物品类型的 [Identifier].
+ * 获取该物品堆叠的物品类型的 [KoishKey].
  *
  * - 只有当该物品堆叠属于 Koish 物品库时才返回非空值.
  * - 不包含套皮物品/原版物品 - 这种情况会直接返回空值.
  */
-val MojangStack.koishTypeId: Identifier?
+val MojangStack.koishTypeId: KoishKey?
     // 最终版本
     //get() = get(ExtraDataComponents.ITEM_KEY)?.id
     // FIXME 临时版本, 用于过渡

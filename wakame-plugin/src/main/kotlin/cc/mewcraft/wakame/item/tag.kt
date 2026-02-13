@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KoishKey
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import org.bukkit.inventory.ItemStack
@@ -27,13 +27,13 @@ object ItemTagManager {
     /**
      * `标签唯一标识 -> 物品引用集合` 的映射.
      */
-    private val map: MutableMap<Identifier, MutableSet<ItemRef>> = mutableMapOf()
+    private val map: MutableMap<KoishKey, MutableSet<ItemRef>> = mutableMapOf()
 
     /**
      * 检查特定物品是否属于某个标签.
      * 标签不存在时返回 false.
      */
-    fun ItemStack.isTagged(tagId: Identifier): Boolean {
+    fun ItemStack.isTagged(tagId: KoishKey): Boolean {
         return map[tagId]?.contains(ItemRef.create(this)) == true
     }
 
@@ -41,7 +41,7 @@ object ItemTagManager {
      * 获取特定标签中全部物品引用的集合.
      * 标签不存在时返回空集合.
      */
-    fun getValues(tagId: Identifier): Set<ItemRef> {
+    fun getValues(tagId: KoishKey): Set<ItemRef> {
         return map[tagId] ?: emptySet()
     }
 

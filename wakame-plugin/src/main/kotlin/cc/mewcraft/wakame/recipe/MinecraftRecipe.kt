@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.lazyconfig.configurate.require
-import cc.mewcraft.wakame.adventure.key.Identified
+import cc.mewcraft.wakame.adventure.key.KoishKeyed
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.util.*
 import cc.mewcraft.wakame.util.adventure.toSimpleString
@@ -47,7 +47,7 @@ import net.minecraft.world.item.equipment.trim.TrimPattern as MojangTrimPattern
 /**
  * 配方 (对 nms 配方的包装).
  */
-sealed interface MinecraftRecipe : Identified, Examinable {
+sealed interface MinecraftRecipe : KoishKeyed, Examinable {
     val result: RecipeResult
 
     /**
@@ -61,7 +61,7 @@ sealed interface MinecraftRecipe : Identified, Examinable {
      * 注意: 仅调用该方法并不会向玩家客户端重新发包.
      */
     fun removeFromManager(): Boolean {
-        return RECIPE_MANAGER.removeRecipe(identifier.createResourceKey())
+        return RECIPE_MANAGER.removeRecipe(key.createResourceKey())
     }
 
     /**
@@ -87,7 +87,7 @@ sealed interface MinecraftRecipe : Identified, Examinable {
  * 高炉配方.
  */
 class BlastingRecipe(
-    override val identifier: Identifier,
+    override val key: KoishKey,
     override val result: RecipeResult,
     val group: String,
     val category: CookingBookCategory,
@@ -104,12 +104,12 @@ class BlastingRecipe(
             exp,
             cookingTime
         )
-        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        val recipeHolder = RecipeHolder(key.createResourceKey(), mojangRecipe)
         RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("identifier", identifier),
+        ExaminableProperty.of("identifier", key),
         ExaminableProperty.of("recipe_result", result),
         ExaminableProperty.of("input", input),
         ExaminableProperty.of("cooking_time", cookingTime),
@@ -123,7 +123,7 @@ class BlastingRecipe(
  * 营火配方.
  */
 class CampfireRecipe(
-    override val identifier: Identifier,
+    override val key: KoishKey,
     override val result: RecipeResult,
     val group: String,
     val category: CookingBookCategory,
@@ -140,12 +140,12 @@ class CampfireRecipe(
             exp,
             cookingTime
         )
-        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        val recipeHolder = RecipeHolder(key.createResourceKey(), mojangRecipe)
         RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("identifier", identifier),
+        ExaminableProperty.of("identifier", key),
         ExaminableProperty.of("recipe_result", result),
         ExaminableProperty.of("input", input),
         ExaminableProperty.of("cooking_time", cookingTime),
@@ -159,7 +159,7 @@ class CampfireRecipe(
  * 熔炉配方.
  */
 class FurnaceRecipe(
-    override val identifier: Identifier,
+    override val key: KoishKey,
     override val result: RecipeResult,
     val group: String,
     val category: CookingBookCategory,
@@ -176,12 +176,12 @@ class FurnaceRecipe(
             exp,
             cookingTime
         )
-        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        val recipeHolder = RecipeHolder(key.createResourceKey(), mojangRecipe)
         RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("identifier", identifier),
+        ExaminableProperty.of("identifier", key),
         ExaminableProperty.of("recipe_result", result),
         ExaminableProperty.of("input", input),
         ExaminableProperty.of("cooking_time", cookingTime),
@@ -196,7 +196,7 @@ class FurnaceRecipe(
  * 工作台有序合成配方.
  */
 class ShapedRecipe(
-    override val identifier: Identifier,
+    override val key: KoishKey,
     override val result: RecipeResult,
     val group: String,
     val category: CraftingBookCategory,
@@ -218,12 +218,12 @@ class ShapedRecipe(
             result.toMojangStack(),
             showNotification
         )
-        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        val recipeHolder = RecipeHolder(key.createResourceKey(), mojangRecipe)
         RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("identifier", identifier),
+        ExaminableProperty.of("identifier", key),
         ExaminableProperty.of("recipe_result", result),
         ExaminableProperty.of("pattern", pattern),
         ExaminableProperty.of("ingredients", ingredients),
@@ -236,7 +236,7 @@ class ShapedRecipe(
  * 工作台无序合成.
  */
 class ShapelessRecipe(
-    override val identifier: Identifier,
+    override val key: KoishKey,
     override val result: RecipeResult,
     val group: String,
     val category: CraftingBookCategory,
@@ -250,12 +250,12 @@ class ShapelessRecipe(
             result.toMojangStack(),
             ingredients.map { it.toMojangIngredient() }
         )
-        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        val recipeHolder = RecipeHolder(key.createResourceKey(), mojangRecipe)
         RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("identifier", identifier),
+        ExaminableProperty.of("identifier", key),
         ExaminableProperty.of("recipe_result", result),
         ExaminableProperty.of("ingredients", ingredients),
     )
@@ -267,7 +267,7 @@ class ShapelessRecipe(
  * 锻造台转化配方.
  */
 class SmithingTransformRecipe(
-    override val identifier: Identifier,
+    override val key: KoishKey,
     override val result: RecipeResult,
     val base: RecipeChoice,
     val addition: RecipeChoice,
@@ -294,12 +294,12 @@ class SmithingTransformRecipe(
             TransmuteResult(resultMojangStack.itemHolder, resultMojangStack.count, resultMojangStack.componentsPatch),
             copyDataComponents
         )
-        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        val recipeHolder = RecipeHolder(key.createResourceKey(), mojangRecipe)
         RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("identifier", identifier),
+        ExaminableProperty.of("identifier", key),
         ExaminableProperty.of("recipe_result", result),
         ExaminableProperty.of("base", base),
         ExaminableProperty.of("addition", addition),
@@ -314,11 +314,11 @@ class SmithingTransformRecipe(
  * 锻造台纹饰配方.
  */
 class SmithingTrimRecipe(
-    override val identifier: Identifier,
+    override val key: KoishKey,
     val base: RecipeChoice,
     val addition: RecipeChoice,
     val template: RecipeChoice,
-    val trimPattern: Identifier,
+    val trimPattern: KoishKey,
     val copyDataComponents: Boolean,
 ) : MinecraftRecipe {
     // 锻造台纹饰配方的结果是原版生成的
@@ -332,12 +332,12 @@ class SmithingTrimRecipe(
             trimPattern.getTrimPattern().toMojangHolder(),
             copyDataComponents
         )
-        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        val recipeHolder = RecipeHolder(key.createResourceKey(), mojangRecipe)
         RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("identifier", identifier),
+        ExaminableProperty.of("identifier", key),
         ExaminableProperty.of("base", base),
         ExaminableProperty.of("addition", addition),
         ExaminableProperty.of("template", template),
@@ -351,7 +351,7 @@ class SmithingTrimRecipe(
  * 烟熏炉配方.
  */
 class SmokingRecipe(
-    override val identifier: Identifier,
+    override val key: KoishKey,
     override val result: RecipeResult,
     val group: String,
     val category: CookingBookCategory,
@@ -368,12 +368,12 @@ class SmokingRecipe(
             exp,
             cookingTime
         )
-        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        val recipeHolder = RecipeHolder(key.createResourceKey(), mojangRecipe)
         RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("identifier", identifier),
+        ExaminableProperty.of("identifier", key),
         ExaminableProperty.of("recipe_result", result),
         ExaminableProperty.of("input", input),
         ExaminableProperty.of("cooking_time", cookingTime),
@@ -387,7 +387,7 @@ class SmokingRecipe(
  * 切石机配方.
  */
 class StonecuttingRecipe(
-    override val identifier: Identifier,
+    override val key: KoishKey,
     override val result: RecipeResult,
     val group: String,
     val input: RecipeChoice,
@@ -398,12 +398,12 @@ class StonecuttingRecipe(
             input.toMojangIngredient(),
             result.toMojangStack()
         )
-        val recipeHolder = RecipeHolder(identifier.createResourceKey(), mojangRecipe)
+        val recipeHolder = RecipeHolder(key.createResourceKey(), mojangRecipe)
         RECIPE_MANAGER.addRecipe(recipeHolder)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("identifier", identifier),
+        ExaminableProperty.of("identifier", key),
         ExaminableProperty.of("result", result),
         ExaminableProperty.of("input", input)
     )
@@ -425,7 +425,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         BlastingRecipe(
-            identifier = key,
+            key = key,
             result = result,
             group = group,
             category = category,
@@ -445,7 +445,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         CampfireRecipe(
-            identifier = key,
+            key = key,
             result = result,
             group = group,
             category = category,
@@ -465,7 +465,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         FurnaceRecipe(
-            identifier = key,
+            key = key,
             result = result,
             group = group,
             category = category,
@@ -514,7 +514,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         ShapedRecipe(
-            identifier = key,
+            key = key,
             result = result,
             group = group,
             category = category,
@@ -543,7 +543,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         ShapelessRecipe(
-            identifier = key,
+            key = key,
             result = result,
             group = group,
             category = category,
@@ -565,7 +565,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         SmithingTransformRecipe(
-            identifier = key,
+            key = key,
             result = result,
             base = base,
             addition = addition,
@@ -577,7 +577,7 @@ enum class RecipeType(
         val base = node.node("base").require<RecipeChoice>()
         val addition = node.node("addition").get<RecipeChoice>(EmptyRecipeChoice)
         val template = node.node("template").get<RecipeChoice>(EmptyRecipeChoice)
-        val trimPattern = node.node("pattern").require<Identifier>()
+        val trimPattern = node.node("pattern").require<KoishKey>()
         val copyDataComponents = node.node("copy_data_components").getBoolean(true)
 
         // addition和template不能同时是EmptyRecipeChoice
@@ -588,7 +588,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         SmithingTrimRecipe(
-            identifier = key,
+            key = key,
             base = base,
             addition = addition,
             template = template,
@@ -607,7 +607,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         SmokingRecipe(
-            identifier = key,
+            key = key,
             result = result,
             group = group,
             category = category,
@@ -624,7 +624,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         StonecuttingRecipe(
-            identifier = key,
+            key = key,
             result = result,
             group = group,
             input = input,
@@ -663,14 +663,14 @@ internal class RecipeTypeBridge<T : MinecraftRecipe>(
 /**
  * 方便函数.
  */
-private fun Identifier.createResourceKey(): MojangResourceKey<Recipe<*>> {
-    return MojangResourceKey.create(Registries.RECIPE, this.toResourceLocation())
+private fun KoishKey.createResourceKey(): MojangResourceKey<Recipe<*>> {
+    return MojangResourceKey.create(Registries.RECIPE, this.toIdentifier())
 }
 
 /**
  * 方便函数.
  */
-private fun Identifier.getTrimPattern(): TrimPattern {
+private fun KoishKey.getTrimPattern(): TrimPattern {
     val trimPattern = RegistryAccess.registryAccess().getRegistry(RegistryKey.TRIM_PATTERN).get(this)
     if (trimPattern == null) {
         throw NoSuchElementException("Trim pattern does not exist: $trimPattern")

@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.IdePauser
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import it.unimi.dsi.fastutil.objects.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -17,7 +17,7 @@ open class SimpleRegistry<T>(
 ) : WritableRegistry<T> {
     private val rawIdToEntry: ObjectList<RegistryEntry.Reference<T>> = ObjectArrayList(256)
     private val entryToRawId: Reference2IntMap<T> = Reference2IntOpenHashMap<T>(1024).apply { defaultReturnValue(-1) }
-    private val idToEntry: MutableMap<Identifier, RegistryEntry.Reference<T>> = HashMap(1024)
+    private val idToEntry: MutableMap<KoishKey, RegistryEntry.Reference<T>> = HashMap(1024)
     private val keyToEntry: Reference2ObjectMap<RegistryKey<T>, RegistryEntry.Reference<T>> = Reference2ObjectOpenHashMap(1024)
     private val valueToEntry: MutableMap<T, RegistryEntry.Reference<T>> = IdentityHashMap(1024)
 
@@ -25,7 +25,7 @@ open class SimpleRegistry<T>(
 
     // 还未正式注册好的 intrusive entries.
     // 该映射在最终必须为空, 否则视为注册表错误.
-    private val intrusiveIdToEntry: MutableMap<Identifier, RegistryEntry.Reference<T>> = HashMap()
+    private val intrusiveIdToEntry: MutableMap<KoishKey, RegistryEntry.Reference<T>> = HashMap()
 
     override fun update(key: RegistryKey<T>, value: T): RegistryEntry.Reference<T> {
         val entry = keyToEntry[key]
@@ -108,16 +108,16 @@ open class SimpleRegistry<T>(
 
     override fun get(index: Int): T? = rawIdToEntry.getOrNull(index)?.unwrap()
     override fun get(key: RegistryKey<T>): T? = keyToEntry[key]?.unwrap()
-    override fun get(id: Identifier): T? = idToEntry[id]?.unwrap()
+    override fun get(id: KoishKey): T? = idToEntry[id]?.unwrap()
 
     override fun getRawId(value: T): Int = entryToRawId.getInt(value)
     override fun getKey(value: T): RegistryKey<T>? = valueToEntry[value]?.getKey()
-    override fun getId(value: T): Identifier? = valueToEntry[value]?.getKey()?.value
+    override fun getId(value: T): KoishKey? = valueToEntry[value]?.getKey()?.value
 
     override fun getDefaultEntry(): RegistryEntry.Reference<T>? = rawIdToEntry.firstOrNull()
     override fun getRandomEntry(random: Random): RegistryEntry.Reference<T>? = rawIdToEntry.randomOrNull(random)
 
-    override val ids: Set<Identifier>
+    override val ids: Set<KoishKey>
         get() = idToEntry.keys
     override val keys: Set<RegistryKey<T>>
         get() = keyToEntry.keys
@@ -127,9 +127,9 @@ open class SimpleRegistry<T>(
         get() = rawIdToEntry.asSequence()
 
     override fun containsKey(key: RegistryKey<T>): Boolean = keyToEntry.containsKey(key)
-    override fun containsId(id: Identifier): Boolean = idToEntry.containsKey(id)
+    override fun containsId(id: KoishKey): Boolean = idToEntry.containsKey(id)
 
-    override fun createEntry(id: Identifier): RegistryEntry.Reference<T> {
+    override fun createEntry(id: KoishKey): RegistryEntry.Reference<T> {
         // 如果注册表已经存在 id 对应的数据, 那么直接返回已存在的实例.
         // 这种情况一般发生在 reload - entry 已创建, 只需要更新数据.
         val existing = idToEntry[id]
@@ -163,7 +163,7 @@ open class SimpleRegistry<T>(
 
     override fun getEntry(rawId: Int): RegistryEntry.Reference<T>? = if (rawId >= 0 && rawId < rawIdToEntry.size) rawIdToEntry[rawId] else null
     override fun getEntry(key: RegistryKey<T>): RegistryEntry.Reference<T>? = keyToEntry[key]
-    override fun getEntry(id: Identifier): RegistryEntry.Reference<T>? = idToEntry[id]
+    override fun getEntry(id: KoishKey): RegistryEntry.Reference<T>? = idToEntry[id]
 
     override fun wrapAsEntry(value: T): RegistryEntry<T> {
         return valueToEntry[value] ?: throw IllegalStateException("Trying to wrap unregistered value '$value' in registry '${this.key}'")
@@ -186,7 +186,7 @@ open class SimpleDefaultedRegistry<T>(
     defaultId: String,
     key: RegistryKey<out Registry<T>>,
 ) : SimpleRegistry<T>(key), WritableDefaultedRegistry<T> {
-    override val defaultId: Identifier = Identifiers.of(defaultId)
+    override val defaultId: KoishKey = KoishKeys.of(defaultId)
     private lateinit var defaultEntry: RegistryEntry.Reference<T>
 
     override fun add(key: RegistryKey<T>, value: T): RegistryEntry.Reference<T> {
@@ -206,7 +206,7 @@ open class SimpleDefaultedRegistry<T>(
         return if (i == -1) super.getRawId(defaultEntry.unwrap()) else i
     }
 
-    override fun getOrDefault(id: Identifier): T {
+    override fun getOrDefault(id: KoishKey): T {
         return super<SimpleRegistry>.get(id) ?: defaultEntry.unwrap()
     }
 
@@ -218,7 +218,7 @@ open class SimpleDefaultedRegistry<T>(
         return super<SimpleRegistry>.get(id) ?: defaultEntry.unwrap()
     }
 
-    override fun getIdOrDefault(value: T): Identifier {
+    override fun getIdOrDefault(value: T): KoishKey {
         return super<SimpleRegistry>.getId(value) ?: this.defaultId
     }
 

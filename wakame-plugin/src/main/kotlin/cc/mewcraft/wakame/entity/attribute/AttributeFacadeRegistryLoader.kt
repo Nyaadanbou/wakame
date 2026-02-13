@@ -14,7 +14,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.ReloadableProperty
 import cc.mewcraft.wakame.util.adventure.toSimpleString
@@ -114,7 +114,7 @@ internal object AttributeFacadeRegistryLoader : RegistryLoader {
     private operator fun AttributeFacade<out ConstantAttributeBundle, out VariableAttributeBundle>.unaryPlus() {
         @Suppress("UNCHECKED_CAST")
         BuiltInRegistries.ATTRIBUTE_FACADE.add(
-            id = Identifiers.of(id),
+            id = KoishKeys.of(id),
             value = (this as AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>)
         )
     }

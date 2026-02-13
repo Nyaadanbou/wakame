@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
-import net.minecraft.commands.arguments.ResourceLocationArgument
+import net.minecraft.commands.arguments.IdentifierArgument
 import org.incendo.cloud.execution.ExecutionCoordinator
 import org.incendo.cloud.paper.PaperCommandManager
 import org.incendo.cloud.paper.util.sender.PaperSimpleSenderMapper
@@ -35,9 +35,9 @@ internal object KoishCommandManager {
                 setNativeNumberSuggestions(true)
 
                 // 在这里注册形如命名空间的指令参数, 否则 Brigadier 无法正常工作
-                registerMapping(typeTokenOf<AttributeParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
-                registerMapping(typeTokenOf<ItemParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
-                registerMapping(typeTokenOf<BlockTagParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
+                registerMapping(typeTokenOf<AttributeParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(IdentifierArgument.id()) }
+                registerMapping(typeTokenOf<ItemParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(IdentifierArgument.id()) }
+                registerMapping(typeTokenOf<BlockTagParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(IdentifierArgument.id()) }
             }
 
             manager.apply {

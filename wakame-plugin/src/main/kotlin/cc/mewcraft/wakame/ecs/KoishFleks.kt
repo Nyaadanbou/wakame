@@ -9,8 +9,8 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import com.github.quillraven.fleks.*
@@ -20,7 +20,7 @@ import org.bukkit.event.Listener
 @InternalInit(InternalInitStage.POST_WORLD)
 internal object KoishFleks : Listener, Fleks, FleksPatcher {
 
-    private val SYSTEM_ORDER: List<Identifier> = listOf(
+    private val SYSTEM_ORDER: List<KoishKey> = listOf(
         "init_item_cooldown_container",
         "init_attribute_container",
         "init_kizami_container",
@@ -38,7 +38,7 @@ internal object KoishFleks : Listener, Fleks, FleksPatcher {
         "tick_smelter_enchantment",
         "tick_veinminer_enchantment",
         "tick_void_escape_enchantment"
-    ).map(Identifiers::of)
+    ).map(KoishKeys::of)
 
     override val world: World = configureWorld {
 

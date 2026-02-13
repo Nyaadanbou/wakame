@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.brewery.BrewRecipeManager
 import cc.mewcraft.wakame.brewery.BrewRecipeRenderer
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KoishKeys
 import com.dre.brewery.BarrelWoodType
 import com.dre.brewery.recipe.PluginItem
 import cc.mewcraft.wakame.brewery.BarrelWoodType as KBarrelWoodType
@@ -34,7 +34,7 @@ object BreweryXHook {
         for (type in BarrelWoodType.entries) {
             val formattedName = type.formattedName
             val translatedName = type.formattedName // TODO #383: 支持 i18n
-            val id = Identifiers.of(type.name.lowercase())
+            val id = KoishKeys.of(type.name.lowercase())
             val obj = KBarrelWoodType(formattedName, translatedName)
             KBarrelWoodType.REGISTRY.add(id, obj)
         }

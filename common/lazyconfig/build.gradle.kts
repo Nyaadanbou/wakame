@@ -24,6 +24,6 @@ dependencies {
     // 配置库
     compileOnlyApi(local.configurate.yaml)
     compileOnlyApi(local.configurate.gson)
-    compileOnlyApi(local.configurate.extra.dfu8)
+    compileOnlyApi(local.configurate.extra.dfu9)
     compileOnlyApi(local.configurate.extra.kotlin)
 }

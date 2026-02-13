@@ -32,7 +32,7 @@
     "MixinItemStack$2",
     "MixinLivingEntity",
     "MixinLootPoolEntries",
-    "MixinMinecraftServer",
+    "MixinPaperWorldLoader",
     "MixinRegistryDataLoader",
     "MixinRepairItemRecipe",
     "MixinServerPlayer",
