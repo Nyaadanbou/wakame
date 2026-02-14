@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.init
 
+import cc.mewcraft.wakame.feature.ResetContainerOnLootGenerate
 import cc.mewcraft.wakame.feature.TeleportOnJoinListener
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -11,7 +12,7 @@ object FeatureInitializer {
 
     @InitFun
     fun init() {
-        // 注册事件监听器
         TeleportOnJoinListener().registerEvents()
+        ResetContainerOnLootGenerate().registerEvents()
     }
 }
