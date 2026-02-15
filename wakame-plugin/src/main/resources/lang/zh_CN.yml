@@ -108,6 +108,8 @@ msg_err_cannot_save_network_pos_in_current_server: "<red>无法在当前位面�
 msg_err_cannot_save_network_pos_in_current_dimension: "<red>无法在当前维度记录网络坐标."
 msg_network_pos_saved: "<aqua>网络坐标已记录!"
 msg_err_not_in_dimensions: "<red>你不在维度内: <arg:0>"
+msg_err_cannot_use_teleport_anchor_in_current_server: "<red>无法在当前位面使用传送锚点."
+msg_err_cannot_use_teleport_anchor_in_current_dimension: "<red>无法在当前维度使用传送锚点."
 
 # 像这样制定一个数字的格式, '#' 是 Java 的 DecimalFormat 的语法
 msg_number_format: "This is a decimal number: <arg:0:'zh-CN':'#'>."
