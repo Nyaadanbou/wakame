@@ -112,7 +112,10 @@ object TranslatableMessages {
     val MSG_PARTY_MEMBER_LIST = create("msg_party_member_list")
     val MSG_ERR_CANNOT_SAVE_NETWORK_POS_IN_CURRENT_SERVER = create("msg_err_cannot_save_network_pos_in_current_server")
     val MSG_ERR_CANNOT_SAVE_NETWORK_POS_IN_CURRENT_DIMENSION = create("msg_err_cannot_save_network_pos_in_current_dimension")
+    val MSG_ERR_CANNOT_USE_TELEPORT_ANCHOR_IN_CURRENT_SERVER = create("msg_err_cannot_use_teleport_anchor_in_current_server")
+    val MSG_ERR_CANNOT_USE_TELEPORT_ANCHOR_IN_CURRENT_DIMENSION = create("msg_err_cannot_use_teleport_anchor_in_current_dimension")
     val MSG_NETWORK_POS_SAVED = create("msg_network_pos_saved")
+    val MSG_ERR_NOT_IN_DIMENSIONS = create("msg_err_not_in_dimensions")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

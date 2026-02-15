@@ -128,7 +128,7 @@ private object AuraPlayerManaIntegration : PlayerManaIntegration {
 
     override fun consumeMana(player: Player, amount: Double): Boolean {
         val consumeMana = getAuraUser(player).consumeMana(amount)
-        if (consumeMana) {
+        if (consumeMana && amount > 0) {
             player.sendActionBar(TranslatableMessages.MSG_MANA_CONSUMED.arguments(Component.text(amount)))
         }
         return consumeMana

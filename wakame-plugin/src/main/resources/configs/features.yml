@@ -43,3 +43,6 @@ teleport_on_join_explicit_server:
   # 传送后应用的效果
   effects:
     - { type: minecraft:slow_falling, duration: 200, amplifier: 1 }
+
+# 给战利品箱生成战利品时先清空容器内容物
+reset_container_on_loot_generate: false

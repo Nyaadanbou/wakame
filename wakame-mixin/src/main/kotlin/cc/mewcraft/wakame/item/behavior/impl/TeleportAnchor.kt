@@ -1,12 +1,16 @@
 package cc.mewcraft.wakame.item.behavior.impl
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.teleport.NetworkTeleport
-import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.behavior.*
 import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.data.impl.NetworkPosition
+import cc.mewcraft.wakame.item.getData
+import cc.mewcraft.wakame.item.getProp
+import cc.mewcraft.wakame.item.hasData
 import cc.mewcraft.wakame.item.property.ItemPropTypes
+import cc.mewcraft.wakame.item.setData
 import io.papermc.paper.datacomponent.DataComponentTypes
 
 /**
@@ -23,12 +27,23 @@ object TeleportAnchor : ItemBehavior {
 
     override fun handleConsume(context: ConsumeContext): BehaviorResult {
         val player = context.player
-        if (!context.itemstack.hasProp(ItemPropTypes.TELEPORT_ANCHOR)) {
-            return BehaviorResult.PASS
-        }
+        val teleportAnchor = context.itemstack.getProp(ItemPropTypes.TELEPORT_ANCHOR) ?: return BehaviorResult.PASS
         val pos = context.itemstack.getData(ItemDataTypes.NETWORK_POSITION) ?: return BehaviorResult.FINISH_AND_CANCEL
-        val res = NetworkTeleport.execute(player, pos.server, pos.world, pos.x, pos.y, pos.z, pos.yaw, pos.pitch)
-        return if (res.isSuccess) {
+        val server = NetworkTeleport.server().getOrElse { ex ->
+            LOGGER.error("Failed to get current server for network teleportation", ex)
+            return BehaviorResult.FINISH_AND_CANCEL
+        }
+        if (server !in teleportAnchor.useServerWhitelist) {
+            player.sendMessage(TranslatableMessages.MSG_ERR_CANNOT_USE_TELEPORT_ANCHOR_IN_CURRENT_SERVER)
+            return BehaviorResult.FINISH_AND_CANCEL
+        }
+        val world = player.world.name
+        if (world !in teleportAnchor.useDimensionWhitelist) {
+            player.sendMessage(TranslatableMessages.MSG_ERR_CANNOT_USE_TELEPORT_ANCHOR_IN_CURRENT_DIMENSION)
+            return BehaviorResult.FINISH_AND_CANCEL
+        }
+        val result = NetworkTeleport.execute(player, pos.server, pos.world, pos.x, pos.y, pos.z, pos.yaw, pos.pitch)
+        return if (result.isSuccess) {
             BehaviorResult.FINISH
         } else {
             BehaviorResult.FINISH_AND_CANCEL
@@ -43,14 +58,17 @@ object TeleportAnchor : ItemBehavior {
             return InteractionResult.PASS // 已经绑定过坐标 - 不重复绑定
         }
         if (player.isSneaking.not()) return InteractionResult.PASS // 为防止误触, 只有在潜行时才可绑定坐标
-        val server = NetworkTeleport.server().getOrNull() ?: return InteractionResult.FAIL_AND_CANCEL
+        val server = NetworkTeleport.server().getOrElse { ex ->
+            LOGGER.error("Failed to get current server for network teleportation", ex)
+            return InteractionResult.FAIL_AND_CANCEL
+        }
         val loc = player.location
         val world = loc.world.name
-        if (server !in teleportAnchor.allowedServers) {
+        if (server !in teleportAnchor.setServerWhitelist) {
             player.sendMessage(TranslatableMessages.MSG_ERR_CANNOT_SAVE_NETWORK_POS_IN_CURRENT_SERVER)
             return InteractionResult.FAIL_AND_CANCEL
         }
-        if (world !in teleportAnchor.allowedDimensions) {
+        if (world !in teleportAnchor.setDimensionWhitelist) {
             player.sendMessage(TranslatableMessages.MSG_ERR_CANNOT_SAVE_NETWORK_POS_IN_CURRENT_DIMENSION)
             return InteractionResult.FAIL_AND_CANCEL
         }
