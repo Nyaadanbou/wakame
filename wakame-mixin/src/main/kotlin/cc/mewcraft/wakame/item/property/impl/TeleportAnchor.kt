@@ -9,8 +9,10 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 @ConfigSerializable
 data class TeleportAnchor(
-    val allowedServers: Set<String> = setOf(),
-    val allowedDimensions: Set<String> = setOf(),
+    val setServerWhitelist: Set<String> = setOf(),
+    val setDimensionWhitelist: Set<String> = setOf(),
+    val useServerWhitelist: Set<String> = setOf(),
+    val useDimensionWhitelist: Set<String> = setOf(),
     val consumableData: ConsumableData = ConsumableData(),
 ) {
 

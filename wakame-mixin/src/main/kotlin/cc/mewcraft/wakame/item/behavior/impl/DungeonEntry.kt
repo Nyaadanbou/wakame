@@ -14,6 +14,7 @@ import cc.mewcraft.wakame.util.metadata.metadata
 import cc.mewcraft.wakame.util.metadata.metadataCooldownKey
 import cc.mewcraft.wakame.util.metadata.metadataKey
 import com.destroystokyo.paper.ParticleBuilder
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
@@ -77,7 +78,6 @@ object DungeonEntry : ItemBehavior {
         val itemstack = context.itemstack
         val dungeonEntry = itemstack.getProp(ItemPropTypes.DUNGEON_ENTRY) ?: return cleanupExistingMembersAndReturn(player, BehaviorResult.FINISH_AND_CANCEL)
         val dungeonId = dungeonEntry.dungeon
-        val structureId = dungeonEntry.structure
 
         // 判断先决条件: 地牢是否存在, 结构是否正确
         if (DungeonBridge.inited().not()) {
@@ -107,21 +107,33 @@ object DungeonEntry : ItemBehavior {
         ) {
             return BehaviorResult.FINISH_AND_CANCEL
         }
-        val placedStructure = player.chunk.structures.firstOrNull {
-            val structure = it.structure
-            val structureType = structure.structureType
-            val structureId2 = Registry.STRUCTURE_TYPE.getKey(structureType)
-            structureId2 == structureId
-        }
-        if (placedStructure == null) {
-            player.sendMessage(TranslatableMessages.MSG_ERR_STRUCTURE_NOT_FOUND_IN_CHUNK.arguments(Component.text(structureId.asString())))
+        val dimensionKeys = dungeonEntry.dimensions
+        if (player.world.key !in dimensionKeys) {
+            player.sendMessage(TranslatableMessages.MSG_ERR_NOT_IN_DIMENSIONS.arguments(Component.text(dimensionKeys.joinToString(transform = Key::asString))))
             return BehaviorResult.FINISH_AND_CANCEL
         }
-        val location = player.location
-        val insideStructure = placedStructure.boundingBox.contains(location.toVector()) ||
-                placedStructure.pieces.any { piece -> piece.boundingBox.contains(location.toVector()) }
+        val structureKeys = dungeonEntry.structures
+        var insideStructure = false
+        for (structureKey in structureKeys) {
+            val placedStructure = player.chunk.structures.firstOrNull {
+                val structure = it.structure
+                val structureType = structure.structureType
+                val structureKey2 = Registry.STRUCTURE_TYPE.getKey(structureType)
+                structureKey2 == structureKey
+            }
+            if (placedStructure == null) {
+                player.sendMessage(TranslatableMessages.MSG_ERR_STRUCTURE_NOT_FOUND_IN_CHUNK.arguments(Component.text(structureKey.asString())))
+                return BehaviorResult.FINISH_AND_CANCEL
+            }
+            val location = player.location
+            val insideStructure2 = placedStructure.boundingBox.contains(location.toVector()) || placedStructure.pieces.any { piece -> piece.boundingBox.contains(location.toVector()) }
+            if (insideStructure2) {
+                insideStructure = true
+                break
+            }
+        }
         if (!insideStructure) {
-            player.sendMessage(TranslatableMessages.MSG_ERR_NOT_INSIDE_STRUCTURE.arguments(Component.text(structureId.asString())))
+            player.sendMessage(TranslatableMessages.MSG_ERR_NOT_INSIDE_STRUCTURE.arguments(Component.text(structureKeys.joinToString(transform = Key::asString))))
             return BehaviorResult.FINISH_AND_CANCEL
         }
 
