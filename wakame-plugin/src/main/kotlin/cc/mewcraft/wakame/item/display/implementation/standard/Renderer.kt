@@ -187,7 +187,9 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
 
         // 隐藏不需要显示的物品组件
         if (hiddenComponents.isNotEmpty()) {
-            item.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay().hiddenComponents(hiddenComponents))
+            val existingHiddenComponents = item.getData(DataComponentTypes.TOOLTIP_DISPLAY)?.hiddenComponents() ?: emptySet()
+            val newHiddenComponents = existingHiddenComponents.union(hiddenComponents)
+            item.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay().hiddenComponents(newHiddenComponents))
         }
 
         // 热修复 `minecraft:item_model` 问题
