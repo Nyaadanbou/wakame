@@ -25,9 +25,11 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
+import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.configurate.yamlLoader
 import cc.mewcraft.wakame.util.item.fastLore
 import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
+import cc.mewcraft.wakame.util.item.toNMS
 import io.papermc.paper.datacomponent.DataComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.FoodProperties
@@ -39,6 +41,10 @@ import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.component.BundleContents
+import net.minecraft.world.item.component.ChargedProjectiles
+import net.minecraft.world.item.component.ItemContainerContents
 import org.bukkit.Registry
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.kotlin.extensions.getList
@@ -92,9 +98,33 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
     }
 
     override fun render(item: ItemStack, context: Nothing?) {
-        if (!(NetworkRenderer.responsible(item))) {
-            return
+        // 渲染物品本身
+        render0(item)
+
+        // 渲染物品里的物品
+        val nmsItem = item.toNMS()
+        val container = nmsItem.get(DataComponents.CONTAINER)
+        if (container != null && container.items.isNotEmpty()) {
+            nmsItem.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(container.items.map { render1(it, MojangStack::asBukkitCopy) }))
         }
+        val bundleContents = nmsItem.get(DataComponents.BUNDLE_CONTENTS)
+        if (bundleContents != null && bundleContents.isEmpty.not()) {
+            nmsItem.set(DataComponents.BUNDLE_CONTENTS, BundleContents(bundleContents.itemsCopy().map { render1(it, MojangStack::asBukkitMirror) }))
+        }
+        val chargedProjectiles = nmsItem.get(DataComponents.CHARGED_PROJECTILES)
+        if (chargedProjectiles != null && chargedProjectiles.isEmpty.not()) {
+            nmsItem.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.of(chargedProjectiles.items.map { render1(it, MojangStack::asBukkitMirror) }))
+        }
+    }
+
+    private fun render1(item: MojangStack, transform: (MojangStack) -> ItemStack): MojangStack {
+        val transformed = transform(item)
+        render0(transformed)
+        return transformed.toNMS()
+    }
+
+    private fun render0(item: ItemStack) {
+        if (!NetworkRenderer.responsible(item)) return
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 

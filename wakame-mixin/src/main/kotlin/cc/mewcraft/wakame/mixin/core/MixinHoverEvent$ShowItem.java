@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class MixinHoverEvent$ShowItem {
 
     /**
-     * 不让 `koish:data_container` 物品组件出现在 HoverEvent.ShotItem 中, 以防止客户端收到未知的封包数据而直接掉线.
+     * 不让 Koish 新增的物品组件出现在 HoverEvent.ShotItem 中, 以防止客户端收到未知的封包数据而直接掉线.
      *
      * @param item 原始参数
      * @return 修改后的参数
@@ -26,8 +26,8 @@ public class MixinHoverEvent$ShowItem {
             )
     )
     private ItemStack redirected(ItemStack item) {
-        item = item.copy();
-        KoishDataSanitizer.sanitizeItemStack(item);
-        return item;
+        ItemStack copy = item.copy();
+        KoishDataSanitizer.sanitizeItemStack(copy);
+        return copy;
     }
 }
