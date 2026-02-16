@@ -24,12 +24,11 @@ object KoishDataSanitizer {
      * 用于修复[错误日志](https://pastes.dev/wLwiJSZMBA).
      *
      * @param item 需要清理 koish:data_container 数据组件的物品堆叠
-     * @return 修改后的 [ItemStack] (原对象), 如果没有修改则返回原 [item]
      */
     @JvmStatic
-    fun sanitizeItemStack(item: ItemStack): ItemStack {
+    fun sanitizeItemStack(item: ItemStack) {
         if (!estimateSanitizing(item)) {
-            return item
+            return
         }
 
         // 移除 koish:item_id
@@ -42,8 +41,6 @@ object KoishDataSanitizer {
         item.updateIfNecessary(DataComponents.BUNDLE_CONTENTS, BundleContents::isNotEmpty, ::sanitizeBundleContents)
         // 移除 minecraft:charged_projectiles 中可能包含的 koish:data_container
         item.updateIfNecessary(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles::isNotEmpty, ::sanitizeChargedProjectiles)
-
-        return item
     }
 
     /**
