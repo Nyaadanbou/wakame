@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toNMS
 import io.papermc.paper.adventure.PaperAdventure
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.minecraft.core.component.DataComponents
@@ -77,16 +78,25 @@ object HotfixItemName {
     }
 
     fun transform(itemstack: MojangStack) {
+        val itemName = getItemName(itemstack) ?: return
+        itemstack.set(DataComponents.ITEM_NAME, itemName)
+    }
+
+    fun getItemName(itemstack: ItemStack): Component? {
+        return getItemName(itemstack.toNMS())?.let(PaperAdventure::asAdventure)
+    }
+
+    fun getItemName(itemstack: MojangStack): net.minecraft.network.chat.Component? {
         val clientboundItemName = itemstack.getProp(ItemPropTypes.CLIENTBOUND_ITEM_NAME)
         if (clientboundItemName != null) {
             val rarity = itemstack.rarity2
             if (rarity != null) {
-                itemstack.set(DataComponents.ITEM_NAME, MiniMessage.miniMessage().deserialize(clientboundItemName, Placeholder.styling("rarity_style", *rarity.unwrap().displayStyles)).let(PaperAdventure::asVanilla))
+                return MiniMessage.miniMessage().deserialize(clientboundItemName, Placeholder.styling("rarity_style", *rarity.unwrap().displayStyles)).let(PaperAdventure::asVanilla)
             } else {
-                itemstack.set(DataComponents.ITEM_NAME, MiniMessage.miniMessage().deserialize(clientboundItemName).let(PaperAdventure::asVanilla))
+                return MiniMessage.miniMessage().deserialize(clientboundItemName).let(PaperAdventure::asVanilla)
             }
         }
-        return
+        return null
     }
 }
 

@@ -1,5 +1,8 @@
 package cc.mewcraft.wakame.item.display.implementation.repairing_table
 
+import cc.mewcraft.wakame.item.HotfixItemModel
+import cc.mewcraft.wakame.item.HotfixItemName
+import cc.mewcraft.wakame.item.HotfixWeaponCooldownDisplay
 import cc.mewcraft.wakame.item.display.IndexedText
 import cc.mewcraft.wakame.item.display.TextAssembler
 import cc.mewcraft.wakame.item.display.implementation.*
@@ -62,6 +65,15 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, Rep
 
         // 应用修改到物品上
         item.fastLore(koishLore)
+
+        // 热修复 `minecraft:item_model` 问题
+        HotfixItemModel.transform(item)
+
+        // 热修复 `minecraft:item_name` 问题
+        HotfixItemName.transform(item)
+
+        // 热修复攻击冷却不显示问题
+        HotfixWeaponCooldownDisplay.transform(item)
     }
 }
 
