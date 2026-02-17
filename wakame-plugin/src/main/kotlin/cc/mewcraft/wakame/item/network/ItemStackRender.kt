@@ -300,7 +300,7 @@ internal object ItemStackRender : PacketListener, Listener {
         if (!isNetworkRewrite) return this
         val copy = this.copy()
         try {
-            ItemRenderers.STANDARD.render(copy.asBukkitMirror())
+            ItemRenderers.STANDARD.render(copy)
         } catch (e: Throwable) {
             if (LOGGING) {
                 LOGGER.error("An error occurred while rewrite network item: ${copy.koishTypeId}", e)

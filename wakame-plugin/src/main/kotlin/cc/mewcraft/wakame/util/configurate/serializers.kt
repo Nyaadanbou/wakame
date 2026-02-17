@@ -50,6 +50,8 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     .register(LootTable.SERIALIZER)
     .register(LootPool.SERIALIZER)
     .register(ComposableEntryContainer.SERIALIZER)
+    // NMS Registry
+    .register(net.minecraft.core.registries.BuiltInRegistries.DATA_COMPONENT_TYPE.valueByNameTypeSerializer())
     // Paper Registry
     .register(RegistryKey.DAMAGE_TYPE.valueByNameTypeSerializer())
     .register(RegistryKey.DATA_COMPONENT_TYPE.valueByNameTypeSerializer())

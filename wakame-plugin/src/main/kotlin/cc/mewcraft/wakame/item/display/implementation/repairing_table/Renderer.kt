@@ -1,5 +1,8 @@
 package cc.mewcraft.wakame.item.display.implementation.repairing_table
 
+import cc.mewcraft.wakame.item.HotfixItemModel
+import cc.mewcraft.wakame.item.HotfixItemName
+import cc.mewcraft.wakame.item.HotfixWeaponCooldownDisplay
 import cc.mewcraft.wakame.item.display.IndexedText
 import cc.mewcraft.wakame.item.display.TextAssembler
 import cc.mewcraft.wakame.item.display.implementation.*
@@ -24,7 +27,7 @@ internal class RepairingTableItemRendererLayout : AbstractRendererLayout(Repairi
 internal data class RepairingTableItemRendererContext(val damage: Int, val maxDamage: Int, val repairCost: Double)
 
 @Init(InitStage.POST_WORLD)
-internal object RepairingTableItemRenderer : AbstractItemRenderer<RepairingTableItemRendererContext>() {
+internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, RepairingTableItemRendererContext>() {
     override val name: String = "repairing_table"
     override val formats: AbstractRendererFormatRegistry = RepairingTableRendererFormatRegistry()
     override val layout: AbstractRendererLayout = RepairingTableItemRendererLayout()
@@ -62,6 +65,15 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<RepairingTable
 
         // 应用修改到物品上
         item.fastLore(koishLore)
+
+        // 热修复 `minecraft:item_model` 问题
+        HotfixItemModel.transform(item)
+
+        // 热修复 `minecraft:item_name` 问题
+        HotfixItemName.transform(item)
+
+        // 热修复攻击冷却不显示问题
+        HotfixWeaponCooldownDisplay.transform(item)
     }
 }
 

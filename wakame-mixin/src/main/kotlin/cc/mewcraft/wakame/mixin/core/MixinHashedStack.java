@@ -43,7 +43,7 @@ public abstract class MixinHashedStack {
         // 算法: 在服务端也渲染一个完整的物品堆叠 x, 然后生成 x 的哈希 h_s. 最终将 h_s 与客户端那边发来的 h_c 进行比较.
         // 注意: stack 是服务端侧的直接物品堆叠实例, 如果要对其修改务必在其克隆上进行 (ItemStack#copy)
         ItemStack copy = stack.copy();
-        NetworkRenderer.getInstance().render(copy.asBukkitMirror());
+        NetworkRenderer.getInstance().render(copy);
         KoishDataSanitizer.sanitizeItemStack(copy);
 
         return this.item.equals(copy.getItemHolder()) && this.components.matches(copy.getComponentsPatch(), hashGenerator);

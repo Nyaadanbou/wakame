@@ -3,8 +3,7 @@
 package cc.mewcraft.wakame.util.item
 
 import cc.mewcraft.wakame.util.MojangStack
-import cc.mewcraft.wakame.util.adventure.toAdventureComponent
-import cc.mewcraft.wakame.util.adventure.toNMSComponent
+import io.papermc.paper.adventure.PaperAdventure
 import io.papermc.paper.datacomponent.DataComponentTypes
 import net.kyori.adventure.text.Component
 import net.minecraft.core.component.DataComponentType
@@ -74,7 +73,7 @@ val ItemStack.customName: Component? get() = getData(DataComponentTypes.CUSTOM_N
 val ItemStack.fastLore: List<Component>? get() = toNMS().lore
 val ItemStack.fastLoreOrEmpty: List<Component> get() = toNMS().loreOrEmpty
 fun ItemStack.fastLore(lore: List<Component>) = toNMS().lore(lore)
-fun ItemStack.toHoverableComponent(): Component = toNMS().hoverName.toAdventureComponent()
+fun ItemStack.toHoverableComponent(): Component = toNMS().hoverName.let(PaperAdventure::asAdventure)
 
 val ItemStack.nbtCopy: CompoundTag? get() = toNMS().nbtCopy
 
@@ -141,9 +140,9 @@ inline fun <T> MojangStack.whenNotEmptyReturn(block: MojangStack.() -> T): T? {
     return if (!isEmpty) block(this) else null
 }
 
-val MojangStack.lore: List<Component>? get() = get(DataComponents.LORE)?.lines?.map(net.minecraft.network.chat.Component::toAdventureComponent)
+val MojangStack.lore: List<Component>? get() = get(DataComponents.LORE)?.lines?.map(PaperAdventure::asAdventure)
 val MojangStack.loreOrEmpty: List<Component> get() = lore ?: emptyList()
-fun MojangStack.lore(lore: List<Component>) = whenNotEmpty { set(DataComponents.LORE, ItemLore(lore.map(Component::toNMSComponent))) }
+fun MojangStack.lore(lore: List<Component>) = whenNotEmpty { set(DataComponents.LORE, ItemLore(lore.map(PaperAdventure::asVanilla))) }
 
 val MojangStack.nbtCopy: CompoundTag? get() = get(DataComponents.CUSTOM_DATA)?.copyTag()
 

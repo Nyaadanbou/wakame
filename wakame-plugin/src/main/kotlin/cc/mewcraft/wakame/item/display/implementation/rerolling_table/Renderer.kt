@@ -42,7 +42,7 @@ internal data class RerollingTableContext(
 }
 
 @Init(InitStage.POST_WORLD)
-internal object RerollingTableItemRenderer : AbstractItemRenderer<RerollingTableContext>() {
+internal object RerollingTableItemRenderer : AbstractItemRenderer<ItemStack, RerollingTableContext>() {
     override val name: String = "rerolling_table"
     override val formats = RerollingTableRendererFormatRegistry(this)
     override val layout = RerollingTableRendererLayout(this)

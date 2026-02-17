@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.gui.blacksmith
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
+import cc.mewcraft.wakame.item.HotfixItemName
 import cc.mewcraft.wakame.item.display.ItemRenderers
 import cc.mewcraft.wakame.item.display.implementation.repairing_table.RepairingTableItemRendererContext
 import cc.mewcraft.wakame.item.extension.level
@@ -247,7 +248,7 @@ internal class BlacksmithMenu(
                 e.isCancelled = true
 
                 val slot = e.slot
-                val claim = repairingSession.getClaim(slot) ?: error("claim not found for slot $slot. This is a bug!")
+                val claim = repairingSession.getClaim(slot) ?: error("Claim not found for slot $slot. This is a bug!")
                 if (claim.repairCost.test(viewer)) {
                     claim.repairCost.take(viewer)
                     claim.repair(viewer)
@@ -256,7 +257,7 @@ internal class BlacksmithMenu(
                     viewer.sendMessage(
                         TranslatableMessages.MSG_SPENT_X_REPAIRING_ITEM.arguments(
                             TranslationArgument.numeric(claim.repairCost.value),
-                            TranslationArgument.component(claim.originalItem.itemName ?: translatable(claim.originalItem))
+                            TranslationArgument.component(HotfixItemName.getItemName(claim.originalItem) ?: claim.originalItem.itemName ?: translatable(claim.originalItem))
                         )
                     )
 

@@ -63,10 +63,10 @@ object NetworkRenderer {
 
     @get:JvmStatic
     @get:JvmName("getInstance")
-    lateinit var INSTANCE: ItemRenderer<ItemStack, Nothing>
+    lateinit var INSTANCE: ItemRenderer<MojangStack, Nothing>
         private set
 
-    fun register(renderer: ItemRenderer<ItemStack, Nothing>) {
+    fun register(renderer: ItemRenderer<MojangStack, Nothing>) {
         INSTANCE = renderer
     }
 

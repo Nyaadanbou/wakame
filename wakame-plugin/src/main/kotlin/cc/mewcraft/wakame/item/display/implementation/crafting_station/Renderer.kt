@@ -47,7 +47,7 @@ internal data class CraftingStationContext(
 }
 
 @Init(InitStage.POST_WORLD)
-internal object CraftingStationItemRenderer : AbstractItemRenderer<CraftingStationContext>() {
+internal object CraftingStationItemRenderer : AbstractItemRenderer<ItemStack, CraftingStationContext>() {
     override val name: String = "crafting_station"
     override val formats = CraftingStationRendererFormatRegistry(this)
     override val layout = CraftingStationRendererLayout(this)
