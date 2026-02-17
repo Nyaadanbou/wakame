@@ -27,25 +27,26 @@ import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.configurate.yamlLoader
-import cc.mewcraft.wakame.util.item.fastLore
-import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
+import cc.mewcraft.wakame.util.item.lore
+import cc.mewcraft.wakame.util.item.loreOrEmpty
+import cc.mewcraft.wakame.util.item.toBukkit
 import cc.mewcraft.wakame.util.item.toNMS
-import io.papermc.paper.datacomponent.DataComponentType
-import io.papermc.paper.datacomponent.DataComponentTypes
-import io.papermc.paper.datacomponent.item.FoodProperties
-import io.papermc.paper.datacomponent.item.ItemEnchantments
-import io.papermc.paper.datacomponent.item.TooltipDisplay
-import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
+import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
+import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
+import net.minecraft.world.food.FoodProperties
 import net.minecraft.world.item.component.BundleContents
 import net.minecraft.world.item.component.ChargedProjectiles
 import net.minecraft.world.item.component.ItemContainerContents
+import net.minecraft.world.item.component.TooltipDisplay
+import net.minecraft.world.item.enchantment.ItemEnchantments
 import org.bukkit.Registry
+import org.bukkit.craftbukkit.enchantments.CraftEnchantment
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.kotlin.extensions.getList
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
@@ -62,8 +63,8 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
     override val formats = StandardRendererFormatRegistry(this)
     override val layout = StandardRendererLayout(this)
     private val textAssembler = TextAssembler(layout)
-    private val removeComponents: MutableList<DataComponentType> = ObjectArrayList()
-    private val hiddenComponents: MutableSet<DataComponentType> = ObjectArraySet()
+    private val removeComponents: MutableSet<DataComponentType<*>> = ObjectArraySet()
+    private val hiddenComponents: MutableSet<DataComponentType<*>> = ObjectArraySet()
 
     @InitFun
     fun init() {
@@ -82,9 +83,9 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         val layoutPath = renderersDirectory.resolve(name).resolve(ItemRendererConstants.LAYOUT_FILE_NAME)
         val yaml = yamlLoader { withDefaults() }.buildAndLoadString(layoutPath.readText())
         removeComponents.clear()
-        removeComponents += yaml.node("remove_components").getList<DataComponentType>(emptyList())
+        removeComponents += yaml.node("remove_components").getList<DataComponentType<*>>(emptyList())
         hiddenComponents.clear()
-        hiddenComponents += yaml.node("hidden_components").getList<DataComponentType>(emptyList())
+        hiddenComponents += yaml.node("hidden_components").getList<DataComponentType<*>>(emptyList())
 
     }
 
@@ -98,32 +99,29 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
     }
 
     override fun render(item: ItemStack, context: Nothing?) {
+        renderDeep(item.toNMS())
+    }
+
+    private fun renderDeep(item: MojangStack) {
         // 渲染物品本身
-        render0(item)
+        renderSelf(item)
 
         // 渲染物品里的物品
-        val nmsItem = item.toNMS()
-        val container = nmsItem.get(DataComponents.CONTAINER)
+        val container = item.get(DataComponents.CONTAINER)
         if (container != null && container.items.isNotEmpty()) {
-            nmsItem.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(container.items.map { render1(it, MojangStack::asBukkitCopy) }))
+            item.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(container.items.map(MojangStack::copy).onEach(::renderDeep)))
         }
-        val bundleContents = nmsItem.get(DataComponents.BUNDLE_CONTENTS)
+        val bundleContents = item.get(DataComponents.BUNDLE_CONTENTS)
         if (bundleContents != null && bundleContents.isEmpty.not()) {
-            nmsItem.set(DataComponents.BUNDLE_CONTENTS, BundleContents(bundleContents.itemsCopy().map { render1(it, MojangStack::asBukkitMirror) }))
+            item.set(DataComponents.BUNDLE_CONTENTS, BundleContents(bundleContents.items().map(MojangStack::copy).onEach(::renderDeep)))
         }
-        val chargedProjectiles = nmsItem.get(DataComponents.CHARGED_PROJECTILES)
+        val chargedProjectiles = item.get(DataComponents.CHARGED_PROJECTILES)
         if (chargedProjectiles != null && chargedProjectiles.isEmpty.not()) {
-            nmsItem.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.of(chargedProjectiles.items.map { render1(it, MojangStack::asBukkitMirror) }))
+            item.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.of(chargedProjectiles.items.onEach(::renderDeep)))
         }
     }
 
-    private fun render1(item: MojangStack, transform: (MojangStack) -> ItemStack): MojangStack {
-        val transformed = transform(item)
-        render0(transformed)
-        return transformed.toNMS()
-    }
-
-    private fun render0(item: ItemStack) {
+    private fun renderSelf(item: MojangStack) {
         if (!NetworkRenderer.responsible(item)) return
 
         val collector = ReferenceOpenHashSet<IndexedText>()
@@ -146,9 +144,9 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         StandardRenderingHandlerRegistry.ENTITY_BUCKET_INFO.process(collector, item.getData(ItemDataTypes.ENTITY_BUCKET_INFO))
         StandardRenderingHandlerRegistry.NETWORK_POSITION.process(collector, item.getData(ItemDataTypes.NETWORK_POSITION))
         StandardRenderingHandlerRegistry.CRATE_KEY_REPLACED.process(collector, if (item.hasData(ItemDataTypes.CRATE_KEY_REPLACED)) Unit else null)
-        StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, item.getData(DataComponentTypes.ENCHANTMENTS))
-        StandardRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, if (item.hasData(DataComponentTypes.DAMAGE_RESISTANT)) Unit else null)
-        StandardRenderingHandlerRegistry.FOOD.process(collector, item.getData(DataComponentTypes.FOOD))
+        StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, item.get(DataComponents.ENCHANTMENTS))
+        StandardRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, if (item.has(DataComponents.DAMAGE_RESISTANT)) Unit else null)
+        StandardRenderingHandlerRegistry.FOOD.process(collector, item.get(DataComponents.FOOD))
         StandardRenderingHandlerRegistry.ENCHANT_SLOTS.process(collector, item)
 
         // 生成 koish lore
@@ -157,7 +155,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         // 尝试在物品原本的 lore 的最后一行插入我们渲染的 lore:
         // - 如果原本的 lore 为空, 则直接使用我们渲染的 lore
         // - 如果原本的 lore 不为空, 则在 koish lore 和 existing lore 之间插入一个空行
-        val existingLore = item.fastLoreOrEmpty
+        val existingLore = item.loreOrEmpty
         val resultantLore = if (existingLore.isEmpty() && koishLore.isNotEmpty()) {
             // existingLore 为空 && koishLore 不为空
             koishLore
@@ -177,19 +175,22 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         }
         // 应用 lore 到物品上
         if (resultantLore != null) {
-            item.fastLore(resultantLore)
+            item.lore(resultantLore)
         }
 
         // 移除不需要的物品组件
         for (componentType in removeComponents) {
-            item.unsetData(componentType)
+            item.remove(componentType)
         }
 
         // 隐藏不需要显示的物品组件
         if (hiddenComponents.isNotEmpty()) {
-            val existingHiddenComponents = item.getData(DataComponentTypes.TOOLTIP_DISPLAY)?.hiddenComponents() ?: emptySet()
-            val newHiddenComponents = existingHiddenComponents.union(hiddenComponents)
-            item.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay().hiddenComponents(newHiddenComponents))
+            val tooltipDisplay = item.get(DataComponents.TOOLTIP_DISPLAY)
+            val hideTooltip = tooltipDisplay?.hideTooltip() ?: false
+            val existingHiddenComponents = tooltipDisplay?.hiddenComponents() ?: emptySet()
+
+            val newHiddenComponents = ReferenceLinkedOpenHashSet(existingHiddenComponents).apply { addAll(hiddenComponents) }
+            item.set(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay(hideTooltip, newHiddenComponents))
         }
 
         // 热修复 `minecraft:item_model` 问题
@@ -257,14 +258,16 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
 
     @JvmField
     val ENCHANTMENTS: RenderingHandler<ItemEnchantments, EnchantmentRendererFormat> = configure("enchantments") { data, format ->
-        format.render(data.enchantments())
+        val converted = data.entrySet().associate { (enchantment, level) -> CraftEnchantment.minecraftHolderToBukkit(enchantment) to level }
+        format.render(converted)
     }
 
     @JvmField
-    val ENCHANT_SLOTS: RenderingHandler<ItemStack, SingleValueRendererFormat> = configure("enchant_slots") { data, format ->
-        val used = EnchantSlotFeature.getSlotUsed(data)
-        val maxBase = EnchantSlotFeature.getSlotBase(data)
-        val maxExtra = EnchantSlotFeature.getSlotExtra(data)
+    val ENCHANT_SLOTS: RenderingHandler<MojangStack, SingleValueRendererFormat> = configure("enchant_slots") { data, format ->
+        val bukkitStack = data.toBukkit()
+        val used = EnchantSlotFeature.getSlotUsed(bukkitStack)
+        val maxBase = EnchantSlotFeature.getSlotBase(bukkitStack)
+        val maxExtra = EnchantSlotFeature.getSlotExtra(bukkitStack)
         val maxTotal = maxBase + maxExtra
         if (maxTotal <= 0) return@configure IndexedText.NOP
         val resolver = TagResolver.resolver(

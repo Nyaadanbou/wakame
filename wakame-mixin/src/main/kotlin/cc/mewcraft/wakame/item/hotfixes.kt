@@ -5,11 +5,14 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.item.extension.rarity2
 import cc.mewcraft.wakame.item.property.ItemPropTypes
-import io.papermc.paper.datacomponent.DataComponentTypes
-import io.papermc.paper.datacomponent.item.UseCooldown
+import cc.mewcraft.wakame.util.MojangStack
+import cc.mewcraft.wakame.util.item.toNMS
+import io.papermc.paper.adventure.PaperAdventure
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import net.minecraft.core.component.DataComponents
 import org.bukkit.inventory.ItemStack
+import java.util.*
 
 
 /**
@@ -27,6 +30,10 @@ import org.bukkit.inventory.ItemStack
 object HotfixItemModel {
 
     fun transform(itemstack: ItemStack) {
+        transform(itemstack.toNMS())
+    }
+
+    fun transform(itemstack: MojangStack) {
         val itemId = itemstack.koishTypeId
         if (itemId == null) {
             // 我们不处理**纯原版**物品, 因为:
@@ -37,12 +44,12 @@ object HotfixItemModel {
         val clientboundItemModel = itemstack.getProp(ItemPropTypes.CLIENTBOUND_ITEM_MODEL)
         if (clientboundItemModel != null) {
             // 如果指定了 clientbound_item_model, 则优先采用这里指定的 minecraft:item_model
-            itemstack.setData(DataComponentTypes.ITEM_MODEL, clientboundItemModel)
+            itemstack.set(DataComponents.ITEM_MODEL, PaperAdventure.asVanilla(clientboundItemModel))
             return
         }
-        if (!itemstack.isDataOverridden(DataComponentTypes.ITEM_MODEL)) {
+        if (!itemstack.hasNonDefault(DataComponents.ITEM_MODEL)) {
             // 如果物品堆叠上没有重写的 minecraft:item_model 组件, 则自动加上对应物品 id 的 minecraft:item_model 组件
-            itemstack.setData(DataComponentTypes.ITEM_MODEL, itemId)
+            itemstack.set(DataComponents.ITEM_MODEL, PaperAdventure.asVanilla(itemId))
             return
         }
         // 否则, 物品堆叠上已经重写了 minecraft:item_model 组件 - 以物品堆叠上的 minecraft:item_model 为准
@@ -65,13 +72,17 @@ object HotfixItemModel {
 object HotfixItemName {
 
     fun transform(itemstack: ItemStack) {
+        transform(itemstack.toNMS())
+    }
+
+    fun transform(itemstack: MojangStack) {
         val clientboundItemName = itemstack.getProp(ItemPropTypes.CLIENTBOUND_ITEM_NAME)
         if (clientboundItemName != null) {
             val rarity = itemstack.rarity2
             if (rarity != null) {
-                itemstack.setData(DataComponentTypes.ITEM_NAME, MiniMessage.miniMessage().deserialize(clientboundItemName, Placeholder.styling("rarity_style", *rarity.unwrap().displayStyles)))
+                itemstack.set(DataComponents.ITEM_NAME, MiniMessage.miniMessage().deserialize(clientboundItemName, Placeholder.styling("rarity_style", *rarity.unwrap().displayStyles)).let(PaperAdventure::asVanilla))
             } else {
-                itemstack.setData(DataComponentTypes.ITEM_NAME, MiniMessage.miniMessage().deserialize(clientboundItemName))
+                itemstack.set(DataComponents.ITEM_NAME, MiniMessage.miniMessage().deserialize(clientboundItemName).let(PaperAdventure::asVanilla))
             }
         }
         return
@@ -84,7 +95,7 @@ object HotfixItemName {
  *
  * 此修复动机:
  * 武器行为这边, 确实会向客户端发送特定武器 id 的 [Set Cooldown](https://minecraft.wiki/w/Java_Edition_protocol/Packets#Set_Cooldown) 封包.
- * 但客户端收到封包后, 发现物品上并没有指定武器 id 的 [UseCooldown.cooldownGroup].
+ * 但客户端收到封包后, 发现物品上并没有指定武器 id 的 [net.minecraft.world.item.component.UseCooldown.cooldownGroup].
  * 于是客户端那边就会静默的忽略这个封包, 最终导致无法看到攻击冷却的效果.
  *
  * 更好的方案:
@@ -96,10 +107,14 @@ object HotfixWeaponCooldownDisplay {
     // 冷却时间不由 minecraft:use_cooldown 组件决定, 而由实际发送到客户端的 Set Cooldown 封包决定
     private const val PLACEHOLDER_USE_COOLDOWN = 1f
 
+    fun transform(itemstack: ItemStack) {
+        transform(itemstack.toNMS())
+    }
+
     /**
      * 如果 [itemstack] 上有带冷却的武器行为, 则添加对应的 cooldown_group 属性.
      */
-    fun transform(itemstack: ItemStack) {
+    fun transform(itemstack: MojangStack) {
         val itemId = itemstack.typeId
         if (!itemstack.hasProp(ItemPropTypes.MINECRAFT_MELEE) &&
             !itemstack.hasProp(ItemPropTypes.MINECRAFT_TRIDENT) &&
@@ -109,9 +124,10 @@ object HotfixWeaponCooldownDisplay {
             // 但我们不应该在这里"解决"这个问题, 应该在加载配置文件的时候就做检查并给出警告
             return
         }
-        val useCooldown = UseCooldown
-            .useCooldown(PLACEHOLDER_USE_COOLDOWN)
-            .cooldownGroup(itemId) // cooldown_group 才是客户端真的需要的数据
-        itemstack.setData(DataComponentTypes.USE_COOLDOWN, useCooldown)
+        val useCooldown = net.minecraft.world.item.component.UseCooldown(
+            PLACEHOLDER_USE_COOLDOWN,
+            Optional.of(PaperAdventure.asVanilla(itemId)) // cooldown_group 才是客户端真的需要的数据
+        )
+        itemstack.set(DataComponents.USE_COOLDOWN, useCooldown)
     }
 }
