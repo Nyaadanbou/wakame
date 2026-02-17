@@ -96,7 +96,7 @@ public abstract class MixinLivingEntity {
             )
     )
     private boolean redirectIsBypassesArmor(DamageSource instance, TagKey<DamageType> damageTypeKey) {
-        return false;
+        return true;
     }
 }
 
