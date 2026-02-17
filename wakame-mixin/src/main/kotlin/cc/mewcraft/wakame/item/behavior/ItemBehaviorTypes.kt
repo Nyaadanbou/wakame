@@ -204,6 +204,30 @@ object ItemBehaviorTypes {
     @JvmField
     val TELEPORT_ANCHOR = typeOf("teleport_anchor", TeleportAnchor)
 
+    /**
+     * 物品具有该行为时, 在物品被消耗掉时会扣除物品指定的耐久度, 并取消掉物品本身的消耗行为.
+     */
+    @JvmField
+    val DAMAGE_ON_CONSUME = typeOf("damage_on_consume", DamageOnConsume)
+
+    /**
+     * 物品具有该行为时, 使用物品对着空气右键会扣除物品指定的耐久度.
+     */
+    @JvmField
+    val DAMAGE_ON_USE = typeOf("damage_on_use", DamageOnUse)
+
+    /**
+     * 物品具有该行为时, 使用物品与实体进行交互会扣除物品指定的耐久度.
+     */
+    @JvmField
+    val DAMAGE_ON_USE_ENTITY = typeOf("damage_on_use_entity", DamageOnUseEntity)
+
+    /**
+     * 物品具有该行为时, 使用物品与方块进行交互会扣除物品指定的耐久度.
+     */
+    @JvmField
+    val DAMAGE_ON_USE_ON = typeOf("damage_on_use_on", DamageOnUseOn)
+
     // ------------
     // 方便函数
     // ------------

@@ -464,6 +464,30 @@ data object ItemPropTypes {
     @JvmField
     val CRATE_KEY_REPLACEMENT = typeOf<String>("crate_key_replacement")
 
+    /**
+     * 使用物品右键消耗时损失的耐久度.
+     */
+    @JvmField
+    val DAMAGE_ON_CONSUME = typeOf<Int>("damage_on_consume")
+
+    /**
+     * 使用物品对空气右键损失的耐久度.
+     */
+    @JvmField
+    val DAMAGE_ON_USE = typeOf<Int>("damage_on_use")
+
+    /**
+     * 使用物品对实体右键损失的耐久度.
+     */
+    @JvmField
+    val DAMAGE_ON_USE_ENTITY = typeOf<Int>("damage_on_use_entity")
+
+    /**
+     * 使用物品对方块右键损失的耐久度.
+     */
+    @JvmField
+    val DAMAGE_ON_USE_ON = typeOf<Int>("damage_on_use_on")
+
     // ------------
     // 方便函数
     // ------------
