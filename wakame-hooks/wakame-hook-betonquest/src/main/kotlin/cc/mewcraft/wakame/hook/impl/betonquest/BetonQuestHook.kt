@@ -12,6 +12,7 @@ import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.koish.OutsideFact
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.party.HasPartyFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.item.KoishQuestItemFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.item.KoishQuestItemSerializer
+import cc.mewcraft.wakame.hook.impl.betonquest.quest.objective.ChangeWorldObjectiveFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.schedule.GameTickScheduleFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.schedule.GameTickScheduler
 import cc.mewcraft.wakame.integration.Hook
@@ -48,6 +49,7 @@ object BetonQuestHook {
         // Objective
         val objectiveRegistry = plugin.questRegistries.objective()
         //objectiveRegistry.register("configure", ConfigureObjectiveFactory())
+        objectiveRegistry.register("changeworld", ChangeWorldObjectiveFactory())
 
         // Placeholder
         val placeholderRegistry = plugin.questRegistries.placeholder()
