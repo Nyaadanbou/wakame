@@ -24,7 +24,7 @@ internal class RepairingTableItemRendererLayout : AbstractRendererLayout(Repairi
 internal data class RepairingTableItemRendererContext(val damage: Int, val maxDamage: Int, val repairCost: Double)
 
 @Init(InitStage.POST_WORLD)
-internal object RepairingTableItemRenderer : AbstractItemRenderer<RepairingTableItemRendererContext>() {
+internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, RepairingTableItemRendererContext>() {
     override val name: String = "repairing_table"
     override val formats: AbstractRendererFormatRegistry = RepairingTableRendererFormatRegistry()
     override val layout: AbstractRendererLayout = RepairingTableItemRendererLayout()

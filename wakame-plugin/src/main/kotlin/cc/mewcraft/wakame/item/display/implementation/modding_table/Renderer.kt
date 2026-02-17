@@ -51,7 +51,7 @@ internal sealed interface ModdingTableContext {
 }
 
 @Init(InitStage.POST_WORLD)
-internal object ModdingTableItemRenderer : AbstractItemRenderer<ModdingTableContext>() {
+internal object ModdingTableItemRenderer : AbstractItemRenderer<ItemStack, ModdingTableContext>() {
     override val name: String = "modding_table"
     override val formats = ModdingTableRendererFormatRegistry(this)
     override val layout = ModdingTableRendererLayout(this)

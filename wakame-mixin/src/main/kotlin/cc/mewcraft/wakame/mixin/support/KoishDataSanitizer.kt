@@ -1,8 +1,7 @@
 package cc.mewcraft.wakame.mixin.support
 
-import cc.mewcraft.wakame.mixin.core.InvokerBundleContents
-import cc.mewcraft.wakame.mixin.core.InvokerChargedProjectiles
-import com.google.common.collect.Lists
+import cc.mewcraft.wakame.util.nms.copyItems
+import cc.mewcraft.wakame.util.nms.isNotEmpty
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
@@ -36,11 +35,11 @@ object KoishDataSanitizer {
         item.remove(ExtraDataComponents.ITEM_KEY)
         // 移除 koish:data_container
         item.remove(ExtraDataComponents.DATA_CONTAINER)
-        // 移除 minecraft:container 中可能包含的 koish:data_container
+        // 移除 minecraft:container 中可能包含的 Koish 数据组件
         item.updateIfNecessary(DataComponents.CONTAINER, ItemContainerContents::isNotEmpty, ::sanitizeItemContainerContents)
-        // 移除 minecraft:bundle_contents 中可能包含的 koish:data_container
+        // 移除 minecraft:bundle_contents 中可能包含的 Koish 数据组件
         item.updateIfNecessary(DataComponents.BUNDLE_CONTENTS, BundleContents::isNotEmpty, ::sanitizeBundleContents)
-        // 移除 minecraft:charged_projectiles 中可能包含的 koish:data_container
+        // 移除 minecraft:charged_projectiles 中可能包含的 Koish 数据组件
         item.updateIfNecessary(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles::isNotEmpty, ::sanitizeChargedProjectiles)
 
         return true
@@ -64,11 +63,11 @@ object KoishDataSanitizer {
         builder.clear(ExtraDataComponents.ITEM_KEY)
         // 移除 koish:data_container
         builder.clear(ExtraDataComponents.DATA_CONTAINER)
-        // 清理 minecraft:container 中可能包含的 koish 组件
+        // 清理 minecraft:container 中可能包含的 Koish 数据组件
         builder.updateIfNecessary(DataComponents.CONTAINER, ItemContainerContents::isNotEmpty, ::sanitizeItemContainerContents)
-        // 清理 minecraft:bundle_contents 中可能包含的 koish 组件
+        // 清理 minecraft:bundle_contents 中可能包含的 Koish 数据组件
         builder.updateIfNecessary(DataComponents.BUNDLE_CONTENTS, BundleContents::isNotEmpty, ::sanitizeBundleContents)
-        // 清理 minecraft:charged_projectiles 中可能包含的 koish 组件
+        // 清理 minecraft:charged_projectiles 中可能包含的 Koish 数据组件
         builder.updateIfNecessary(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles::isNotEmpty, ::sanitizeChargedProjectiles)
 
         return builder.build()
@@ -101,7 +100,7 @@ private fun estimateSanitizing(patch: DataComponentPatch): Boolean {
 private fun sanitizeChargedProjectiles(chargedProjectiles: ChargedProjectiles): ChargedProjectiles {
     return sanitizeItemsInContainer(
         data = chargedProjectiles,
-        itemsGetter = ChargedProjectiles::unsafeItems,
+        itemsGetter = ChargedProjectiles::copyItems,
         constructor = ChargedProjectiles::of
     )
 }
@@ -109,7 +108,7 @@ private fun sanitizeChargedProjectiles(chargedProjectiles: ChargedProjectiles): 
 private fun sanitizeBundleContents(bundleContents: BundleContents): BundleContents {
     return sanitizeItemsInContainer(
         data = bundleContents,
-        itemsGetter = BundleContents::unsafeItems,
+        itemsGetter = BundleContents::copyItems,
         constructor = ::BundleContents,
     )
 }
@@ -117,14 +116,14 @@ private fun sanitizeBundleContents(bundleContents: BundleContents): BundleConten
 private fun sanitizeItemContainerContents(container: ItemContainerContents): ItemContainerContents {
     return sanitizeItemsInContainer(
         data = container,
-        itemsGetter = ItemContainerContents::unsafeItems,
+        itemsGetter = ItemContainerContents::copyItems,
         constructor = ItemContainerContents::fromItems,
     )
 }
 
-private fun <T : Any> ItemStack.updateIfNecessary(type: DataComponentType<T>, pass2: (T) -> Boolean, updater: (T) -> T) {
+private fun <T : Any> ItemStack.updateIfNecessary(type: DataComponentType<T>, necessity: (T) -> Boolean, updater: (T) -> T) {
     val component = this.get(type)
-    if (component != null && pass2(component)) {
+    if (component != null && necessity(component)) {
         val updated = updater(component)
         if (updated !== component) {
             this.set(type, updated)
@@ -174,14 +173,3 @@ private fun <T> sanitizeItemsInContainer(
         data
     }
 }
-
-private fun ItemContainerContents.isNotEmpty(): Boolean = this.items.isEmpty().not()
-private fun ItemContainerContents.unsafeItems(): List<ItemStack> = Lists.transform(this.items, ItemStack::copy)
-
-private fun BundleContents.isNotEmpty(): Boolean = this.isEmpty.not()
-@Suppress("CAST_NEVER_SUCCEEDS")
-private fun BundleContents.unsafeItems(): List<ItemStack> = Lists.transform((this as InvokerBundleContents).items(), ItemStack::copy)
-
-@Suppress("CAST_NEVER_SUCCEEDS")
-private fun ChargedProjectiles.isNotEmpty(): Boolean = (this as InvokerChargedProjectiles).items().isEmpty().not()
-private fun ChargedProjectiles.unsafeItems(): List<ItemStack> = this.items

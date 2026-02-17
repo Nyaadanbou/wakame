@@ -11,6 +11,7 @@ import io.papermc.paper.adventure.PaperAdventure
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.component.UseCooldown
 import org.bukkit.inventory.ItemStack
 import java.util.*
 
@@ -95,7 +96,7 @@ object HotfixItemName {
  *
  * 此修复动机:
  * 武器行为这边, 确实会向客户端发送特定武器 id 的 [Set Cooldown](https://minecraft.wiki/w/Java_Edition_protocol/Packets#Set_Cooldown) 封包.
- * 但客户端收到封包后, 发现物品上并没有指定武器 id 的 [net.minecraft.world.item.component.UseCooldown.cooldownGroup].
+ * 但客户端收到封包后, 发现物品上并没有指定武器 id 的 [UseCooldown.cooldownGroup].
  * 于是客户端那边就会静默的忽略这个封包, 最终导致无法看到攻击冷却的效果.
  *
  * 更好的方案:
@@ -124,7 +125,7 @@ object HotfixWeaponCooldownDisplay {
             // 但我们不应该在这里"解决"这个问题, 应该在加载配置文件的时候就做检查并给出警告
             return
         }
-        val useCooldown = net.minecraft.world.item.component.UseCooldown(
+        val useCooldown = UseCooldown(
             PLACEHOLDER_USE_COOLDOWN,
             Optional.of(PaperAdventure.asVanilla(itemId)) // cooldown_group 才是客户端真的需要的数据
         )

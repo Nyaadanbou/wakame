@@ -27,7 +27,7 @@ internal class SimpleRendererFormatRegistry : AbstractRendererFormatRegistry(Sim
 internal class SimpleItemRendererLayout : AbstractRendererLayout(SimpleItemRenderer)
 
 @Init(InitStage.POST_WORLD)
-internal object SimpleItemRenderer : AbstractItemRenderer<Nothing>() {
+internal object SimpleItemRenderer : AbstractItemRenderer<ItemStack, Nothing>() {
     override val name: String = "simple"
     override val formats: AbstractRendererFormatRegistry = SimpleRendererFormatRegistry()
     override val layout: AbstractRendererLayout = SimpleItemRendererLayout()

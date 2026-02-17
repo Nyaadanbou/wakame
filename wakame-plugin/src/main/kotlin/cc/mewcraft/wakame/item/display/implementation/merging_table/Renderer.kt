@@ -38,7 +38,7 @@ internal sealed interface MergingTableContext {
 }
 
 @Init(InitStage.POST_WORLD)
-internal object MergingTableItemRenderer : AbstractItemRenderer<MergingTableContext>() {
+internal object MergingTableItemRenderer : AbstractItemRenderer<ItemStack, MergingTableContext>() {
     override val name: String = "merging_table"
     override val formats = MergingTableRendererFormatRegistry(this)
     override val layout = MergingTableRendererLayout(this)

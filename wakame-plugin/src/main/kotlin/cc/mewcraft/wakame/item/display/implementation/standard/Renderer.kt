@@ -30,7 +30,8 @@ import cc.mewcraft.wakame.util.configurate.yamlLoader
 import cc.mewcraft.wakame.util.item.lore
 import cc.mewcraft.wakame.util.item.loreOrEmpty
 import cc.mewcraft.wakame.util.item.toBukkit
-import cc.mewcraft.wakame.util.item.toNMS
+import cc.mewcraft.wakame.util.nms.copyItems
+import cc.mewcraft.wakame.util.nms.isNotEmpty
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
@@ -47,7 +48,6 @@ import net.minecraft.world.item.component.TooltipDisplay
 import net.minecraft.world.item.enchantment.ItemEnchantments
 import org.bukkit.Registry
 import org.bukkit.craftbukkit.enchantments.CraftEnchantment
-import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.kotlin.extensions.getList
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import java.nio.file.Path
@@ -58,7 +58,7 @@ internal class StandardRendererFormatRegistry(renderer: StandardItemRenderer) : 
 internal class StandardRendererLayout(renderer: StandardItemRenderer) : AbstractRendererLayout(renderer)
 
 @Init(InitStage.POST_WORLD)
-internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
+internal object StandardItemRenderer : AbstractItemRenderer<MojangStack, Nothing>() {
     override val name = "standard"
     override val formats = StandardRendererFormatRegistry(this)
     override val layout = StandardRendererLayout(this)
@@ -98,8 +98,8 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         layout.initialize(layoutPath)
     }
 
-    override fun render(item: ItemStack, context: Nothing?) {
-        renderDeep(item.toNMS())
+    override fun render(item: MojangStack, context: Nothing?) {
+        renderDeep(item)
     }
 
     private fun renderDeep(item: MojangStack) {
@@ -107,17 +107,23 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         renderSelf(item)
 
         // 渲染物品里的物品
-        val container = item.get(DataComponents.CONTAINER)
-        if (container != null && container.items.isNotEmpty()) {
-            item.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(container.items.map(MojangStack::copy).onEach(::renderDeep)))
-        }
-        val bundleContents = item.get(DataComponents.BUNDLE_CONTENTS)
-        if (bundleContents != null && bundleContents.isEmpty.not()) {
-            item.set(DataComponents.BUNDLE_CONTENTS, BundleContents(bundleContents.items().map(MojangStack::copy).onEach(::renderDeep)))
-        }
-        val chargedProjectiles = item.get(DataComponents.CHARGED_PROJECTILES)
-        if (chargedProjectiles != null && chargedProjectiles.isEmpty.not()) {
-            item.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.of(chargedProjectiles.items.onEach(::renderDeep)))
+        renderItems(item, DataComponents.CONTAINER, ItemContainerContents::isNotEmpty, ItemContainerContents::copyItems, ItemContainerContents::fromItems)
+        renderItems(item, DataComponents.BUNDLE_CONTENTS, BundleContents::isNotEmpty, BundleContents::copyItems, ::BundleContents)
+        renderItems(item, DataComponents.CHARGED_PROJECTILES, ChargedProjectiles::isNotEmpty, ChargedProjectiles::copyItems, ChargedProjectiles::of)
+    }
+
+    private fun <T : Any> renderItems(
+        parent: MojangStack,
+        boxType: DataComponentType<T>,
+        necessity: (T) -> Boolean,
+        copyItems: (T) -> List<MojangStack>,
+        constructor: (List<MojangStack>) -> T,
+    ) {
+        val component = parent.get(boxType)
+        if (component != null && necessity(component)) {
+            val copyItems = copyItems(component).onEach(::renderDeep)
+            val updated = constructor(copyItems)
+            parent.set(boxType, updated)
         }
     }
 

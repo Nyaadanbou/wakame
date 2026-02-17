@@ -6,13 +6,12 @@ package cc.mewcraft.wakame.item.display.implementation
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.item.display.*
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
-import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.requireNotNull
 
 /* 这里定义了可以在不同渲染器之间通用的 ItemRenderer 实现 */
 
-internal abstract class AbstractItemRenderer<in C> : ItemRenderer<ItemStack, C> {
+internal abstract class AbstractItemRenderer<T, in C> : ItemRenderer<T, C> {
     /**
      * 渲染器的名字, 用来定位配置文件和生成日志.
      */
@@ -49,7 +48,7 @@ internal abstract class AbstractItemRenderer<in C> : ItemRenderer<ItemStack, C> 
  * 具体的推荐用法, 请参考已经存在的实现.
  */
 internal abstract class RenderingHandlerRegistry(
-    private val renderer: AbstractItemRenderer<*>,
+    private val renderer: AbstractItemRenderer<*, *>,
 ) {
     /**
      * To explicitly initialize static block.
