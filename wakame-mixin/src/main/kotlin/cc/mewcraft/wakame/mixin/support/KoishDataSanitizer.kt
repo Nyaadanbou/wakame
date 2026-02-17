@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.mixin.support
 
 import cc.mewcraft.wakame.mixin.core.InvokerBundleContents
 import cc.mewcraft.wakame.mixin.core.InvokerChargedProjectiles
+import com.google.common.collect.Lists
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
@@ -23,12 +24,11 @@ object KoishDataSanitizer {
      * 用于修复[错误日志](https://pastes.dev/wLwiJSZMBA).
      *
      * @param item 需要清理 koish:data_container 数据组件的物品堆叠
-     * @return 修改后的 [ItemStack] (原对象), 如果没有修改则返回原 [item]
      */
     @JvmStatic
-    fun sanitizeItemStack(item: ItemStack): ItemStack {
+    fun sanitizeItemStack(item: ItemStack) {
         if (!estimateSanitizing(item)) {
-            return item
+            return
         }
 
         // 移除 koish:item_id
@@ -41,8 +41,6 @@ object KoishDataSanitizer {
         item.updateIfNecessary(DataComponents.BUNDLE_CONTENTS, BundleContents::isNotEmpty, ::sanitizeBundleContents)
         // 移除 minecraft:charged_projectiles 中可能包含的 koish:data_container
         item.updateIfNecessary(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles::isNotEmpty, ::sanitizeChargedProjectiles)
-
-        return item
     }
 
     /**
@@ -63,11 +61,11 @@ object KoishDataSanitizer {
         builder.clear(ExtraDataComponents.ITEM_KEY)
         // 移除 koish:data_container
         builder.clear(ExtraDataComponents.DATA_CONTAINER)
-        // 清理 minecraft:container 中可能包含的 koish:data_container
+        // 清理 minecraft:container 中可能包含的 koish 组件
         builder.updateIfNecessary(DataComponents.CONTAINER, ItemContainerContents::isNotEmpty, ::sanitizeItemContainerContents)
-        // 清理 minecraft:bundle_contents 中可能包含的 koish:data_container
+        // 清理 minecraft:bundle_contents 中可能包含的 koish 组件
         builder.updateIfNecessary(DataComponents.BUNDLE_CONTENTS, BundleContents::isNotEmpty, ::sanitizeBundleContents)
-        // 清理 minecraft:charged_projectiles 中可能包含的 koish:data_container
+        // 清理 minecraft:charged_projectiles 中可能包含的 koish 组件
         builder.updateIfNecessary(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles::isNotEmpty, ::sanitizeChargedProjectiles)
 
         return builder.build()
@@ -160,7 +158,6 @@ private fun <T> sanitizeItemsInContainer(
     itemsGetter: Function<T, List<ItemStack>>,
     constructor: Function<List<ItemStack>, T>,
 ): T {
-    // 用于标记是否有移除过组件, 用于节省不必要的复制操作
     var removed = false
     // 获取原物品列表 oldItems
     val oldItems = itemsGetter.apply(data)
@@ -170,13 +167,10 @@ private fun <T> sanitizeItemsInContainer(
     for (item in oldItems) {
         if (item.has(ExtraDataComponents.ITEM_KEY) || item.has(ExtraDataComponents.DATA_CONTAINER)) {
             removed = true
-            val copy = item.copy() // 这里修改物品必须克隆, 这是 NMS 的代码传统
-            copy.remove(ExtraDataComponents.ITEM_KEY)
-            copy.remove(ExtraDataComponents.DATA_CONTAINER)
-            newItems.add(copy)
-        } else {
-            newItems.add(item)
+            item.remove(ExtraDataComponents.ITEM_KEY)
+            item.remove(ExtraDataComponents.DATA_CONTAINER)
         }
+        newItems.add(item)
     }
     // 如果移除过组件, 则返回修改后的, 否则返回原来的
     return if (removed) {
@@ -186,13 +180,13 @@ private fun <T> sanitizeItemsInContainer(
     }
 }
 
-private fun ItemContainerContents.isNotEmpty(): Boolean = !this.items.isEmpty()
-private fun ItemContainerContents.unsafeItems(): List<ItemStack> = this.items
+private fun ItemContainerContents.isNotEmpty(): Boolean = this.items.isEmpty().not()
+private fun ItemContainerContents.unsafeItems(): List<ItemStack> = Lists.transform(this.items, ItemStack::copy)
 
-private fun BundleContents.isNotEmpty(): Boolean = !this.isEmpty
+private fun BundleContents.isNotEmpty(): Boolean = this.isEmpty.not()
 @Suppress("CAST_NEVER_SUCCEEDS")
-private fun BundleContents.unsafeItems(): List<ItemStack> = (this as InvokerBundleContents).items()
+private fun BundleContents.unsafeItems(): List<ItemStack> = Lists.transform((this as InvokerBundleContents).items(), ItemStack::copy)
 
-private fun ChargedProjectiles.isNotEmpty(): Boolean = !this.items.isEmpty()
 @Suppress("CAST_NEVER_SUCCEEDS")
-private fun ChargedProjectiles.unsafeItems(): List<ItemStack> = (this as InvokerChargedProjectiles).items()
+private fun ChargedProjectiles.isNotEmpty(): Boolean = (this as InvokerChargedProjectiles).items().isEmpty().not()
+private fun ChargedProjectiles.unsafeItems(): List<ItemStack> = this.items

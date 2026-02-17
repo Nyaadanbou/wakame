@@ -42,13 +42,10 @@ public abstract class MixinHashedStack {
         // 这里就是解决物品不同步问题的核心逻辑了!!!
         // 算法: 在服务端也渲染一个完整的物品堆叠 x, 然后生成 x 的哈希 h_s. 最终将 h_s 与客户端那边发来的 h_c 进行比较.
         // 注意: stack 是服务端侧的直接物品堆叠实例, 如果要对其修改务必在其克隆上进行 (ItemStack#copy)
-        if (NetworkRenderer.responsible(stack)) {
-            stack = stack.copy();
-            NetworkRenderer.getInstance().render(stack.asBukkitMirror());
-        }
+        ItemStack copy = stack.copy();
+        NetworkRenderer.getInstance().render(copy.asBukkitMirror());
+        KoishDataSanitizer.sanitizeItemStack(copy);
 
-        KoishDataSanitizer.sanitizeItemStack(stack);
-
-        return this.item.equals(stack.getItemHolder()) && this.components.matches(stack.getComponentsPatch(), hashGenerator);
+        return this.item.equals(copy.getItemHolder()) && this.components.matches(copy.getComponentsPatch(), hashGenerator);
     }
 }

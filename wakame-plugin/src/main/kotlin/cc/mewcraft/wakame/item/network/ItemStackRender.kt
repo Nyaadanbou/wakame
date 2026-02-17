@@ -14,7 +14,6 @@ import cc.mewcraft.wakame.network.event.*
 import cc.mewcraft.wakame.network.event.clientbound.*
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.getOrThrow
-import cc.mewcraft.wakame.util.item.toNMS
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
 import com.mojang.datafixers.util.Pair
@@ -298,17 +297,15 @@ internal object ItemStackRender : PacketListener, Listener {
     }
 
     private fun MojangStack.modify(): MojangStack {
-        if (!isNetworkRewrite)
-            return this
-
-        val bukkitCopy = asBukkitCopy()
+        if (!isNetworkRewrite) return this
+        val copy = this.copy()
         try {
-            ItemRenderers.STANDARD.render(bukkitCopy)
+            ItemRenderers.STANDARD.render(copy.asBukkitMirror())
         } catch (e: Throwable) {
             if (LOGGING) {
-                LOGGER.error("An error occurred while rewrite network item: ${bukkitCopy.koishTypeId}", e)
+                LOGGER.error("An error occurred while rewrite network item: ${copy.koishTypeId}", e)
             }
         }
-        return bukkitCopy.toNMS()
+        return copy
     }
 }
