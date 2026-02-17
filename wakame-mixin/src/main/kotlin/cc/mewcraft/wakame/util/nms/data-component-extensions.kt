@@ -15,6 +15,7 @@ fun ItemContainerContents.lazyCopyItems(): List<ItemStack> = Lists.transform(thi
 fun BundleContents.isNotEmpty(): Boolean = this.isEmpty.not()
 @Suppress("CAST_NEVER_SUCCEEDS")
 fun BundleContents.copyItems(): List<ItemStack> = (this as InvokerBundleContents).items().map(ItemStack::copy)
+@Suppress("CAST_NEVER_SUCCEEDS")
 fun BundleContents.lazyCopyItems(): List<ItemStack> = Lists.transform((this as InvokerBundleContents).items(), ItemStack::copy)
 
 @Suppress("CAST_NEVER_SUCCEEDS")
