@@ -113,17 +113,17 @@ internal object StandardItemRenderer : AbstractItemRenderer<MojangStack, Nothing
     }
 
     private fun <T : Any> renderItems(
-        parent: MojangStack,
+        owner: MojangStack,
         boxType: DataComponentType<T>,
         necessity: (T) -> Boolean,
         copyItems: (T) -> List<MojangStack>,
         constructor: (List<MojangStack>) -> T,
     ) {
-        val component = parent.get(boxType)
+        val component = owner.get(boxType)
         if (component != null && necessity(component)) {
-            val copyItems = copyItems(component).onEach(::renderDeep)
-            val updated = constructor(copyItems)
-            parent.set(boxType, updated)
+            val items = copyItems(component).onEach(::renderDeep)
+            val updated = constructor(items)
+            owner.set(boxType, updated)
         }
     }
 
