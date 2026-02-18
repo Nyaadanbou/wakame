@@ -116,6 +116,7 @@ object TranslatableMessages {
     val MSG_ERR_CANNOT_USE_TELEPORT_ANCHOR_IN_CURRENT_DIMENSION = create("msg_err_cannot_use_teleport_anchor_in_current_dimension")
     val MSG_NETWORK_POS_SAVED = create("msg_network_pos_saved")
     val MSG_ERR_NOT_IN_DIMENSIONS = create("msg_err_not_in_dimensions")
+    val MSG_LOOTCHEST_CANNOT_BE_DESTROYED = create("msg_lootchest_cannot_be_destroyed")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

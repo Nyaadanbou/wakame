@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.init
 
 import cc.mewcraft.wakame.feature.ResetContainerOnLootGenerate
+import cc.mewcraft.wakame.feature.StopBreakingLootChests
 import cc.mewcraft.wakame.feature.TeleportOnJoinListener
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -14,5 +15,6 @@ object FeatureInitializer {
     fun init() {
         TeleportOnJoinListener().registerEvents()
         ResetContainerOnLootGenerate().registerEvents()
+        StopBreakingLootChests().registerEvents()
     }
 }
