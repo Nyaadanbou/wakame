@@ -37,7 +37,7 @@ dependencies:
       load: OMIT
     CraftEngine:
       required: false
-      load: OMIT
+      load: BEFORE
     Economy:
       required: false
       load: OMIT
