@@ -16,71 +16,43 @@ import cc.mewcraft.wakame.hook.impl.betonquest.quest.objective.ChangeWorldObject
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.schedule.GameTickScheduleFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.schedule.GameTickScheduler
 import cc.mewcraft.wakame.integration.Hook
-import org.betonquest.betonquest.BetonQuest
 import org.betonquest.betonquest.schedule.ActionScheduling
 
 @Hook(plugins = ["BetonQuest"])
 object BetonQuestHook {
 
     init {
-        val plugin = BetonQuest.getInstance()
-        val questTypeApi = plugin.questTypeApi
-        val profileProvider = plugin.profileProvider
-        val loggerFactory = plugin.loggerFactory
-
-        /* Quest Type Registries */
-
-        // Condition
-        val conditionRegistry = plugin.questRegistries.condition()
-        conditionRegistry.register("attribute", AttributeFactory(loggerFactory))
-        conditionRegistry.register("hasparty", HasPartyFactory(loggerFactory))
-        conditionRegistry.register("light", LightFactory(loggerFactory))
-        conditionRegistry.register("outside", OutsideFactory(loggerFactory))
-
-        // Action
-        val actionRegistry = plugin.questRegistries.action()
-        actionRegistry.register("createparty", CreatePartyActionFactory(loggerFactory, questTypeApi, profileProvider))
-        actionRegistry.register("leaveparty", LeavePartyActionFactory(loggerFactory))
-        actionRegistry.register("lockfreezeticks", LockFreezeTicksActionFactory(loggerFactory))
-        actionRegistry.register("setfreezeticks", SetFreezeTicksActionFactory(loggerFactory))
-        actionRegistry.register("teleportonjoin", TeleportOnJoinActionFactory(loggerFactory))
-        actionRegistry.register("replaceCrateKey", ReplaceCrateKeyActionFactory(loggerFactory))
-
-        // Objective
-        val objectiveRegistry = plugin.questRegistries.objective()
-        //objectiveRegistry.register("configure", ConfigureObjectiveFactory())
-        objectiveRegistry.register("changeworld", ChangeWorldObjectiveFactory())
-
-        // Placeholder
-        val placeholderRegistry = plugin.questRegistries.placeholder()
-
-        /* Feature Registries */
-
-        // ConversationIO
-        val conversationIoRegistry = plugin.featureRegistries.conversationIO()
-
-        // Interceptor
-        val interceptorRegistry = plugin.featureRegistries.interceptor()
-
-        // Item
-        val itemRegistry = plugin.featureRegistries.item()
-        itemRegistry.register("koish", KoishQuestItemFactory())
-        itemRegistry.registerSerializer("koish", KoishQuestItemSerializer())
-
-        // TextParser
-        val textParserRegistry = plugin.featureRegistries.textParser()
-
-        // NotifyIO
-        val notifyIoRegistry = plugin.featureRegistries.notifyIO()
-
-        // Schedule
-        val scheduleRegistry = plugin.featureRegistries.actionScheduling()
-        scheduleRegistry.register(
-            "game-tick",
-            ActionScheduling.ScheduleType(
-                GameTickScheduleFactory(),
-                GameTickScheduler(loggerFactory.create(GameTickScheduler::class.java), questTypeApi, plugin)
-            ),
-        )
+        hook {
+            conditions {
+                register("attribute", AttributeFactory(api.loggerFactory()))
+                register("hasparty", HasPartyFactory(api.loggerFactory()))
+                register("light", LightFactory(api.loggerFactory()))
+                register("outside", OutsideFactory(api.loggerFactory()))
+            }
+            actions {
+                register("createparty", CreatePartyActionFactory(api.loggerFactory(), api.managers().conditions(), api.profiles()))
+                register("leaveparty", LeavePartyActionFactory(api.loggerFactory()))
+                register("lockfreezeticks", LockFreezeTicksActionFactory(api.loggerFactory()))
+                register("setfreezeticks", SetFreezeTicksActionFactory(api.loggerFactory()))
+                register("teleportonjoin", TeleportOnJoinActionFactory(api.loggerFactory()))
+                register("replaceCrateKey", ReplaceCrateKeyActionFactory(api.loggerFactory()))
+            }
+            objectives {
+                register("changeworld", ChangeWorldObjectiveFactory())
+            }
+            items {
+                register("koish", KoishQuestItemFactory())
+                registerSerializer("koish", KoishQuestItemSerializer())
+            }
+            schedules {
+                register(
+                    "game-tick",
+                    ActionScheduling.ScheduleType(
+                        GameTickScheduleFactory(),
+                        GameTickScheduler(api.loggerFactory().create(GameTickScheduler::class.java), api.managers().actions(), pl)
+                    ),
+                )
+            }
+        }
     }
 }

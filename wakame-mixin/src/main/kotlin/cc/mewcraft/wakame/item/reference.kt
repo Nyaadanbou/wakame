@@ -63,6 +63,7 @@ interface ItemRef {
          * 该函数可能的使用场景:
          * 游戏处于运行状态时, 需要接收来自玩家的输入 (在此场景下, 服务器管理员也算玩家).
          */
+        @JvmStatic
         fun create(id: KoishKey): ItemRef? {
             return ItemRefManager.createChecked(id)
         }
@@ -73,6 +74,7 @@ interface ItemRef {
          * 该函数对于任何 [ItemStack] 都会返回一个有效的 [ItemRef], 而不是返回 `null` 或抛异常.
          * 如果没有物品系统可以理解 [stack], 一个 Minecraft 系统下的 [ItemRef] 将被作为兜底返回.
          */
+        @JvmStatic
         fun create(stack: ItemStack): ItemRef {
             val handler = ItemRefManager.getHandler(stack) ?: error("Cannot get handler from ItemStack: ${stack.toJsonString()}. This is a bug!")
             val id = handler.getId(stack) ?: error("Cannot get type id from ItemStack: ${stack.toJsonString()}. This is a bug!")
@@ -82,10 +84,10 @@ interface ItemRef {
         /**
          * 从 [material] 创建一个 [ItemRef].
          */
+        @JvmStatic
         fun create(material: Material): ItemRef {
             return create(material.key) ?: error("Cannot get reference from Material: $material. This is a bug!")
         }
-
     }
 
     /**

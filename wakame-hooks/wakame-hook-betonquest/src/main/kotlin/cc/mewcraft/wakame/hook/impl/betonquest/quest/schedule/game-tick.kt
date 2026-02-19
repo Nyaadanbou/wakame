@@ -6,10 +6,10 @@ import org.betonquest.betonquest.api.identifier.ActionIdentifier
 import org.betonquest.betonquest.api.identifier.ScheduleIdentifier
 import org.betonquest.betonquest.api.instruction.section.SectionInstruction
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
-import org.betonquest.betonquest.api.quest.QuestTypeApi
 import org.betonquest.betonquest.api.schedule.CatchupStrategy
 import org.betonquest.betonquest.api.schedule.Schedule
 import org.betonquest.betonquest.api.schedule.Scheduler
+import org.betonquest.betonquest.api.service.action.ActionManager
 import org.betonquest.betonquest.schedule.impl.BaseScheduleFactory
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
@@ -80,9 +80,9 @@ class GameTickScheduleFactory : BaseScheduleFactory<GameTickSchedule>() {
  */
 class GameTickScheduler(
     private val log: BetonQuestLogger,
-    private val questTypeApi: QuestTypeApi,
+    private val actionManager: ActionManager,
     private val plugin: JavaPlugin,
-) : Scheduler<GameTickSchedule, Int>(log, questTypeApi), Listener {
+) : Scheduler<GameTickSchedule, Int>(log, actionManager), Listener {
 
     /**
      * Next server tick at which each schedule should be executed.
