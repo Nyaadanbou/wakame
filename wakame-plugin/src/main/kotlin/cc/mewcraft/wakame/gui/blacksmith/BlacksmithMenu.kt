@@ -380,7 +380,7 @@ internal class BlacksmithMenu(
                         }
                         folded("item_list") {
                             for (item in recyclingSession.getAllClaims().map { claim -> claim.originalItem }) {
-                                val itemName = item.itemNameOrType
+                                val itemName = HotfixItemName.getItemName(item) ?: item.itemNameOrType
                                 val itemLevel = item.level?.level?.let(::text)
                                 if (itemLevel != null) {
                                     resolve("with_level") {
