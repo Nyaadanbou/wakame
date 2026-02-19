@@ -46,3 +46,6 @@ teleport_on_join_explicit_server:
 
 # 给战利品箱生成战利品时先清空容器内容物
 reset_container_on_loot_generate: false
+
+# 阻止战利品箱被玩家摧毁 (常见情况下)
+stop_breaking_loot_chests: false

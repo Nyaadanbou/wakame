@@ -59,6 +59,8 @@ object TickVoidEscapeEnchantment : ListenableIteratingSystem(
             ).thenRun {
                 // 清除随机传送进行中的标记
                 player.metadata().remove(RANDOM_TELEPORT_IN_PROGRESS)
+                // 设置摔落高度为 0，避免传送到地面后摔死
+                player.fallDistance = 0f
 
                 player.playSound(Sound.sound().type(BukkitSound.ITEM_TOTEM_USE).source(Sound.Source.PLAYER).build())
                 player.playSound(Sound.sound().type(BukkitSound.ITEM_CHORUS_FRUIT_TELEPORT).source(Sound.Source.PLAYER).build())
