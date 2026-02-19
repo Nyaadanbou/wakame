@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.reforge.recycle
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.integration.economy.EconomyIntegration2
-import cc.mewcraft.wakame.item.koishTypeId
+import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.util.decorate
@@ -32,7 +32,7 @@ internal class SimpleRecyclingSession(
     private val claims: ArrayList<Claim> = ArrayList(maxClaims)
 
     private fun getItemKey(item: ItemStack): Key {
-        return item.koishTypeId ?: item.type.key
+        return ItemRef.create(item).id
     }
 
     private fun getItemPrice(item: ItemStack?): PriceInstance? {
