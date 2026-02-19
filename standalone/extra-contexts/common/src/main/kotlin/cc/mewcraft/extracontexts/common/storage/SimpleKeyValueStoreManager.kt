@@ -19,7 +19,7 @@ object SimpleKeyValueStoreManager : KeyValueStoreManager {
 
     override fun get(id: UUID): List<Pair<String, String>> {
         return transaction(DatabaseManager.database()) {
-            addLogger(StdOutSqlLogger)
+            //addLogger(StdOutSqlLogger)
             KeyValuePairsQueries
                 .findByPlayer(id)
                 .map { row -> row[KeyValuePairs.key] to row[KeyValuePairs.value] }
@@ -29,7 +29,7 @@ object SimpleKeyValueStoreManager : KeyValueStoreManager {
 
     override fun get(id: UUID, key: String): String? {
         return transaction(DatabaseManager.database()) {
-            addLogger(StdOutSqlLogger)
+            //addLogger(StdOutSqlLogger)
             KeyValuePairsQueries
                 .findByPlayerAndKey(id, key)
                 .singleOrNull()
@@ -39,7 +39,7 @@ object SimpleKeyValueStoreManager : KeyValueStoreManager {
 
     override fun getWithPrefix(id: UUID, prefix: String): List<Pair<String, String>> {
         return transaction(DatabaseManager.database()) {
-            addLogger(StdOutSqlLogger)
+            //addLogger(StdOutSqlLogger)
             KeyValuePairsQueries
                 .findByPlayerAndKeyPrefix(id, prefix)
                 .map { row -> row[KeyValuePairs.key] to row[KeyValuePairs.value] }
@@ -49,7 +49,7 @@ object SimpleKeyValueStoreManager : KeyValueStoreManager {
 
     override fun set(id: UUID, key: String, value: String) {
         transaction(DatabaseManager.database()) {
-            addLogger(StdOutSqlLogger)
+            //addLogger(StdOutSqlLogger)
             KeyValuePairsQueries
                 .upsertEntry(id, key, value)
         }
@@ -57,7 +57,7 @@ object SimpleKeyValueStoreManager : KeyValueStoreManager {
 
     override fun delete(id: UUID) {
         transaction(DatabaseManager.database()) unit@{
-            addLogger(StdOutSqlLogger)
+            //addLogger(StdOutSqlLogger)
             KeyValuePairsQueries
                 .deleteByPlayer(id)
         }
@@ -65,7 +65,7 @@ object SimpleKeyValueStoreManager : KeyValueStoreManager {
 
     override fun delete(id: UUID, key: String) {
         transaction(DatabaseManager.database()) unit@{
-            addLogger(StdOutSqlLogger)
+            //addLogger(StdOutSqlLogger)
             KeyValuePairsQueries
                 .deleteByPlayerAndKey(id, key)
         }
@@ -73,7 +73,7 @@ object SimpleKeyValueStoreManager : KeyValueStoreManager {
 
     override fun deleteWithPrefix(id: UUID, prefix: String) {
         transaction(DatabaseManager.database()) unit@{
-            addLogger(StdOutSqlLogger)
+            //addLogger(StdOutSqlLogger)
             KeyValuePairsQueries
                 .deleteByPlayerAndKeyPrefix(id, prefix)
         }

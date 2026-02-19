@@ -49,7 +49,7 @@ object DatabaseManager {
                 useNestedTransactions = true
             }
 
-            database = Database.Companion.connect(
+            database = Database.connect(
                 datasource = dataSource,
                 databaseConfig = databaseConfig,
                 connectionAutoRegistration = ExposedConnectionImpl() // 在 shade 环境下 Exposed 无法自动找到连接的实现, 需要我们自己指定
