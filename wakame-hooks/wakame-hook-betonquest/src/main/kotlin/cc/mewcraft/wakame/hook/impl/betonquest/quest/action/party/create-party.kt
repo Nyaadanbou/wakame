@@ -10,25 +10,25 @@ import org.betonquest.betonquest.api.logger.BetonQuestLogger
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
 import org.betonquest.betonquest.api.profile.ProfileProvider
-import org.betonquest.betonquest.api.quest.QuestTypeApi
 import org.betonquest.betonquest.api.quest.action.OnlineAction
 import org.betonquest.betonquest.api.quest.action.OnlineActionAdapter
 import org.betonquest.betonquest.api.quest.action.PlayerAction
 import org.betonquest.betonquest.api.quest.action.PlayerActionFactory
+import org.betonquest.betonquest.api.service.condition.ConditionManager
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import kotlin.jvm.optionals.getOrNull
 
 
 /**
- * @param questTypeApi the Quest Type API
+ * @param conditionManager the ConditionManager
  * @param profileProvider the profile provider instance
  * @param range the range of the party
  * @param amount the optional maximum amount of players affected by this action
  * @param conditions the conditions that must be met by the party members
  */
 class CreatePartyAction(
-    private val questTypeApi: QuestTypeApi,
+    private val conditionManager: ConditionManager,
     private val profileProvider: ProfileProvider,
     private val range: Argument<Number>,
     private val conditions: Argument<List<ConditionIdentifier>>,
@@ -71,7 +71,7 @@ class CreatePartyAction(
     private fun getMemberList(profile: OnlineProfile): Set<OnlineProfile> {
         val toExecute = amount?.getValue(profile)?.toInt() ?: -1
         val members = getParty(
-            questTypeApi,
+            conditionManager,
             profileProvider.onlineProfiles,
             profile.player.location,
             range.getValue(profile).toDouble(),
@@ -91,7 +91,7 @@ class CreatePartyAction(
     }
 
     private fun getParty(
-        questTypeApi: QuestTypeApi,
+        conditionManager: ConditionManager,
         profiles: Collection<OnlineProfile>,
         location: Location,
         range: Double,
@@ -106,7 +106,7 @@ class CreatePartyAction(
         val rangePlayers = if (range <= 0.0) playerToDistance else playerToDistance.filter { (_, distance) -> distance <= squared }
 
         return rangePlayers
-            .filter { (profile, _) -> questTypeApi.conditions(profile, conditions) }
+            .filter { (profile, _) -> conditionManager.testAll(profile, conditions) }
             .toMap()
 
     }
@@ -123,12 +123,12 @@ class CreatePartyAction(
 
 /**
  * @param loggerFactory the logger factory to create a logger for the actions
- * @param questTypeApi the Quest Type API
+ * @param conditionManager the ConditionManager
  * @param profileProvider the profile provider instance
  */
 class CreatePartyActionFactory(
     private val loggerFactory: BetonQuestLoggerFactory,
-    private val questTypeApi: QuestTypeApi,
+    private val conditionManager: ConditionManager,
     private val profileProvider: ProfileProvider,
 ) : PlayerActionFactory {
 
@@ -138,7 +138,7 @@ class CreatePartyActionFactory(
         val amount = instruction.number().get("amount").getOrNull()
         val logger = loggerFactory.create(CreatePartyAction::class.java)
         val questPackage = instruction.getPackage()
-        val action = CreatePartyAction(questTypeApi, profileProvider, range, conditions, amount, logger)
+        val action = CreatePartyAction(conditionManager, profileProvider, range, conditions, amount, logger)
         val adapter = OnlineActionAdapter(action, logger, questPackage)
         return adapter
     }
