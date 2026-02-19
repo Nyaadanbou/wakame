@@ -410,7 +410,7 @@ data object ItemPropTypes {
     @JvmField
     val WORLD_WEATHER_CONTROL = typeOf<WorldWeatherControl>("world_weather_control") {
         serializers {
-            register(WeatherControl.Action.serializer())
+            registerExact(WeatherControl.Action.serializer())
         }
     }
 
