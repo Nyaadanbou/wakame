@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.support;
 
-import cc.mewcraft.wakame.api.Koish;
+import cc.mewcraft.wakame.item.ItemRef;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -56,16 +56,19 @@ public class KoishLootItem extends LootPoolSingletonContainer {
         var path = id.getPath();
         var player = getLootingPlayer(context);
 
-        var nekoItem = Koish.get().getItemRegistry().getOrNull(Key.key(namespace, path));
-        if (nekoItem == null) {
+        var itemRef = ItemRef.create(Key.key(namespace, path));
+        if (itemRef == null) {
             LogUtils.getClassLogger().error("No item type with id: {}", id);
             return;
         }
 
-        var bukkitItemStack = nekoItem.createItemStack(player);
-        var mojangItemStack = CraftItemStack.unwrap(bukkitItemStack);
-
-        lootConsumer.accept(mojangItemStack);
+        try {
+            var bukkitItem = itemRef.createItemStack(1, player);
+            var mojangItem = CraftItemStack.unwrap(bukkitItem);
+            lootConsumer.accept(mojangItem);
+        } catch (Exception e) {
+            LogUtils.getClassLogger().error("Failed to create item stack for id: {}", id);
+        }
     }
 
     /**
@@ -92,5 +95,4 @@ public class KoishLootItem extends LootPoolSingletonContainer {
 
         return null;
     }
-
 }
