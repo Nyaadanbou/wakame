@@ -20,22 +20,22 @@ class BetonQuestHookDSL {
     val api: BetonQuestApi = BetonQuestApiService.get().orElseThrow().api(pl)
 
     fun conditions(builder: ConditionRegistry.() -> Unit) {
-        builder(api.registries().conditions())
+        builder(api.conditions().registry())
     }
 
     fun actions(builder: ActionRegistry.() -> Unit) {
-        builder(api.registries().actions())
+        builder(api.actions().registry())
     }
 
     fun objectives(builder: ObjectiveRegistry.() -> Unit) {
-        builder(api.registries().objectives())
+        builder(api.objectives().registry())
     }
 
     fun items(builder: ItemRegistry.() -> Unit) {
-        builder(api.registries().items())
+        builder(api.items().registry())
     }
 
     fun schedules(builder: FeatureRegistry<ActionScheduling.ScheduleType<*, *>>.() -> Unit) {
-        builder(pl.legacyFeatureRegistries.actionScheduling())
+        builder(pl.coreQuestTypeHandler.scheduleRegistry)
     }
 }

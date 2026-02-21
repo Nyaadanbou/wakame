@@ -16,12 +16,15 @@ import cc.mewcraft.wakame.hook.impl.betonquest.quest.objective.ChangeWorldObject
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.schedule.GameTickScheduleFactory
 import cc.mewcraft.wakame.hook.impl.betonquest.quest.schedule.GameTickScheduler
 import cc.mewcraft.wakame.integration.Hook
+import cc.mewcraft.wakame.integration.betonquest.BetonQuestIntegration
 import org.betonquest.betonquest.schedule.ActionScheduling
 
 @Hook(plugins = ["BetonQuest"])
 object BetonQuestHook {
 
     init {
+        BetonQuestIntegration.setImplementation(BetonQuestIntegrationImpl())
+
         hook {
             conditions {
                 register("attribute", AttributeFactory(api.loggerFactory()))
@@ -30,7 +33,7 @@ object BetonQuestHook {
                 register("outside", OutsideFactory(api.loggerFactory()))
             }
             actions {
-                register("createparty", CreatePartyActionFactory(api.loggerFactory(), api.managers().conditions(), api.profiles()))
+                register("createparty", CreatePartyActionFactory(api.loggerFactory(), api.conditions().manager(), api.profiles()))
                 register("leaveparty", LeavePartyActionFactory(api.loggerFactory()))
                 register("lockfreezeticks", LockFreezeTicksActionFactory(api.loggerFactory()))
                 register("setfreezeticks", SetFreezeTicksActionFactory(api.loggerFactory()))
@@ -49,7 +52,7 @@ object BetonQuestHook {
                     "game-tick",
                     ActionScheduling.ScheduleType(
                         GameTickScheduleFactory(),
-                        GameTickScheduler(api.loggerFactory().create(GameTickScheduler::class.java), api.managers().actions(), pl)
+                        GameTickScheduler(api.loggerFactory().create(GameTickScheduler::class.java), api.actions().manager(), pl)
                     ),
                 )
             }
