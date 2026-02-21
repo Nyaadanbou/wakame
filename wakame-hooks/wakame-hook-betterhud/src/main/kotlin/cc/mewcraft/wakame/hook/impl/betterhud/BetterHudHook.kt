@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.hook.impl.betterhud
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.integration.Hook
+import cc.mewcraft.wakame.integration.betonquest.BetonQuestIntegration
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.integration.playermana.PlayerManaIntegration
 import kr.toxicity.hud.api.BetterHud
@@ -73,6 +74,18 @@ object BetterHudHook {
                     }
                 }
                 .build()
+        )
+        placeholderManager.booleanContainer.addPlaceholder(
+            "has_potion_effects", HudPlaceholder.of(HudPlaceholder.PlaceholderFunction.of { playerx ->
+                val player = playerx.toBukkitPlayer()
+                player.activePotionEffects.isNotEmpty()
+            })
+        )
+        placeholderManager.booleanContainer.addPlaceholder(
+            "in_conversation", HudPlaceholder.of(HudPlaceholder.PlaceholderFunction.of { playerx ->
+                val player = playerx.toBukkitPlayer()
+                BetonQuestIntegration.inConversation(player)
+            })
         )
     }
 }
