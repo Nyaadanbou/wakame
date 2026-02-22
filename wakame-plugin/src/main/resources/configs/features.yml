@@ -47,7 +47,37 @@ teleport_on_join_explicit_server:
 # 给战利品箱生成战利品时先清空容器内容物
 reset_container_on_loot_generate: false
 
-# 阻止战利品箱被玩家摧毁 (常规情况下)
+# 阻止指定维度下的战利品箱在指定事件下被玩家摧毁
+# 一级 key 是维度的标识符, 二级 key 是事件类型
 stop_breaking_loot_chests:
-  block_break: true
-  vehicle_destroy: true
+  koish:eden:
+    block_break: true
+    block_explode: true
+    entity_explode: true
+    vehicle_destroy: true
+  koish:dune:
+    block_break: true
+    block_explode: true
+    entity_explode: true
+    vehicle_destroy: true
+  koish:hollow:
+    block_break: true
+    block_explode: true
+    entity_explode: true
+    vehicle_destroy: true
+  koish:nether:
+    block_break: true
+    block_explode: true
+    entity_explode: true
+    vehicle_destroy: true
+  koish:end:
+    block_break: true
+    block_explode: true
+    entity_explode: true
+    vehicle_destroy: true
+
+# 死亡时不掉落以下槽位组 (EquipmentSlotGroup) 中的物品
+# EquipmentSlotGroup: https://jd.papermc.io/paper/1.21.11/org/bukkit/inventory/EquipmentSlotGroup.html
+equipment_slots_to_keep_on_death:
+  - hand
+  - armor
