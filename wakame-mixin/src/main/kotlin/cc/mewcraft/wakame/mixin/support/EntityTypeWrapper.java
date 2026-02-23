@@ -16,6 +16,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -121,28 +122,58 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
     }
 
     @Override
-    public @Nullable T spawn(ServerLevel world, BlockPos pos, EntitySpawnReason reason) {
-        return getDelegate().spawn(world, pos, reason);
+    public @Nullable T spawn(ServerLevel level, @Nullable ItemStack spawnedFrom, @Nullable LivingEntity owner, BlockPos pos, EntitySpawnReason spawnReason, boolean shouldOffsetY, boolean shouldOffsetYMore) {
+        return getDelegate().spawn(level, spawnedFrom, owner, pos, spawnReason, shouldOffsetY, shouldOffsetYMore);
     }
 
     @Override
-    public @Nullable T spawn(ServerLevel worldserver, BlockPos blockposition, EntitySpawnReason entityspawnreason, CreatureSpawnEvent.SpawnReason spawnReason) {
-        return getDelegate().spawn(worldserver, blockposition, entityspawnreason, spawnReason);
+    public @Nullable T spawn(ServerLevel level, @Nullable ItemStack spawnedFrom, @Nullable LivingEntity owner, BlockPos pos, EntitySpawnReason spawnReason, boolean shouldOffsetY, boolean shouldOffsetYMore, CreatureSpawnEvent.SpawnReason createSpawnReason) {
+        return getDelegate().spawn(level, spawnedFrom, owner, pos, spawnReason, shouldOffsetY, shouldOffsetYMore, createSpawnReason);
     }
 
     @Override
-    public @Nullable T spawn(ServerLevel world, @Nullable Consumer<T> afterConsumer, BlockPos pos, EntitySpawnReason reason, boolean alignPosition, boolean invertY) {
-        return getDelegate().spawn(world, afterConsumer, pos, reason, alignPosition, invertY);
+    public @Nullable T spawn(ServerLevel level, BlockPos pos, EntitySpawnReason spawnReason) {
+        return getDelegate().spawn(level, pos, spawnReason);
     }
 
     @Override
-    public @Nullable T spawn(ServerLevel worldserver, @Nullable Consumer<T> consumer, BlockPos blockposition, EntitySpawnReason entityspawnreason, boolean flag, boolean flag1, CreatureSpawnEvent.SpawnReason spawnReason) {
-        return getDelegate().spawn(worldserver, consumer, blockposition, entityspawnreason, flag, flag1, spawnReason);
+    public @Nullable T spawn(ServerLevel level, BlockPos pos, EntitySpawnReason spawnReason, CreatureSpawnEvent.SpawnReason creatureSpawnReason) {
+        return getDelegate().spawn(level, pos, spawnReason, creatureSpawnReason);
     }
 
     @Override
-    public @Nullable T create(ServerLevel world, @Nullable Consumer<T> afterConsumer, BlockPos pos, EntitySpawnReason reason, boolean alignPosition, boolean invertY) {
-        return getDelegate().create(world, afterConsumer, pos, reason, alignPosition, invertY);
+    public @Nullable T spawn(ServerLevel level, @Nullable Consumer<T> consumer, BlockPos pos, EntitySpawnReason spawnReason, boolean shouldOffsetY, boolean shouldOffsetYMore) {
+        return getDelegate().spawn(level, consumer, pos, spawnReason, shouldOffsetY, shouldOffsetYMore);
+    }
+
+    @Override
+    public @Nullable T spawn(ServerLevel level, @Nullable Consumer<T> consumer, BlockPos pos, EntitySpawnReason spawnReason, boolean shouldOffsetY, boolean shouldOffsetYMore, CreatureSpawnEvent.SpawnReason creatureSpawnReason) {
+        return getDelegate().spawn(level, consumer, pos, spawnReason, shouldOffsetY, shouldOffsetYMore, creatureSpawnReason);
+    }
+
+    @Override
+    public @Nullable T create(ServerLevel level, @Nullable Consumer<T> consumer, BlockPos pos, EntitySpawnReason reason, boolean shouldOffsetY, boolean shouldOffsetYMore) {
+        return getDelegate().create(level, consumer, pos, reason, shouldOffsetY, shouldOffsetYMore);
+    }
+
+    @Override
+    public @Nullable T create(Level world, EntitySpawnReason reason) {
+        T entity = getDelegate().create(world, reason);
+        if (entity == null)
+            return null;
+
+        CraftEntity bukkitEntity = entity.getBukkitEntity();
+
+        // MythicMobs 5.8.2:
+        // 在实体被创建时, MythicMobs 会识别这里写入的数据, 将实体变成对应的 MythicMobs 实体
+        MythicPluginBridge.Impl.writeIdMark(bukkitEntity, PaperAdventure.asAdventure(id));
+
+        return entity;
+    }
+
+    @Override
+    public boolean onlyOpCanSetNbt() {
+        return getDelegate().onlyOpCanSetNbt();
     }
 
     @Override
@@ -216,21 +247,6 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
     }
 
     @Override
-    public @Nullable T create(Level world, EntitySpawnReason reason) {
-        T entity = getDelegate().create(world, reason);
-        if (entity == null)
-            return null;
-
-        CraftEntity bukkitEntity = entity.getBukkitEntity();
-
-        // MythicMobs 5.8.2:
-        // 在实体被创建时, MythicMobs 会识别这里写入的数据, 将实体变成对应的 MythicMobs 实体
-        MythicPluginBridge.Impl.writeIdMark(bukkitEntity, PaperAdventure.asAdventure(id));
-
-        return entity;
-    }
-
-    @Override
     public AABB getSpawnAABB(double x, double y, double z) {
         return getDelegate().getSpawnAABB(x, y, z);
     }
@@ -247,42 +263,42 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
     @Override
     public int clientTrackingRange() {
-        throw new UnsupportedOperationException();
+        return getDelegate().clientTrackingRange();
     }
 
     @Override
     public int updateInterval() {
-        throw new UnsupportedOperationException();
+        return getDelegate().updateInterval();
     }
 
     @Override
     public boolean trackDeltas() {
-        throw new UnsupportedOperationException();
+        return getDelegate().trackDeltas();
     }
 
     @Override
     public boolean is(TagKey<EntityType<?>> tag) {
-        throw new UnsupportedOperationException();
+        return getDelegate().is(tag);
     }
 
     @Override
     public boolean is(HolderSet<EntityType<?>> entityTypeEntryList) {
-        throw new UnsupportedOperationException();
+        return getDelegate().is(entityTypeEntryList);
     }
 
     @Override
     public @Nullable T tryCast(Entity obj) {
-        throw new UnsupportedOperationException();
+        return  getDelegate().tryCast(obj);
     }
 
     @Override
     public Class<? extends Entity> getBaseClass() {
-        throw new UnsupportedOperationException();
+        return getDelegate().getBaseClass();
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public Holder.Reference<EntityType<?>> builtInRegistryHolder() {
-        throw new UnsupportedOperationException();
+        return getDelegate().builtInRegistryHolder();
     }
 }

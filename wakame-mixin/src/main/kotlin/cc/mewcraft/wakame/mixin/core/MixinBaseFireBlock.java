@@ -30,9 +30,9 @@ public abstract class MixinBaseFireBlock {
     /// @reason allow portals to work in custom dimensions
     @Overwrite
     private static boolean inPortalDimension(Level level) {
-        var levelKey = PaperAdventure.asAdventure(level.getTypeKey().identifier());
-        var testKeys = PrimaryConfig.Impl.getNetherPortalFunctionalDimensions();
-        return testKeys.contains(levelKey);
+        var dimensionKey = PaperAdventure.asAdventure(level.dimension().identifier());
+        var configuredKeys = PrimaryConfig.Impl.getNetherPortalFunctionalDimensions();
+        return configuredKeys.contains(dimensionKey);
     }
 }
 
