@@ -278,27 +278,27 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
     @Override
     public boolean is(TagKey<EntityType<?>> tag) {
-        throw new UnsupportedOperationException();
+        return getDelegate().is(tag);
     }
 
     @Override
     public boolean is(HolderSet<EntityType<?>> entityTypeEntryList) {
-        throw new UnsupportedOperationException();
+        return getDelegate().is(entityTypeEntryList);
     }
 
     @Override
     public @Nullable T tryCast(Entity obj) {
-        throw new UnsupportedOperationException();
+        return  getDelegate().tryCast(obj);
     }
 
     @Override
     public Class<? extends Entity> getBaseClass() {
-        throw new UnsupportedOperationException();
+        return getDelegate().getBaseClass();
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public Holder.Reference<EntityType<?>> builtInRegistryHolder() {
-        throw new UnsupportedOperationException();
+        return getDelegate().builtInRegistryHolder();
     }
 }

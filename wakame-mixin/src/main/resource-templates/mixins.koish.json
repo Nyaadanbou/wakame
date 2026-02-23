@@ -38,6 +38,7 @@
     "MixinRepairItemRecipe",
     "MixinServerPlayer",
     "MixinSpawnerData",
+    "MixinSpawnPlacements",
     "MixinStackedContentsExtrasMap",
     "MixinTippedArrowRecipe",
     "MixinTooltipDisplay"
