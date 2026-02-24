@@ -17,7 +17,7 @@ object MythicSkillIntegration : SkillIntegration {
     private val mythicApi: MythicBukkit
         get() = MythicBukkit.inst()
 
-    override fun castBlockSkill(player: Player, id: String, ctx: Castable) {
+    override fun castBlockSkill(player: Player, id: String, ctx: Castable?) {
         val origin = player.location
         val entityTargets = listOf(MythicUtil.getTargetedEntity(player))
         val locationTargets = listOf(player.getLineOfSight(null, 32).last().location)
@@ -25,7 +25,7 @@ object MythicSkillIntegration : SkillIntegration {
         LOGGER.info("Trying to running block skill: $id")
     }
 
-    override fun castInlineSkill(player: Player, line: String, ctx: Castable) {
+    override fun castInlineSkill(player: Player, line: String, ctx: Castable?) {
         val line = "[ - $line ]"
         val entity: AbstractEntity = BukkitAdapter.adapt(player)
         val caster = mythicApi.skillManager.getCaster(entity)
@@ -41,7 +41,7 @@ object MythicSkillIntegration : SkillIntegration {
         }
     }
 
-    override fun isCooldown(player: Player, id: String, ctx: Castable): Boolean {
+    override fun isCooldown(player: Player, id: String, ctx: Castable?): Boolean {
         val skill = mythicApi.skillManager.getSkill(id).getOrNull() ?: return false
         val caster = mythicApi.skillManager.getCaster(BukkitAdapter.adapt(player))
         return skill.onCooldown(caster)

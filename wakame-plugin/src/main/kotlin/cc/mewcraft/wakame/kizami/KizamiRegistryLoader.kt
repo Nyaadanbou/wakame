@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.registerExact
 import cc.mewcraft.lazyconfig.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
+import cc.mewcraft.wakame.integration.skill.SkillWrapper
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -51,11 +53,12 @@ internal object KizamiRegistryLoader : RegistryLoader {
             withDefaults()
             serializers {
                 register<KizamiEffectAttributeModifier>(KizamiEffectAttributeModifier.SERIALIZER)
-                register(
+                registerAll(SkillWrapper.serializers())
+                registerExact<KizamiEffect>(
                     DispatchingSerializer.createPartial<String, KizamiEffect>(
                         mapOf(
                             "attribute_modifier" to KizamiEffectAttributeModifier::class,
-                            // TODO 支持技能
+                            "skill_execution" to KizamiEffectSkill::class,
                         )
                     )
                 )
@@ -72,7 +75,7 @@ internal object KizamiRegistryLoader : RegistryLoader {
                 registryAction(entryId, entryVal)
             } catch (e: Throwable) {
                 IdePauser.pauseInIde(e)
-                LOGGER.error("Failed to register kizami from file: ${f.relativeTo(rootDirectory)}")
+                LOGGER.error("Failed to register kizami from file: ${f.relativeTo(rootDirectory)}", e)
             }
         }
     }
