@@ -8,6 +8,7 @@ import org.betonquest.betonquest.api.service.action.ActionRegistry
 import org.betonquest.betonquest.api.service.condition.ConditionRegistry
 import org.betonquest.betonquest.api.service.item.ItemRegistry
 import org.betonquest.betonquest.api.service.objective.ObjectiveRegistry
+import org.betonquest.betonquest.kernel.registry.feature.ScheduleRegistry
 import org.betonquest.betonquest.schedule.ActionScheduling
 
 fun hook(builder: BetonQuestHookDSL.() -> Unit) {
@@ -36,6 +37,8 @@ class BetonQuestHookDSL {
     }
 
     fun schedules(builder: FeatureRegistry<ActionScheduling.ScheduleType<*, *>>.() -> Unit) {
-        builder(pl.coreQuestTypeHandler.scheduleRegistry)
+        val componentLoader = pl.componentLoader
+        val scheduleRegistry = componentLoader.get(ScheduleRegistry::class.java)
+        builder(scheduleRegistry)
     }
 }

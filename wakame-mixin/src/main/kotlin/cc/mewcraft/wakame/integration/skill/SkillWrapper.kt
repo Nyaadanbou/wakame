@@ -30,7 +30,7 @@ interface SkillWrapper {
      *
      * @param player 释放者
      */
-    fun cast(player: Player, ctx: Castable)
+    fun cast(player: Player, ctx: Castable? = null)
 
     /**
      * 一个完整的机制, 以 [id] 唯一识别.
@@ -45,7 +45,7 @@ interface SkillWrapper {
         override val type: SkillWrapperType
             get() = SkillWrapperTypes.BLOCK
 
-        override fun cast(player: Player, ctx: Castable) {
+        override fun cast(player: Player, ctx: Castable?) {
             SkillIntegration.castBlockSkill(player, id, ctx)
         }
     }
@@ -63,7 +63,7 @@ interface SkillWrapper {
         override val type: SkillWrapperType
             get() = SkillWrapperTypes.INLINE
 
-        override fun cast(player: Player, ctx: Castable) {
+        override fun cast(player: Player, ctx: Castable?) {
             SkillIntegration.castInlineSkill(player, line, ctx)
         }
     }
