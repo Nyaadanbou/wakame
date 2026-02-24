@@ -10,8 +10,11 @@ import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.network.event.*
+import cc.mewcraft.wakame.network.event.PacketHandler
+import cc.mewcraft.wakame.network.event.PacketListener
 import cc.mewcraft.wakame.network.event.clientbound.*
+import cc.mewcraft.wakame.network.event.registerPacketListener
+import cc.mewcraft.wakame.network.event.unregisterPacketListener
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.getOrThrow
 import cc.mewcraft.wakame.util.registerEvents
@@ -33,6 +36,7 @@ import net.minecraft.world.item.trading.ItemCost
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
 import org.bukkit.GameMode
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import xyz.xenondevs.commons.provider.orElse
@@ -59,25 +63,26 @@ internal object ItemStackRender : PacketListener, Listener {
     }
 
     @PacketHandler
-    private fun handleSetContentPacket(event: ClientboundContainerSetContentPacketEvent) {
-        if (isCreative(event)) return
+    private fun handleContainerSetContent(event: ClientboundContainerSetContentPacketEvent) {
+        val player = event.player
+        if (isCreative(player)) return
         val items = event.items
-
         items.forEachIndexed { i, item ->
-            items[i] = item.modify()
+            items[i] = item.copy().modify(player)
         }
-
-        event.carriedItem = event.carriedItem.modify()
+        event.carriedItem = event.carriedItem.copy().modify(player)
     }
 
     @PacketHandler
-    private fun handleSetSlot(event: ClientboundContainerSetSlotPacketEvent) {
-        if (isCreative(event)) return
-        event.item = event.item.modify()
+    private fun handleContainerSetSlot(event: ClientboundContainerSetSlotPacketEvent) {
+        val player = event.player
+        if (isCreative(player)) return
+        event.item = event.item.copy().modify(player)
     }
 
     @PacketHandler
-    private fun handleEntityData(event: ClientboundSetEntityDataPacketEvent) {
+    private fun handleSetEntityData(event: ClientboundSetEntityDataPacketEvent) {
+        val player = event.player
         val oldItems = event.packedItems
         val newItems = ArrayList<DataValue<*>>()
         for (dataValue in oldItems) {
@@ -86,7 +91,7 @@ internal object ItemStackRender : PacketListener, Listener {
                 newItems += DataValue(
                     dataValue.id,
                     EntityDataSerializers.ITEM_STACK,
-                    value.modify()
+                    value.copy().modify(player)
                 )
             } else {
                 newItems += dataValue
@@ -97,48 +102,48 @@ internal object ItemStackRender : PacketListener, Listener {
 
     @PacketHandler
     private fun handleSetEquipment(event: ClientboundSetEquipmentPacketEvent) {
-        if (isCreative(event)) return
+        val player = event.player
+        if (isCreative(player)) return
         val slots = ArrayList(event.slots).also { event.slots = it }
-
         for ((i, pair) in slots.withIndex()) {
             slots[i] = Pair(
                 pair.first,
-                pair.second.modify()
+                pair.second.copy().modify(player)
             )
         }
     }
 
     @PacketHandler
     private fun handleMerchantOffers(event: ClientboundMerchantOffersPacketEvent) {
+        val player = event.player
         val newOffers = MerchantOffers()
-
         event.offers.forEach { offer ->
-            val stackA = offer.baseCostA.itemStack.modify()
+            val stackA = offer.baseCostA.itemStack.copy().modify(player)
             val costA = ItemCost(stackA.itemHolder, stackA.count, DataComponentExactPredicate.EMPTY, stackA)
             val costB = offer.costB.map {
-                val stackB = it.itemStack.modify()
+                val stackB = it.itemStack.copy().modify(player)
                 ItemCost(stackB.itemHolder, stackB.count, DataComponentExactPredicate.EMPTY, stackB)
             }
             newOffers += MerchantOffer(
-                costA, costB, offer.result.modify(),
+                costA, costB, offer.result.copy().modify(player),
                 offer.uses, offer.maxUses, offer.xp, offer.priceMultiplier, offer.demand
             )
         }
-
         event.offers = newOffers
     }
 
     @PacketHandler
     private fun handleRecipeBookAdd(event: ClientboundRecipeBookAddPacketEvent) {
+        val player = event.player
         event.entries = event.entries.map { entry ->
             val contents = entry.contents
             ClientboundRecipeBookAddPacket.Entry(
                 RecipeDisplayEntry(
                     contents.id,
-                    modifyRecipeDisplay(contents.display),
+                    modifyRecipeDisplay(player, contents.display),
                     contents.group,
                     contents.category,
-                    modifyIngredientList(contents.craftingRequirements)
+                    modifyIngredientList(player, contents.craftingRequirements)
                 ),
                 entry.notification(),
                 entry.highlight()
@@ -148,70 +153,74 @@ internal object ItemStackRender : PacketListener, Listener {
 
     @PacketHandler
     private fun handlePlaceGhostRecipe(event: ClientboundPlaceGhostRecipePacketEvent) {
-        event.recipeDisplay = modifyRecipeDisplay(event.recipeDisplay)
+        val player = event.player
+        event.recipeDisplay = modifyRecipeDisplay(player, event.recipeDisplay)
     }
 
     @EventHandler
     private fun handlePlayerChat(event: AsyncChatEvent) {
+        val player = event.player
         val originMessage = event.message()
-        event.message(modifyComponent(originMessage))
+        event.message(modifyComponent(player, originMessage))
     }
 
     @PacketHandler
     private fun handleSystemChat(event: ClientboundSystemChatPacketEvent) {
-        event.message = modifyComponent(event.message)
+        val player = event.player
+        event.message = modifyComponent(player, event.message)
     }
 
     @PacketHandler
-    private fun handleCombatKill(event: ClientboundPlayerCombatKillPacketEvent) {
-        event.message = modifyComponent(event.message)
+    private fun handlePlayerCombatKill(event: ClientboundPlayerCombatKillPacketEvent) {
+        val player = event.player
+        event.message = modifyComponent(player, event.message)
     }
 
-    private fun modifyIngredientList(optList: Optional<List<Ingredient>>): Optional<List<Ingredient>> =
+    private fun modifyIngredientList(player: Player, optList: Optional<List<Ingredient>>): Optional<List<Ingredient>> =
         optList.map { ingredientList ->
             ingredientList.map { ingredient ->
                 val itemStacks = ingredient.itemStacks()
                 if (itemStacks != null)
-                    Ingredient.ofStacks(itemStacks.map { it.modify() })
+                    Ingredient.ofStacks(itemStacks.map { it.copy().modify(player) })
                 else ingredient
             }
         }
 
-    private fun modifyRecipeDisplay(display: RecipeDisplay): RecipeDisplay = when (display) {
+    private fun modifyRecipeDisplay(player: Player, display: RecipeDisplay): RecipeDisplay = when (display) {
         is FurnaceRecipeDisplay -> FurnaceRecipeDisplay(
-            modifySlotDisplay(display.ingredient),
-            modifySlotDisplay(display.fuel),
-            modifySlotDisplay(display.result),
-            modifySlotDisplay(display.craftingStation),
+            modifySlotDisplay(player, display.ingredient),
+            modifySlotDisplay(player, display.fuel),
+            modifySlotDisplay(player, display.result),
+            modifySlotDisplay(player, display.craftingStation),
             display.duration,
             display.experience
         )
 
         is ShapedCraftingRecipeDisplay -> ShapedCraftingRecipeDisplay(
             display.width, display.height,
-            display.ingredients.map(::modifySlotDisplay),
-            modifySlotDisplay(display.result),
-            modifySlotDisplay(display.craftingStation)
+            display.ingredients.map { display -> modifySlotDisplay(player, display) },
+            modifySlotDisplay(player, display.result),
+            modifySlotDisplay(player, display.craftingStation)
         )
 
         is ShapelessCraftingRecipeDisplay -> ShapelessCraftingRecipeDisplay(
-            display.ingredients.map(::modifySlotDisplay),
-            modifySlotDisplay(display.result),
-            modifySlotDisplay(display.craftingStation)
+            display.ingredients.map { display -> modifySlotDisplay(player, display) },
+            modifySlotDisplay(player, display.result),
+            modifySlotDisplay(player, display.craftingStation)
         )
 
         is SmithingRecipeDisplay -> SmithingRecipeDisplay(
-            modifySlotDisplay(display.template),
-            modifySlotDisplay(display.base),
-            modifySlotDisplay(display.addition),
-            modifySlotDisplay(display.result),
-            modifySlotDisplay(display.craftingStation)
+            modifySlotDisplay(player, display.template),
+            modifySlotDisplay(player, display.base),
+            modifySlotDisplay(player, display.addition),
+            modifySlotDisplay(player, display.result),
+            modifySlotDisplay(player, display.craftingStation)
         )
 
         is StonecutterRecipeDisplay -> StonecutterRecipeDisplay(
-            modifySlotDisplay(display.input),
-            modifySlotDisplay(display.result),
-            modifySlotDisplay(display.craftingStation)
+            modifySlotDisplay(player, display.input),
+            modifySlotDisplay(player, display.result),
+            modifySlotDisplay(player, display.craftingStation)
         )
 
         else -> {
@@ -220,24 +229,24 @@ internal object ItemStackRender : PacketListener, Listener {
         }
     }
 
-    private fun modifySlotDisplay(display: SlotDisplay): SlotDisplay = when (display) {
+    private fun modifySlotDisplay(player: Player, display: SlotDisplay): SlotDisplay = when (display) {
         is SlotDisplay.Composite -> SlotDisplay.Composite(
-            display.contents.map(::modifySlotDisplay)
+            display.contents.map { display -> modifySlotDisplay(player, display) }
         )
 
         is SlotDisplay.ItemStackSlotDisplay -> SlotDisplay.ItemStackSlotDisplay(
-            display.stack.modify()
+            display.stack.copy().modify(player)
         )
 
         is SlotDisplay.SmithingTrimDemoSlotDisplay -> SlotDisplay.SmithingTrimDemoSlotDisplay(
-            modifySlotDisplay(display.base),
-            modifySlotDisplay(display.material),
+            modifySlotDisplay(player, display.base),
+            modifySlotDisplay(player, display.material),
             display.pattern
         )
 
         is SlotDisplay.WithRemainder -> SlotDisplay.WithRemainder(
-            modifySlotDisplay(display.input),
-            modifySlotDisplay(display.remainder)
+            modifySlotDisplay(player, display.input),
+            modifySlotDisplay(player, display.remainder)
         )
 
         is SlotDisplay.AnyFuel,
@@ -258,31 +267,31 @@ internal object ItemStackRender : PacketListener, Listener {
      * @param component Adventure Component
      * @return 修改后的 Adventure Component
      */
-    private fun modifyComponent(component: Component): Component {
+    private fun modifyComponent(player: Player, component: Component): Component {
         if (component !is TranslatableComponent)
             return component
 
-        val modified = modifyComponent0(component)
+        val modified = modifyComponent0(player, component)
 
-        val modifiedChildren = modified.children().map { modifyComponent(it) }
-        val modifiedArguments = modified.arguments().map { modifyComponent(it.asComponent()) }
+        val modifiedChildren = modified.children().map { modifyComponent(player, it) }
+        val modifiedArguments = modified.arguments().map { modifyComponent(player, it.asComponent()) }
 
         return modified.children(modifiedChildren).arguments(modifiedArguments)
     }
 
-    private fun modifyComponent0(component: TranslatableComponent): TranslatableComponent {
+    private fun modifyComponent0(player: Player, component: TranslatableComponent): TranslatableComponent {
         val hoverEvent = component.hoverEvent() ?: return component
         if (hoverEvent.action() == HoverEvent.Action.SHOW_ITEM) {
             val itemStackInfo = hoverEvent.value() as HoverEvent.ShowItem
             val originItemStack = MojangStack(Registries.ITEM.getOrThrow(itemStackInfo.item()), itemStackInfo.count(), PaperAdventure.asVanilla(itemStackInfo.dataComponents()))
-            val itemStack = originItemStack.modify()
+            val itemStack = originItemStack.copy().modify(player)
             val newHover = itemStack.asBukkitMirror().asHoverEvent()
             return component.hoverEvent(newHover)
         }
         return component
     }
 
-    private fun isCreative(event: PlayerPacketEvent<*>): Boolean {
+    private fun isCreative(player: Player): Boolean {
         // 创造模式会1:1复制它接收到的物品到客户端本地,
         // 而我们发给客户端的萌芽物品并不是原始物品, 而是修改过的.
         // 问题在于, 修改过的萌芽物品并不包含任何 wakame 数据,
@@ -293,19 +302,18 @@ internal object ItemStackRender : PacketListener, Listener {
         //
         // 因此, 我们现阶段能做的就是忽略该问题.
 
-        return event.player.gameMode == GameMode.CREATIVE
+        return player.gameMode === GameMode.CREATIVE
     }
 
-    private fun MojangStack.modify(): MojangStack {
+    private fun MojangStack.modify(player: Player): MojangStack {
         if (!isNetworkRewrite) return this
-        val copy = this.copy()
         try {
-            ItemRenderers.STANDARD.render(copy)
+            ItemRenderers.STANDARD.render(this, player)
         } catch (e: Throwable) {
             if (LOGGING) {
-                LOGGER.error("An error occurred while rewrite network item: ${copy.koishTypeId}", e)
+                LOGGER.error("An error occurred while rewrite network item: ${this.koishTypeId}", e)
             }
         }
-        return copy
+        return this
     }
 }

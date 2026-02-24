@@ -36,6 +36,7 @@
     "MixinPaperWorldLoader",
     "MixinRegistryDataLoader",
     "MixinRepairItemRecipe",
+    "MixinServerboundContainerClickPacket",
     "MixinServerPlayer",
     "MixinSpawnerData",
     "MixinSpawnPlacements",

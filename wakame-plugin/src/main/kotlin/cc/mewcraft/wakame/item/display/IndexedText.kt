@@ -17,14 +17,14 @@ sealed interface IndexedText {
 
     companion object {
         @JvmField
-        val NOP: IndexedText = _root_ide_package_.cc.mewcraft.wakame.item.display.NoOpIndexedText
+        val NO_OP: IndexedText = NoOpIndexedText
     }
 }
 
 /**
  * 一个空的 [cc.mewcraft.wakame.item.display.IndexedText] 实例, 用于表示该内容不应该被渲染.
  *
- * 推荐用法: 使用 [IndexedText.NOP] 来获取该实例.
+ * 推荐用法: 使用 [IndexedText.NO_OP] 来获取该实例.
  */
 data object NoOpIndexedText : IndexedText {
     override val idx: Key = Key.key("internal", "noop")

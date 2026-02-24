@@ -122,7 +122,7 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
 
             is MetaCoreContainer.Contextual -> {
                 // TODO #373: 实现动态生成
-                IndexedText.NOP
+                IndexedText.NO_OP
             }
         }
     }

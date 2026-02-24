@@ -5,16 +5,9 @@ import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.entity.player.component.InventoryListenable
-import cc.mewcraft.wakame.entity.player.koishLevel
 import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
-import cc.mewcraft.wakame.item.extension.level
-import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
-import cc.mewcraft.wakame.item.property.impl.ItemSlotGroup
 import cc.mewcraft.wakame.item.property.impl.ItemSlotRegistry
-import cc.mewcraft.wakame.util.item.damage
-import cc.mewcraft.wakame.util.item.isDamageable
-import cc.mewcraft.wakame.util.item.maxDamage
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.FamilyOnAdd
@@ -51,8 +44,10 @@ object ScanItemSlotChanges : IteratingSystem(
             val entry = slotChanges[slot]
             entry.update(curr)
             if (entry.changing) {
+                val prev = entry.previous
+                val curr = entry.current
                 if (!PlayerItemSlotChangeEvent.getHandlerList().registeredListeners.isEmpty()) {
-                    PlayerItemSlotChangeEvent(player, slot, entry.previous, entry.current).callEvent()
+                    PlayerItemSlotChangeEvent(player, slot, prev, curr).callEvent()
                 }
             }
         }
@@ -71,45 +66,19 @@ data class ItemSlotChanges(
 
     companion object : EComponentType<ItemSlotChanges>() {
 
-        //
-        // 下面提供一些方便函数用于判断一个特定槽位上的物品是否生效.
-        //
-
-        /**
-         * 检查物品在“正确”的物品槽.
-         */
+        @Deprecated("use the new function", replaceWith = ReplaceWith("ItemStackEffectiveness.testSlot(slot, itemstack)"))
         fun testSlot(slot: ItemSlot, itemstack: ItemStack?): Boolean {
-            if (itemstack == null) return false
-            val slotGroup = itemstack.getProp(ItemPropTypes.SLOT) ?: ItemSlotGroup.empty()
-            return slotGroup.contains(slot)
+            return ItemStackEffectiveness.testSlot(slot, itemstack)
         }
 
-        /**
-         * 检查物品的等级小于等于玩家的冒险等级.
-         */
+        @Deprecated("use the new function", replaceWith = ReplaceWith("ItemStackEffectiveness.testLevel(player, itemstack)"))
         fun testLevel(player: Player, itemstack: ItemStack?): Boolean {
-            // 如果不是萌芽物品, 那么玩家的等级一定高于该物品 (0)
-            if (itemstack == null) return true
-            // 如果物品没有等级, 那么玩家的等级一定高于该物品 (0)
-            val itemLevel = itemstack.level?.level ?: return true
-
-            val playerLevel = player.koishLevel
-            return itemLevel <= playerLevel
+            return ItemStackEffectiveness.testLevel(player, itemstack)
         }
 
-        /**
-         * 检查物品没有损坏.
-         */
+        @Deprecated("use the new function", replaceWith = ReplaceWith("ItemStackEffectiveness.testDamaged(itemstack)"))
         fun testDurability(itemstack: ItemStack): Boolean {
-            if (!itemstack.isDamageable) {
-                return true // 如果物品有“无法破坏”或耐久组件不完整, 那么认为物品没有耐久度, 应该返回 true
-            }
-
-            if (itemstack.damage >= itemstack.maxDamage) {
-                return false // 如果物品已经损坏, 那么应该返回 false
-            }
-
-            return true
+            return ItemStackEffectiveness.testDamaged(itemstack)
         }
     }
 

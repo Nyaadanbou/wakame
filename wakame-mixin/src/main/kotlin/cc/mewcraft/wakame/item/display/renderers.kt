@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.display
 
 import cc.mewcraft.wakame.item.isKoish
 import cc.mewcraft.wakame.util.MojangStack
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.nio.file.Path
 
@@ -63,10 +64,10 @@ object NetworkRenderer {
 
     @get:JvmStatic
     @get:JvmName("getInstance")
-    lateinit var INSTANCE: ItemRenderer<MojangStack, Nothing>
+    lateinit var INSTANCE: ItemRenderer<MojangStack, Player>
         private set
 
-    fun register(renderer: ItemRenderer<MojangStack, Nothing>) {
+    fun register(renderer: ItemRenderer<MojangStack, Player>) {
         INSTANCE = renderer
     }
 

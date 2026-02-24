@@ -13,6 +13,7 @@ import cc.mewcraft.wakame.item.display.implementation.rerolling_table.RerollingT
 import cc.mewcraft.wakame.item.display.implementation.simple.SimpleItemRenderer
 import cc.mewcraft.wakame.item.display.implementation.standard.StandardItemRenderer
 import cc.mewcraft.wakame.util.MojangStack
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.nio.file.Path
 
@@ -24,7 +25,7 @@ internal object ItemRenderers {
     val SIMPLE: ItemRenderer<ItemStack, Nothing> = SimpleItemRenderer
 
     @JvmField // 省去无用的函数调用
-    val STANDARD: ItemRenderer<MojangStack, Nothing> = StandardItemRenderer
+    val STANDARD: ItemRenderer<MojangStack, Player> = StandardItemRenderer
 
     @JvmField
     val CRAFTING_STATION: ItemRenderer<ItemStack, CraftingStationContext> = CraftingStationItemRenderer
