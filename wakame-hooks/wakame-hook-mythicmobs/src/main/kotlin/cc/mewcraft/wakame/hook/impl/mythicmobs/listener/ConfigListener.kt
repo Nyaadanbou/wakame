@@ -28,6 +28,10 @@ object ConfigListener : Listener {
                 e.registerCondition(::HoldingCondition)
             }
 
+            "inscription" -> {
+                e.registerCondition(::InscriptionCondition)
+            }
+
             "nekolevel" -> {
                 e.registerCondition(::LevelCondition)
             }
