@@ -254,17 +254,26 @@ object EntityBucket : ItemBehavior {
 
             is Wolf -> asWolfBucket(itemstack, clicked, player)
 
+            is ZombieHorse -> asZombieHorseBucket(itemstack, clicked, player)
+
+            // Water Animals
+            is Nautilus -> asNautilusBucket(itemstack, clicked, player)
+
+            // Animals Like
             is Allay -> asAllayBucket(itemstack, clicked, player)
 
             is IronGolem -> asIronGolemBucket(itemstack, clicked, player)
 
             is Snowman -> asSnowGolemBucket(itemstack, clicked, player)
 
+            // NPCs
             is Villager -> asVillagerBucket(itemstack, clicked, player)
 
             is WanderingTrader -> asWanderingTraderBucket(itemstack, clicked, player)
 
             is ZombieVillager -> asZombieVillagerBucket(itemstack, clicked, player)
+
+            is ZombieNautilus -> asZombieNautilusBucket(itemstack, clicked, player)
 
             else -> throw IllegalStateException("unsupported entity type: ${clicked.type}")
         }
@@ -314,6 +323,10 @@ object EntityBucket : ItemBehavior {
             EntityType.TRADER_LLAMA to Sound.ENTITY_LLAMA_HURT,
             EntityType.TURTLE to Sound.ENTITY_TURTLE_HURT,
             EntityType.WOLF to Sound.ENTITY_WOLF_HURT,
+            EntityType.ZOMBIE_HORSE to Sound.ENTITY_ZOMBIE_HORSE_HURT,
+
+            // Water Animals
+            EntityType.NAUTILUS to Sound.ENTITY_NAUTILUS_HURT,
 
             // Animals Like
             EntityType.ALLAY to Sound.ENTITY_ALLAY_DEATH,
@@ -324,6 +337,7 @@ object EntityBucket : ItemBehavior {
             EntityType.VILLAGER to Sound.ENTITY_VILLAGER_HURT,
             EntityType.WANDERING_TRADER to Sound.ENTITY_WANDERING_TRADER_HURT,
             EntityType.ZOMBIE_VILLAGER to Sound.ENTITY_ZOMBIE_VILLAGER_HURT,
+            EntityType.ZOMBIE_NAUTILUS to Sound.ENTITY_ZOMBIE_NAUTILUS_HURT,
         )
     }
 
@@ -652,9 +666,27 @@ object EntityBucket : ItemBehavior {
             )
         )
     }
+
+    private fun asZombieHorseBucket(itemstack: ItemStack, clicked: ZombieHorse, player: Player) {
+        itemstack.setCustomModelData("zombie_horse")
+        itemstack.setEntityBucketInfo(
+            ZombieHorseEntityBucketInfo(
+                isAdult = clicked.isAdult,
+            )
+        )
+    }
     //</editor-fold>
 
     //<editor-fold desc="Animals Like">
+    private fun asNautilusBucket(itemstack: ItemStack, clicked: Nautilus, player: Player) {
+        itemstack.setCustomModelData("nautilus")
+        itemstack.setEntityBucketInfo(
+            NautilusEntityBucketInfo(
+                isAdult = clicked.isAdult,
+            )
+        )
+    }
+
     private fun asAllayBucket(itemstack: ItemStack, clicked: Allay, player: Player) {
         itemstack.setCustomModelData("allay")
         itemstack.setEntityBucketInfo(AllayEntityBucketInfo()) // TODO 填充生物信息
@@ -718,6 +750,16 @@ object EntityBucket : ItemBehavior {
             ZombieVillagerEntityBucketInfo(
                 region = clicked.villagerType.key().value(),
                 profession = clicked.villagerProfession.key().value()
+            )
+        )
+    }
+
+    private fun asZombieNautilusBucket(itemstack: ItemStack, clicked: ZombieNautilus, player: Player) {
+        val variant = clicked.variant.key().value()
+        itemstack.setCustomModelData("zombie_nautilus/$variant")
+        itemstack.setEntityBucketInfo(
+            ZombieNautilusEntityBucketInfo(
+                variant = variant,
             )
         )
     }
