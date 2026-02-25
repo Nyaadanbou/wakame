@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.display.implementation.standard
 
 import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item.*
@@ -11,7 +12,7 @@ import cc.mewcraft.wakame.item.datagen.impl.MetaCustomName
 import cc.mewcraft.wakame.item.datagen.impl.MetaItemName
 import cc.mewcraft.wakame.item.display.IndexedText
 import cc.mewcraft.wakame.item.display.ItemRendererConstants
-import cc.mewcraft.wakame.item.display.NetworkRenderer
+import cc.mewcraft.wakame.item.display.ItemStackRenderer
 import cc.mewcraft.wakame.item.display.TextAssembler
 import cc.mewcraft.wakame.item.display.implementation.*
 import cc.mewcraft.wakame.item.display.implementation.common.*
@@ -27,6 +28,7 @@ import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.configurate.yamlLoader
+import cc.mewcraft.wakame.util.decorate
 import cc.mewcraft.wakame.util.item.lore
 import cc.mewcraft.wakame.util.item.loreOrEmpty
 import cc.mewcraft.wakame.util.item.toBukkit
@@ -48,6 +50,7 @@ import net.minecraft.world.item.component.TooltipDisplay
 import net.minecraft.world.item.enchantment.ItemEnchantments
 import org.bukkit.Registry
 import org.bukkit.craftbukkit.enchantments.CraftEnchantment
+import org.bukkit.entity.Player
 import org.spongepowered.configurate.kotlin.extensions.getList
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import java.nio.file.Path
@@ -58,10 +61,11 @@ internal class StandardRendererFormatRegistry(renderer: StandardItemRenderer) : 
 internal class StandardRendererLayout(renderer: StandardItemRenderer) : AbstractRendererLayout(renderer)
 
 @Init(InitStage.POST_WORLD)
-internal object StandardItemRenderer : AbstractItemRenderer<MojangStack, Nothing>() {
+internal object StandardItemRenderer : AbstractItemRenderer<MojangStack, Player>() {
     override val name = "standard"
     override val formats = StandardRendererFormatRegistry(this)
     override val layout = StandardRendererLayout(this)
+    private val logger = LOGGER.decorate(StandardItemRenderer::class)
     private val textAssembler = TextAssembler(layout)
     private val removeComponents: MutableSet<DataComponentType<*>> = ObjectArraySet()
     private val hiddenComponents: MutableSet<DataComponentType<*>> = ObjectArraySet()
@@ -98,21 +102,22 @@ internal object StandardItemRenderer : AbstractItemRenderer<MojangStack, Nothing
         layout.initialize(layoutPath)
     }
 
-    override fun render(item: MojangStack, context: Nothing?) {
-        renderDeep(item)
+    override fun render(item: MojangStack, context: Player?) {
+        renderDeep(context, item)
     }
 
-    private fun renderDeep(item: MojangStack) {
+    private fun renderDeep(player: Player?, item: MojangStack) {
         // 渲染物品本身
-        renderSelf(item)
+        renderSelf(player, item)
 
         // 渲染物品里的物品
-        renderItems(item, DataComponents.CONTAINER, ItemContainerContents::isNotEmpty, ItemContainerContents::copyItems, ItemContainerContents::fromItems)
-        renderItems(item, DataComponents.BUNDLE_CONTENTS, BundleContents::isNotEmpty, BundleContents::copyItems, ::BundleContents)
-        renderItems(item, DataComponents.CHARGED_PROJECTILES, ChargedProjectiles::isNotEmpty, ChargedProjectiles::copyItems, ChargedProjectiles::of)
+        renderItems(player, item, DataComponents.CONTAINER, ItemContainerContents::isNotEmpty, ItemContainerContents::copyItems, ItemContainerContents::fromItems)
+        renderItems(player, item, DataComponents.BUNDLE_CONTENTS, BundleContents::isNotEmpty, BundleContents::copyItems, ::BundleContents)
+        renderItems(player, item, DataComponents.CHARGED_PROJECTILES, ChargedProjectiles::isNotEmpty, ChargedProjectiles::copyItems, ChargedProjectiles::of)
     }
 
     private fun <T : Any> renderItems(
+        player: Player?,
         owner: MojangStack,
         boxType: DataComponentType<T>,
         necessity: (T) -> Boolean,
@@ -121,14 +126,14 @@ internal object StandardItemRenderer : AbstractItemRenderer<MojangStack, Nothing
     ) {
         val component = owner.get(boxType)
         if (component != null && necessity(component)) {
-            val items = copyItems(component).onEach(::renderDeep)
+            val items = copyItems(component).onEach { item -> renderDeep(player, item) }
             val updated = constructor(items)
             owner.set(boxType, updated)
         }
     }
 
-    private fun renderSelf(item: MojangStack) {
-        if (!NetworkRenderer.responsible(item)) return
+    private fun renderSelf(player: Player?, item: MojangStack) {
+        if (!ItemStackRenderer.responsible(item)) return
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 
@@ -154,6 +159,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<MojangStack, Nothing
         StandardRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, if (item.has(DataComponents.DAMAGE_RESISTANT)) Unit else null)
         StandardRenderingHandlerRegistry.FOOD.process(collector, item.get(DataComponents.FOOD))
         StandardRenderingHandlerRegistry.ENCHANT_SLOTS.process(collector, item)
+        StandardRenderingHandlerRegistry.EFFECTIVENESS.process(collector, player, item)
 
         // 生成 koish lore
         val koishLore = textAssembler.assemble(collector)
@@ -215,7 +221,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<MojangStack, Nothing
             when (core) {
                 is AttributeCore -> StandardRenderingHandlerRegistry.CORE_ATTRIBUTE.process(collector, core)
                 is EmptyCore -> StandardRenderingHandlerRegistry.CORE_EMPTY.process(collector, core)
-                is VirtualCore -> IndexedText.NOP
+                is VirtualCore -> IndexedText.NO_OP
             }
         }
     }
@@ -275,7 +281,7 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
         val maxBase = EnchantSlotFeature.getSlotBase(bukkitStack)
         val maxExtra = EnchantSlotFeature.getSlotExtra(bukkitStack)
         val maxTotal = maxBase + maxExtra
-        if (maxTotal <= 0) return@configure IndexedText.NOP
+        if (maxTotal <= 0) return@configure IndexedText.NO_OP
         val resolver = TagResolver.resolver(
             Placeholder.component("used", Component.text(used)),
             Placeholder.component("max_base", Component.text(maxBase)),
@@ -344,10 +350,17 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
     }
 
     @JvmField
-    val CASTABLE: RenderingHandler<Map<String, Castable>, CastableRendererFormat> = configure("castable") { data, format -> format.render(data) }
+    val CASTABLE: RenderingHandler<Map<String, Castable>, CastableRendererFormat> = configure("castable") { data, format ->
+        format.render(data)
+    }
 
     @JvmField
     val NETWORK_POSITION: RenderingHandler<NetworkPosition, NetworkPositionRendererFormat> = configure("network_position") { data, format ->
         format.render(data)
+    }
+
+    @JvmField
+    val EFFECTIVENESS: RenderingHandler2<Player?, MojangStack, EffectivenessRendererFormat> = configure2("effectiveness") { data1, data2, format ->
+        format.render(data1, data2)
     }
 }

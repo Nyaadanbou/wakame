@@ -343,6 +343,7 @@ private open class SimpleItemDataContainer(
             val iter = obj.fastIterator()
             while (iter.hasNext()) {
                 val (dataType, dataValue) = iter.next()
+                if (!dataType.persistent) continue
                 val dataTypeId = BuiltInRegistries.ITEM_DATA_TYPE.getId(dataType) ?: continue
                 val mapKey = dataTypeId.value() // 这里写入的 map key 省略了命名空间 "koish"
                 val entryNode = node.node(mapKey)

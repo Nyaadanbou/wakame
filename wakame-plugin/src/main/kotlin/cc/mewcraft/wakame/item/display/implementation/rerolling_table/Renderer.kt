@@ -99,7 +99,7 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<ItemStack, Rer
                 when (core) {
                     is AttributeCore -> RerollingTableRenderingHandlerRegistry.CORE_ATTRIBUTE_IN.process(collector, id, core, context)
                     is EmptyCore -> RerollingTableRenderingHandlerRegistry.CORE_EMPTY_IN.process(collector, id, core, context)
-                    is VirtualCore -> IndexedText.NOP
+                    is VirtualCore -> IndexedText.NO_OP
                 }
             }
 
@@ -107,7 +107,7 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<ItemStack, Rer
                 when (core) {
                     is AttributeCore -> RerollingTableRenderingHandlerRegistry.CORE_ATTRIBUTE_OUT.process(collector, id, core, context)
                     is EmptyCore -> RerollingTableRenderingHandlerRegistry.CORE_EMPTY_OUT.process(collector, id, core, context)
-                    is VirtualCore -> IndexedText.NOP
+                    is VirtualCore -> IndexedText.NO_OP
                 }
             }
 

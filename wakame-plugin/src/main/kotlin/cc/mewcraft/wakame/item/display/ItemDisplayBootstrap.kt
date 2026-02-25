@@ -15,6 +15,6 @@ object ItemDisplayBootstrap {
 
     @InitFun
     fun init() {
-        NetworkRenderer.register(StandardItemRenderer)
+        ItemStackRenderer.register(StandardItemRenderer)
     }
 }

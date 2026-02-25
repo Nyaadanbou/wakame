@@ -12,6 +12,7 @@ import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.integration.playermana.PlayerManaIntegration
 import cc.mewcraft.wakame.integration.playermana.PlayerManaType
 import cc.mewcraft.wakame.util.event
+import cc.mewcraft.wakame.util.registerEvents
 import dev.aurelium.auraskills.api.AuraSkillsApi
 import dev.aurelium.auraskills.api.event.user.UserLoadEvent
 import dev.aurelium.auraskills.api.user.SkillsUser
@@ -38,6 +39,8 @@ object AuraSkillsHook : PlayerManaIntegration by AuraPlayerManaIntegration {
 
         registerTraits()
         registerTraitHandlers()
+
+        AuraSkillsListener().registerEvents()
     }
 
     private fun registerTraits() {

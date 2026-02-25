@@ -53,6 +53,27 @@ sealed interface ItemSlot : Examinable {
          */
         fun imaginary(): ItemSlot = Imaginary
 
+        /**
+         * 返回 [rawSlot] 对应的 [ItemSlot] 实例.
+         *
+         * 如果物品配置从未设置 [rawSlot] 为生效槽位, 该函数可能返回 `null`.
+         */
+        fun fromRawSlot(rawSlot: Int): ItemSlot? {
+            val convertedSlot = when (rawSlot) {
+                in 0..4 -> null
+                5 -> 39
+                6 -> 38
+                7 -> 37
+                8 -> 36
+                in 9..35 -> rawSlot
+                in 36..44 -> rawSlot - 36
+                45 -> 40
+                else -> null
+            } ?: return null
+            val found = MinecraftItemSlot.from(convertedSlot)
+                ?: ExtraItemSlot.from(convertedSlot)
+            return found
+        }
     }
 
     /**
@@ -63,9 +84,10 @@ sealed interface ItemSlot : Examinable {
     /**
      * 获取该 [ItemSlot] 所对应的玩家背包里的栏位.
      *
-     * 参考:
+     * 关于 [index] 的取值所对应的物品栏位置可参考:
      *
      * Converted Slots:
+     * ```
      * 39             1  2     0
      * 38             3  4
      * 37
@@ -74,6 +96,7 @@ sealed interface ItemSlot : Examinable {
      * 18 19 20 21 22 23 24 25 26
      * 27 28 29 30 31 32 33 34 35
      * 0  1  2  3  4  5  6  7  8
+     * ```
      */
     val index: Int
 
@@ -173,6 +196,25 @@ sealed interface ItemSlotGroup {
     val children: Set<ItemSlot>
 
     /**
+     * 检查给定的 [convertedSlot] 是否在这个组中.
+     *
+     * 关于 [convertedSlot] 的取值参考:
+     *
+     * Converted Slots:
+     * ```
+     * 39             1  2     0
+     * 38             3  4
+     * 37
+     * 36          40
+     * 9  10 11 12 13 14 15 16 17
+     * 18 19 20 21 22 23 24 25 26
+     * 27 28 29 30 31 32 33 34 35
+     * 0  1  2  3  4  5  6  7  8
+     * ```
+     */
+    fun contains(convertedSlot: Int): Boolean
+
+    /**
      * 检查给定的 [Key] 是否在这个组中.
      */
     fun contains(id: Key): Boolean
@@ -231,7 +273,7 @@ object ItemSlotRegistry {
      * 获取 Minecraft 的 [ItemSlot] 实例.
      * 这些实例代表原版的装备栏位, 例如双手/盔甲.
      */
-    fun minecraftItemSlots(): Collection<ItemSlot> {
+    fun minecraftItemSlots(): Collection<MinecraftItemSlot> {
         return equipmentSlotToItemSlot.values
     }
 
@@ -239,32 +281,46 @@ object ItemSlotRegistry {
      * 获取自定义的 [ItemSlot] 实例.
      * 这些实例代表是非原版的装备栏位, 例如非双手/非盔甲.
      */
-    fun extraItemSlots(): Collection<ItemSlot> {
+    fun extraItemSlots(): Collection<ExtraItemSlot> {
         return extraItemSlots
     }
 
     /**
      * 获取一个 [EquipmentSlotGroup] 所对应的 [ItemSlot].
-     * 如果不��在, 则返回一个空集合.
+     * 如果不存在, 则返回一个空集合.
      */
-    fun get(group: EquipmentSlotGroup): Set<ItemSlot> {
-        return equipmentSlotGroupToItemSlots[group] ?: emptySet()
+    fun get(equipmentSlotGroup: EquipmentSlotGroup): Set<ItemSlot> {
+        return equipmentSlotGroupToItemSlots[equipmentSlotGroup] ?: emptySet()
     }
 
     /**
      * 获取一个 [EquipmentSlot] 所对应的 [ItemSlot].
      * 如果不存在, 则返回 `null`.
      */
-    fun get(slot: EquipmentSlot): ItemSlot? {
-        return equipmentSlotToItemSlot[slot]
+    fun get(equipmentSlot: EquipmentSlot): ItemSlot? {
+        return equipmentSlotToItemSlot[equipmentSlot]
     }
 
     /**
      * 获取一个跟 [ItemSlot.index] 所对应的 [ItemSlot].
      * 如果不存在, 则返回 `null`.
+     *
+     * 关于 [convertedSlot] 的取值可参考:
+     *
+     * Converted Slots:
+     * ```
+     * 39             1  2     0
+     * 38             3  4
+     * 37
+     * 36          40
+     * 9  10 11 12 13 14 15 16 17
+     * 18 19 20 21 22 23 24 25 26
+     * 27 28 29 30 31 32 33 34 35
+     * 0  1  2  3  4  5  6  7  8
+     * ```
      */
-    fun get(slotIndex: Int): ItemSlot? {
-        return indexToExtraSlot[slotIndex]
+    fun get(convertedSlot: Int): ExtraItemSlot? {
+        return indexToExtraSlot[convertedSlot]
     }
 
     /**
@@ -281,8 +337,8 @@ object ItemSlotRegistry {
 
         when (slot) {
             is MinecraftItemSlot -> {
-                equipmentSlotToItemSlot.putIfAbsent(slot.slot, slot)
-                equipmentSlotGroupToItemSlots.computeIfAbsent(slot.slot.group, Reference2ReferenceFunction { ObjectArraySet() }).add(slot)
+                equipmentSlotToItemSlot.putIfAbsent(slot.equipmentSlot, slot)
+                equipmentSlotGroupToItemSlots.computeIfAbsent(slot.equipmentSlot.group, Reference2ReferenceFunction { ObjectArraySet() }).add(slot)
             }
 
             is ExtraItemSlot -> {
@@ -307,7 +363,7 @@ object ItemSlotRegistry {
 enum class MinecraftItemSlot(
     override val index: Int,
     @JvmField
-    val slot: EquipmentSlot,
+    val equipmentSlot: EquipmentSlot,
 ) : ItemSlot {
     MAINHAND(-1, EquipmentSlot.HAND),
     OFFHAND(40, EquipmentSlot.OFF_HAND),
@@ -320,35 +376,39 @@ enum class MinecraftItemSlot(
     companion object {
         const val NAMESPACE = "minecraft"
 
+        fun from(convertedSlot: Int): MinecraftItemSlot? {
+            return entries.find { it.index == convertedSlot }
+        }
+
         fun from(slot: EquipmentSlot): MinecraftItemSlot? {
-            return entries.find { it.slot == slot }
+            return entries.find { it.equipmentSlot == slot }
         }
 
         fun from(group: EquipmentSlotGroup): Set<MinecraftItemSlot> {
-            return entries.filterTo(HashSet()) { group.test(it.slot) }
+            return entries.filterTo(HashSet()) { group.test(it.equipmentSlot) }
         }
     }
 
     override val id: Key = Key.key("minecraft", name.lowercase())
 
     override fun testEquipmentSlot(slot: EquipmentSlot): Boolean {
-        return this.slot == slot
+        return this.equipmentSlot == slot
     }
 
     override fun testEquipmentSlotGroup(group: EquipmentSlotGroup): Boolean {
-        return group.test(slot)
+        return group.test(equipmentSlot)
     }
 
     override fun getItem(player: Player): ItemStack? {
         // PlayerInventory.getItem(EquipmentSlot) 会返回 `空气` 来表示一个空的槽位.
         // 因此, 这里需要先将 `空气` 物品转换为 null 然后再 return 以遵循该接口的协议.
-        return player.inventory.getItem(slot).takeUnlessEmpty()
+        return player.inventory.getItem(equipmentSlot).takeUnlessEmpty()
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.concat(
             super.examinableProperties(), Stream.of(
-                ExaminableProperty.of("slot", slot)
+                ExaminableProperty.of("slot", equipmentSlot)
             )
         )
     }
@@ -363,7 +423,7 @@ enum class MinecraftItemSlot(
  *
  * @param index 玩家背包的槽位, 但不包含任何 [MinecraftItemSlot] 的槽位
  */
-private data class ExtraItemSlot(
+data class ExtraItemSlot(
     override val index: Int,
 ) : ItemSlot {
     companion object {
@@ -371,6 +431,10 @@ private data class ExtraItemSlot(
 
         // 确保对于任意 index 全局只有一个对应的实例
         private val alreadyInitialized = mutableSetOf<Int>()
+
+        fun from(convertedSlot: Int): ExtraItemSlot? {
+            return ItemSlotRegistry.get(convertedSlot)
+        }
     }
 
     init {
@@ -447,6 +511,7 @@ private object ItemSlotSerializer : SimpleSerializer<ItemSlot> {
 
 private object EmptyItemSlotGroup : ItemSlotGroup {
     override val children: Set<ItemSlot> = emptySet()
+    override fun contains(convertedSlot: Int): Boolean = false
     override fun contains(id: Key): Boolean = false
     override fun contains(itemSlot: ItemSlot): Boolean = false
     override fun test(slot: EquipmentSlot): Boolean = false
@@ -456,6 +521,10 @@ private object EmptyItemSlotGroup : ItemSlotGroup {
 private class SimpleItemSlotGroup(
     override val children: Set<ItemSlot>,
 ) : ItemSlotGroup {
+    override fun contains(convertedSlot: Int): Boolean {
+        return children.any { it.index == convertedSlot }
+    }
+
     override fun contains(id: Key): Boolean {
         return children.any { it.id == id }
     }

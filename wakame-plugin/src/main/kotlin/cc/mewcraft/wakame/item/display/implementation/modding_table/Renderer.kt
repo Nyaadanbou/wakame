@@ -96,7 +96,7 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<ItemStack, Moddi
                     when (core) {
                         is AttributeCore -> ModdingTableRenderingHandlerRegistry.CORE_ATTRIBUTE_MAIN_IN.process(collector, id, core, context)
                         is EmptyCore -> ModdingTableRenderingHandlerRegistry.CORE_EMPTY_IN.process(collector, id, context)
-                        is VirtualCore -> IndexedText.NOP
+                        is VirtualCore -> IndexedText.NO_OP
                     }
                 }
             }
@@ -109,7 +109,7 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<ItemStack, Moddi
                     when (core) {
                         is AttributeCore -> ModdingTableRenderingHandlerRegistry.CORE_ATTRIBUTE_MAIN_OUT.process(collector, id, core, context)
                         is EmptyCore -> ModdingTableRenderingHandlerRegistry.CORE_EMPTY_OUT.process(collector, id, context)
-                        is VirtualCore -> IndexedText.NOP
+                        is VirtualCore -> IndexedText.NO_OP
                     }
                 }
             }

@@ -70,6 +70,9 @@ primary:
   - general:rarity
   - general:lore
 
+  - (fixed:*)
+  - special:effectiveness
+
 # 注意!!! 该节点仅存在于网络物品渲染配置中
 #
 # 在发送物品网络包到客户端时, 移除以下物品组件

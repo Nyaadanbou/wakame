@@ -78,7 +78,7 @@ internal data class EnchantmentRendererFormat(
      */
     fun render(data: Map<Enchantment, Int>): IndexedText {
         if (data.isEmpty())
-            return IndexedText.NOP
+            return IndexedText.NO_OP
         return SimpleIndexedText(index, data.map { (enchantment, level) -> enchantment.displayName(level).removeItalic })
     }
 }

@@ -3,11 +3,15 @@ package cc.mewcraft.wakame.init
 import cc.mewcraft.wakame.catalog.OpenCatalogImpl
 import cc.mewcraft.wakame.item.CustomItemRegistryLoader
 import cc.mewcraft.wakame.item.ItemProxyRegistryLoader
+import cc.mewcraft.wakame.item.ItemStackEffectivenessListener
 import cc.mewcraft.wakame.item.KoishTagManager
 import cc.mewcraft.wakame.item.behavior.impl.OpenCatalog
+import cc.mewcraft.wakame.item.display.ShowItemRenderer
+import cc.mewcraft.wakame.item.network.ShowItemRendererImpl
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.util.registerEvents
 
 
 // TODO 迁移逻辑
@@ -17,13 +21,24 @@ object ItemInitializer {
 
     @InitFun
     fun init() {
-        // 注册物品行为实现
+        // 注册实现: OpenCatalog
         OpenCatalog.setImplementation(OpenCatalogImpl)
+        // 注册实现: ShowItemRenderer
+        ShowItemRenderer.setImplementation(ShowItemRendererImpl)
     }
 
     fun reload() {
         CustomItemRegistryLoader.reload()
         ItemProxyRegistryLoader.reload()
+    }
+}
+
+@Init(InitStage.POST_WORLD)
+object ItemEventInitializer {
+
+    @InitFun
+    fun init() {
+        ItemStackEffectivenessListener.registerEvents()
     }
 }
 

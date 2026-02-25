@@ -1,12 +1,16 @@
 package cc.mewcraft.wakame.item.display.implementation.standard
 
 import cc.mewcraft.wakame.entity.player.AttackSpeed
+import cc.mewcraft.wakame.item.ItemStackEffectiveness
+import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.data.impl.*
 import cc.mewcraft.wakame.item.display.*
 import cc.mewcraft.wakame.item.display.implementation.common.*
+import cc.mewcraft.wakame.item.getData
 import cc.mewcraft.wakame.item.property.impl.*
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
+import cc.mewcraft.wakame.util.MojangStack
 import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -16,6 +20,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.Player
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
 
@@ -370,5 +375,55 @@ internal data class NetworkPositionRendererFormat(
             .build()
         val lines = content.map { MiniMessage.miniMessage().deserialize(it, resolver) }
         return SimpleIndexedText(index, lines)
+    }
+}
+
+@ConfigSerializable
+internal data class EffectivenessRendererFormat(
+    override val namespace: String,
+    private val ordinal: List<Ordinal>,
+    private val badSlot: Component,
+    private val badLevel: Component,
+    private val badDamage: Component,
+) : RendererFormat.Simple {
+    override val id: String = "effectiveness"
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory.fixed()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate.literal(namespace, id)
+
+    fun render(player: Player?, item: MojangStack): IndexedText {
+        val components = ArrayList<Component>()
+        for (ord in ordinal) {
+            when (ord) {
+                Ordinal.BAD_SLOT -> {
+                    // TODO 需要更完善的实现
+                    val convertedSlot = item.getData(ItemDataTypes.SLOT) ?: continue
+                    if (player != null && ItemStackEffectiveness.testSlot(convertedSlot, item).not()) {
+                        components += badSlot
+                    }
+                }
+
+                Ordinal.BAD_LEVEL -> {
+                    if (player != null && ItemStackEffectiveness.testLevel(player, item).not()) {
+                        components += badLevel
+                    }
+                }
+
+                Ordinal.BAD_DAMAGE -> {
+                    if (ItemStackEffectiveness.testDamaged(item).not()) {
+                        components += badDamage
+                    }
+                }
+            }
+        }
+        return if (components.isEmpty()) {
+            IndexedText.NO_OP
+        } else {
+            SimpleIndexedText(index, components)
+        }
+    }
+
+    enum class Ordinal {
+        BAD_SLOT, BAD_LEVEL, BAD_DAMAGE
     }
 }
