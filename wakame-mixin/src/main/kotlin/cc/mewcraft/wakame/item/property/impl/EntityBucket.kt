@@ -50,6 +50,10 @@ data class EntityBucket(
             EntityType.TRADER_LLAMA,
             EntityType.TURTLE,
             EntityType.WOLF,
+            EntityType.ZOMBIE_HORSE,
+
+            // Water Animals
+            EntityType.NAUTILUS,
 
             // Animals Like
             EntityType.ALLAY,
@@ -60,6 +64,7 @@ data class EntityBucket(
             EntityType.VILLAGER,
             EntityType.WANDERING_TRADER,
             EntityType.ZOMBIE_VILLAGER,
+            EntityType.ZOMBIE_NAUTILUS,
         ).mapTo(HashSet(32), EntityType::getKey)
     }
 

@@ -220,6 +220,8 @@ entity_bucket_info:
     turtle:
       - "<!i><gray>已怀孕: <yellow><has_egg>"
     wolf: [ ]
+    zombie_horse: [ ]
+    nautilus: [ ]
     allay:
       - "<!i><gray>左手物品: <yellow><item_in_mainhand>"
       - "<!i><gray>右手物品: <yellow><item_in_offhand>"
@@ -235,6 +237,7 @@ entity_bucket_info:
     zombie_villager:
       - "<!i><gray>区域: <yellow><region>"
       - "<!i><gray>职业: <yellow><profession>"
+    zombie_nautilus: [ ]
 
 # id: `fuel`
 fuel:

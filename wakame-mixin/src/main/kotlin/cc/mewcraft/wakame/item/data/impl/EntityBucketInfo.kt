@@ -153,9 +153,15 @@ object EntityBucketInfoTypes {
 
     @JvmField
     val WOLF: EntityBucketInfoType = register<WolfEntityBucketInfo>("wolf")
+
+    @JvmField
+    val ZOMBIE_HORSE: EntityBucketInfoType = register<ZombieHorseEntityBucketInfo>("zombie_horse")
     //</editor-fold>
 
     //<editor-fold desc="Animals Like"> See: https://minecraft.wiki/w/Animal
+    @JvmField
+    val NAUTILUS: EntityBucketInfoType = register<NautilusEntityBucketInfo>("nautilus")
+
     @JvmField
     val ALLAY: EntityBucketInfoType = register<AllayEntityBucketInfo>("allay")
 
@@ -175,6 +181,9 @@ object EntityBucketInfoTypes {
 
     @JvmField
     val ZOMBIE_VILLAGER: EntityBucketInfoType = register<ZombieVillagerEntityBucketInfo>("zombie_villager")
+
+    @JvmField
+    val ZOMBIE_NAUTILUS: EntityBucketInfoType = register<ZombieNautilusEntityBucketInfo>("zombie_nautilus")
     //</editor-fold>
 
     private inline fun <reified E : EntityBucketInfo> register(id: String): EntityBucketInfoType {
@@ -461,9 +470,25 @@ data class WolfEntityBucketInfo(
     override val type: EntityBucketInfoType get() = EntityBucketInfoTypes.WOLF
     override val typeName: Component get() = Component.translatable(EntityType.WOLF)
 }
+
+@ConfigSerializable
+data class ZombieHorseEntityBucketInfo(
+    override val isAdult: Boolean = false,
+) : EntityBucketInfo, EntityBucketInfo.Ageable {
+    override val type: EntityBucketInfoType get() = EntityBucketInfoTypes.ZOMBIE_HORSE
+    override val typeName: Component get() = Component.translatable(EntityType.ZOMBIE_HORSE)
+}
 //</editor-fold>
 
 //<editor-fold desc="Animals Like">
+@ConfigSerializable
+data class NautilusEntityBucketInfo(
+    override val isAdult: Boolean = false,
+) : EntityBucketInfo, EntityBucketInfo.Ageable {
+    override val type: EntityBucketInfoType get() = EntityBucketInfoTypes.NAUTILUS
+    override val typeName: Component get() = Component.translatable(EntityType.NAUTILUS)
+}
+
 @ConfigSerializable
 data class AllayEntityBucketInfo(
     val itemInMainhand: String? = null,
@@ -516,5 +541,13 @@ data class ZombieVillagerEntityBucketInfo(
 ) : EntityBucketInfo {
     override val type: EntityBucketInfoType get() = EntityBucketInfoTypes.ZOMBIE_VILLAGER
     override val typeName: Component get() = Component.translatable(EntityType.ZOMBIE_VILLAGER)
+}
+
+@ConfigSerializable
+data class ZombieNautilusEntityBucketInfo(
+    override val variant: String = "none",
+) : EntityBucketInfo, EntityBucketInfo.Variable {
+    override val type: EntityBucketInfoType get() = EntityBucketInfoTypes.ZOMBIE_NAUTILUS
+    override val typeName: Component get() = Component.translatable(EntityType.ZOMBIE_NAUTILUS)
 }
 //</editor-fold>
