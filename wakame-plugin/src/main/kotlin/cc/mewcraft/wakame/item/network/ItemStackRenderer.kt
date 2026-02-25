@@ -29,6 +29,7 @@ import net.minecraft.network.protocol.game.ClientboundRecipeBookAddPacket
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
 import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.item.crafting.SelectableRecipe
 import net.minecraft.world.item.crafting.display.*
 import net.minecraft.world.item.trading.ItemCost
 import net.minecraft.world.item.trading.MerchantOffer
@@ -127,6 +128,22 @@ object ItemStackRenderer : PacketListener {
     }
 
     @PacketHandler
+    private fun handleUpdateRecipes(event: ClientboundUpdateRecipesPacketEvent) {
+        val player = event.player
+        event.stonecutterRecipes = SelectableRecipe.SingleInputSet(
+            event.stonecutterRecipes.entries().map { entry ->
+                SelectableRecipe.SingleInputEntry(
+                    modifyIngredient(player, entry.input()),
+                    SelectableRecipe(
+                        modifySlotDisplay(player, entry.recipe().optionDisplay()),
+                        entry.recipe().recipe()
+                    )
+                )
+            }
+        )
+    }
+
+    @PacketHandler
     private fun handleRecipeBookAdd(event: ClientboundRecipeBookAddPacketEvent) {
         val player = event.player
         event.entries = event.entries.map { entry ->
@@ -163,15 +180,22 @@ object ItemStackRenderer : PacketListener {
         event.message = renderShowItem(player, event.message)
     }
 
-    private fun modifyIngredientList(player: Player, optList: Optional<List<Ingredient>>): Optional<List<Ingredient>> =
-        optList.map { ingredientList ->
+    private fun modifyIngredient(player: Player, ingredient: Ingredient): Ingredient {
+        val itemStacks = ingredient.itemStacks()
+        return if (itemStacks != null)
+            Ingredient.ofStacks(itemStacks.map { it.copy().modify(player) })
+        else {
+            ingredient
+        }
+    }
+
+    private fun modifyIngredientList(player: Player, optionalIngredientList: Optional<List<Ingredient>>): Optional<List<Ingredient>> {
+        return optionalIngredientList.map { ingredientList ->
             ingredientList.map { ingredient ->
-                val itemStacks = ingredient.itemStacks()
-                if (itemStacks != null)
-                    Ingredient.ofStacks(itemStacks.map { it.copy().modify(player) })
-                else ingredient
+                modifyIngredient(player, ingredient)
             }
         }
+    }
 
     private fun modifyRecipeDisplay(player: Player, display: RecipeDisplay): RecipeDisplay = when (display) {
         is FurnaceRecipeDisplay -> FurnaceRecipeDisplay(
