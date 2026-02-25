@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
+import cc.mewcraft.wakame.item.display.ItemStackRenderer;
 import cc.mewcraft.wakame.mixin.support.KoishDataSanitizer;
 import net.minecraft.server.dialog.body.ItemBody;
 import net.minecraft.world.item.ItemStack;
@@ -17,6 +18,7 @@ public abstract class MixinItemBody {
             argsOnly = true)
     private static ItemStack redirected(ItemStack item) {
         ItemStack copy = item.copy();
+        ItemStackRenderer.getInstance().render(copy);
         KoishDataSanitizer.sanitizeItemStack(copy);
         return copy;
     }

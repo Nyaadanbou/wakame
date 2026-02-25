@@ -21,11 +21,8 @@ public class MixinServerboundContainerClickPacket {
     )
     private void wrapHandleContainerClick(ServerGamePacketListener listener, ServerboundContainerClickPacket packet, Operation<Void> original) {
         if (listener instanceof ServerGamePacketListenerImpl listenerImpl) {
-            try {
-                ContainerSyncSession.INSTANCE.setPlayer(listenerImpl.getCraftPlayer());
+            try (ContainerSyncSession ignored = ContainerSyncSession.INSTANCE.start(listenerImpl.getCraftPlayer())) {
                 original.call(listener, packet);
-            } finally {
-                ContainerSyncSession.INSTANCE.unsetPlayer();
             }
         } else {
             original.call(listener, packet);

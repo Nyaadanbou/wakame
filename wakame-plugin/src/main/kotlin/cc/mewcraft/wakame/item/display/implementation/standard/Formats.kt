@@ -391,20 +391,20 @@ internal data class EffectivenessRendererFormat(
     override val textMetaFactory: TextMetaFactory = TextMetaFactory.fixed()
     override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate.literal(namespace, id)
 
-    fun render(player: Player, item: MojangStack): IndexedText {
+    fun render(player: Player?, item: MojangStack): IndexedText {
         val components = ArrayList<Component>()
         for (ord in ordinal) {
             when (ord) {
                 Ordinal.BAD_SLOT -> {
                     // TODO 需要更完善的实现
                     val convertedSlot = item.getData(ItemDataTypes.SLOT) ?: continue
-                    if (ItemStackEffectiveness.testSlot(convertedSlot, item).not()) {
+                    if (player != null && ItemStackEffectiveness.testSlot(convertedSlot, item).not()) {
                         components += badSlot
                     }
                 }
 
                 Ordinal.BAD_LEVEL -> {
-                    if (ItemStackEffectiveness.testLevel(player, item).not()) {
+                    if (player != null && ItemStackEffectiveness.testLevel(player, item).not()) {
                         components += badLevel
                     }
                 }

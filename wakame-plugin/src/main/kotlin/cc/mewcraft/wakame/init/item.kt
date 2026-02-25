@@ -6,6 +6,8 @@ import cc.mewcraft.wakame.item.ItemProxyRegistryLoader
 import cc.mewcraft.wakame.item.ItemStackEffectivenessListener
 import cc.mewcraft.wakame.item.KoishTagManager
 import cc.mewcraft.wakame.item.behavior.impl.OpenCatalog
+import cc.mewcraft.wakame.item.display.ShowItemRenderer
+import cc.mewcraft.wakame.item.network.ShowItemRendererImpl
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -19,8 +21,10 @@ object ItemInitializer {
 
     @InitFun
     fun init() {
-        // 注册物品行为实现
+        // 注册实现: OpenCatalog
         OpenCatalog.setImplementation(OpenCatalogImpl)
+        // 注册实现: ShowItemRenderer
+        ShowItemRenderer.setImplementation(ShowItemRendererImpl)
     }
 
     fun reload() {

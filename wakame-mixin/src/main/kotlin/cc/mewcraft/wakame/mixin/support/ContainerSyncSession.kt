@@ -1,20 +1,22 @@
 package cc.mewcraft.wakame.mixin.support
 
+import io.papermc.paper.util.SafeAutoClosable
 import org.bukkit.entity.Player
 
-object ContainerSyncSession {
+object ContainerSyncSession : SafeAutoClosable {
 
-    private val threadLocalPlayer = ThreadLocal.withInitial<Player> { null }
+    private val THREAD_LOCAL_PLAYER = ThreadLocal.withInitial<Player> { null }
 
-    fun setPlayer(player: Player) {
-        threadLocalPlayer.set(player)
+    fun start(player: Player): ContainerSyncSession {
+        THREAD_LOCAL_PLAYER.set(player)
+        return this
     }
 
-    fun unsetPlayer() {
-        threadLocalPlayer.remove()
+    fun player(): Player? {
+        return THREAD_LOCAL_PLAYER.get()
     }
 
-    fun getPlayer(): Player? {
-        return threadLocalPlayer.get()
+    override fun close() {
+        THREAD_LOCAL_PLAYER.remove()
     }
 }

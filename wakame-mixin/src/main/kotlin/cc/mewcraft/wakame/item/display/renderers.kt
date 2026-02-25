@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.display
 
 import cc.mewcraft.wakame.item.isKoish
 import cc.mewcraft.wakame.util.MojangStack
+import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.nio.file.Path
@@ -60,7 +61,7 @@ interface ItemRenderer<in T, in C> {
 /**
  * 用于渲染从服务端发送到客户端的网络物品堆叠的 [ItemRenderer].
  */
-object NetworkRenderer {
+object ItemStackRenderer {
 
     @get:JvmStatic
     @get:JvmName("getInstance")
@@ -84,4 +85,29 @@ object NetworkRenderer {
      */
     @JvmStatic
     fun responsible(item: MojangStack): Boolean = item.isKoish
+}
+
+/**
+ * 用于渲染从服务端发送到客户端的文本组件里面的物品堆叠.
+ *
+ * @see net.kyori.adventure.text.event.HoverEvent.ShowItem
+ */
+interface ShowItemRenderer {
+
+    fun render(component: Component): Component
+
+    companion object Impl : ShowItemRenderer {
+        private var implementation: ShowItemRenderer = object : ShowItemRenderer {
+            override fun render(component: Component): Component = component
+        }
+
+        @JvmStatic
+        fun setImplementation(renderer: ShowItemRenderer) {
+            this.implementation = renderer
+        }
+
+        override fun render(component: Component): Component {
+            return this.implementation.render(component)
+        }
+    }
 }

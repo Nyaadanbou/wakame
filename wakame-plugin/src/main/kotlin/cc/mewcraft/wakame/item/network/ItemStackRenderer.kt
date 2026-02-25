@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.mixin.support.KoishDataSanitizer
 import cc.mewcraft.wakame.network.event.PacketHandler
 import cc.mewcraft.wakame.network.event.PacketListener
 import cc.mewcraft.wakame.network.event.clientbound.*
@@ -17,11 +18,8 @@ import cc.mewcraft.wakame.network.event.registerPacketListener
 import cc.mewcraft.wakame.network.event.unregisterPacketListener
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.getOrThrow
-import cc.mewcraft.wakame.util.registerEvents
-import cc.mewcraft.wakame.util.unregisterEvents
 import com.mojang.datafixers.util.Pair
 import io.papermc.paper.adventure.PaperAdventure
-import io.papermc.paper.event.player.AsyncChatEvent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.event.HoverEvent
@@ -37,8 +35,6 @@ import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
 import xyz.xenondevs.commons.provider.orElse
 import java.util.*
 
@@ -48,17 +44,15 @@ private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "r
  * 修改 [net.minecraft.world.item.ItemStack].
  */
 @Init(InitStage.POST_WORLD)
-internal object ItemStackRender : PacketListener, Listener {
+object ItemStackRenderer : PacketListener {
 
     @InitFun
-    fun init() {
-        registerEvents()
+    internal fun init() {
         registerPacketListener()
     }
 
     @DisableFun
-    fun disable() {
-        unregisterEvents()
+    internal fun disable() {
         unregisterPacketListener()
     }
 
@@ -157,23 +151,16 @@ internal object ItemStackRender : PacketListener, Listener {
         event.recipeDisplay = modifyRecipeDisplay(player, event.recipeDisplay)
     }
 
-    @EventHandler
-    private fun handlePlayerChat(event: AsyncChatEvent) {
-        val player = event.player
-        val originMessage = event.message()
-        event.message(modifyComponent(player, originMessage))
-    }
-
     @PacketHandler
     private fun handleSystemChat(event: ClientboundSystemChatPacketEvent) {
         val player = event.player
-        event.message = modifyComponent(player, event.message)
+        event.message = renderShowItem(player, event.message)
     }
 
     @PacketHandler
     private fun handlePlayerCombatKill(event: ClientboundPlayerCombatKillPacketEvent) {
         val player = event.player
-        event.message = modifyComponent(player, event.message)
+        event.message = renderShowItem(player, event.message)
     }
 
     private fun modifyIngredientList(player: Player, optList: Optional<List<Ingredient>>): Optional<List<Ingredient>> =
@@ -262,40 +249,41 @@ internal object ItemStackRender : PacketListener, Listener {
     }
 
     /**
-     * 递归修改 Adventure Component
+     * 渲染 [component] 中的物品堆叠.
      *
-     * @param component Adventure Component
-     * @return 修改后的 Adventure Component
+     * @param component 文本组件
+     * @return 渲染后的 [component]
      */
-    private fun modifyComponent(player: Player, component: Component): Component {
-        if (component !is TranslatableComponent)
-            return component
-
-        val modified = modifyComponent0(player, component)
-
-        val modifiedChildren = modified.children().map { modifyComponent(player, it) }
-        val modifiedArguments = modified.arguments().map { modifyComponent(player, it.asComponent()) }
-
-        return modified.children(modifiedChildren).arguments(modifiedArguments)
+    fun renderShowItem(player: Player?, component: Component): Component {
+        val modified = renderShowItem0(player, component)
+        if (modified is TranslatableComponent) {
+            val modifiedChildren = modified.children().map { renderShowItem(player, it) }
+            val modifiedArguments = modified.arguments().map { renderShowItem(player, it.asComponent()) }
+            return modified.children(modifiedChildren).arguments(modifiedArguments)
+        } else {
+            val modifiedChildren = modified.children().map { renderShowItem(player, it) }
+            return modified.children(modifiedChildren)
+        }
     }
 
-    private fun modifyComponent0(player: Player, component: TranslatableComponent): TranslatableComponent {
+    private fun renderShowItem0(player: Player?, component: Component): Component {
         val hoverEvent = component.hoverEvent() ?: return component
         if (hoverEvent.action() == HoverEvent.Action.SHOW_ITEM) {
-            val itemStackInfo = hoverEvent.value() as HoverEvent.ShowItem
-            val originItemStack = MojangStack(Registries.ITEM.getOrThrow(itemStackInfo.item()), itemStackInfo.count(), PaperAdventure.asVanilla(itemStackInfo.dataComponents()))
-            val itemStack = originItemStack.copy().modify(player)
-            val newHover = itemStack.asBukkitMirror().asHoverEvent()
-            return component.hoverEvent(newHover)
+            val itemstackInfo = hoverEvent.value() as HoverEvent.ShowItem
+            val originItemstack = MojangStack(Registries.ITEM.getOrThrow(itemstackInfo.item()), itemstackInfo.count(), PaperAdventure.asVanilla(itemstackInfo.dataComponents()))
+            val changedItemStack = originItemstack.copy().modify(player)
+            KoishDataSanitizer.sanitizeItemStack(changedItemStack) // 清理 Koish 数据组件
+            val changedHoverEvent = changedItemStack.asBukkitMirror().asHoverEvent()
+            return component.hoverEvent(changedHoverEvent)
         }
         return component
     }
 
     private fun isCreative(player: Player): Boolean {
-        // 创造模式会1:1复制它接收到的物品到客户端本地,
-        // 而我们发给客户端的萌芽物品并不是原始物品, 而是修改过的.
-        // 问题在于, 修改过的萌芽物品并不包含任何 wakame 数据,
-        // 这也就导致了创造模式会让物品栏内的萌芽物品失效.
+        // 创造模式会 1:1 复制它接收到的物品到客户端本地,
+        // 而我们发给客户端的 Koish 物品并不是原始物品, 而是修改过的.
+        // 问题在于, 修改过的 Koish 物品并不包含任何 Koish 数据组件,
+        // 这也就导致了创造模式会让物品栏内的 Koish 物品失效.
         //
         // 这个问题的解决办法就是在物品上永远存一份原始数据的备份,
         // 但那样会导致额外的内存和性能开销. 不如等 Mojang 更新.
@@ -305,7 +293,7 @@ internal object ItemStackRender : PacketListener, Listener {
         return player.gameMode === GameMode.CREATIVE
     }
 
-    private fun MojangStack.modify(player: Player): MojangStack {
+    private fun MojangStack.modify(player: Player?): MojangStack {
         if (!isNetworkRewrite) return this
         try {
             ItemRenderers.STANDARD.render(this, player)

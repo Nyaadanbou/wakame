@@ -34,13 +34,16 @@
     "MixinLivingEntity",
     "MixinLootPoolEntries",
     "MixinPaperWorldLoader",
+    "MixinPlainMessage",
     "MixinRegistryDataLoader",
     "MixinRepairItemRecipe",
     "MixinServerboundContainerClickPacket",
     "MixinServerPlayer",
+    "MixinServerPlayer$2",
     "MixinSpawnerData",
     "MixinSpawnPlacements",
     "MixinStackedContentsExtrasMap",
+    "MixinStonecutterMenu",
     "MixinTippedArrowRecipe",
     "MixinTooltipDisplay"
   ]

@@ -16,6 +16,9 @@ import net.draycia.carbon.api.users.Party as InternalParty
 object CarbonChatHook {
 
     init {
+        // 监听 CarbonChat 事件
+        CarbonChatEventHandler.subscribe()
+        // 注册 PartyIntegration 实现
         PartyIntegration.setImplementation(CarbonChatPartyIntegration)
     }
 }

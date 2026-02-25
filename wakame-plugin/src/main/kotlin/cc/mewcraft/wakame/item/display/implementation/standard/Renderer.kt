@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.item.datagen.impl.MetaCustomName
 import cc.mewcraft.wakame.item.datagen.impl.MetaItemName
 import cc.mewcraft.wakame.item.display.IndexedText
 import cc.mewcraft.wakame.item.display.ItemRendererConstants
-import cc.mewcraft.wakame.item.display.NetworkRenderer
+import cc.mewcraft.wakame.item.display.ItemStackRenderer
 import cc.mewcraft.wakame.item.display.TextAssembler
 import cc.mewcraft.wakame.item.display.implementation.*
 import cc.mewcraft.wakame.item.display.implementation.common.*
@@ -103,14 +103,10 @@ internal object StandardItemRenderer : AbstractItemRenderer<MojangStack, Player>
     }
 
     override fun render(item: MojangStack, context: Player?) {
-        if (context != null) {
-            renderDeep(context, item)
-        } else {
-            logger.error("Attempted to render item without player context. Item: {}", item)
-        }
+        renderDeep(context, item)
     }
 
-    private fun renderDeep(player: Player, item: MojangStack) {
+    private fun renderDeep(player: Player?, item: MojangStack) {
         // 渲染物品本身
         renderSelf(player, item)
 
@@ -121,7 +117,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<MojangStack, Player>
     }
 
     private fun <T : Any> renderItems(
-        player: Player,
+        player: Player?,
         owner: MojangStack,
         boxType: DataComponentType<T>,
         necessity: (T) -> Boolean,
@@ -136,8 +132,8 @@ internal object StandardItemRenderer : AbstractItemRenderer<MojangStack, Player>
         }
     }
 
-    private fun renderSelf(player: Player, item: MojangStack) {
-        if (!NetworkRenderer.responsible(item)) return
+    private fun renderSelf(player: Player?, item: MojangStack) {
+        if (!ItemStackRenderer.responsible(item)) return
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 
@@ -364,7 +360,7 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
     }
 
     @JvmField
-    val EFFECTIVENESS: RenderingHandler2<Player, MojangStack, EffectivenessRendererFormat> = configure2("effectiveness") { data1, data2, format ->
+    val EFFECTIVENESS: RenderingHandler2<Player?, MojangStack, EffectivenessRendererFormat> = configure2("effectiveness") { data1, data2, format ->
         format.render(data1, data2)
     }
 }
