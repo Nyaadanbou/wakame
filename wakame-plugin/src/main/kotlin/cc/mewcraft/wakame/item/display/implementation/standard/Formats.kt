@@ -380,7 +380,6 @@ internal data class NetworkPositionRendererFormat(
 internal data class EffectivenessRendererFormat(
     override val namespace: String,
     private val ordinal: List<Ordinal>,
-    private val badSlot: Component,
     private val badLevel: Component,
     private val badDamage: Component,
 ) : RendererFormat.Simple {
