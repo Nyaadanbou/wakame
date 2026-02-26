@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.network
 import cc.mewcraft.lazyconfig.MAIN_CONFIG
 import cc.mewcraft.lazyconfig.access.optionalEntry
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.item.HotfixItemName
 import cc.mewcraft.wakame.item.display.ItemRenderers
 import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.item.koishTypeId
@@ -25,6 +26,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.event.HoverEvent
 import net.minecraft.core.component.DataComponentExactPredicate
+import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.HashedPatchMap
 import net.minecraft.network.HashedStack
@@ -314,8 +316,19 @@ object ItemStackRenderer : PacketListener {
         if (hoverEvent.action() == HoverEvent.Action.SHOW_ITEM) {
             val itemstackInfo = hoverEvent.value() as HoverEvent.ShowItem
             val originItemstack = MojangStack(Registries.ITEM.getOrThrow(itemstackInfo.item()), itemstackInfo.count(), PaperAdventure.asVanilla(itemstackInfo.dataComponents()))
-            val changedItemStack = originItemstack.copy().modify(player)
-            KoishDataSanitizer.sanitizeItemStack(changedItemStack) // 清理 Koish 数据组件
+            var changedItemStack = originItemstack.copy().modify(player)
+
+            // 把 Koish 物品的基底换成一个不会被 Koish 渲染的物品,
+            // 这样可以避免消息跨服时被其他服务端当成套皮进行二次渲染
+            changedItemStack.item = Items.STONE
+
+            // 基底换了以后, minecraft:item_name 也需要修正一下
+            val clientItemName = HotfixItemName.getItemName(originItemstack) ?: originItemstack.itemName
+            changedItemStack.set(DataComponents.ITEM_NAME, clientItemName)
+
+            // 清理 Koish 数据组件以避免客户端强制掉线
+            KoishDataSanitizer.sanitizeItemStack(changedItemStack)
+
             val changedHoverEvent = changedItemStack.asBukkitMirror().asHoverEvent()
             return component.hoverEvent(changedHoverEvent)
         }

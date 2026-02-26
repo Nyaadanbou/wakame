@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(HoverEvent.ShowItem.class)
 public class MixinHoverEvent$ShowItem {
 
-    // 清理 HoverEvent.ShowItem 中的 Koish 数据组件的逻辑已全部由发包环节负责.
+    // 清理 HoverEvent.ShowItem 中的 Koish 数据组件的绝大部分逻辑已由 Paper 提供的聊天渲染 API 完成.
     //
     // HoverEvent 只会出现在聊天/对话框中, 但不知道为何这个构造函数会对同一 ItemStack 调用多次, 出现以下情况:
     // 1. 第一次渲染时, 物品上只有裸的 Koish 数据组件, 没有 lore - 结果为正常渲染, 并清理 Koish 数据组件
@@ -15,7 +15,7 @@ public class MixinHoverEvent$ShowItem {
     // ...最后造成这个物品上有 3 个叠加的 lore
 
     /*
-    /// 渲染 [HoverEvent.ShowItem] 中的 Koish 物品堆叠.
+    /// 如果 [HoverEvent.ShowItem] 是 Koish 物品堆叠则写入 minecraft:item_name 以便让自定义物品名字可以显示出来.
     ///
     /// @param item 原始参数
     /// @return 修改后的参数
