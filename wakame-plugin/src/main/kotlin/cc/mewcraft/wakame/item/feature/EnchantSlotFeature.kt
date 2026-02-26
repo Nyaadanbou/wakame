@@ -11,10 +11,8 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.registerEvents
-import cc.mewcraft.wakame.util.runTask
 import cc.mewcraft.wakame.util.runTaskLater
 import io.papermc.paper.datacomponent.DataComponentTypes
-import io.papermc.paper.datacomponent.item.ItemEnchantments
 import net.kyori.adventure.text.Component
 import org.bukkit.GameMode
 import org.bukkit.Material
@@ -218,40 +216,32 @@ object EnchantSlotFeature : Listener {
         val player = event.enchanter
         val item = event.item.takeUnlessEmpty() ?: return
         if (item.type == Material.BOOK) return // 书不受魔咒槽位限制, 因为书没有附魔槽位的概念
-        val enchantsToAdd = event.enchantsToAdd
+        val enchantsToAdd = event.enchantsToAdd // 将要添加到物品上的魔咒 (根据 API 这是可变映射)
         val slotTotal = getSlotTotal(item)
         val slotUsedAlready = getSlotUsed(item)
         val slotUsedAfter = getSlotCapacity(item, enchantsToAdd)
         val slotUsedFinal = slotUsedAlready + slotUsedAfter
 
         if (slotUsedFinal <= slotTotal) {
-            // 如果魔咒后没有超出最大容量, 则直接放行
-            return
+            return // 如果魔咒数量没有超出最大容量, 则直接放行
         }
 
-        // 超出了最大容量, 取消事件并给出提示
         player.sendMessage(TranslatableMessages.MSG_NO_FREE_ENCHANT_SLOTS)
         player.playSound(player, Sound.ENTITY_SHULKER_HURT, 1f, 1f)
 
-        // 随机移除超出容量的魔咒
+        // 移除超出容量的魔咒
         val excessAmount = slotUsedFinal - slotTotal
         if (excessAmount > 0) {
-            runTask { ->
-                var removedAmount = 0
-                val enchantments = (item.getData(DataComponentTypes.ENCHANTMENTS)?.enchantments()?.entries ?: mutableListOf())
-                    .sortedByDescending { (enchant, level) -> getSlotCapacity(item, enchant) } // 优先移除占用槽位容量较大的魔咒, 以最大程度保留物品上的魔咒
-                    .toMutableList()
-                val enchantmentsIt = enchantments.iterator()
-                for ((enchant, level) in enchantmentsIt) {
-                    if (removedAmount >= excessAmount) break
-                    enchantmentsIt.remove()
-                    removedAmount += getSlotCapacity(item, enchant)
-                }
-                val newEnchantments = ItemEnchantments.itemEnchantments(enchantments.associate { (enchant, level) -> enchant to level })
-                item.setData(DataComponentTypes.ENCHANTMENTS, newEnchantments)
-                player.sendMessage(TranslatableMessages.MSG_REMOVED_EXCESS_ENCHANTMENTS.arguments(Component.text(removedAmount)))
-                player.playSound(player, Sound.ENTITY_SHULKER_HURT, 1f, 1f)
+            var removedAmount = 0
+            val sortedEnchantsToAdd = enchantsToAdd
+                .entries
+                .sortedByDescending { (enchant, level) -> getSlotCapacity(item, enchant) } // 优先移除占用槽位容量较大的魔咒, 以最大程度保留物品上的魔咒
+            for ((enchant, level) in sortedEnchantsToAdd) {
+                if (removedAmount >= excessAmount) break
+                enchantsToAdd.remove(enchant)
+                removedAmount += getSlotCapacity(item, enchant)
             }
+            player.sendMessage(TranslatableMessages.MSG_REMOVED_EXCESS_ENCHANTMENTS.arguments(Component.text(removedAmount)))
         }
     }
 
