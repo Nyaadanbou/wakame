@@ -2,37 +2,18 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.entity.player.koishLevel
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelUpEvent
-import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.extension.level
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import cc.mewcraft.wakame.item.property.impl.ItemSlotGroup
-import cc.mewcraft.wakame.item.property.impl.ItemSlotRegistry
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toNMS
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.inventory.InventoryCloseEvent
-import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.ItemStack
 
 object ItemStackEffectivenessListener : Listener {
-
-    @EventHandler
-    fun on(event: InventoryCloseEvent) {
-        // 写入物品所在的槽位信息, 以渲染 bad_slot
-        val player = event.player as? Player ?: return
-        val inventory = event.inventory
-        if (inventory !is CraftingInventory) {
-            return
-        }
-        for (slot in ItemSlotRegistry.itemSlots()) {
-            val item = slot.getItem(player) ?: continue
-            val slot = slot.index
-            item.setData(ItemDataTypes.SLOT, slot)
-        }
-    }
 
     @EventHandler
     fun on(event: PlayerLevelUpEvent) {

@@ -320,9 +320,7 @@ effectiveness:
   namespace: special
   # 排序
   ordinal:
-    # - bad_slot  # 不推荐使用, 目前的行为不太符合玩家直觉
     - bad_level
     - bad_damage
-  bad_slot: "<!i><red>当前装备槽位无效"
   bad_level: "<!i><red>你的冒险等级不足以使用该物品"
   bad_damage: "<!i><red>物品已经损坏, 无法再正常使用"

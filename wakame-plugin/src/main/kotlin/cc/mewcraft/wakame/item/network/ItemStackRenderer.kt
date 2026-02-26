@@ -15,6 +15,7 @@ import cc.mewcraft.wakame.network.event.PacketHandler
 import cc.mewcraft.wakame.network.event.PacketListener
 import cc.mewcraft.wakame.network.event.clientbound.*
 import cc.mewcraft.wakame.network.event.registerPacketListener
+import cc.mewcraft.wakame.network.event.serverbound.ServerboundContainerClickPacketEvent
 import cc.mewcraft.wakame.network.event.unregisterPacketListener
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.getOrThrow
@@ -25,9 +26,12 @@ import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.event.HoverEvent
 import net.minecraft.core.component.DataComponentExactPredicate
 import net.minecraft.core.registries.Registries
+import net.minecraft.network.HashedPatchMap
+import net.minecraft.network.HashedStack
 import net.minecraft.network.protocol.game.ClientboundRecipeBookAddPacket
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
+import net.minecraft.world.item.Items
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.SelectableRecipe
 import net.minecraft.world.item.crafting.display.*
@@ -58,18 +62,31 @@ object ItemStackRenderer : PacketListener {
     }
 
     @PacketHandler
+    private fun handleContainerClick(event: ServerboundContainerClickPacketEvent) {
+        // FIXME: HashedStack breaks the approach of saving server-side data in the client-side stack via custom data
+        //        This could be solved by caching a mapping from client-side stack to server-side stack during getClientSideStack
+
+        // carried item needs to always be set to an item that triggers an update to prevent desync on single-item drag
+        event.carriedItem = HashedStack.ActualItem(Items.DIRT.builtInRegistryHolder(), -1, HashedPatchMap(emptyMap(), emptySet()))
+    }
+
+    @PacketHandler
     private fun handleContainerSetContent(event: ClientboundContainerSetContentPacketEvent) {
         val player = event.player
         if (isCreative(player)) return
-        val items = event.items
-        items.forEachIndexed { i, item ->
-            items[i] = item.copy().modify(player)
-        }
+        event.items = event.items.map { it.copy().modify(player) }
         event.carriedItem = event.carriedItem.copy().modify(player)
     }
 
     @PacketHandler
     private fun handleContainerSetSlot(event: ClientboundContainerSetSlotPacketEvent) {
+        val player = event.player
+        if (isCreative(player)) return
+        event.item = event.item.copy().modify(player)
+    }
+
+    @PacketHandler
+    private fun handleSetCursorItem(event: ClientboundSetCursorItemPacketEvent) {
         val player = event.player
         if (isCreative(player)) return
         event.item = event.item.copy().modify(player)
@@ -99,13 +116,7 @@ object ItemStackRenderer : PacketListener {
     private fun handleSetEquipment(event: ClientboundSetEquipmentPacketEvent) {
         val player = event.player
         if (isCreative(player)) return
-        val slots = ArrayList(event.slots).also { event.slots = it }
-        for ((i, pair) in slots.withIndex()) {
-            slots[i] = Pair(
-                pair.first,
-                pair.second.copy().modify(player)
-            )
-        }
+        event.slots = event.slots.map { Pair(it.first, it.second.copy().modify(player)) }
     }
 
     @PacketHandler
@@ -119,10 +130,18 @@ object ItemStackRenderer : PacketListener {
                 val stackB = it.itemStack.copy().modify(player)
                 ItemCost(stackB.itemHolder, stackB.count, DataComponentExactPredicate.EMPTY, stackB)
             }
-            newOffers += MerchantOffer(
-                costA, costB, offer.result.copy().modify(player),
-                offer.uses, offer.maxUses, offer.xp, offer.priceMultiplier, offer.demand
+            val newOffer = MerchantOffer(
+                costA,
+                costB,
+                offer.result.copy().modify(player),
+                offer.uses,
+                offer.maxUses,
+                offer.xp,
+                offer.priceMultiplier,
+                offer.demand
             )
+            newOffer.ignoreDiscounts = offer.ignoreDiscounts // 可以 AT  MerchantOffer 的构造器以直接在构造器指定 ignoreDiscounts
+            newOffers += newOffer
         }
         event.offers = newOffers
     }
