@@ -35,9 +35,6 @@ import org.bukkit.inventory.view.AnvilView
 /**
  * 实现了魔咒槽位机制.
  */
-// FIXME 这功能不太能用 ItemBehavior 实现, 因为在一次事件中涉及到多个物品, 具体原因类似我们如何实现属性机制一样
-//  但从包含与否的关系来看, 单独写个监听器(类似这里的 xxxFeature) 实际上是包含了 ItemBehavior 的所有功能的
-//  我在考虑要不要把 ItemBehavior 干掉换成这种实现得了
 @Init(InitStage.POST_WORLD)
 object EnchantSlotFeature : Listener {
 
@@ -179,6 +176,7 @@ object EnchantSlotFeature : Listener {
         val extraItem = event.cursor.takeUnlessEmpty() ?: return
         val targetItem = event.currentItem?.takeUnlessEmpty() ?: return
         if (!extraItem.hasProp(ItemPropTypes.ENCHANT_SLOT_ADDER)) return
+
         if (targetItem.isExactKoish.not()) {
             // 如果不是非套皮 Koish 物品, 则不允许安装额外槽位
             // 这是因为物品系统的一大约定就是不修改原版物品堆叠
@@ -192,19 +190,24 @@ object EnchantSlotFeature : Listener {
 
             return
         }
+
         val slotLimit = getSlotLimit(targetItem)
         val slotTotal = getSlotTotal(targetItem)
         if (slotTotal >= slotLimit) {
-            // 这里直接 return 而不取消事件, 因为玩家可能只是想 swap 这个物品
-            player.sendMessage(TranslatableMessages.MSG_MAX_ENCHANT_SLOT_REACHED)
-            player.playSound(player, Sound.ENTITY_SHULKER_HURT, 1f, 1f)
-            return
+            if (targetItem.hasData(DataComponentTypes.ENCHANTABLE)) {
+                // 仅在目标物品为可附魔时才发送提示, 否则是个 Koish 物品都会提示这个
+                player.sendMessage(TranslatableMessages.MSG_MAX_ENCHANT_SLOT_REACHED)
+                player.playSound(player, Sound.ENTITY_SHULKER_HURT, 1f, 1f)
+            }
+            return // 这里直接 return 而不取消事件, 因为玩家可能只是想 swap 这个物品
         }
+
         if (slotLimit <= 0) return // 没有魔咒槽位, 直接安静的忽略
 
         extraItem.subtract()
         addSlotExtra(targetItem)
         player.playSound(player, Sound.BLOCK_ANVIL_USE, 1f, 1f)
+
         event.isCancelled = true // 取消事件, 不然被安装额外槽位的物品会留在 cursor 上
 
         runTaskLater(1) { -> player.updateInventory() } // 必须延迟 1t 否则被打额外槽位的物品会从视觉上消失
