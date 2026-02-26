@@ -178,29 +178,36 @@ object EnchantSlotFeature : Listener {
         val clickedInventory = event.clickedInventory as? PlayerInventory ?: return // 玩家必须点击自己背包里的物品进行操作
         val player = event.whoClicked as? Player ?: return
         if (player.gameMode == GameMode.CREATIVE) return // 直接安静的忽略创造模式, 不发送任何提示信息
-        val targetItem = event.currentItem?.takeUnlessEmpty() ?: return
-        if (!targetItem.isExactKoish) return // 不对套皮物品进行修改
         val extraItem = event.cursor.takeUnlessEmpty() ?: return
+        val targetItem = event.currentItem?.takeUnlessEmpty() ?: return
+        if (!extraItem.hasProp(ItemPropTypes.ENCHANT_SLOT_ADDER)) return
+        if (targetItem.isExactKoish.not()) {
+            // 如果不是非套皮 Koish 物品, 则不允许安装额外槽位
+            // 这是因为物品系统的一大约定就是不修改原版物品堆叠
 
-        val isExtraItem = extraItem.hasProp(ItemPropTypes.ENCHANT_SLOT_ADDER)
-        if (!isExtraItem) return
+            // 对于可以附魔的物品, 这里我们需要给出提示信息, 消除玩家对此类物品无法添加额外槽位而产生的疑惑
+            if (targetItem.hasData(DataComponentTypes.ENCHANTABLE)) {
+                player.sendMessage(TranslatableMessages.MSG_ERR_CANNOT_ADD_EXTRA_ENCHANT_SLOT_FOR_VANILLA_ITEMS)
+                player.playSound(player, Sound.ENTITY_SHULKER_HURT, 1f, 1f)
+                event.isCancelled = true
+            }
 
+            return
+        }
         val slotLimit = getSlotLimit(targetItem)
         val slotTotal = getSlotTotal(targetItem)
         if (slotTotal >= slotLimit) {
+            // 这里直接 return 而不取消事件, 因为玩家可能只是想 swap 这个物品
             player.sendMessage(TranslatableMessages.MSG_MAX_ENCHANT_SLOT_REACHED)
             player.playSound(player, Sound.ENTITY_SHULKER_HURT, 1f, 1f)
-            // 这里直接 return 而不取消事件, 因为玩家可能只是想 swap 这个物品
             return
         }
-
         if (slotLimit <= 0) return // 没有魔咒槽位, 直接安静的忽略
-
-        event.isCancelled = true // 取消事件, 不然被安装额外槽位的物品会留在 cursor 上
 
         extraItem.subtract()
         addSlotExtra(targetItem)
         player.playSound(player, Sound.BLOCK_ANVIL_USE, 1f, 1f)
+        event.isCancelled = true // 取消事件, 不然被安装额外槽位的物品会留在 cursor 上
 
         runTaskLater(1) { -> player.updateInventory() } // 必须延迟 1t 否则被打额外槽位的物品会从视觉上消失
     }
@@ -210,41 +217,42 @@ object EnchantSlotFeature : Listener {
     private fun on(event: EnchantItemEvent) {
         val player = event.enchanter
         val item = event.item.takeUnlessEmpty() ?: return
-        if (item.type == Material.BOOK) return // 书不受魔咒槽位限制, 因为书上
+        if (item.type == Material.BOOK) return // 书不受魔咒槽位限制, 因为书没有附魔槽位的概念
         val enchantsToAdd = event.enchantsToAdd
-        val slotLimit = getSlotLimit(item)
+        val slotTotal = getSlotTotal(item)
         val slotUsedAlready = getSlotUsed(item)
         val slotUsedAfter = getSlotCapacity(item, enchantsToAdd)
         val slotUsedFinal = slotUsedAlready + slotUsedAfter
 
-        if (slotUsedFinal <= slotLimit) {
+        if (slotUsedFinal <= slotTotal) {
             // 如果魔咒后没有超出最大容量, 则直接放行
             return
         }
 
         // 超出了最大容量, 取消事件并给出提示
-        event.isCancelled = true
         player.sendMessage(TranslatableMessages.MSG_NO_FREE_ENCHANT_SLOTS)
         player.playSound(player, Sound.ENTITY_SHULKER_HURT, 1f, 1f)
 
         // 随机移除超出容量的魔咒
-        val excessAmt = slotUsedFinal - slotLimit
-        if (item.type != Material.BOOK && excessAmt > 0) {
+        val excessAmount = slotUsedFinal - slotTotal
+        if (excessAmount > 0) {
             runTask { ->
-                var removedAmt = 0
-                val enchantsOnItem = (item.getData(DataComponentTypes.ENCHANTMENTS)?.enchantments() ?: emptyMap()).toMutableMap()
-                enchantsOnItem.forEach { (enchantment, _) ->
-                    if (removedAmt >= excessAmt) return@forEach
-                    enchantsOnItem.remove(enchantment)
-                    removedAmt += getSlotCapacity(item, enchantment)
+                var removedAmount = 0
+                val enchantments = (item.getData(DataComponentTypes.ENCHANTMENTS)?.enchantments()?.entries ?: mutableListOf())
+                    .sortedByDescending { (enchant, level) -> getSlotCapacity(item, enchant) } // 优先移除占用槽位容量较大的魔咒, 以最大程度保留物品上的魔咒
+                    .toMutableList()
+                val enchantmentsIt = enchantments.iterator()
+                for ((enchant, level) in enchantmentsIt) {
+                    if (removedAmount >= excessAmount) break
+                    enchantmentsIt.remove()
+                    removedAmount += getSlotCapacity(item, enchant)
                 }
-                item.setData(DataComponentTypes.ENCHANTMENTS, ItemEnchantments.itemEnchantments(enchantsOnItem))
-                player.sendMessage(TranslatableMessages.MSG_REMOVED_EXCESS_ENCHANTMENTS.arguments(Component.text(removedAmt)))
+                val newEnchantments = ItemEnchantments.itemEnchantments(enchantments.associate { (enchant, level) -> enchant to level })
+                item.setData(DataComponentTypes.ENCHANTMENTS, newEnchantments)
+                player.sendMessage(TranslatableMessages.MSG_REMOVED_EXCESS_ENCHANTMENTS.arguments(Component.text(removedAmount)))
                 player.playSound(player, Sound.ENTITY_SHULKER_HURT, 1f, 1f)
             }
         }
-
-        player.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
     }
 
     // 监听玩家在锻造台 (Smithing Table) 合成物品时, 自动设置和校验物品的魔咒容量, 防止超出自定义的最大"魔咒槽"容量
@@ -255,9 +263,7 @@ object EnchantSlotFeature : Listener {
         val player = event.whoClicked as? Player ?: return
         val inventory = event.inventory
 
-        //val firstItem = inventory.inputTemplate?.takeUnlessEmpty()
         val secondItem = inventory.inputEquipment?.takeUnlessEmpty() ?: return
-        //val thirdItem = inventory.inputMineral?.takeUnlessEmpty()
         val resultItem = inventory.result?.takeUnlessEmpty() ?: return
 
         // 计算 result 物品的槽位容量 (= result 物品的基础槽位容量 + second 物品的额外槽位容量)

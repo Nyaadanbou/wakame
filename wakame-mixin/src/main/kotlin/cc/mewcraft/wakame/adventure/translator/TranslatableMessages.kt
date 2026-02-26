@@ -79,6 +79,7 @@ object TranslatableMessages {
     val MSG_MAX_ENCHANT_SLOT_REACHED = create("msg_max_enchant_slot_reached")
     val MSG_NO_FREE_ENCHANT_SLOTS = create("msg_no_free_enchant_slots")
     val MSG_REMOVED_EXCESS_ENCHANTMENTS = create("msg_removed_excess_enchantments")
+    val MSG_ERR_CANNOT_ADD_EXTRA_ENCHANT_SLOT_FOR_VANILLA_ITEMS = create("msg_err_cannot_add_extra_enchant_slot_for_vanilla_items")
     val MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_SIMPLE_USE = create("msg_hold_last_damage_default_when_simple_use")
     val MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_SIMPLE_ATTACK = create("msg_hold_last_damage_default_when_simple_attack")
     val MSG_HOLD_LAST_DAMAGE_DEFAULT_WHEN_CAUSE_DAMAGE = create("msg_hold_last_damage_default_when_cause_damage")
