@@ -2,11 +2,9 @@ package cc.mewcraft.wakame.item.display.implementation.standard
 
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item.ItemStackEffectiveness
-import cc.mewcraft.wakame.item.data.ItemDataTypes
 import cc.mewcraft.wakame.item.data.impl.*
 import cc.mewcraft.wakame.item.display.*
 import cc.mewcraft.wakame.item.display.implementation.common.*
-import cc.mewcraft.wakame.item.getData
 import cc.mewcraft.wakame.item.property.impl.*
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
@@ -395,14 +393,6 @@ internal data class EffectivenessRendererFormat(
         val components = ArrayList<Component>()
         for (ord in ordinal) {
             when (ord) {
-                Ordinal.BAD_SLOT -> {
-                    // TODO 需要更完善的实现
-                    val convertedSlot = item.getData(ItemDataTypes.SLOT) ?: continue
-                    if (player != null && ItemStackEffectiveness.testSlot(convertedSlot, item).not()) {
-                        components += badSlot
-                    }
-                }
-
                 Ordinal.BAD_LEVEL -> {
                     if (player != null && ItemStackEffectiveness.testLevel(player, item).not()) {
                         components += badLevel
@@ -424,6 +414,6 @@ internal data class EffectivenessRendererFormat(
     }
 
     enum class Ordinal {
-        BAD_SLOT, BAD_LEVEL, BAD_DAMAGE
+        BAD_LEVEL, BAD_DAMAGE
     }
 }
