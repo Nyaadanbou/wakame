@@ -25,6 +25,9 @@ import io.papermc.paper.adventure.PaperAdventure
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.event.HoverEvent
+import net.minecraft.advancements.Advancement
+import net.minecraft.advancements.AdvancementHolder
+import net.minecraft.advancements.DisplayInfo
 import net.minecraft.core.component.DataComponentExactPredicate
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
@@ -64,7 +67,42 @@ object ItemStackRenderer : PacketListener {
     }
 
     @PacketHandler
+    private fun handleUpdateAdvancements(event: ClientboundUpdateAdvancementsPacketEvent) {
+        val player = event.player
+        if (isCreative(player)) return
+        val changedAdded = event.added.map { advancementHolder ->
+            val advancement = advancementHolder.value
+            val changedDisplayInfo = advancement.display().map { displayInfo ->
+                DisplayInfo(
+                    displayInfo.icon.copy().modify(player),
+                    displayInfo.title,
+                    displayInfo.description,
+                    displayInfo.background,
+                    displayInfo.type,
+                    displayInfo.shouldShowToast(),
+                    displayInfo.shouldAnnounceChat(),
+                    displayInfo.isHidden
+                )
+            }
+            val changedAdvancement = Advancement(
+                advancement.parent,
+                changedDisplayInfo,
+                advancement.rewards,
+                advancement.criteria,
+                advancement.requirements,
+                advancement.sendsTelemetryEvent,
+                advancement.name
+            )
+            AdvancementHolder(advancementHolder.id, changedAdvancement)
+        }
+        event.added = changedAdded
+    }
+
+    @PacketHandler
     private fun handleContainerClick(event: ServerboundContainerClickPacketEvent) {
+        val player = event.player
+        if (isCreative(player)) return
+
         // FIXME: HashedStack breaks the approach of saving server-side data in the client-side stack via custom data
         //        This could be solved by caching a mapping from client-side stack to server-side stack during getClientSideStack
 
@@ -315,15 +353,15 @@ object ItemStackRenderer : PacketListener {
         val hoverEvent = component.hoverEvent() ?: return component
         if (hoverEvent.action() == HoverEvent.Action.SHOW_ITEM) {
             val itemstackInfo = hoverEvent.value() as HoverEvent.ShowItem
-            val originItemstack = MojangStack(Registries.ITEM.getOrThrow(itemstackInfo.item()), itemstackInfo.count(), PaperAdventure.asVanilla(itemstackInfo.dataComponents()))
-            var changedItemStack = originItemstack.copy().modify(player)
+            val originalItemstack = MojangStack(Registries.ITEM.getOrThrow(itemstackInfo.item()), itemstackInfo.count(), PaperAdventure.asVanilla(itemstackInfo.dataComponents()))
+            var changedItemStack = originalItemstack.copy().modify(player)
 
             // 把 Koish 物品的基底换成一个不会被 Koish 渲染的物品,
             // 这样可以避免消息跨服时被其他服务端当成套皮进行二次渲染
             changedItemStack.item = Items.STONE
 
             // 基底换了以后, minecraft:item_name 也需要修正一下
-            val clientItemName = HotfixItemName.getItemName(originItemstack) ?: originItemstack.itemName
+            val clientItemName = HotfixItemName.getItemName(originalItemstack) ?: originalItemstack.itemName
             changedItemStack.set(DataComponents.ITEM_NAME, clientItemName)
 
             // 清理 Koish 数据组件以避免客户端强制掉线
