@@ -9,7 +9,7 @@ import net.william278.huskhomes.teleport.TeleportRequest
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
-class TpaBlockListener : Listener {
+class TeleportRequestBlockListener : Listener {
 
     //
     // 允许玩家在 <server> 收到 TPA 请求
