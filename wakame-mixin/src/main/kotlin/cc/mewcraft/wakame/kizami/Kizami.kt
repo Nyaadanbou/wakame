@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.PlayerFriendlyNamed
 import cc.mewcraft.wakame.util.adventure.toSimpleString
+import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 import net.kyori.adventure.text.Component
@@ -28,16 +29,16 @@ constructor(
      * 键名 [Int] 代表产生对应铭刻效果 [KizamiEffect] 所需要的铭刻数量.
      *
      * 例如有这样一个映射:
-     * - `1` -> [`增加 2 攻击力`]
-     * - `2` -> [`增加 3 攻击力`]
-     * - `3` -> [`增加 4 攻击力`, `激活被动技能`]
+     * - `1` -> `增加 2 攻击力`
+     * - `2` -> `增加 3 攻击力`
+     * - `3` -> `增加 4 攻击力`, `激活被动技能`
      *
-     * 意为:
+     * 意为 (只会应用满足数量条件中最高一档的效果):
      * - 当铭刻数量达到 1 时, 会产生 `增加 2 攻击力` 的效果;
      * - 当铭刻数量达到 2 时, 会产生 `增加 3 攻击力` 的效果;
      * - 当铭刻数量达到 3 时, 会产生 `增加 4 攻击力` 和 `激活被动技能` 的效果.
      */
-    val effects: Map<Int, List<KizamiEffect>>,
+    val effects: Int2ObjectSortedMap<List<KizamiEffect>>,
 ) : Keyed, Examinable, PlayerFriendlyNamed {
 
     override fun key(): Key {

@@ -176,13 +176,17 @@ private class KizamiMapImpl(
 
     override fun removeAllEffects(player: Player) {
         for ((kizami, amount) in iterator()) {
-            kizami.unwrap().effects[amount]?.forEach { it.remove(player) }
+            val candidates = kizami.unwrap().effects.headMap(amount + 1) // keys <= amount
+            if (candidates.isEmpty()) continue
+            candidates[candidates.lastIntKey()]?.forEach { it.remove(player) }
         }
     }
 
     override fun applyAllEffects(player: Player) {
         for ((kizami, amount) in iterator()) {
-            kizami.unwrap().effects[amount]?.forEach { it.apply(player) }
+            val candidates = kizami.unwrap().effects.headMap(amount + 1) // keys <= amount
+            if (candidates.isEmpty()) continue
+            candidates[candidates.lastIntKey()]?.forEach { it.apply(player) }
         }
     }
 

@@ -16,6 +16,7 @@ import cc.mewcraft.wakame.util.IdePauser
 import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.KoishKeys
 import cc.mewcraft.wakame.util.configurate.yamlLoader
+import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 import org.spongepowered.configurate.ConfigurationNode
@@ -117,11 +118,12 @@ internal object KizamiRegistryLoader : RegistryLoader {
         node.hint(RepresentationHints.KIZAMI_ID, id)
         val effects = node.node("effects").get<Map<Int, List<KizamiEffect>>>(emptyMap())
         require(effects.keys.all { it >= 0 }) { "All the keys of kizami effects must be positive integers" }
+        val sortedEffects = Int2ObjectRBTreeMap<List<KizamiEffect>>().apply { putAll(effects) }
 
         return Kizami(
             displayName = name,
             displayStyles = styles,
-            effects = effects
+            effects = sortedEffects
         )
     }
 }
