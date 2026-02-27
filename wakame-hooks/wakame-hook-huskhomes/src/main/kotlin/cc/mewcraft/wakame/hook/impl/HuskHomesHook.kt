@@ -9,7 +9,7 @@ object HuskHomesHook {
 
     init {
         // 注册事件监听器
-        TpaBlockListener().registerEvents()
+        TeleportRequestBlockListener().registerEvents()
         // 注册跨服务器传送实现
         NetworkTeleport.setImplementation(HuskHomesNetworkTeleport())
     }

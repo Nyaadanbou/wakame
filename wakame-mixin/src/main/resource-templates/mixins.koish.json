@@ -30,6 +30,7 @@
     "MixinInventory",
     "MixinInventoryChangeTrigger",
     "MixinItemBody",
+    "MixinItemStack",
     "MixinItemStack$2",
     "MixinLivingEntity",
     "MixinLootPoolEntries",

@@ -17,7 +17,6 @@ import cc.mewcraft.wakame.item.display.TextAssembler
 import cc.mewcraft.wakame.item.display.implementation.*
 import cc.mewcraft.wakame.item.display.implementation.common.*
 import cc.mewcraft.wakame.item.extension.*
-import cc.mewcraft.wakame.item.feature.EnchantSlotFeature
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.*
 import cc.mewcraft.wakame.kizami.Kizami
@@ -39,7 +38,6 @@ import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.food.FoodProperties
@@ -275,20 +273,8 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
     }
 
     @JvmField
-    val ENCHANT_SLOTS: RenderingHandler<MojangStack, SingleValueRendererFormat> = configure("enchant_slots") { data, format ->
-        val bukkitStack = data.toBukkit()
-        val used = EnchantSlotFeature.getSlotUsed(bukkitStack)
-        val maxBase = EnchantSlotFeature.getSlotBase(bukkitStack)
-        val maxExtra = EnchantSlotFeature.getSlotExtra(bukkitStack)
-        val maxTotal = maxBase + maxExtra
-        if (maxTotal <= 0) return@configure IndexedText.NO_OP
-        val resolver = TagResolver.resolver(
-            Placeholder.component("used", Component.text(used)),
-            Placeholder.component("max_base", Component.text(maxBase)),
-            Placeholder.component("max_extra", Component.text(maxExtra)),
-            Placeholder.component("max_total", Component.text(maxTotal)),
-        )
-        format.render(resolver)
+    val ENCHANT_SLOTS: RenderingHandler<MojangStack, EnchantSlotRendererFormat> = configure("enchant_slots") { data, format ->
+        format.render(data.toBukkit())
     }
 
     @JvmField
