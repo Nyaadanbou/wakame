@@ -112,6 +112,10 @@ msg_err_not_in_dimensions: "<red>你不在维度内: <arg:0>"
 msg_err_cannot_use_teleport_anchor_in_current_server: "<red>无法在当前位面使用传送锚点."
 msg_err_cannot_use_teleport_anchor_in_current_dimension: "<red>无法在当前维度使用传送锚点."
 msg_lootchest_cannot_be_destroyed: "<red>战利品箱无法被摧毁."
+msg_err_cannot_use_random_teleport_in_current_server: "<red>末影之力无法在当前位面使用."
+msg_err_cannot_use_random_teleport_in_current_dimension: "<red>末影之力无法在当前维度使用."
+msg_err_random_teleport_found_no_safe_location: "<red>末影之力未能找到安全的位置."
+msg_searching_safe_location_for_random_teleport: "<gray>末影之力正在寻找安全的位置..."
 
 # 像这样制定一个数字的格式, '#' 是 Java 的 DecimalFormat 的语法
 msg_number_format: "This is a decimal number: <arg:0:'zh-CN':'#'>."

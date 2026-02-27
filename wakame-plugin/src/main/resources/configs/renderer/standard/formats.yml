@@ -327,3 +327,13 @@ effectiveness:
     - bad_damage
   bad_level: "<!i><red>你的冒险等级不足以使用该物品"
   bad_damage: "<!i><red>物品已经损坏, 无法再正常使用"
+
+# id: `random_teleport`
+random_teleport:
+  namespace: special
+  # 可用标签
+  # <search_radius> 搜索半径
+  # <search_height> 搜索高度
+  tooltip:
+    - "<!i><gray>随机半径: <yellow><search_radius>"
+    - "<!i><gray>随机高度: <yellow><search_height>"

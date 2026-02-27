@@ -63,6 +63,7 @@ primary:
   - special:castable
   - special:network_position
   - special:crate_key_replaced
+  - special:random_teleport
 
   - (fixed:general)<st><dark_gray>             </dark_gray></st>
   - general:kizami

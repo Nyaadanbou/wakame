@@ -17,14 +17,13 @@ class PortalsRandomTeleport : RandomTeleport {
             bounds.searchSafeLocation(Random())
                 .thenApply { location ->
                     if (location != null) {
-                        // 因为搜索已经将区块载入, 所以这里直接用 Entity#teleport 不会触发区块加载
-                        entity.teleport(location)
+                        entity.teleportAsync(location)
                         true
                     } else {
                         false
                     }
                 }
-                .exceptionally { throwable ->
+                .exceptionally { ex ->
                     false
                 }
         } catch (_: Exception) {

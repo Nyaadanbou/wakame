@@ -488,6 +488,12 @@ data object ItemPropTypes {
     @JvmField
     val DAMAGE_ON_USE_ON = typeOf<Int>("damage_on_use_on")
 
+    /**
+     * 储存了 [cc.mewcraft.wakame.item.behavior.impl.RandomTeleport] 行为的全局配置项.
+     */
+    @JvmField
+    val RANDOM_TELEPORT: ItemPropType<RandomTeleport> = typeOf("random_teleport")
+
     // ------------
     // 方便函数
     // ------------

@@ -141,6 +141,8 @@ internal object StandardItemRenderer : AbstractItemRenderer<MojangStack, Player>
         StandardRenderingHandlerRegistry.ENTITY_BUCKET_PROP.process(collector, item.getProp(ItemPropTypes.ENTITY_BUCKET))
         StandardRenderingHandlerRegistry.FUEL.process(collector, item.getProp(ItemPropTypes.FUEL))
         StandardRenderingHandlerRegistry.CASTABLE.process(collector, item.getProp(ItemPropTypes.CASTABLE))
+        StandardRenderingHandlerRegistry.RANDOM_TELEPORT.process(collector, item.getProp(ItemPropTypes.RANDOM_TELEPORT))
+        StandardRenderingHandlerRegistry.EFFECTIVENESS.process(collector, player, item)
         StandardRenderingHandlerRegistry.ITEM_NAME.process(collector, item.getMeta(ItemMetaTypes.ITEM_NAME)) // 对于最可能被频繁修改的 `item_name`, `custom_name`
         StandardRenderingHandlerRegistry.CUSTOM_NAME.process(collector, item.getMeta(ItemMetaTypes.CUSTOM_NAME))
         StandardRenderingHandlerRegistry.CRATE.process(collector, item.getData(ItemDataTypes.CRATE))
@@ -157,7 +159,6 @@ internal object StandardItemRenderer : AbstractItemRenderer<MojangStack, Player>
         StandardRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, if (item.has(DataComponents.DAMAGE_RESISTANT)) Unit else null)
         StandardRenderingHandlerRegistry.FOOD.process(collector, item.get(DataComponents.FOOD))
         StandardRenderingHandlerRegistry.ENCHANT_SLOTS.process(collector, item)
-        StandardRenderingHandlerRegistry.EFFECTIVENESS.process(collector, player, item)
 
         // 生成 koish lore
         val koishLore = textAssembler.assemble(collector)
@@ -348,5 +349,13 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
     @JvmField
     val EFFECTIVENESS: RenderingHandler2<Player?, MojangStack, EffectivenessRendererFormat> = configure2("effectiveness") { data1, data2, format ->
         format.render(data1, data2)
+    }
+
+    @JvmField
+    val RANDOM_TELEPORT: RenderingHandler<RandomTeleport, ListValueRendererFormat> = configure("random_teleport") { data, format ->
+        format.render(
+            Placeholder.component("search_radius", Component.text(data.searchRadius.toInt())),
+            Placeholder.component("search_height", Component.text(data.searchHeight.toInt())),
+        )
     }
 }

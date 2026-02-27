@@ -228,6 +228,12 @@ object ItemBehaviorTypes {
     @JvmField
     val DAMAGE_ON_USE_ON = typeOf("damage_on_use_on", DamageOnUseOn)
 
+    /**
+     * 物品具有该行为时, 消耗时会进行一次随机传送.
+     */
+    @JvmField
+    val RANDOM_TELEPORT = typeOf("random_teleport", RandomTeleport)
+
     // ------------
     // 方便函数
     // ------------

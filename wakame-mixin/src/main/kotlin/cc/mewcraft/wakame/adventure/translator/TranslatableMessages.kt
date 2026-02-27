@@ -118,6 +118,10 @@ object TranslatableMessages {
     val MSG_NETWORK_POS_SAVED = create("msg_network_pos_saved")
     val MSG_ERR_NOT_IN_DIMENSIONS = create("msg_err_not_in_dimensions")
     val MSG_LOOTCHEST_CANNOT_BE_DESTROYED = create("msg_lootchest_cannot_be_destroyed")
+    val MSG_ERR_CANNOT_USE_RANDOM_TELEPORT_IN_CURRENT_SERVER = create("msg_err_cannot_use_random_teleport_in_current_server")
+    val MSG_ERR_CANNOT_USE_RANDOM_TELEPORT_IN_CURRENT_DIMENSION = create("msg_err_cannot_use_random_teleport_in_current_dimension")
+    val MSG_ERR_RANDOM_TELEPORT_FOUND_NO_SAFE_LOCATION = create("msg_err_random_teleport_found_no_safe_location")
+    val MSG_SEARCHING_SAFE_LOCATION_FOR_RANDOM_TELEPORT = create("msg_searching_safe_location_for_random_teleport")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

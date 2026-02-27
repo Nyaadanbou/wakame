@@ -59,6 +59,7 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     .register(RegistryKey.ENTITY_TYPE.valueByNameTypeSerializer())
     .register(RegistryKey.ITEM.valueByNameTypeSerializer())
     .register(RegistryKey.MOB_EFFECT.valueByNameTypeSerializer())
+    .register(RegistryKey.SOUND_EVENT.valueByNameTypeSerializer())
     // Koish Registry
     .register(BuiltInRegistries.ATTRIBUTE.holderByNameTypeSerializer())
     .register(BuiltInRegistries.ELEMENT.holderByNameTypeSerializer())
