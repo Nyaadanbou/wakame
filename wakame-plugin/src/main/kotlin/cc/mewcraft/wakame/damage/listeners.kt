@@ -33,7 +33,7 @@ internal object DamageListener : Listener {
         DamageManagerImpl.registerTrident(event)
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST) // 设为 HIGHEST 兼容 MythicMobs 的 onShoot 光环
     fun on(event: EntityShootBowEvent) {
         DamageManagerImpl.registerExactArrow(event)
     }
