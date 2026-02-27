@@ -83,7 +83,10 @@ enchant_slots:
   # <max_base> 附魔槽位数量的基础上限
   # <max_extra> 附魔槽位数量的额外上限
   # <max_total> 附魔槽位数量的总上限 (base + extra)
-  tooltip: "<!i><gray>附魔槽位: <white><used>/<max_base>(+<max_extra>)"
+  # normal 在 `<max_extra>` 为零时渲染
+  normal: "<!i><gray>附魔槽位: <white><used>/<max_base>"
+  # extra 在 `<max_extra>` 不为零时渲染
+  extra: "<!i><gray>附魔槽位: <white><used>/<max_base> (+<max_extra>)"
 
 # id: `damage_resistant`
 damage_resistant:

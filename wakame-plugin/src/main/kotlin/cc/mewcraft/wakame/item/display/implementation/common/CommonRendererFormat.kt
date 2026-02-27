@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.display.implementation.common
 import cc.mewcraft.wakame.item.data.impl.AttributeCore
 import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.item.display.*
+import cc.mewcraft.wakame.item.feature.EnchantSlotFeature
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.adventure.removeItalic
@@ -11,8 +12,10 @@ import it.unimi.dsi.fastutil.objects.ObjectImmutableList
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.component
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.NodeKey
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
@@ -40,7 +43,7 @@ internal data class ExtraLoreRendererFormat(
      */
     fun render(data: List<Component>): IndexedText {
         val size = tooltip.header.size + data.size + tooltip.bottom.size
-        val lines = data.mapTo(ObjectArrayList(size)) { MiniMessage.miniMessage().deserialize(tooltip.line, component("line", it)) }
+        val lines = data.mapTo(ObjectArrayList(size)) { MiniMessage.miniMessage().deserialize(tooltip.line, Placeholder.component("line", it)) }
         val header: List<Component> = tooltip.header.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.header.size), MiniMessage.miniMessage()::deserialize) ?: ObjectImmutableList.of()
         val bottom: List<Component> = tooltip.bottom.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.bottom.size), MiniMessage.miniMessage()::deserialize) ?: ObjectImmutableList.of()
         lines.addAll(0, header)
@@ -83,6 +86,41 @@ internal data class EnchantmentRendererFormat(
     }
 }
 
+/**
+ * @property normal 没有额外附魔槽位时的提示文本
+ * @property extra 拥有额外附魔槽位时的提示文本
+ */
+@ConfigSerializable
+internal data class EnchantSlotRendererFormat(
+    override val namespace: String,
+    private val normal: String = "<!i><gray>附魔槽位: <white><used>/<max_base>",
+    private val extra: String = "<!i><gray>附魔槽位: <white><used>/<max_base> (+<max_extra>)",
+) : RendererFormat.Simple {
+    override val id: String = "enchant_slots"
+    override val index: DerivedIndex = Key.key(namespace, id)
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory.fixed()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate.literal(namespace, id)
+
+    fun render(item: ItemStack): IndexedText {
+        val used = EnchantSlotFeature.getSlotUsed(item)
+        val maxBase = EnchantSlotFeature.getSlotBase(item)
+        val maxExtra = EnchantSlotFeature.getSlotExtra(item)
+        val maxTotal = maxBase + maxExtra
+        if (maxTotal <= 0) return IndexedText.NO_OP
+        val resolver = TagResolver.resolver(
+            Placeholder.component("used", Component.text(used)),
+            Placeholder.component("max_base", Component.text(maxBase)),
+            Placeholder.component("max_extra", Component.text(maxExtra)),
+            Placeholder.component("max_total", Component.text(maxTotal)),
+        )
+        return if (maxExtra <= 0) {
+            SimpleIndexedText(index, listOf(MiniMessage.miniMessage().deserialize(normal, resolver)))
+        } else {
+            SimpleIndexedText(index, listOf(MiniMessage.miniMessage().deserialize(extra, resolver)))
+        }
+    }
+}
+
 @ConfigSerializable
 internal data class RarityRendererFormat(
     override val namespace: String,
@@ -99,7 +137,7 @@ internal data class RarityRendererFormat(
             index, listOf(
                 MiniMessage.miniMessage().deserialize(
                     simple,
-                    component("rarity_display_name", rarity.unwrap().displayName)
+                    Placeholder.component("rarity_display_name", rarity.unwrap().displayName)
                 )
             )
         )
@@ -110,8 +148,8 @@ internal data class RarityRendererFormat(
             index, listOf(
                 MiniMessage.miniMessage().deserialize(
                     complex,
-                    component("rarity_display_name", rarity.unwrap().displayName),
-                    component("reforge_mod_count", Component.text(modCount.toString()))
+                    Placeholder.component("rarity_display_name", rarity.unwrap().displayName),
+                    Placeholder.component("reforge_mod_count", Component.text(modCount.toString()))
                 )
             )
         )
