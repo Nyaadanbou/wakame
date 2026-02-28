@@ -59,8 +59,7 @@ class HasPlotFactory(
         val dimension = instruction.string().get("dimension").getOrNull()
         val logger = loggerFactory.create(HasPlot::class.java)
         val hasPlot = HasPlot(amount, dimension, logger)
-        val questPackage = instruction.getPackage()
-        val adapter = OnlineConditionAdapter(hasPlot, logger, questPackage)
+        val adapter = OnlineConditionAdapter(hasPlot)
         return adapter
     }
 }

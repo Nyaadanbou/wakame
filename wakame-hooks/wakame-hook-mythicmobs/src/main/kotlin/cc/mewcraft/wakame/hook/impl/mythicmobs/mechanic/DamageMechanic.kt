@@ -17,12 +17,13 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import java.io.File
 
-class NekoBaseDamageMechanic(
+class DamageMechanic(
     manager: SkillExecutor,
     file: File,
     line: String,
     mlc: MythicLineConfig,
 ) : SkillMechanic(manager, file, line, mlc), ITargetedEntitySkill {
+
     companion object {
         private val DAMAGE_BUNDLE_PATTERN: Regex = Regex("\\([^)]+\\)")
     }
@@ -33,7 +34,7 @@ class NekoBaseDamageMechanic(
 
     private val damageBundle: (SkillMetadata) -> DamageBundle = parseDamageBundle(mlc.getStringList(arrayOf("bundle", "b"), ""))
     private val criticalStrikePower: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("critical_strike_power", "csp"), 1.0)
-    private val criticalStrikeState: CriticalStrikeState = parseCriticalState(mlc.getString(arrayOf("critical_strike_state", "css"), "NONE"))
+    private val criticalStrikeState: CriticalStrikeState = mlc.getString(arrayOf("critical_strike_state", "css"), "NONE").let(CriticalStrikeState::valueOf)
     private val knockback: Boolean = mlc.getBoolean(arrayOf("knockback", "kb"), true)
 
     private fun parseDamageBundle(origin: List<String>): (SkillMetadata) -> DamageBundle {
@@ -46,24 +47,45 @@ class NekoBaseDamageMechanic(
                         ?.split(",") // 按逗号分割
                         ?: throw IllegalArgumentException("Invalid damage bundle: $rawPacketString")
                     when (split.size) {
-                        // 登神长阶
-
                         // 配置文件内指定 element, min, 其中 min = max
-                        2 -> split[0] to DamagePacket(split[0], split[1].toPlaceholderDouble()[data], split[1].toPlaceholderDouble()[data])
+                        2 -> split[0] to DamagePacket(
+                            split[0],
+                            PlaceholderDouble.of(split[1])[data],
+                            PlaceholderDouble.of(split[1])[data]
+                        )
+
                         // 配置文件内指定 element, min, max
-                        3 -> split[0] to DamagePacket(split[0], split[1].toPlaceholderDouble()[data], split[2].toPlaceholderDouble()[data])
+                        3 -> split[0] to DamagePacket(
+                            split[0],
+                            PlaceholderDouble.of(split[1])[data],
+                            PlaceholderDouble.of(split[2])[data]
+                        )
+
                         // 配置文件内指定 element, min, max, rate
-                        4 -> split[0] to DamagePacket(split[0], split[1].toPlaceholderDouble()[data], split[2].toPlaceholderDouble()[data], split[3].toPlaceholderDouble()[data])
+                        4 -> split[0] to DamagePacket(
+                            split[0],
+                            PlaceholderDouble.of(split[1])[data],
+                            PlaceholderDouble.of(split[2])[data],
+                            PlaceholderDouble.of(split[3])[data]
+                        )
+
                         // 配置文件内指定 element, min, max, rate, defense_penetration
-                        5 -> split[0] to DamagePacket(split[0], split[1].toPlaceholderDouble()[data], split[2].toPlaceholderDouble()[data], split[3].toPlaceholderDouble()[data], split[4].toPlaceholderDouble()[data])
+                        5 -> split[0] to DamagePacket(
+                            split[0],
+                            PlaceholderDouble.of(split[1])[data],
+                            PlaceholderDouble.of(split[2])[data],
+                            PlaceholderDouble.of(split[3])[data],
+                            PlaceholderDouble.of(split[4])[data]
+                        )
+
                         // 配置文件内指定 element, min, max, rate, defense_penetration, defense_penetration_rate
                         6 -> split[0] to DamagePacket(
                             split[0],
-                            split[1].toPlaceholderDouble()[data],
-                            split[2].toPlaceholderDouble()[data],
-                            split[3].toPlaceholderDouble()[data],
-                            split[4].toPlaceholderDouble()[data],
-                            split[5].toPlaceholderDouble()[data]
+                            PlaceholderDouble.of(split[1])[data],
+                            PlaceholderDouble.of(split[2])[data],
+                            PlaceholderDouble.of(split[3])[data],
+                            PlaceholderDouble.of(split[4])[data],
+                            PlaceholderDouble.of(split[5])[data]
                         )
 
                         else -> throw IllegalArgumentException("Invalid damage packet: '$rawPacketString'")
@@ -73,44 +95,24 @@ class NekoBaseDamageMechanic(
         }
     }
 
-    private fun String.toPlaceholderDouble(): PlaceholderDouble {
-        return PlaceholderDouble.of(this)
-    }
-
-    private fun parseCriticalState(origin: String): CriticalStrikeState {
-        return CriticalStrikeState.valueOf(origin)
-    }
-
     override fun castAtEntity(data: SkillMetadata, target: AbstractEntity): SkillResult {
-        if (target.isDead) {
-            return SkillResult.INVALID_TARGET
-        }
-
-        val entity = (target.bukkitEntity as? LivingEntity)
-            ?: return SkillResult.INVALID_TARGET
-
-        val damageMetadata = DamageMetadata(
-            damageBundle.invoke(data), CriticalStrikeMetadata(criticalStrikePower[target], criticalStrikeState)
-        )
-
+        if (target.isDead) return SkillResult.INVALID_TARGET
+        val targetEntity = target.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
         val casterEntity = data.caster?.entity?.bukkitEntity as? LivingEntity
-        val damageSource = if (casterEntity == null) {
-            DamageSource.builder(DamageType.GENERIC).build()
-        } else if (casterEntity is Player) {
-            KoishDamageSources.playerAttack(casterEntity)
-        } else {
-            KoishDamageSources.mobAttack(casterEntity)
+        val damageSource = when (casterEntity) {
+            null -> DamageSource.builder(DamageType.GENERIC).build()
+            is Player -> KoishDamageSources.playerAttack(casterEntity)
+            else -> KoishDamageSources.mobAttack(casterEntity)
         }
-
         val mythicDamageMetadata = MythicUtils.createMythicDamageMetadata(data)
         // 添加标记使本次伤害被视为技能伤害, 而不再触发 ~onAttack 触发器, 避免堆栈溢出
         target.setMetadata("skill-damage", mythicDamageMetadata)
         // 对目标生物造成自定义的萌芽伤害
-        DamageManagerApi.hurt(entity, damageMetadata, damageSource, knockback)
-        // 移除标记
-        // 是的, MythicMobs 并不会自动移除伤害元数据, 但它却以此来区分伤害是否为技能伤害
+        val csm = CriticalStrikeMetadata(criticalStrikePower[target], criticalStrikeState)
+        val damageMetadata = DamageMetadata(damageBundle(data), csm)
+        DamageManagerApi.hurt(targetEntity, damageMetadata, damageSource, knockback)
+        // 移除标记 (是的, MythicMobs 并不会自动移除伤害元数据, 但它却以此来区分伤害是否为技能伤害)
         target.removeMetadata("skill-damage")
-
         return SkillResult.SUCCESS
     }
 }

@@ -49,8 +49,7 @@ class ReplaceCrateKeyActionFactory(
     override fun parsePlayer(instruction: Instruction): PlayerAction {
         val logger = loggerFactory.create(ReplaceCrateKeyAction::class.java)
         val action = ReplaceCrateKeyAction(logger)
-        val questPackage = instruction.getPackage()
-        val adapter = OnlineActionAdapter(action, logger, questPackage)
+        val adapter = OnlineActionAdapter(action)
         return adapter
     }
 }

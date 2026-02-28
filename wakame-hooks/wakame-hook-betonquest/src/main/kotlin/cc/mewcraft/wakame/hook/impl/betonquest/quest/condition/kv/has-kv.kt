@@ -57,8 +57,7 @@ class HasKeyValueFactory(
         val value = instruction.string().get("value").getOrNull()
         val logger = loggerFactory.create(HasKeyValueCondition::class.java)
         val condition = HasKeyValueCondition(key, value, logger)
-        val questPackage = instruction.getPackage()
-        return OnlineConditionAdapter(condition, logger, questPackage)
+        return OnlineConditionAdapter(condition)
     }
 }
 

@@ -79,10 +79,10 @@ class AttributeModifierMechanic(
             )
         }
         if (replace) {
-            instance.removeModifier(modifier.id)
+            instance.removeModifier(modifier)
         }
         if (isPlayer) {
-            // 给玩家添加临时的属性修饰符, 避免属性意外永久驻留在玩家存档里
+            // 对于玩家, 添加临时属性修饰符, 以避免属性意外永久驻留在玩家存档里
             instance.addTransientModifier(modifier)
         } else {
             instance.addModifier(modifier)

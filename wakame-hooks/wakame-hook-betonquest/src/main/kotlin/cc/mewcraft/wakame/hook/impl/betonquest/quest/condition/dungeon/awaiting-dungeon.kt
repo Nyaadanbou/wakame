@@ -32,8 +32,7 @@ class AwaitingDungeonFactory(
     override fun parsePlayer(instruction: Instruction): PlayerCondition {
         val logger = loggerFactory.create(AwaitingDungeon::class.java)
         val awaitingDungeon = AwaitingDungeon(logger)
-        val questPackage = instruction.getPackage()
-        val adapter = OnlineConditionAdapter(awaitingDungeon, logger, questPackage)
+        val adapter = OnlineConditionAdapter(awaitingDungeon)
         return adapter
     }
 }

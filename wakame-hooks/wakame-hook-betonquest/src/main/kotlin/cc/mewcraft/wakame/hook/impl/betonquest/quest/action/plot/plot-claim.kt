@@ -70,9 +70,8 @@ class PlotClaimActionFactory(
         val skipIfExists = instruction.bool().getFlag("skipIfExists", true).getValue(null).orElse(false)
         val dimension = instruction.string().get("dimension").getOrNull()
         val logger = loggerFactory.create(PlotClaimAction::class.java)
-        val questPackage = instruction.getPackage()
         val action = PlotClaimAction(skipIfExists, dimension, logger)
-        val adapter = OnlineActionAdapter(action, logger, questPackage)
+        val adapter = OnlineActionAdapter(action)
         return adapter
     }
 }

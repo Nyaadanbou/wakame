@@ -65,8 +65,7 @@ class SetFreezeTicksActionFactory(
         val amount = instruction.number().get()
         val logger = loggerFactory.create(SetFreezeTicksAction::class.java)
         val action = SetFreezeTicksAction(operation, amount, logger)
-        val questPackage = instruction.getPackage()
-        val adapter = OnlineActionAdapter(action, logger, questPackage)
+        val adapter = OnlineActionAdapter(action)
         return adapter
     }
 }

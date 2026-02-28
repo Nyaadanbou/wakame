@@ -45,8 +45,7 @@ class OutsideFactory(
     override fun parsePlayer(instruction: Instruction): PlayerCondition {
         val logger = loggerFactory.create(Outside::class.java)
         val condition = Outside(logger)
-        val questPackage = instruction.getPackage()
-        val adapter = OnlineConditionAdapter(condition, logger, questPackage)
+        val adapter = OnlineConditionAdapter(condition)
         return adapter
     }
 }

@@ -72,7 +72,7 @@ logback-classic = "1.5.6"
 
 adventurelevel = "2.0.0"
 auraskills = "2.2.4"
-betonquest = "3.0.0-SNAPSHOT"
+betonquest = "3.0.0-20260227.224034-611"
 bettercommand = "1.4.3"
 bettergui = "10.2"
 betterhud = "1.12"

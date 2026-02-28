@@ -65,8 +65,7 @@ class AttributeFactory(
         val value = instruction.number().get()
         val logger = loggerFactory.create(KoishAttribute::class.java)
         val condition = KoishAttribute(attribute, operation, value, logger)
-        val questPackage = instruction.getPackage()
-        val adapter = OnlineConditionAdapter(condition, logger, questPackage)
+        val adapter = OnlineConditionAdapter(condition)
         return adapter
     }
 }

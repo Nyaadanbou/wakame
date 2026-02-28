@@ -54,8 +54,7 @@ class EnterDungeonActionFactory(
         val logger = loggerFactory.create(EnterDungeonAction::class.java)
         val dungeon = instruction.string().get()
         val onlineAction = EnterDungeonAction(dungeon, logger)
-        val questPackage = instruction.getPackage()
-        val adapter = OnlineActionAdapter(onlineAction, logger, questPackage)
+        val adapter = OnlineActionAdapter(onlineAction)
         return adapter
     }
 }

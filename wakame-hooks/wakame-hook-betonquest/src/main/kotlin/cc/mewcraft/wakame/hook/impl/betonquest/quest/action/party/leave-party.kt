@@ -36,8 +36,7 @@ class LeavePartyActionFactory(
     override fun parsePlayer(instruction: Instruction): PlayerAction {
         val logger = loggerFactory.create(LeavePartyAction::class.java)
         val onlineAction = LeavePartyAction(logger)
-        val questPackage = instruction.getPackage()
-        val adapter = OnlineActionAdapter(onlineAction, logger, questPackage)
+        val adapter = OnlineActionAdapter(onlineAction)
         return adapter
     }
 }
