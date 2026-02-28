@@ -137,9 +137,8 @@ class CreatePartyActionFactory(
         val conditions = instruction.identifier(ConditionIdentifier::class.java).list().get()
         val amount = instruction.number().get("amount").getOrNull()
         val logger = loggerFactory.create(CreatePartyAction::class.java)
-        val questPackage = instruction.getPackage()
         val action = CreatePartyAction(conditionManager, profileProvider, range, conditions, amount, logger)
-        val adapter = OnlineActionAdapter(action, logger, questPackage)
+        val adapter = OnlineActionAdapter(action)
         return adapter
     }
 }

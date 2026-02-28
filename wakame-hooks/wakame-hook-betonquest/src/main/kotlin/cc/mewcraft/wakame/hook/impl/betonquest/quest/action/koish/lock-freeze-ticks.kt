@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.hook.impl.betonquest.quest.action.koish
 
 import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
-import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory
 import org.betonquest.betonquest.api.profile.OnlineProfile
 import org.betonquest.betonquest.api.quest.action.OnlineAction
 import org.betonquest.betonquest.api.quest.action.OnlineActionAdapter
@@ -42,16 +41,12 @@ class LockFreezeTicksAction(
 /**
  * [LockFreezeTicksAction] 的工厂类.
  */
-class LockFreezeTicksActionFactory(
-    private val loggerFactory: BetonQuestLoggerFactory,
-) : PlayerActionFactory {
+class LockFreezeTicksActionFactory : PlayerActionFactory {
 
     override fun parsePlayer(instruction: Instruction): PlayerAction {
         val type = instruction.enumeration(LockFreezeTicksAction.Type::class.java).get()
-        val logger = loggerFactory.create(LockFreezeTicksAction::class.java)
         val action = LockFreezeTicksAction(type)
-        val questPackage = instruction.getPackage()
-        val adapter = OnlineActionAdapter(action, logger, questPackage)
+        val adapter = OnlineActionAdapter(action)
         return adapter
     }
 }

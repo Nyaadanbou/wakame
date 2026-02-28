@@ -35,7 +35,7 @@ object BetonQuestHook {
             actions {
                 register("createparty", CreatePartyActionFactory(api.loggerFactory(), api.conditions().manager(), api.profiles()))
                 register("leaveparty", LeavePartyActionFactory(api.loggerFactory()))
-                register("lockfreezeticks", LockFreezeTicksActionFactory(api.loggerFactory()))
+                register("lockfreezeticks", LockFreezeTicksActionFactory())
                 register("setfreezeticks", SetFreezeTicksActionFactory(api.loggerFactory()))
                 register("teleportonjoin", TeleportOnJoinActionFactory(api.loggerFactory()))
                 register("replaceCrateKey", ReplaceCrateKeyActionFactory(api.loggerFactory()))

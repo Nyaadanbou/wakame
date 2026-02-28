@@ -47,9 +47,8 @@ class UpdateGovernmentBoardFactory(
 
     override fun parsePlayer(instruction: Instruction): PlayerAction {
         val logger = loggerFactory.create(UpdateGovernmentBoard::class.java)
-        val questPkg = instruction.`package`
         val govType = instruction.enumeration(GovernmentType::class.java).get()
-        val adapter = OnlineActionAdapter(UpdateGovernmentBoard(logger, govType), logger, questPkg)
+        val adapter = OnlineActionAdapter(UpdateGovernmentBoard(logger, govType))
         return adapter
     }
 }

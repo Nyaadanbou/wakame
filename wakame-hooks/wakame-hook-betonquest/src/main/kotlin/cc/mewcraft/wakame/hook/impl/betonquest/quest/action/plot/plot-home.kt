@@ -74,9 +74,8 @@ class PlotHomeActionFactory(
         val order = instruction.number().atLeast(1).get("order").getOrNull()
         val dimension = instruction.string().get("dimension").getOrNull()
         val logger = loggerFactory.create(PlotHomeAction::class.java)
-        val questPackage = instruction.getPackage()
         val action = PlotHomeAction(order, dimension, logger)
-        val adapter = OnlineActionAdapter(action, logger, questPackage)
+        val adapter = OnlineActionAdapter(action)
         return adapter
     }
 }

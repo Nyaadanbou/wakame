@@ -33,8 +33,7 @@ class TeleportOnJoinActionFactory(
     override fun parsePlayer(instruction: Instruction): PlayerAction? {
         val logger = loggerFactory.create(TeleportOnJoinAction::class.java)
         val action = TeleportOnJoinAction(logger)
-        val questPkg = instruction.getPackage()
-        val adapter = OnlineActionAdapter(action, logger, questPkg)
+        val adapter = OnlineActionAdapter(action)
         return adapter
     }
 }

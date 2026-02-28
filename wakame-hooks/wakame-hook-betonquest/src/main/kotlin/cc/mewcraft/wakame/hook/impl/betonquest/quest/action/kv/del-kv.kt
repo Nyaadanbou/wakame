@@ -69,8 +69,7 @@ class DeleteKeyActionFactory(
 
         val logger = loggerFactory.create(DeleteKeyAction::class.java)
         val onlineAction = DeleteKeyAction(key, prefix, logger)
-        val questPackage = instruction.getPackage()
-        val adapter = OnlineActionAdapter(onlineAction, logger, questPackage)
+        val adapter = OnlineActionAdapter(onlineAction)
         return adapter
     }
 }

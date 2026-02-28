@@ -81,10 +81,8 @@ class LightFactory(
         val type = instruction.enumeration(Light.Type::class.java).get()
         val operation = instruction.parse(FriendlyEnumParser<ComparisonOp>()).get()
         val value = instruction.number().get()
-        val logger = loggerFactory.create(Light::class.java)
         val condition = Light(type, operation, value)
-        val questPackage = instruction.getPackage()
-        val adapter = OnlineConditionAdapter(condition, logger, questPackage)
+        val adapter = OnlineConditionAdapter(condition)
         return adapter
     }
 }

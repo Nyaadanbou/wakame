@@ -39,7 +39,6 @@ class HasPartyFactory(
         val amount = instruction.number().atLeast(0).get("amount").getOrNull()
         val logger = loggerFactory.create(HasParty::class.java)
         val hasParty = HasParty(amount, logger)
-        val questPackage = instruction.getPackage()
-        return OnlineConditionAdapter(hasParty, logger, questPackage)
+        return OnlineConditionAdapter(hasParty)
     }
 }

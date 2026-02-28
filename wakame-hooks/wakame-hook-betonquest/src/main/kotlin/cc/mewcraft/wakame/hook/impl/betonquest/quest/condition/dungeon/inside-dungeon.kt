@@ -32,8 +32,7 @@ class InsideDungeonFactory(
     override fun parsePlayer(instruction: Instruction): PlayerCondition {
         val logger = loggerFactory.create(InsideDungeon::class.java)
         val insideDungeon = InsideDungeon(logger)
-        val questPackage = instruction.getPackage()
-        val adapter = OnlineConditionAdapter(insideDungeon, logger, questPackage)
+        val adapter = OnlineConditionAdapter(insideDungeon)
         return adapter
     }
 }

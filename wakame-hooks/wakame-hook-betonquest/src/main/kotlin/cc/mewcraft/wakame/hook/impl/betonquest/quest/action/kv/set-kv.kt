@@ -40,8 +40,7 @@ class SetKeyValueActionFactory(
         val value = instruction.string().get()
         val logger = loggerFactory.create(SetKeyValueAction::class.java)
         val onlineAction = SetKeyValueAction(key, value, logger)
-        val questPackage = instruction.getPackage()
-        val adapter = OnlineActionAdapter(onlineAction, logger, questPackage)
+        val adapter = OnlineActionAdapter(onlineAction)
         return adapter
     }
 }
