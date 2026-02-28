@@ -27,7 +27,7 @@ class AttributeMechanic(
 ) : SkillMechanic(manager, file, line, mlc), ITargetedEntitySkill, INoTargetSkill {
 
     companion object {
-        private val modifierRemovalTasks = ExpiringMap.builder().variableExpiration().build<Attribute, BukkitTask>()
+        private val baseRemovalTasks = ExpiringMap.builder().variableExpiration().build<Attribute, BukkitTask>()
     }
 
     init {
@@ -61,8 +61,8 @@ class AttributeMechanic(
         instance.setBaseValue(value)
         if (duration > 0) {
             val attribute = instance.attribute
-            modifierRemovalTasks.remove(attribute)?.cancel()
-            modifierRemovalTasks.put(
+            baseRemovalTasks.remove(attribute)?.cancel()
+            baseRemovalTasks.put(
                 attribute, runTaskLater(duration.toLong()) { ->
                     instance.setBaseValue(original)
                 },
