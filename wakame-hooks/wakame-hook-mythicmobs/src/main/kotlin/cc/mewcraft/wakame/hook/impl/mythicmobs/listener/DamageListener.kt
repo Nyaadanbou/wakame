@@ -13,10 +13,9 @@ object DamageListener : Listener {
     // Bukkit 的 EntityDamageEvent 也会被触发, 但那个事件里的 DamageSource 完全没法正常使用.
     // TODO 现在没用到 SkillAdapter#doDamage 了, 还需要这个监听器吗?
     @EventHandler
-    fun on(e: MythicDamageEvent) {
-        val damager = e.caster.entity.bukkitEntity as? Player ?: return
-        val victim = e.target.bukkitEntity as? LivingEntity ?: return
-
-        e.isCancelled = !ProtectionManager.canHurtEntity(damager, victim, null)
+    fun on(event: MythicDamageEvent) {
+        val damager = event.caster.entity.bukkitEntity as? Player ?: return
+        val victim = event.target.bukkitEntity as? LivingEntity ?: return
+        event.isCancelled = !ProtectionManager.canHurtEntity(damager, victim, null)
     }
 }

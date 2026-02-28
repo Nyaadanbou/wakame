@@ -18,12 +18,12 @@ object EntityTypeWrapperObjects {
         return instances
     }
 
-    fun reloadInstances() {
+    fun resetDelegates() {
         // 重新初始化 MythicBootstrapBridge
         MythicBootstrapBridge.init()
 
         // 更新所有 EntityTypeWrapper 的 delegate
-        for (inst in EntityTypeWrapperObjects.instances()) {
+        for (inst in instances) {
             val id = inst.id
             val entityType = MythicBootstrapBridge.getEntityType(id) ?: run {
                 LOGGER.warn("The MythicMobs entity '$id' has no corresponding EntityType")

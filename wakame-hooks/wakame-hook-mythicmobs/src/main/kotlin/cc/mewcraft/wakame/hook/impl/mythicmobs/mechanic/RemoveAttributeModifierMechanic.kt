@@ -14,11 +14,9 @@ import org.bukkit.entity.LivingEntity
 import java.io.File
 
 class RemoveAttributeModifierMechanic(
-    manager: SkillExecutor,
-    file: File,
-    line: String,
-    mlc: MythicLineConfig,
+    manager: SkillExecutor, file: File, line: String, mlc: MythicLineConfig,
 ) : SkillMechanic(manager, file, line, mlc), ITargetedEntitySkill, INoTargetSkill {
+
     init {
         threadSafetyLevel = ThreadSafetyLevel.SYNC_ONLY
     }

@@ -11,7 +11,7 @@ import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import kotlin.jvm.optionals.getOrNull
 
-class NekoItemDrop(
+class KoishItemDrop(
     config: MythicLineConfig,
     argument: String,
 ) : ItemDrop(argument, config), IItemDrop {
@@ -21,10 +21,8 @@ class NekoItemDrop(
     override fun getDrop(data: DropMetadata, amount: Double): AbstractItemStack {
         val key = Key.key(itemKey)
         val player = data.cause.getOrNull()?.bukkitEntity as? Player
-
         val itemRef = ItemRef.create(key) ?: error("Invalid ItemRef: $key") // may throw exceptions, can MM handle it?
         val itemStack = itemRef.createItemStack(1, player)
-
         return ItemComponentBukkitItemStack(itemStack).amount(amount.toInt())
     }
 }

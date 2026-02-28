@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.listener
 
 import cc.mewcraft.wakame.hook.impl.mythicmobs.condition.*
-import cc.mewcraft.wakame.hook.impl.mythicmobs.drop.NekoItemDrop
+import cc.mewcraft.wakame.hook.impl.mythicmobs.drop.KoishItemDrop
 import cc.mewcraft.wakame.hook.impl.mythicmobs.mechanic.*
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.drops.IDrop
@@ -20,34 +20,36 @@ object ConfigListener : Listener {
     @EventHandler
     fun on(event: MythicConditionLoadEvent) = with(event) {
         when (conditionName.lowercase()) {
-            "koish:has_item", "nekohasitem" -> registerCondition(::HasItemCondition)
-            "koish:holding", "nekoholding" -> registerCondition(::HoldingCondition)
-            "koish:inscription", "inscription" -> registerCondition(::InscriptionCondition)
-            "koish:level", "nekolevel" -> registerCondition(::LevelCondition)
-            "koish:mana", "mana" -> registerCondition(::ManaCondition)
-            "koish:mainhand_item_group_on_cooldown", "mainhanditemgrouponcooldown" -> registerCondition(::MainhandItemGroupOnCooldown)
+            "koish_has_item", "nekohasitem" -> registerCondition(::HasItemCondition)
+            "koish_holding", "nekoholding" -> registerCondition(::HoldingCondition)
+            "koish_inscription", "inscription" -> registerCondition(::InscriptionCondition)
+            "koish_level", "nekolevel" -> registerCondition(::LevelCondition)
+            "koish_mana", "mana" -> registerCondition(::ManaCondition)
+            "koish_item_group_on_cooldown", "mainhanditemgrouponcooldown" -> registerCondition(::ItemGroupOnCooldownCondition)
         }
     }
 
     @EventHandler
     fun on(event: MythicMechanicLoadEvent) = with(event) {
         when (mechanicName.lowercase()) {
-            "koish:attribute", "nekoattribute" -> registerMechanic(::AttributeMechanic)
-            "koish:attribute_modifier", "nekoattributemodifier" -> registerMechanic(::AttributeModifierMechanic)
-            "koish:damage", "nekodamage", "nekobasedamage" -> registerMechanic(::DamageMechanic)
-            "koish:damage_percent", "nekopercentdamage" -> registerMechanic(::DamagePercentMechanic)
-            "koish:remove_attribute_modifier", "nekoremoveattributemodifier" -> registerMechanic(::RemoveAttributeModifierMechanic)
-            "koish:restore_mana", "koishrestoremana", "restoremana" -> registerMechanic(::RestoreManaMechanic)
-            "koish:restore_mana_percent", "koishrestoremanapercent", "restoremanapercent" -> registerMechanic(::RestoreManaPercentMechanic)
-            "koish:consume_mana", "koishconsumemana", "consumemana" -> registerMechanic(::ConsumeManaMechanic)
-            "koish:consume_mana_percent", "koishconsumemanapercent", "consumemanapercent" -> registerMechanic(::ConsumeManaPercentMechanic)
+            "koish_attribute", "nekoattribute" -> registerMechanic(::AttributeMechanic)
+            "koish_attribute_modifier", "nekoattributemodifier" -> registerMechanic(::AttributeModifierMechanic)
+            "koish_consume_mana", "koishconsumemana", "consumemana" -> registerMechanic(::ConsumeManaMechanic)
+            "koish_consume_mana_percent", "koishconsumemanapercent", "consumemanapercent" -> registerMechanic(::ConsumeManaPercentMechanic)
+            "koish_damage", "nekodamage", "nekobasedamage" -> registerMechanic(::DamageMechanic)
+            "koish_damage_percent", "nekopercentdamage" -> registerMechanic(::DamagePercentMechanic)
+            "koish_damage_attribute_map", "nekopaneldamage" -> registerMechanic(::DamageAttributeMapMechanic)
+            "koish_remove_attribute_modifier", "nekoremoveattributemodifier" -> registerMechanic(::RemoveAttributeModifierMechanic)
+            "koish_reset_item_group_cooldown" -> registerMechanic(::ResetItemGroupCooldownMechanic)
+            "koish_restore_mana", "koishrestoremana", "restoremana" -> registerMechanic(::RestoreManaMechanic)
+            "koish_restore_mana_percent", "koishrestoremanapercent", "restoremanapercent" -> registerMechanic(::RestoreManaPercentMechanic)
         }
     }
 
     @EventHandler
     fun on(event: MythicDropLoadEvent) = with(event) {
         when (dropName.lowercase()) {
-            "koish:item", "nekodrop" -> registerDrop(::NekoItemDrop)
+            "koish_item", "nekodrop" -> registerDrop(::KoishItemDrop)
         }
     }
 

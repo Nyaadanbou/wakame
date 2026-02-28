@@ -17,6 +17,7 @@ import dev.aurelium.auraskills.api.AuraSkillsApi
 import dev.aurelium.auraskills.api.event.user.UserLoadEvent
 import dev.aurelium.auraskills.api.user.SkillsUser
 import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -121,12 +122,24 @@ private object AuraPlayerManaIntegration : PlayerManaIntegration {
         return getAuraUser(player).mana
     }
 
+    override fun getMana(playerId: UUID): Double {
+        return getAuraUser(playerId).mana
+    }
+
     override fun setMana(player: Player, amount: Double) {
         getAuraUser(player).mana = amount
     }
 
+    override fun setMana(playerId: UUID, amount: Double) {
+        getAuraUser(playerId).mana = amount
+    }
+
     override fun getMaxMana(player: Player): Double {
         return getAuraUser(player).maxMana
+    }
+
+    override fun getMaxMana(playerId: UUID): Double {
+        return getAuraUser(playerId).maxMana
     }
 
     override fun consumeMana(player: Player, amount: Double): Boolean {
@@ -137,7 +150,21 @@ private object AuraPlayerManaIntegration : PlayerManaIntegration {
         return consumeMana
     }
 
+    override fun consumeMana(playerId: UUID, amount: Double): Boolean {
+        val auraUser = getAuraUser(playerId)
+        val consumeMana = auraUser.consumeMana(amount)
+        val player = Bukkit.getPlayer(playerId)
+        if (player != null && amount > 0) {
+            player.sendActionBar(TranslatableMessages.MSG_MANA_CONSUMED.arguments(Component.text(amount)))
+        }
+        return consumeMana
+    }
+
     private fun getAuraUser(player: Player): SkillsUser {
-        return auraApi.getUser(player.uniqueId)
+        return getAuraUser(player.uniqueId)
+    }
+
+    private fun getAuraUser(playerId: UUID): SkillsUser {
+        return auraApi.getUser(playerId)
     }
 }

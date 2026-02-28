@@ -21,6 +21,7 @@ class AttributeMechanic(
     line: String,
     mlc: MythicLineConfig,
 ) : SkillMechanic(manager, file, line, mlc), ITargetedEntitySkill, INoTargetSkill {
+
     init {
         threadSafetyLevel = ThreadSafetyLevel.SYNC_ONLY
     }
