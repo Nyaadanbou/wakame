@@ -38,7 +38,7 @@ object ConfigListener : Listener {
             "koish_consume_mana_percent", "koishconsumemanapercent", "consumemanapercent" -> registerMechanic(::ConsumeManaPercentMechanic)
             "koish_damage", "nekodamage", "nekobasedamage" -> registerMechanic(::DamageMechanic)
             "koish_damage_percent", "nekopercentdamage" -> registerMechanic(::DamagePercentMechanic)
-            "koish_damage_attribute_map", "nekopaneldamage" -> registerMechanic(::DamageAttributeMapMechanic)
+            "koish_damage_attribute_map" -> registerMechanic(::DamageAttributeMapMechanic)
             "koish_remove_attribute_modifier", "nekoremoveattributemodifier" -> registerMechanic(::RemoveAttributeModifierMechanic)
             "koish_reset_item_group_cooldown" -> registerMechanic(::ResetItemGroupCooldownMechanic)
             "koish_restore_mana", "koishrestoremana", "restoremana" -> registerMechanic(::RestoreManaMechanic)
