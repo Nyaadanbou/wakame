@@ -17,7 +17,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import java.io.File
 
-class NekoBaseDamageMechanic(
+class DamageMechanic(
     manager: SkillExecutor,
     file: File,
     line: String,

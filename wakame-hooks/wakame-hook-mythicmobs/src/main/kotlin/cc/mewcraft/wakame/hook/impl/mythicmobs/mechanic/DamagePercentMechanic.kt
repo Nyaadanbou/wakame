@@ -19,7 +19,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import java.io.File
 
-class NekoPercentDamageMechanic(
+class DamagePercentMechanic(
     manager: SkillExecutor,
     file: File,
     line: String,
@@ -85,7 +85,7 @@ class NekoPercentDamageMechanic(
     private fun String.toHealthPercentDouble(): (SkillMetadata, AbstractEntity) -> Double {
         return { data, target ->
             val percent = toPlaceholderDouble()[data, target]
-            val damage = if (this@NekoPercentDamageMechanic.currentHealth) {
+            val damage = if (currentHealth) {
                 target.health * percent
             } else {
                 val maxHealthAttribute = requireNotNull(Attributes.MAX_HEALTH) { "\"max_health\" attribute is null!" }

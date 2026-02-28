@@ -18,93 +18,51 @@ import java.io.File
 object ConfigListener : Listener {
 
     @EventHandler
-    fun on(e: MythicConditionLoadEvent) {
-        when (e.conditionName.lowercase()) {
-            "nekohasitem" -> {
-                e.registerCondition(::HasItemCondition)
-            }
-
-            "nekoholding" -> {
-                e.registerCondition(::HoldingCondition)
-            }
-
-            "inscription" -> {
-                e.registerCondition(::InscriptionCondition)
-            }
-
-            "nekolevel" -> {
-                e.registerCondition(::LevelCondition)
-            }
-
-            "koishmana", "mana" -> {
-                e.registerCondition(::ManaCondition)
-            }
-
-            "mainhanditemgrouponcooldown" -> {
-                e.registerCondition(::MainhandItemGroupOnCooldown)
-            }
+    fun on(event: MythicConditionLoadEvent) = with(event) {
+        when (conditionName.lowercase()) {
+            "koish:has_item", "nekohasitem" -> registerCondition(::HasItemCondition)
+            "koish:holding", "nekoholding" -> registerCondition(::HoldingCondition)
+            "koish:inscription", "inscription" -> registerCondition(::InscriptionCondition)
+            "koish:level", "nekolevel" -> registerCondition(::LevelCondition)
+            "koish:mana", "mana" -> registerCondition(::ManaCondition)
+            "koish:mainhand_item_group_on_cooldown", "mainhanditemgrouponcooldown" -> registerCondition(::MainhandItemGroupOnCooldown)
         }
     }
 
     @EventHandler
-    fun on(e: MythicMechanicLoadEvent) {
-        when (e.mechanicName.lowercase()) {
-            "nekoattribute" -> {
-                e.registerMechanic(::AttributeMechanic)
-            }
-
-            "nekoattributemodifier" -> {
-                e.registerMechanic(::AttributeModifierMechanic)
-            }
-
-            "nekodamage", "nekobasedamage" -> {
-                e.registerMechanic(::NekoBaseDamageMechanic)
-            }
-
-            "nekopercentdamage" -> {
-                e.registerMechanic(::NekoPercentDamageMechanic)
-            }
-
-            "nekoremoveattributemodifier" -> {
-                e.registerMechanic(::RemoveAttributeModifierMechanic)
-            }
-
-            "koishrestoremana", "restoremana" -> {
-                e.registerMechanic(::RestoreManaMechanic)
-            }
-
-            "koishrestoremanapercent", "restoremanapercent" -> {
-                e.registerMechanic(::RestoreManaPercentMechanic)
-            }
-
-            "koishconsumemana", "consumemana" -> {
-                e.registerMechanic(::ConsumeManaMechanic)
-            }
-
-            "koishconsumemanapercent", "consumemanapercent" -> {
-                e.registerMechanic(::ConsumeManaPercentMechanic)
-            }
+    fun on(event: MythicMechanicLoadEvent) = with(event) {
+        when (mechanicName.lowercase()) {
+            "koish:attribute", "nekoattribute" -> registerMechanic(::AttributeMechanic)
+            "koish:attribute_modifier", "nekoattributemodifier" -> registerMechanic(::AttributeModifierMechanic)
+            "koish:damage", "nekodamage", "nekobasedamage" -> registerMechanic(::DamageMechanic)
+            "koish:damage_percent", "nekopercentdamage" -> registerMechanic(::DamagePercentMechanic)
+            "koish:remove_attribute_modifier", "nekoremoveattributemodifier" -> registerMechanic(::RemoveAttributeModifierMechanic)
+            "koish:restore_mana", "koishrestoremana", "restoremana" -> registerMechanic(::RestoreManaMechanic)
+            "koish:restore_mana_percent", "koishrestoremanapercent", "restoremanapercent" -> registerMechanic(::RestoreManaPercentMechanic)
+            "koish:consume_mana", "koishconsumemana", "consumemana" -> registerMechanic(::ConsumeManaMechanic)
+            "koish:consume_mana_percent", "koishconsumemanapercent", "consumemanapercent" -> registerMechanic(::ConsumeManaPercentMechanic)
         }
     }
 
     @EventHandler
-    fun on(e: MythicDropLoadEvent) {
-        when (e.dropName.lowercase()) {
-            "nekodrop" -> {
-                e.registerDrop(::NekoItemDrop)
-            }
+    fun on(event: MythicDropLoadEvent) = with(event) {
+        when (dropName.lowercase()) {
+            "koish:item", "nekodrop" -> registerDrop(::NekoItemDrop)
         }
     }
 
-    private fun MythicConditionLoadEvent.registerCondition(constructor: (String, MythicLineConfig) -> ISkillCondition) {
-        register(constructor(config.line, config))
+    context(event: MythicConditionLoadEvent)
+    private fun registerCondition(constructor: (String, MythicLineConfig) -> ISkillCondition) {
+        event.register(constructor(event.config.line, event.config))
     }
 
-    private fun MythicMechanicLoadEvent.registerMechanic(constructor: (SkillExecutor, File, String, MythicLineConfig) -> ISkillMechanic) {
-        register(constructor(container.manager, container.file, config.line, config))
+    context(event: MythicMechanicLoadEvent)
+    private fun registerMechanic(constructor: (SkillExecutor, File, String, MythicLineConfig) -> ISkillMechanic) {
+        event.register(constructor(event.container.manager, event.container.file, event.config.line, event.config))
     }
 
-    private fun MythicDropLoadEvent.registerDrop(constructor: (MythicLineConfig, String) -> IDrop) {
-        register(constructor(config, config.line))
+    context(event: MythicDropLoadEvent)
+    private fun registerDrop(constructor: (MythicLineConfig, String) -> IDrop) {
+        event.register(constructor(event.config, event.config.line))
     }
 }
