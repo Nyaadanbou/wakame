@@ -2,8 +2,12 @@ package cc.mewcraft.wakame.adventure.translator
 
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.*
-import net.kyori.adventure.text.minimessage.*
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TranslatableComponent
+import net.kyori.adventure.text.TranslationArgument
+import net.kyori.adventure.text.minimessage.Context
+import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.minimessage.ParsingException
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -11,7 +15,9 @@ import net.kyori.adventure.translation.Translator
 import net.kyori.adventure.util.TriState
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import java.text.*
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.text.MessageFormat
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.stream.Stream
@@ -183,18 +189,18 @@ private class MiniMessageTranslationRegistryImpl(
 
             val argumentAtIndex = this.arguments[index]
             val argumentValue = argumentAtIndex.value()
-            if (argumentValue is Number && arguments.hasNext()) {
+            if (argumentValue is Number) {
+                // 根据剩余参数个数决定数字格式:
+                //   <arg:index>                -> 使用默认 DecimalFormat
+                //   <arg:index:format>         -> 使用指定 format + JVM 默认 locale 的符号
+                //   <arg:index:locale:format>  -> 使用指定 locale + 指定 format
                 val decimalFormat = if (arguments.hasNext()) {
-                    val locale = arguments.pop().value()
+                    val first = arguments.pop().value()
                     if (arguments.hasNext()) {
-                        val format = arguments.pop().value()
-                        DecimalFormat(format, DecimalFormatSymbols(Locale.forLanguageTag(locale)))
+                        val second = arguments.pop().value()
+                        DecimalFormat(second, DecimalFormatSymbols(Locale.forLanguageTag(first)))
                     } else {
-                        if (locale.contains(".")) {
-                            DecimalFormat(locale, DecimalFormatSymbols.getInstance())
-                        } else {
-                            DecimalFormat.getInstance(Locale.forLanguageTag(locale))
-                        }
+                        DecimalFormat(first, DecimalFormatSymbols.getInstance())
                     }
                 } else {
                     DecimalFormat.getInstance()

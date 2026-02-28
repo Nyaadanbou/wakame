@@ -258,7 +258,7 @@ internal class BlacksmithMenu(
                         TranslatableMessages.MSG_SPENT_X_REPAIRING_ITEM.arguments(
                             TranslationArgument.numeric(claim.repairCost.value),
                             TranslationArgument.component(HotfixItemName.getItemName(claim.originalItem) ?: claim.originalItem.itemName ?: translatable(claim.originalItem))
-                        )
+                        ).translate(viewer)
                     )
 
                     // 修复物品后从 claims 列表中移除
@@ -430,7 +430,7 @@ internal class BlacksmithMenu(
                     viewer.sendMessage(
                         TranslatableMessages.MSG_SOLD_ITEMS_FOR_X_COINS.arguments(
                             TranslationArgument.numeric(purchaseResult.fixPrice)
-                        )
+                        ).translate(viewer)
                     )
 
                     // 同步菜单里的回收列表
