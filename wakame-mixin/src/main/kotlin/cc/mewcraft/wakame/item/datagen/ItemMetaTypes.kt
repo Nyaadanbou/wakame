@@ -115,6 +115,15 @@ data object ItemMetaTypes {
     @JvmField
     val REMOVED_COMPONENTS: ItemMetaType<MetaRemovedComponents, Set<Key>> = typeOf("removed_components")
 
+    @JvmField
+    val PERSISTENT_ITEM_MODEL = typeOf<MetaPersistentItemModel, Key>("persistent_item_model")
+
+    @JvmField
+    val PERSISTENT_ITEM_NAME = typeOf<MetaPersistentItemName, Component>("persistent_item_name")
+
+    @JvmField
+    val PERSISTENT_LORE = typeOf<MetaPersistentLore, List<Component>>("persistent_lore")
+
     // ------------
     // 方便函数
     // ------------
