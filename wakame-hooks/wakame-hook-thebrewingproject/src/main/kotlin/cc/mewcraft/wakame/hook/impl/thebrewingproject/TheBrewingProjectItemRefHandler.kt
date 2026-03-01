@@ -66,7 +66,7 @@ object TheBrewingProjectItemRefHandler : ItemRefHandler<Recipe<ItemStack>> {
         val recipe: Recipe<ItemStack> = tbpApi.recipeRegistry.getRecipe(recipeId).getOrNull() ?: return null
         val brewQuality: BrewQuality = recipeId.extractIntQuality()?.toBrewQuality() ?: return null
         val brewItem: ItemStack = recipe.getRecipeResult(brewQuality).newLorelessItem()
-        return brewItem
+        return brewItem.asQuantity(amount)
     }
 
     private fun String.extractRecipeId(): String {

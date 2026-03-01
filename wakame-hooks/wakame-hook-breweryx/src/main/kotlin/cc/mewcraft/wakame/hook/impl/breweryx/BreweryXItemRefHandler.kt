@@ -66,8 +66,8 @@ object BreweryXItemRefHandler : ItemRefHandler<BRecipe> {
         val value = id.value()
         val recipeId = value.extractRecipeId() ?: return null
         val quality = value.extractQuality() ?: return null
-        val ret = BreweryApi.createBrewItem(recipeId, quality, player)
-        return ret
+        val ret = BreweryApi.createBrewItem(recipeId, quality, player) ?: return null
+        return ret.asQuantity(amount)
     }
 
     private fun String.extractRecipeId(): String? {

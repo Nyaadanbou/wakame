@@ -53,7 +53,7 @@ internal object ItemRefBootstrap {
 
     override fun createItemStack(id: KoishKey, amount: Int, player: Player?): ItemStack? {
         val type = getInternalType(id) ?: return null
-        return ItemStack(type).apply { this.amount = amount }
+        return ItemStack(type).asQuantity(amount)
     }
 
     override fun getInternalType(id: KoishKey): Material? {
@@ -88,7 +88,7 @@ internal object ItemRefBootstrap {
     override fun createItemStack(id: KoishKey, amount: Int, player: Player?): ItemStack? {
         val type = getInternalType(id) ?: return null
         val item = KoishStackGenerator.generate(type, ItemGenerationContext(type, 0f, 0))
-        return item
+        return item.asQuantity(amount)
     }
 
     override fun getInternalType(id: KoishKey): KoishItem? {
