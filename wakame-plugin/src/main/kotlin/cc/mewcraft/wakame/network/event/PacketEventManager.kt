@@ -56,6 +56,7 @@ object PacketEventManager {
         registerPlayerEventType(::ClientboundPlayerCombatKillPacketEvent)
         registerPlayerEventType(::ClientboundUpdateMobEffectPacketEvent)
         registerPlayerEventType(::ClientboundUpdateAdvancementsPacketEvent)
+        registerPlayerEventType(::ClientboundBlockEntityDataPacketEvent)
 
         // serverbound - player
         registerPlayerEventType(::ServerboundPlaceRecipePacketEvent)

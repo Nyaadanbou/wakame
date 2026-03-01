@@ -19,6 +19,7 @@ import cc.mewcraft.wakame.network.event.registerPacketListener
 import cc.mewcraft.wakame.network.event.serverbound.ServerboundContainerClickPacketEvent
 import cc.mewcraft.wakame.network.event.unregisterPacketListener
 import cc.mewcraft.wakame.util.MojangStack
+import cc.mewcraft.wakame.util.REGISTRY_ACCESS
 import cc.mewcraft.wakame.util.getOrThrow
 import com.mojang.datafixers.util.Pair
 import io.papermc.paper.adventure.PaperAdventure
@@ -31,11 +32,13 @@ import net.minecraft.advancements.DisplayInfo
 import net.minecraft.core.component.DataComponentExactPredicate
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
+import net.minecraft.nbt.NbtOps
 import net.minecraft.network.HashedPatchMap
 import net.minecraft.network.HashedStack
 import net.minecraft.network.protocol.game.ClientboundRecipeBookAddPacket
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
+import net.minecraft.world.ItemStackWithSlot
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.SelectableRecipe
@@ -43,6 +46,7 @@ import net.minecraft.world.item.crafting.display.*
 import net.minecraft.world.item.trading.ItemCost
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
+import net.minecraft.world.level.block.entity.BlockEntityType
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.provider.orElse
@@ -96,6 +100,23 @@ object ItemStackRenderer : PacketListener {
             AdvancementHolder(advancementHolder.id, changedAdvancement)
         }
         event.added = changedAdded
+    }
+
+    @PacketHandler
+    private fun handleBlockEntityData(event: ClientboundBlockEntityDataPacketEvent) {
+        if (event.type === BlockEntityType.SHELF) {
+            val tag = event.tag
+            val items = tag.getList("Items").orElse(null) ?: return
+            val ops = REGISTRY_ACCESS.createSerializationContext(NbtOps.INSTANCE)
+            val codec = ItemStackWithSlot.CODEC
+            for (i in 0 until items.size) {
+                val itemTag = items.getCompound(i).orElse(null) ?: continue
+                val decoded = codec.parse(ops, itemTag).result().orElse(null) ?: continue
+                val modifiedItemStack = decoded.stack().copy().modify(event.player)
+                val encoded = codec.encodeStart(ops, ItemStackWithSlot(decoded.slot(), modifiedItemStack)).result().orElse(null) ?: continue
+                items[i] = encoded
+            }
+        }
     }
 
     @PacketHandler
