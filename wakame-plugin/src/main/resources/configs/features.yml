@@ -81,3 +81,7 @@ stop_breaking_loot_chests:
 equipment_slots_to_keep_on_death:
   - hand
   - armor
+
+# 兼容 Just Enough Items (Fabric/NeoForge), 基本没用, 留着仅供参考说不定以后会用到
+# 限制: 客户端只会识别配方里的原版物品类型(Item), 不会识别任何额外数据(DataComponentMap)
+jei_compatibility: false

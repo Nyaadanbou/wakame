@@ -23,9 +23,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = StackedContentsExtrasMap.class)
 public abstract class MixinStackedContentsExtrasMap {
 
-    @Unique
-    private boolean accountAllItemStackToExact = false;
-
     @Shadow
     @Final
     public ObjectSet<ItemStack> exactIngredients;
@@ -33,6 +30,9 @@ public abstract class MixinStackedContentsExtrasMap {
     @Shadow
     @Final
     private StackedContents<ItemOrExact> contents;
+
+    @Unique
+    private boolean koish$accountAllItemStackToExact = false;
 
     /// @author Flandreqwq
     /// @reason 让无序合成能够支持 Koish 物品
@@ -48,9 +48,9 @@ public abstract class MixinStackedContentsExtrasMap {
         // 服务端原逻辑
         for (Ingredient ingredient : recipe.placementInfo().ingredients()) {
             // 插入对 Koish 原料的判定
-            if (KoishIngredient.minecraftToKoish(ingredient).isKoish()) {
+            if (KoishIngredient.cast(ingredient).koish$hasKeys()) {
                 // 添加标记
-                accountAllItemStackToExact = true;
+                koish$accountAllItemStackToExact = true;
                 // 清一下防止出问题
                 this.exactIngredients.clear();
                 // 后续服务端用于登记输入到 exactIngredients 的代码可以不用执行
@@ -72,7 +72,7 @@ public abstract class MixinStackedContentsExtrasMap {
     /// @reason 让无序合成能够支持 Koish 物品
     @Inject(method = "resetExtras", at = @At("HEAD"))
     private void onResetExtras(CallbackInfo ci) {
-        if (accountAllItemStackToExact) {
+        if (koish$accountAllItemStackToExact) {
             // 如果之前把输入物品统一识别为了 Exact, 在这里移除掉
             // 否则下次使用 StackedContentsExtrasMap 时会异常, 之前记录的物品没有正确清空
             Object2IntOpenHashMap<ItemOrExact> amounts = this.contents.amounts;
@@ -82,7 +82,7 @@ public abstract class MixinStackedContentsExtrasMap {
                 }
             }
             // 移除标记
-            accountAllItemStackToExact = false;
+            koish$accountAllItemStackToExact = false;
         }
 
         // 后续是服务端原逻辑
@@ -91,10 +91,10 @@ public abstract class MixinStackedContentsExtrasMap {
     /// @author Flandreqwq
     /// @reason 让无序合成能够支持 Koish 物品, 防止 Koish 物品被视为原版物品而参与原版无序合成配方
     @Inject(method = "accountStack", at = @At("HEAD"), cancellable = true)
-    public void accountStack(ItemStack stack, int count, CallbackInfoReturnable<Boolean> cir) {
+    private void accountStack(ItemStack stack, int count, CallbackInfoReturnable<Boolean> cir) {
         // 若有 accountAllItemStackToExact 标记, 则将输入物品都识别成 Exact
         // 因为只有这样才能在匹配配方原料时, 拿到物品的唯一标识
-        if (accountAllItemStackToExact) {
+        if (koish$accountAllItemStackToExact) {
             this.contents.account(new ItemOrExact.Exact(stack), count);
             cir.setReturnValue(true);
         } else if (KoishStackData.isExactKoish(stack)) {

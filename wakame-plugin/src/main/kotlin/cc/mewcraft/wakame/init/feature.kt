@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.feature.EquipmentSlotsToKeepOnDeath
 import cc.mewcraft.wakame.feature.ResetContainerOnLootGenerate
 import cc.mewcraft.wakame.feature.StopBreakingLootChests
 import cc.mewcraft.wakame.feature.TeleportOnJoinListener
+import cc.mewcraft.wakame.feature.jeicompat.ClientRecipeHandler
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -14,6 +15,9 @@ object FeatureInitializer {
 
     @InitFun
     fun init() {
+        // jet compat
+        ClientRecipeHandler().registerEvents()
+
         // equipment slots to keep on death
         EquipmentSlotsToKeepOnDeath().registerEvents()
 

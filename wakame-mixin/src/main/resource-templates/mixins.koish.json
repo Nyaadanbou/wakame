@@ -47,6 +47,14 @@
     "MixinStackedContentsExtrasMap",
     "MixinStonecutterMenu",
     "MixinTippedArrowRecipe",
-    "MixinTooltipDisplay"
+    "MixinTooltipDisplay",
+    "crafting.MixinAbstractCookingRecipe$Serializer",
+    "crafting.MixinShapedRecipe$Serializer",
+    "crafting.MixinShapelessRecipe$Serializer",
+    "crafting.MixinSingleItemRecipe$Serializer",
+    "crafting.MixinSmithingTransformRecipe$Serializer",
+    "crafting.MixinSmithingTrimRecipe$Serializer",
+    "crafting.MixinTransmuteRecipe$Serializer",
+    "crafting.MixinTransmuteResult"
   ]
 }

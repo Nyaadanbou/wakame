@@ -41,7 +41,7 @@ data class SingleItemRecipeChoice(
     val item: ItemRef,
 ) : RecipeChoice {
     override fun toMojangIngredient(): MojangIngredient {
-        return KoishIngredient.ofIdentifiers(setOf(item.id))
+        return KoishIngredient.ofKeys(setOf(item.id))
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -59,7 +59,7 @@ data class MultiItemRecipeChoice(
     val items: List<ItemRef>,
 ) : RecipeChoice {
     override fun toMojangIngredient(): MojangIngredient {
-        return KoishIngredient.ofIdentifiers(items.map { it.id }.toSet())
+        return KoishIngredient.ofKeys(items.mapTo(HashSet()) { it.id })
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -84,7 +84,7 @@ data class TagRecipeChoice(
         if (items.isEmpty()) {
             throw IllegalStateException("Tag '$tagId' does not exist or is empty.")
         }
-        return KoishIngredient.ofIdentifiers(items.map { it.id }.toSet())
+        return KoishIngredient.ofKeys(items.mapTo(HashSet()) { it.id })
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
