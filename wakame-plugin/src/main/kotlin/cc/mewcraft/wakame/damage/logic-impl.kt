@@ -271,15 +271,13 @@ internal object DamageManagerImpl : DamageManagerApi {
         val finalDamage = finalDamageContext.finalDamage
         val damagee = rawDamageContext.damagee
         if (finalDamage > 0) {
-            val entityEquipment = damagee.equipment ?: return
+            val equipment = damagee.equipment ?: return
             for (equipmentSlot in slots) {
-                val itemStack = entityEquipment.getItem(equipmentSlot)
-                if (!itemStack.isDamageable) return
-
-                val equippable = itemStack.getData(DataComponentTypes.EQUIPPABLE) ?: return
-                if (!equippable.damageOnHurt()) return
-
-                val damageResistant = itemStack.getData(DataComponentTypes.DAMAGE_RESISTANT)
+                val itemstack = equipment.getItem(equipmentSlot)
+                if (!itemstack.isDamageable) continue
+                val equippable = itemstack.getData(DataComponentTypes.EQUIPPABLE) ?: continue
+                if (!equippable.damageOnHurt()) continue
+                val damageResistant = itemstack.getData(DataComponentTypes.DAMAGE_RESISTANT)
                 if (damageResistant == null || !damageResistant.isResistantTo(rawDamageContext.damageSource)) {
                     val amount = (finalDamage * EQUIPMENT_AMOUNT_PER_DAMAGE).toInt().coerceIn(EQUIPMENT_MIN_AMOUNT, EQUIPMENT_MAX_AMOUNT).coerceAtLeast(0)
                     damagee.damageItemStack(equipmentSlot, amount)
