@@ -41,6 +41,7 @@
     "MixinServerboundContainerClickPacket",
     "MixinServerPlayer",
     "MixinServerPlayer$2",
+    "MixinShelfBlockEntity",
     "MixinSpawnerData",
     "MixinSpawnPlacements",
     "MixinStackedContentsExtrasMap",

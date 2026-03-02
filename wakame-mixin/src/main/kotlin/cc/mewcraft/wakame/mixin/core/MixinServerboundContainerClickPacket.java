@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import cc.mewcraft.wakame.mixin.support.ContainerSyncSession;
+import cc.mewcraft.wakame.mixin.support.ServerboundPacketSession;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
@@ -21,7 +21,7 @@ public class MixinServerboundContainerClickPacket {
     )
     private void wrapHandleContainerClick(ServerGamePacketListener listener, ServerboundContainerClickPacket packet, Operation<Void> original) {
         if (listener instanceof ServerGamePacketListenerImpl listenerImpl) {
-            try (ContainerSyncSession ignored = ContainerSyncSession.INSTANCE.start(listenerImpl.getCraftPlayer())) {
+            try (ServerboundPacketSession ignored = ServerboundPacketSession.INSTANCE.start(listenerImpl.getCraftPlayer())) {
                 original.call(listener, packet);
             }
         } else {

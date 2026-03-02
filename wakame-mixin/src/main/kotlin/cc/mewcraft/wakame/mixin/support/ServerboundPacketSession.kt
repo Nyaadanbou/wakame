@@ -3,11 +3,14 @@ package cc.mewcraft.wakame.mixin.support
 import io.papermc.paper.util.SafeAutoClosable
 import org.bukkit.entity.Player
 
-object ContainerSyncSession : SafeAutoClosable {
+/**
+ * 用于优雅的将 [Player] 对象传递到 Koish 的网络物品逻辑中.
+ */
+object ServerboundPacketSession : SafeAutoClosable {
 
     private val THREAD_LOCAL_PLAYER = ThreadLocal.withInitial<Player> { null }
 
-    fun start(player: Player): ContainerSyncSession {
+    fun start(player: Player): ServerboundPacketSession {
         THREAD_LOCAL_PLAYER.set(player)
         return this
     }
