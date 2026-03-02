@@ -36,7 +36,7 @@
     "MixinLootPoolEntries",
     "MixinPaperWorldLoader",
     "MixinPlainMessage",
-    "MixinRegistryDataLoader",
+    "MixinRegistryDataLoader$RegistryData",
     "MixinRepairItemRecipe",
     "MixinServerboundContainerClickPacket",
     "MixinServerPlayer",
