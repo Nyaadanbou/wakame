@@ -1,26 +1,19 @@
 package cc.mewcraft.wakame.enchantment.system
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.ecs.bridge.EWorld
-import cc.mewcraft.wakame.ecs.bridge.koishify
-import cc.mewcraft.wakame.ecs.component.BukkitObject
-import cc.mewcraft.wakame.ecs.component.BukkitPlayer
-import cc.mewcraft.wakame.ecs.system.ListenableIteratingSystem
-import cc.mewcraft.wakame.enchantment.component.VoidEscape
+import cc.mewcraft.wakame.enchantment.effect.EnchantmentVoidEscapeEffect
 import cc.mewcraft.wakame.integration.teleport.RandomTeleport
 import cc.mewcraft.wakame.util.adventure.BukkitSound
 import cc.mewcraft.wakame.util.metadata.Empty
 import cc.mewcraft.wakame.util.metadata.MetadataKey
 import cc.mewcraft.wakame.util.metadata.metadata
-import com.github.quillraven.fleks.Entity
 import net.kyori.adventure.sound.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 
-object TickVoidEscapeEnchantment : ListenableIteratingSystem(
-    family = EWorld.family { all(BukkitObject, BukkitPlayer, VoidEscape) }
-) {
+object TickVoidEscapeEnchantment : Listener {
 
     const val RANDOM_TELEPORT_RADIUS = 128.0
     const val RANDOM_TELEPORT_HEIGHT = 256.0
@@ -28,17 +21,14 @@ object TickVoidEscapeEnchantment : ListenableIteratingSystem(
     @JvmStatic
     val RANDOM_TELEPORT_IN_PROGRESS = MetadataKey.createEmptyKey("elytra_extras:random_teleport_in_progress")
 
-    override fun onTickEntity(entity: Entity) {
-        // 无操作
-    }
-
     @EventHandler(ignoreCancelled = true)
     fun on(event: EntityDamageEvent) {
         val player = event.entity as? Player ?: return
-        val playerEntity = player.koishify().unwrap()
+        val metadata = player.metadata()
         if (event.cause != EntityDamageEvent.DamageCause.VOID)
             return
-        if (playerEntity.has(VoidEscape)) {
+
+        if (metadata.has(EnchantmentVoidEscapeEffect.DATA_KEY)) {
             // 从虚空掉落时触发随机传送效果:
 
             if (player.metadata().has(RANDOM_TELEPORT_IN_PROGRESS))

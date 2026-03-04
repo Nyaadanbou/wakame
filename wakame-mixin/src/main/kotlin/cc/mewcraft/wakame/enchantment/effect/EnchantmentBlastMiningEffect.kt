@@ -1,13 +1,14 @@
 package cc.mewcraft.wakame.enchantment.effect
 
-import cc.mewcraft.wakame.ecs.configure
 import cc.mewcraft.wakame.enchantment.component.BlastMining
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
-import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.EntityComponentContext
+import cc.mewcraft.wakame.util.metadata.MetadataKey
+import cc.mewcraft.wakame.util.metadata.metadata
+import cc.mewcraft.wakame.util.metadata.metadataKey
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.world.item.enchantment.LevelBasedValue
+import org.bukkit.entity.LivingEntity
 
 @JvmRecord
 data class EnchantmentBlastMiningEffect(
@@ -26,30 +27,28 @@ data class EnchantmentBlastMiningEffect(
     companion object {
 
         @JvmField
+        val DATA_KEY: MetadataKey<BlastMining> = metadataKey("enchantment:blast_mining")
+
+        @JvmField
         val CODEC: Codec<EnchantmentBlastMiningEffect> = RecordCodecBuilder.create { instance ->
             instance.group(
                 LevelBasedValue.CODEC.fieldOf("explosion_power").forGetter(EnchantmentBlastMiningEffect::explosionPower),
                 LevelBasedValue.CODEC.fieldOf("min_block_hardness").forGetter(EnchantmentBlastMiningEffect::minBlockHardness)
             ).apply(instance, ::EnchantmentBlastMiningEffect)
         }
-
     }
 
-    context(_: EntityComponentContext)
-    override fun apply(entity: Entity, level: Int, slot: ItemSlot) {
-        entity.configure {
-            it += BlastMining(
+    override fun apply(entity: LivingEntity, level: Int, slot: ItemSlot) {
+        entity.metadata().put(
+            DATA_KEY,
+            BlastMining(
                 explosionPower.calculate(level),
                 minBlockHardness.calculate(level),
             )
-        }
+        )
     }
 
-    context(_: EntityComponentContext)
-    override fun remove(entity: Entity, level: Int, slot: ItemSlot) {
-        entity.configure {
-            it -= BlastMining
-        }
+    override fun remove(entity: LivingEntity, level: Int, slot: ItemSlot) {
+        entity.metadata().remove(DATA_KEY)
     }
-
 }

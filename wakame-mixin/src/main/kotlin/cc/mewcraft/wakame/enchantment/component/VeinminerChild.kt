@@ -1,9 +1,8 @@
 package cc.mewcraft.wakame.enchantment.component
 
-import cc.mewcraft.wakame.ecs.bridge.EComponentType
-import com.github.quillraven.fleks.Component
 import org.bukkit.Material
 import org.bukkit.block.Block
+import org.bukkit.entity.Player
 
 /**
  * 用于记录一个连锁挖矿的遍历状态.
@@ -13,30 +12,30 @@ import org.bukkit.block.Block
  * 遍历完成后, 该 ecs entity 会被移除, 表示一个连锁挖矿的效果执行完毕.
  */
 class VeinminerChild(
+    val player: Player,
+    val parent: Veinminer,
     var currentCount: Short,
     val maximumCount: Short,
     val startBlockType: Material,
     val queue: ArrayDeque<Block>,
     val visited: HashSet<Block>,
-) : Component<VeinminerChild> {
+) {
 
     constructor(
-        longestMiningChain: Short,
+        player: Player,
+        veinminer: Veinminer,
         startBlock: Block,
     ) : this(
+        player = player,
+        parent = veinminer,
         currentCount = 0,
-        maximumCount = longestMiningChain,
+        maximumCount = veinminer.longestMiningChain,
         startBlockType = startBlock.type,
         queue = ArrayDeque<Block>(12).apply { this.addFirst(startBlock) },
         visited = HashSet<Block>(12).apply { this.add(startBlock) },
     )
 
-    companion object : EComponentType<VeinminerChild>()
-
-    override fun type() = VeinminerChild
-
     fun sameType(block: Block): Boolean {
         return block.type == startBlockType
     }
-
 }
