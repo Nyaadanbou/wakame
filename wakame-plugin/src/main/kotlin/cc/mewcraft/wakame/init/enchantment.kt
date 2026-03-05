@@ -18,6 +18,7 @@ object EnchantmentInitializer {
         TickAttributeEnchantment.registerEvents()
         TickBlastMiningEnchantment.registerEvents()
         TickFragileEnchantment.registerEvents()
+        TickRangeMiningEnchantment.registerEvents()
         TickSmelterEnchantment.registerEvents()
         TickVeinminerEnchantment.registerEvents()
         TickVoidEscapeEnchantment.registerEvents()

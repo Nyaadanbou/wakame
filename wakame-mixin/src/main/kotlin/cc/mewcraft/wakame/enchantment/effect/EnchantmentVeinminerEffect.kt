@@ -20,6 +20,7 @@ data class EnchantmentVeinminerEffect(
     val longestChainMining: LevelBasedValue,
     val allowedBlockTypes: Set<Material>,
     val blockBreakSound: KoishKey,
+    val period: Long,
 ) : EnchantmentListenerBasedEffect {
 
     companion object {
@@ -32,7 +33,8 @@ data class EnchantmentVeinminerEffect(
             instance.group(
                 LevelBasedValue.CODEC.fieldOf("longest_chain_mining").forGetter(EnchantmentVeinminerEffect::longestChainMining),
                 BukkitCodecs.MATERIAL.setOf().fieldOf("allowed_block_types").forGetter(EnchantmentVeinminerEffect::allowedBlockTypes),
-                KoishCodecs.KOISH_KEY.fieldOf("block_break_sound").forGetter(EnchantmentVeinminerEffect::blockBreakSound)
+                KoishCodecs.KOISH_KEY.fieldOf("block_break_sound").forGetter(EnchantmentVeinminerEffect::blockBreakSound),
+                Codec.LONG.optionalFieldOf("period", 3L).forGetter(EnchantmentVeinminerEffect::period),
             ).apply(instance, ::EnchantmentVeinminerEffect)
         }
 
@@ -45,6 +47,7 @@ data class EnchantmentVeinminerEffect(
                 longestChainMining.calculate(level).toInt().toShort().coerceIn(1, 128),
                 allowedBlockTypes,
                 blockBreakSound,
+                period.coerceAtLeast(1),
             )
         )
     }

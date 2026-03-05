@@ -78,6 +78,13 @@ public class ExtraEnchantmentEffectComponents {
             "koish:void_escape", builder -> builder.persistent(EnchantmentVoidEscapeEffect.CODEC)
     );
 
+    /**
+     * 范围挖掘, 同时挖掘设定范围内的所有方块.
+     */
+    public static final DataComponentType<EnchantmentRangeMiningEffect> RANGE_MINING = register(
+            "koish:range_mining", builder -> builder.persistent(EnchantmentRangeMiningEffect.CODEC)
+    );
+
     public static void bootstrap() {
         // 用于初始化静态变量
     }

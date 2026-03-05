@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.enchantment.component.VeinminerChild
 import cc.mewcraft.wakame.enchantment.effect.EnchantmentVeinminerEffect
 import cc.mewcraft.wakame.util.metadata.metadata
 import cc.mewcraft.wakame.util.runTaskTimer
-import org.bukkit.Particle
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.event.EventHandler
@@ -55,7 +54,7 @@ object TickVeinminerEnchantment : Listener {
         }
         if (child.queue.isEmpty()) return // 没有相邻的同类方块, 无需启动连锁效果
 
-        runTaskTimer(0, 3) { task -> runChild(task, child) }
+        runTaskTimer(0, child.parent.period) { task -> runChild(task, child) }
     }
 
     private fun runChild(task: BukkitTask, child: VeinminerChild) {
@@ -77,12 +76,6 @@ object TickVeinminerEnchantment : Listener {
 
         runningBlock.set(bukkitBlock)
         player.breakBlock(bukkitBlock)
-        Particle.BLOCK_CRUMBLE.builder()
-            .location(bukkitBlock.location.toCenterLocation())
-            .count(4)
-            .data(bukkitBlock.blockData)
-            .receivers(16)
-            .spawn()
         // ... 这里将接着执行 BlockBreakEvent 的逻辑
         runningBlock.remove()
 

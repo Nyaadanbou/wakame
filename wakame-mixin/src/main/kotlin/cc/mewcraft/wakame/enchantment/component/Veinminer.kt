@@ -7,4 +7,5 @@ class Veinminer(
     val longestMiningChain: Short,
     val allowedBlockTypes: Set<Material>,
     val blockBreakSound: KoishKey,
+    val period: Long,
 )
