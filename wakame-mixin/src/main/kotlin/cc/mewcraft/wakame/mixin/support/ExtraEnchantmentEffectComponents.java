@@ -85,6 +85,13 @@ public class ExtraEnchantmentEffectComponents {
             "koish:range_mining", builder -> builder.persistent(EnchantmentRangeMiningEffect.CODEC)
     );
 
+    /**
+     * 自动种植, 右键成熟的农作物自动收获并补种.
+     */
+    public static final DataComponentType<EnchantmentAutoReplantEffect> AUTO_REPLANT = register(
+            "koish:auto_replant", builder -> builder.persistent(EnchantmentAutoReplantEffect.CODEC)
+    );
+
     public static void bootstrap() {
         // 用于初始化静态变量
     }

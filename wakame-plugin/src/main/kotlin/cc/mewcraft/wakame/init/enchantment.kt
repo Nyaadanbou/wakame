@@ -16,6 +16,7 @@ object EnchantmentInitializer {
         ApplyEnchantmentEffect.registerEvents()
         TickAntigravShotEnchantment.registerEvents()
         TickAttributeEnchantment.registerEvents()
+        TickAutoReplantEnchantment.registerEvents()
         TickBlastMiningEnchantment.registerEvents()
         TickFragileEnchantment.registerEvents()
         TickRangeMiningEnchantment.registerEvents()
