@@ -18,6 +18,8 @@ import io.papermc.paper.datacomponent.item.TooltipDisplay
 import io.papermc.paper.datacomponent.item.UseCooldown
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.minecraft.world.item.component.ResolvableProfile
+import org.spongepowered.configurate.extra.dfu.v9.DfuSerializers
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 /**
@@ -123,6 +125,13 @@ data object ItemMetaTypes {
 
     @JvmField
     val PERSISTENT_LORE = typeOf<MetaPersistentLore, List<Component>>("persistent_lore")
+
+    @JvmField
+    val PROFILE = typeOf<MetaPersistentProfile, ResolvableProfile>("persistent_profile") {
+        serializers {
+            register<ResolvableProfile>(DfuSerializers.serializer(ResolvableProfile.CODEC))
+        }
+    }
 
     // ------------
     // 方便函数

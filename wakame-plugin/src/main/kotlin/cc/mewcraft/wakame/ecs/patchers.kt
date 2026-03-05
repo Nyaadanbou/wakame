@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.ecs
 
-import cc.mewcraft.wakame.enchantment.system.*
 import cc.mewcraft.wakame.entity.attribute.system.ApplyAttributeEffects
 import cc.mewcraft.wakame.entity.attribute.system.InitAttributeContainer
 import cc.mewcraft.wakame.entity.player.system.InitItemCooldownContainer
@@ -20,26 +19,6 @@ object AttributeFleksPatcher : FleksPatcher {
     fun init() {
         addToRegistrySystem("apply_attribute_effects") { ApplyAttributeEffects } // 将物品上的属性效果应用到玩家
         addToRegistrySystem("init_attribute_container") { InitAttributeContainer } // 初始化玩家的属性容器
-    }
-}
-
-@Init(InitStage.PRE_FLEKS)
-object CommonFleksPatcher : FleksPatcher {
-    // ParticleManager 已通过事件监听器自动处理粒子渲染，无需注册系统
-}
-
-@Init(InitStage.PRE_FLEKS)
-object EnchantmentFleksPatcher : FleksPatcher {
-    @InitFun
-    fun init() {
-        addToRegistrySystem("apply_enchantment_effect") { ApplyEnchantmentEffect } // 将物品上的附魔效果应用到玩家
-        addToRegistrySystem("tick_antigrav_shot_enchantment") { TickAntigravShotEnchantment }
-        addToRegistrySystem("tick_attribute_enchantment") { TickAttributeEnchantment }
-        addToRegistrySystem("tick_blast_mining_enchantment") { TickBlastMiningEnchantment }
-        addToRegistrySystem("tick_fragile_enchantment") { TickFragileEnchantment }
-        addToRegistrySystem("tick_smelter_enchantment") { TickSmelterEnchantment }
-        addToRegistrySystem("tick_veinminer_enchantment") { TickVeinminerEnchantment }
-        addToRegistrySystem("tick_void_escape_enchantment") { TickVoidEscapeEnchantment }
     }
 }
 

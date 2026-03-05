@@ -1,18 +1,19 @@
 package cc.mewcraft.wakame.enchantment.effect
 
-import cc.mewcraft.wakame.ecs.configure
 import cc.mewcraft.wakame.enchantment.component.Smelter
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import cc.mewcraft.wakame.serialization.codec.BukkitCodecs
 import cc.mewcraft.wakame.serialization.codec.KoishCodecs
 import cc.mewcraft.wakame.serialization.codec.setOf
 import cc.mewcraft.wakame.util.KoishKey
-import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.EntityComponentContext
+import cc.mewcraft.wakame.util.metadata.MetadataKey
+import cc.mewcraft.wakame.util.metadata.metadata
+import cc.mewcraft.wakame.util.metadata.metadataKey
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.RecipeChoice
 
@@ -27,12 +28,14 @@ data class EnchantmentSmelterEffect(
     val sound: KoishKey,
     /**
      * List of blocks / items that are immune to the Smelter effect.
-     * TODO #365: 支持自定义物品 (使用 Set<ItemRef>)
      */
     val exemptedItems: Set<Material>,
 ) : EnchantmentListenerBasedEffect {
 
     companion object {
+
+        @JvmField
+        val DATA_KEY: MetadataKey<Smelter> = metadataKey<Smelter>("enchantment:smelter")
 
         @JvmField
         val CODEC: Codec<EnchantmentSmelterEffect> = RecordCodecBuilder.create { instance ->
@@ -42,7 +45,6 @@ data class EnchantmentSmelterEffect(
                 BukkitCodecs.MATERIAL.setOf().fieldOf("exempted_items").forGetter(EnchantmentSmelterEffect::exemptedItems)
             ).apply(instance, ::EnchantmentSmelterEffect)
         }
-
     }
 
     // 可用于魔咒效果的烧炼配方
@@ -59,22 +61,17 @@ data class EnchantmentSmelterEffect(
             }
     }
 
-    context(_: EntityComponentContext)
-    override fun apply(entity: Entity, level: Int, slot: ItemSlot) {
-        entity.configure {
-            it += Smelter(
+    override fun apply(entity: LivingEntity, level: Int, slot: ItemSlot) {
+        entity.metadata().put(
+            DATA_KEY, Smelter(
                 disableOnCrouch,
                 sound,
                 registeredFurnaceRecipes
             )
-        }
+        )
     }
 
-    context(_: EntityComponentContext)
-    override fun remove(entity: Entity, level: Int, slot: ItemSlot) {
-        entity.configure {
-            it -= Smelter
-        }
+    override fun remove(entity: LivingEntity, level: Int, slot: ItemSlot) {
+        entity.metadata().remove(DATA_KEY)
     }
-
 }

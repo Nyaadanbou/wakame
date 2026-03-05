@@ -1,8 +1,7 @@
 package cc.mewcraft.wakame.enchantment.effect
 
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
-import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.EntityComponentContext
+import org.bukkit.entity.LivingEntity
 
 /**
  * 代表一个基于 [org.bukkit.event.Listener] 实现的魔咒效果组件.
@@ -25,10 +24,7 @@ import com.github.quillraven.fleks.EntityComponentContext
  */
 interface EnchantmentListenerBasedEffect {
 
-    context(_: EntityComponentContext)
-    fun apply(entity: Entity, level: Int, slot: ItemSlot)
+    fun apply(entity: LivingEntity, level: Int, slot: ItemSlot)
 
-    context(_: EntityComponentContext)
-    fun remove(entity: Entity, level: Int, slot: ItemSlot)
-
+    fun remove(entity: LivingEntity, level: Int, slot: ItemSlot)
 }

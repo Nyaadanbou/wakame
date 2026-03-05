@@ -36,5 +36,4 @@ object BukkitBridge : Listener {
         val koishify = player.koishify().apply { remove() }
         LOGGER.info("[ECS] $koishify removed for ${player.name} (${player.uniqueId})")
     }
-
 }

@@ -1,28 +1,20 @@
 package cc.mewcraft.wakame.enchantment.system
 
-import cc.mewcraft.wakame.ecs.Fleks
-import cc.mewcraft.wakame.ecs.bridge.EWorld
-import cc.mewcraft.wakame.ecs.bridge.koishify
-import cc.mewcraft.wakame.ecs.component.BukkitPlayer
-import cc.mewcraft.wakame.ecs.component.EntityPlayer
-import cc.mewcraft.wakame.ecs.system.ListenableIteratingSystem
-import cc.mewcraft.wakame.enchantment.component.Veinminer
 import cc.mewcraft.wakame.enchantment.component.VeinminerChild
-import cc.mewcraft.wakame.util.adventure.playSound
-import cc.mewcraft.wakame.util.serverTick
-import com.github.quillraven.fleks.Entity
-import net.kyori.adventure.sound.Sound
+import cc.mewcraft.wakame.enchantment.effect.EnchantmentVeinminerEffect
+import cc.mewcraft.wakame.util.metadata.metadata
+import cc.mewcraft.wakame.util.runTaskTimer
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.scheduler.BukkitTask
 
 /**
  * @see cc.mewcraft.wakame.enchantment.effect.EnchantmentVeinminerEffect
  */
-object TickVeinminerEnchantment : ListenableIteratingSystem(
-    family = EWorld.family { all(EntityPlayer, BukkitPlayer, Veinminer, VeinminerChild) }
-) {
+object TickVeinminerEnchantment : Listener {
 
     private val validAdjacentFaces: Array<BlockFace> = arrayOf(
         BlockFace.WEST,
@@ -36,66 +28,63 @@ object TickVeinminerEnchantment : ListenableIteratingSystem(
     @JvmStatic
     val runningBlock: ThreadLocal<Block> = ThreadLocal()
 
-    override fun onTickEntity(entity: Entity) {
-        if (serverTick % 2 == 0) return // 慢一点儿, 避免音效过于密集
-
-        val entityPlayer = entity[EntityPlayer]()
-        if (entityPlayer == null || entityPlayer.has(Veinminer) == false) {
-            entity.remove(); return // 玩家离线或失去该魔咒, 停止连锁采矿效果
-        }
-
-        // BFS
-
-        val veinminerChild = entity[VeinminerChild]
-        val queue = veinminerChild.queue
-        if (queue.isEmpty() || veinminerChild.currentCount++ > veinminerChild.maximumCount) {
-            entity.remove(); return // 整个矿脉已遍历完毕或达到遍历次数上限
-        }
-
-        val bukkitPlayer = entity[BukkitPlayer].unwrap()
-        val bukkitBlock = queue.removeFirst()
-
-        this.runningBlock.set(bukkitBlock)
-        bukkitPlayer.breakBlock(bukkitBlock)
-        // ... 这里将接着执行 BlockBreakEvent 的逻辑
-        this.runningBlock.remove()
-
-        if (!queue.isEmpty()) { // 不播放第一个方块的特效 (第一个方块是玩家自己破坏掉的方块, 特效已经播放)
-            val veinminer = entity[Veinminer]
-            bukkitPlayer.playSound(bukkitBlock.location) {
-                type(veinminer.blockBreakSound)
-                source(Sound.Source.BLOCK)
-            }
-        }
-
-        val visited = veinminerChild.visited
-        for (face in validAdjacentFaces) {
-            val neighbor = bukkitBlock.getRelative(face)
-            if (veinminerChild.sameType(neighbor) && visited.add(neighbor)) {
-                queue.addLast(neighbor)
-            }
-        }
-    }
-
     // 挖掘了特定方块后触发连锁效果
     @EventHandler
     fun on(event: BlockBreakEvent) {
         val block = event.block
-        if (block == this.runningBlock.get()) return // 禁止 Veinminer 破坏的方块再次触发 Veinminer
-        //if (block == BlastMiningEnchantmentHandler.runningBlock.get()) return // 禁止 BlastMining 破坏的方块触发 Veinminer
+        if (block == runningBlock.get()) return // 禁止 Veinminer 破坏的方块再次触发 Veinminer
+        if (block == TickBlastMiningEnchantment.runningBlock.get()) return // 禁止 BlastMining 破坏的方块触发 Veinminer
         val player = event.player
         if (player.isSneaking) return // 潜行时不触发该魔咒效果
-        val playerEntity = player.koishify().unwrap()
-        val veinminer = playerEntity.getOrNull(Veinminer) ?: return
+        val metadata = player.metadata()
+        val veinminer = metadata.getOrNull(EnchantmentVeinminerEffect.DATA_KEY) ?: return
         val allowedBlockTypes = veinminer.allowedBlockTypes
         if (block.type !in allowedBlockTypes) return
 
-        Fleks.INSTANCE.createEntity {
-            it += EntityPlayer(playerEntity)
-            it += BukkitPlayer(player)
-            it += veinminer
-            it += VeinminerChild(veinminer.longestMiningChain, block)
+        val child = VeinminerChild(player, veinminer, block)
+
+        // 起始方块已被玩家自己破坏, 只需将其邻居加入队列用于 BFS 扩展
+        // 起始方块本身不应再被 breakBlock, 否则会导致声音播放两次
+        child.queue.removeFirst()
+        for (face in validAdjacentFaces) {
+            val neighbor = block.getRelative(face)
+            if (child.sameType(neighbor) && child.visited.add(neighbor)) {
+                child.queue.addLast(neighbor)
+            }
         }
+        if (child.queue.isEmpty()) return // 没有相邻的同类方块, 无需启动连锁效果
+
+        runTaskTimer(0, child.parent.period) { task -> runChild(task, child) }
     }
 
+    private fun runChild(task: BukkitTask, child: VeinminerChild) {
+        val player = child.player
+        if (player.isConnected.not() || player.metadata().has(EnchantmentVeinminerEffect.DATA_KEY).not()) {
+            task.cancel()
+            return // 玩家离线或失去该魔咒, 停止连锁采矿效果
+        }
+
+        // BFS
+
+        val queue = child.queue
+        if (queue.isEmpty() || child.currentCount++ > child.maximumCount) {
+            task.cancel()
+            return // 整个矿脉已遍历完毕或达到遍历次数上限
+        }
+
+        val bukkitBlock = queue.removeFirst()
+
+        runningBlock.set(bukkitBlock)
+        player.breakBlock(bukkitBlock)
+        // ... 这里将接着执行 BlockBreakEvent 的逻辑
+        runningBlock.remove()
+
+        val visited = child.visited
+        for (face in validAdjacentFaces) {
+            val neighbor = bukkitBlock.getRelative(face)
+            if (child.sameType(neighbor) && visited.add(neighbor)) {
+                queue.addLast(neighbor)
+            }
+        }
+    }
 }
