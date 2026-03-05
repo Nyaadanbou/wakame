@@ -127,7 +127,7 @@ data object ItemMetaTypes {
     val PERSISTENT_LORE = typeOf<MetaPersistentLore, List<Component>>("persistent_lore")
 
     @JvmField
-    val PROFILE = typeOf<MetaPersistentProfile, ResolvableProfile>("profile") {
+    val PROFILE = typeOf<MetaPersistentProfile, ResolvableProfile>("persistent_profile") {
         serializers {
             register<ResolvableProfile>(DfuSerializers.serializer(ResolvableProfile.CODEC))
         }
