@@ -32,6 +32,38 @@ import java.util.concurrent.ConcurrentHashMap
 object EnchantmentRangeMiningSystem : Listener {
 
     /**
+     * 六个轴对齐的方块面方向, 用于 BFS 连通性判断.
+     */
+    private val BLOCK_FACES_6 = arrayOf(
+        BlockFace.UP, BlockFace.DOWN,
+        BlockFace.NORTH, BlockFace.SOUTH,
+        BlockFace.EAST, BlockFace.WEST,
+    )
+
+    /**
+     * 从 [candidates] 中过滤出与 [center] 6-面连通的方块.
+     */
+    private fun getConnectedBlocks(center: Block, candidates: Set<Block>): List<Block> {
+        val result = mutableListOf<Block>()
+        val visited = HashSet<Block>(candidates.size)
+        val bfsQueue = ArrayDeque<Block>()
+        bfsQueue.addLast(center)
+        visited.add(center)
+        while (bfsQueue.isNotEmpty()) {
+            val current = bfsQueue.removeFirst()
+            for (face in BLOCK_FACES_6) {
+                val rel = current.getRelative(face)
+                if (rel in candidates && rel !in visited) {
+                    visited.add(rel)
+                    bfsQueue.addLast(rel)
+                    result.add(rel)
+                }
+            }
+        }
+        return result
+    }
+
+    /**
      * 用于防止范围挖掘破坏的方块再次触发范围挖掘的递归循环.
      */
     @JvmStatic
@@ -71,12 +103,12 @@ object EnchantmentRangeMiningSystem : Listener {
         val progress = event.progress
         val centerType = block.type
 
-        // 获取范围内所有受影响的方块, 并发送假的破坏进度
-        val affectedBlocks = rangeMining.getAffectedBlocks(block, face)
-        for (affectedBlock in affectedBlocks) {
-            if (rangeMining.shouldAffect(affectedBlock, centerType)) {
-                player.sendBlockDamage(affectedBlock.location, progress, affectedBlock.hashCode())
-            }
+        // 获取范围内所有受影响的方块（BFS 连通性过滤），并发送假的破坏进度
+        val candidateBlocks = rangeMining.getAffectedBlocks(block, face)
+            .filter { rangeMining.shouldAffect(it, centerType) }
+            .toHashSet()
+        for (connectedBlock in getConnectedBlocks(block, candidateBlocks)) {
+            player.sendBlockDamage(connectedBlock.location, progress, connectedBlock.hashCode())
         }
     }
 
@@ -97,18 +129,20 @@ object EnchantmentRangeMiningSystem : Listener {
 
         val face = playerMiningFace.remove(player.uniqueId) ?: return
 
-        // 收集范围内所有受影响的方块
+        // 收集范围内所有受影响的方块（BFS 连通性过滤）
         val centerType = block.type
-        val affectedBlocks = rangeMining.getAffectedBlocks(block, face)
-        val queue = ArrayDeque<Block>(affectedBlocks.size)
-        for (affectedBlock in affectedBlocks) {
-            if (rangeMining.shouldAffect(affectedBlock, centerType)) {
-                // 清除假的破坏动画
-                player.sendBlockDamage(affectedBlock.location, 0f, affectedBlock.hashCode())
-                queue.addLast(affectedBlock)
-            }
+        val candidateBlocks = rangeMining.getAffectedBlocks(block, face)
+            .filter { rangeMining.shouldAffect(it, centerType) }
+            .toHashSet()
+        val connectedBlocks = getConnectedBlocks(block, candidateBlocks)
+        if (connectedBlocks.isEmpty()) return
+
+        val queue = ArrayDeque<Block>(connectedBlocks.size)
+        for (connectedBlock in connectedBlocks) {
+            // 清除假的破坏动画
+            player.sendBlockDamage(connectedBlock.location, 0f, connectedBlock.hashCode())
+            queue.addLast(connectedBlock)
         }
-        if (queue.isEmpty()) return
 
         val child = RangeMiningChild(player, rangeMining, centerType, queue)
         runTaskTimer(0, rangeMining.period) { task -> runChild(task, child) }
