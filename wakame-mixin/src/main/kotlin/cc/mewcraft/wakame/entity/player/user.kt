@@ -23,15 +23,17 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 object UserListener : Listener {
+    private val logger: Logger = LOGGER.decorate(UserListener::class)
+
     @EventHandler(priority = EventPriority.LOWEST)
     fun on(event: AsyncPlayerConnectionConfigureEvent) {
         val conn = event.connection
         val audience = conn.audience
         val id = audience.get(Identity.UUID).getOrNull()
         if (id != null) {
-            UserManager.get(id)
+            UserManager.create(id)
         } else {
-            LOGGER.error("Failed to get player UUID from connection audience, skipping User initialization.")
+            logger.error("Failed to get player UUID from connection audience, skipping User initialization.")
         }
     }
 
@@ -54,14 +56,19 @@ object UserManager : Listener {
     }
 
     fun get(playerId: UUID): User {
+        return data[playerId] ?: EmptyUser
+    }
+
+    fun create(playerId: UUID): User {
         return data.computeIfAbsent(playerId) {
-            LOGGER.info("[UserManager] Creating User for player with UUID: $playerId")
-            User(it)
+            logger.info("Creating user object for player $playerId")
+            SimpleUser(it)
         }
     }
 
     fun remove(playerId: UUID) {
         data.remove(playerId)
+        logger.info("Removed user object for player $playerId")
     }
 
     fun remove(player: Player) {
@@ -72,11 +79,50 @@ object UserManager : Listener {
 /**
  * 封装了 Koish 系统下的一个玩家所需要的所有数据.
  */
-class User(
-    val playerId: UUID,
-) {
+interface User {
+    val playerId: UUID
+    var synced: Boolean
+    val player: Player?
+    val powerLevel: Int
+    val itemSlotChanges: ItemSlotChanges
+    val attributeContainer: AttributeMap
+    val itemCooldownContainer: ItemCooldownContainer
+    val inscriptionContainer: KizamiMap
+
     /**
-     * 标记 Koish 是否应该处理该玩家背包里的物品变化.
+     * 该 [User] 是否为空实现.
+     */
+    val isEmpty: Boolean
+}
+
+/**
+ * 空的 [User] 实现. 所有属性返回默认/空值.
+ *
+ * 当玩家不在线或 [User] 尚未创建时, [UserManager.get] 返回此实例.
+ */
+private object EmptyUser : User {
+    private val NIL_UUID: UUID = UUID(0, 0)
+
+    override val playerId: UUID get() = NIL_UUID
+    override var synced: Boolean
+        get() = false
+        set(_) {}
+    override val player: Player? get() = null
+    override val powerLevel: Int get() = 1
+    override val itemSlotChanges: ItemSlotChanges get() = ItemSlotChanges.empty()
+    override val attributeContainer: AttributeMap get() = AttributeMapFactory.empty()
+    override val itemCooldownContainer: ItemCooldownContainer get() = ItemCooldownContainer.empty()
+    override val inscriptionContainer: KizamiMap get() = KizamiMap.empty()
+    override val isEmpty: Boolean get() = true
+}
+
+private class SimpleUser(
+    override val playerId: UUID,
+) : User {
+    /**
+     * 标记该玩家的数据是否已经跨服同步完成.
+     *
+     * 当服务端只有一个时, 该值在玩家加入服务器时就会被设置为 `true`.
      *
      * 当该值为 `false` 时, Koish 不应该处理背包物品的变化;
      * 这意味着玩家背包里的任何物品都不会提供任何来自 Koish 的效果 (例如: 属性, 技能).
@@ -86,55 +132,65 @@ class User(
      *
      * 并不是所有时刻 Koish 都应该处理玩家背包物品的变化.
      */
-    var initialized: Boolean =
+    @Volatile
+    override var synced: Boolean =
         false
 
-    val player: Player?
+    override val player: Player?
         get() = Bukkit.getPlayer(playerId)
 
-    val powerLevel: Int
+    override val powerLevel: Int
         get() = PlayerLevelIntegration.getOrDefault(playerId, 1)
 
-    val itemSlotChanges: ItemSlotChanges by ValueOrEmpty(
+    override val itemSlotChanges: ItemSlotChanges by ValueOrEmpty(
         ItemSlotChanges::empty,
         ItemSlotChanges::create
     )
 
-    val attributeContainer: AttributeMap by ValueOrEmpty(
-        AttributeMapFactory.INSTANCE::empty,
-        AttributeMapFactory.INSTANCE::create
+    override val attributeContainer: AttributeMap by ValueOrEmpty(
+        AttributeMapFactory::empty,
+        AttributeMapFactory::create
     )
 
-    val itemCooldownContainer: ItemCooldownContainer by ValueOrEmpty(
+    override val itemCooldownContainer: ItemCooldownContainer by ValueOrEmpty(
         ItemCooldownContainer::empty,
         ItemCooldownContainer::minecraft
     )
 
-    val inscriptionContainer: KizamiMap by ValueOrEmpty(
+    override val inscriptionContainer: KizamiMap by ValueOrEmpty(
         KizamiMap::empty,
         KizamiMap::create
     )
+
+    override val isEmpty: Boolean get() = false
 
     /**
      * 返回初始化后的数据, 或空数据 (如果尚未初始化).
      */
     inner class ValueOrEmpty<T>(
-        private val emptyConstructor: () -> T,
-        private val valueConstructor: (Player) -> T,
+        private val emptyProvider: () -> T,
+        private val valueProvider: (Player) -> T,
     ) : ReadOnlyProperty<Any, T> {
-        private var valueOrNull: T? = null
+        @Volatile
+        private var value: T? = null
 
         override fun getValue(thisRef: Any, property: KProperty<*>): T {
-            val valueOrNull = valueOrNull
-            if (valueOrNull != null) {
-                return valueOrNull
-            } else if (initialized) {
-                val player = player ?: return emptyConstructor()
-                val value = valueConstructor(player)
-                this.valueOrNull = value
+            val current = value
+            if (current != null) {
+                return current
+            }
+            if (!synced) {
+                return emptyProvider()
+            }
+            synchronized(this) {
+                val existing = value
+                if (existing != null) {
+                    return existing
+                }
+                val player = player ?: return emptyProvider()
+                val value = valueProvider(player)
+                this.value = value
                 return value
-            } else {
-                return emptyConstructor()
             }
         }
     }

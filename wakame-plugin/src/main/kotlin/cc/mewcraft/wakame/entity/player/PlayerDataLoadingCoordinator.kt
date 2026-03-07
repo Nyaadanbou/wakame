@@ -139,7 +139,7 @@ object PlayerDataLoadingCoordinator : Listener {
             // 当 stage 1 和 stage 2 都完成后运行 Koish 的逻辑
             runTask { ->
                 if (player.isConnected) {
-                    player.isInventoryListenable = true
+                    player.isDataSynced = true
                 }
 
                 runTaskLater(1) { -> // 疑问: 除了延迟 1t 外还有更好维护的解决方式吗?

@@ -18,6 +18,7 @@ object ServerOnlineUserTicker : Listener {
         val players = Bukkit.getOnlinePlayers().toList()
         for (player in players) {
             val user = UserManager.get(player)
+            if (user.isEmpty) continue
             ScanItemSlotChanges.onTickUser(user, player)
             ItemBehaviorListener.onTickUser(user, player)
             ItemAttributeSystem.onTickUser(user, player)

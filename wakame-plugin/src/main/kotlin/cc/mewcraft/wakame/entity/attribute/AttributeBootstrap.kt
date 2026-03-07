@@ -22,9 +22,9 @@ internal interface AttributeBootstrap2 {
         @InitFun
         fun init() {
             Attributes.init()
-            AttributeProvider.register(Attributes)
-            AttributeMapFactory.register(AttributeMapFactoryImpl)
-            AttributeMapAccess.register(AttributeMapAccessImpl)
+            AttributeProvider.setImplementation(Attributes)
+            AttributeMapFactory.setImplementation(AttributeMapFactoryImpl)
+            AttributeMapAccess.setImplementation(AttributeMapAccessImpl)
         }
     }
 

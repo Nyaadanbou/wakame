@@ -34,10 +34,8 @@ val Player.attributeContainer: AttributeMap
 val Player.kizamiContainer: KizamiMap
     get() = UserManager.get(this).inscriptionContainer
 
-@get:Synchronized
-@set:Synchronized
-var Player.isInventoryListenable: Boolean
-    get() = UserManager.get(this).initialized
+var Player.isDataSynced: Boolean
+    get() = UserManager.get(this).synced
     set(value) {
-        UserManager.get(this).initialized = value
+        UserManager.get(this).synced = value
     }

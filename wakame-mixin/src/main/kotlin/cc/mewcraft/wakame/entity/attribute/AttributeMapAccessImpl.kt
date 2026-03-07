@@ -26,11 +26,10 @@ object AttributeMapAccessImpl : AttributeMapAccess {
             )
         }
 
-        val value = AttributeMapFactory.INSTANCE.create(entity) ?: return Result.failure(
+        val value = AttributeMapFactory.create(entity) ?: return Result.failure(
             IllegalArgumentException("Entity $entity has no AttributeMap!")
         )
 
         return Result.success(value)
     }
-
 }
