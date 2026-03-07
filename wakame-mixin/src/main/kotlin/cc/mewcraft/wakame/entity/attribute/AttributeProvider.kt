@@ -8,7 +8,7 @@ import org.jetbrains.annotations.ApiStatus
 interface AttributeProvider {
 
     companion object : AttributeProvider {
-        var implementation: AttributeProvider = object : AttributeProvider {
+        private var implementation: AttributeProvider = object : AttributeProvider {
             override fun get(id: String): Attribute? = null
             override fun getList(id: String): Collection<Attribute> = emptyList()
             override fun isElementalById(id: String): Boolean = false
