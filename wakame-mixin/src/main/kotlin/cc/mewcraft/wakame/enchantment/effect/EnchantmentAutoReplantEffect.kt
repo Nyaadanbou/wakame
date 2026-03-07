@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.util.metadata.metadata
 import cc.mewcraft.wakame.util.metadata.metadataKey
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
+import net.minecraft.world.item.enchantment.LevelBasedValue
 import org.bukkit.Material
 import org.bukkit.entity.LivingEntity
 
@@ -25,17 +26,20 @@ import org.bukkit.entity.LivingEntity
  *         "minecraft:potatoes": "minecraft:potato",
  *         "minecraft:beetroots": "minecraft:beetroot_seeds",
  *         "minecraft:nether_wart": "minecraft:nether_wart"
- *       }
+ *       },
+ *       "effect_radius": 3
  *     }
  *   }
  * }
  * ```
  *
  * @param cropSeedMap 农作物方块到种子物品的映射
+ * @param effectRadius 以右键方块为中心的补种半径, 根据 level 计算; 实际范围为 (2*effectRadius+1)²; 0 表示只补种右键的方块本身
  */
 @JvmRecord
 data class EnchantmentAutoReplantEffect(
     val cropSeedMap: Map<Material, Material>,
+    val effectRadius: LevelBasedValue,
 ) : EnchantmentListenerBasedEffect {
 
     companion object {
@@ -49,12 +53,20 @@ data class EnchantmentAutoReplantEffect(
                 Codec.unboundedMap(BukkitCodecs.MATERIAL, BukkitCodecs.MATERIAL)
                     .fieldOf("crop_seed_map")
                     .forGetter(EnchantmentAutoReplantEffect::cropSeedMap),
+                LevelBasedValue.CODEC.optionalFieldOf("effect_radius", LevelBasedValue.constant(0f))
+                    .forGetter(EnchantmentAutoReplantEffect::effectRadius),
             ).apply(instance, ::EnchantmentAutoReplantEffect)
         }
     }
 
     override fun apply(entity: LivingEntity, level: Int, slot: ItemSlot) {
-        entity.metadata().put(DATA_KEY, AutoReplant(cropSeedMap))
+        entity.metadata().put(
+            DATA_KEY,
+            AutoReplant(
+                cropSeedMap,
+                effectRadius.calculate(level).toInt().coerceAtLeast(0),
+            )
+        )
     }
 
     override fun remove(entity: LivingEntity, level: Int, slot: ItemSlot) {
