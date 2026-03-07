@@ -103,20 +103,25 @@ internal object CatalogItemLootTableRecipeRegistryLoader : RegistryLoader {
             }
 
         // 根据对应的菜单布局和图标, 注册战利品表配方
-        lootTableIds.forEach { lootTableId ->
+        for (lootTableId in lootTableIds) {
             val icon = lootTableIdToIconId[lootTableId] ?: BuiltInRegistries.ITEM.defaultId
             val menuSettings = lootTableIdToMenuId[lootTableId]?.let(CatalogItemMenuSettings::getMenuSettings)
                 ?: BasicMenuSettings(Component.text("Untitled"), emptyArray(), hashMapOf())
 
-            registryAction(
-                KoishKey.key(lootTableId),
-                CatalogItemLootTableRecipe(
-                    lootTableId = lootTableId,
-                    lootTable = MINECRAFT_LOOT_TABLE_MAP[lootTableId]!!,
-                    catalogIcon = icon,
-                    catalogMenuSettings = menuSettings
+            try {
+                registryAction(
+                    KoishKey.key(lootTableId),
+                    CatalogItemLootTableRecipe(
+                        lootTableId = lootTableId,
+                        lootTable = MINECRAFT_LOOT_TABLE_MAP[lootTableId]!!,
+                        catalogIcon = icon,
+                        catalogMenuSettings = menuSettings
+                    )
                 )
-            )
+            } catch (e: Throwable) {
+                IdePauser.pauseInIde(e)
+                LOGGER.error("Failed to register catalog loot table recipe for loot table '$lootTableId'")
+            }
         }
     }
 }

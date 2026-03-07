@@ -44,7 +44,8 @@ data class CatalogItemLootTableRecipe(
     val catalogMenuSettings: BasicMenuSettings,
 ) : CatalogRecipe {
 
-    override val type = CatalogRecipeType.LOOT_TABLE_RECIPE
+    override val type =
+        CatalogRecipeType.LOOT_TABLE_RECIPE
     override val sortId
         get() = lootTableId
 
