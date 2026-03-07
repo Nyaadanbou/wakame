@@ -21,10 +21,10 @@ import org.bukkit.entity.LivingEntity
  *   "effects": {
  *     "koish:auto_replant": {
  *       "crop_seed_map": {
- *         "minecraft:wheat": "minecraft:wheat_seeds",
- *         "minecraft:carrots": "minecraft:carrot",
- *         "minecraft:potatoes": "minecraft:potato",
- *         "minecraft:beetroots": "minecraft:beetroot_seeds",
+ *         "minecraft:wheat": "minecraft:wheat_seed",
+ *         "minecraft:carrot": "minecraft:carrot",
+ *         "minecraft:potato": "minecraft:potato",
+ *         "minecraft:beetroot": "minecraft:beetroot_seed",
  *         "minecraft:nether_wart": "minecraft:nether_wart"
  *       },
  *       "effect_radius": 3
