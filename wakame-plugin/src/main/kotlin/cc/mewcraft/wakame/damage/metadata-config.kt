@@ -139,7 +139,7 @@ internal object AttributeDamageMetadataBuilder : DamageMetadataBuilder<Double> {
         val damager = context.damageSource.causingEntity ?: throw IllegalStateException(
             "Failed to build damage metadata by attribute map because the damager is null."
         )
-        val attributeMap = AttributeMapAccess.INSTANCE.get(damager).getOrElse {
+        val attributeMap = AttributeMapAccess.get(damager).getOrElse {
             error("Failed to build damage metadata by attribute map because the entity '${damager.type}' does not have an attribute map.")
         }
         val damageBundle = damageBundle(attributeMap) {

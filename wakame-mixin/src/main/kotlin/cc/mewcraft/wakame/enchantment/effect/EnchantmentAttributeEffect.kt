@@ -35,11 +35,11 @@ data class EnchantmentAttributeEffect(
     }
 
     fun apply(player: Player, level: Int, slot: ItemSlot) {
-        AttributeMapAccess.INSTANCE.get(player).addTransientModifiers(makeAttributeMap(level, slot))
+        AttributeMapAccess.get(player).addTransientModifiers(makeAttributeMap(level, slot))
     }
 
     fun remove(player: Player, level: Int, slot: ItemSlot) {
-        AttributeMapAccess.INSTANCE.get(player).removeModifiers(makeAttributeMap(level, slot))
+        AttributeMapAccess.get(player).removeModifiers(makeAttributeMap(level, slot))
     }
 
     private fun getModifierId(suffix: String): KoishKey {

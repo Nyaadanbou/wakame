@@ -7,17 +7,34 @@ import org.jetbrains.annotations.ApiStatus
  */
 interface AttributeProvider {
 
-    companion object {
-
-        @get:JvmName("getInstance")
-        @get:JvmStatic
-        lateinit var INSTANCE: AttributeProvider private set
-
-        @ApiStatus.Internal
-        fun register(provider: AttributeProvider) {
-            INSTANCE = provider
+    companion object : AttributeProvider {
+        var implementation: AttributeProvider = object : AttributeProvider {
+            override fun get(id: String): Attribute? = null
+            override fun getList(id: String): Collection<Attribute> = emptyList()
+            override fun isElementalById(id: String): Boolean = false
+            override fun isElementalByBundleId(bundleId: String): Boolean = false
         }
 
+        @ApiStatus.Internal
+        fun setImplementation(provider: AttributeProvider) {
+            implementation = provider
+        }
+
+        override fun get(id: String): Attribute? {
+            return implementation.get(id)
+        }
+
+        override fun getList(id: String): Collection<Attribute> {
+            return implementation.getList(id)
+        }
+
+        override fun isElementalById(id: String): Boolean {
+            return implementation.isElementalById(id)
+        }
+
+        override fun isElementalByBundleId(bundleId: String): Boolean {
+            return implementation.isElementalByBundleId(bundleId)
+        }
     }
 
     /**
