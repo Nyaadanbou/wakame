@@ -16,7 +16,7 @@ object KoishPlaceholders {
         api.placeholderManager.register("caster.attribute", Placeholder.meta { meta, arg ->
             val entity = meta?.caster?.entity?.bukkitEntity ?: return@meta "0"
             val attributeType = arg?.let(Attributes::get) ?: return@meta "0"
-            AttributeMapAccess.INSTANCE.get(entity).getOrNull()?.getValue(attributeType)?.toString() ?: return@meta "0"
+            AttributeMapAccess.get(entity).getOrNull()?.getValue(attributeType)?.toString() ?: return@meta "0"
         })
 
         // Trigger placeholders
@@ -26,7 +26,7 @@ object KoishPlaceholders {
         api.placeholderManager.register("trigger.attribute", Placeholder.meta { meta, arg ->
             val entity = meta?.trigger?.bukkitEntity ?: return@meta "0"
             val attributeType = arg?.let(Attributes::get) ?: return@meta "0"
-            AttributeMapAccess.INSTANCE.get(entity).getOrNull()?.getValue(attributeType)?.toString() ?: return@meta "0"
+            AttributeMapAccess.get(entity).getOrNull()?.getValue(attributeType)?.toString() ?: return@meta "0"
         })
 
         // Target placeholders
@@ -36,7 +36,7 @@ object KoishPlaceholders {
         api.placeholderManager.register("target.attribute", Placeholder.target { meta, target, arg ->
             val entity = target?.bukkitEntity ?: return@target "0"
             val attributeType = arg?.let(Attributes::get) ?: return@target "0"
-            AttributeMapAccess.INSTANCE.get(entity).getOrNull()?.getValue(attributeType)?.toString() ?: return@target "0"
+            AttributeMapAccess.get(entity).getOrNull()?.getValue(attributeType)?.toString() ?: return@target "0"
         })
     }
 }

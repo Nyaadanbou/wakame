@@ -66,7 +66,7 @@ internal object ResourceLoadingFixBootstrap {
             // 所以可以直接在进入游戏时读取玩家的等级信息并且加载资源数据.
             PlayerLevelType.VANILLA -> event<PlayerJoinEvent> { event ->
                 val player = event.player
-                player.isInventoryListenable = true
+                player.isDataSynced = true
                 ResourceSynchronizer.load(player)
             }
 

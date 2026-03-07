@@ -1,9 +1,6 @@
 package cc.mewcraft.wakame.kizami
 
-import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import com.github.quillraven.fleks.Component
-
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import org.bukkit.entity.Player
 
@@ -22,7 +19,7 @@ import org.bukkit.entity.Player
  * - [removeAllEffects]
  * - [applyAllEffects]
  */
-interface KizamiMap : Iterable<Map.Entry<RegistryEntry<Kizami>, Int>>, Component<KizamiMap> {
+interface KizamiMap : Iterable<Map.Entry<RegistryEntry<Kizami>, Int>> {
 
     /**
      * Returns a copy of this map.
@@ -95,9 +92,14 @@ interface KizamiMap : Iterable<Map.Entry<RegistryEntry<Kizami>, Int>>, Component
      */
     fun applyAllEffects(player: Player)
 
-    // Fleks
+    companion object {
 
-    companion object : EComponentType<KizamiMap>() {
+        /**
+         * 返回一个空的 [KizamiMap] 实例. 该实例不包含任何铭刻, 也不与任何玩家绑定.
+         */
+        fun empty(): KizamiMap {
+            return EmptyKizamiMap
+        }
 
         /**
          * 创建一个新的 [KizamiMap].
@@ -106,9 +108,13 @@ interface KizamiMap : Iterable<Map.Entry<RegistryEntry<Kizami>, Int>>, Component
             return KizamiMapImpl(copyOnWrite = false)
         }
 
+        /**
+         * 创建一个新的 [KizamiMap].
+         */
+        fun create(player: Player): KizamiMap {
+            return create()
+        }
     }
-
-    override fun type(): EComponentType<KizamiMap> = KizamiMap
 }
 
 
@@ -116,6 +122,21 @@ interface KizamiMap : Iterable<Map.Entry<RegistryEntry<Kizami>, Int>>, Component
 // 内部实现
 // ------------
 
+
+private object EmptyKizamiMap : KizamiMap {
+    override fun copy(): KizamiMap = this
+    override fun isEmpty(): Boolean = true
+    override fun getAmount(kizami: RegistryEntry<Kizami>): Int = 0
+    override fun addOneEach(kizami: Iterable<RegistryEntry<Kizami>>) = Unit
+    override fun addOne(kizami: RegistryEntry<Kizami>) = Unit
+    override fun add(kizami: RegistryEntry<Kizami>, amount: Int) = Unit
+    override fun subtractOneEach(kizami: Iterable<RegistryEntry<Kizami>>) = Unit
+    override fun subtractOne(kizami: RegistryEntry<Kizami>) = Unit
+    override fun subtract(kizami: RegistryEntry<Kizami>, amount: Int) = Unit
+    override fun removeAllEffects(player: Player) = Unit
+    override fun applyAllEffects(player: Player) = Unit
+    override fun iterator(): Iterator<Map.Entry<RegistryEntry<Kizami>, Int>> = emptyMap<RegistryEntry<Kizami>, Int>().iterator()
+}
 
 /**
  * Each player will be associated with an instance of [KizamiMap].
@@ -128,7 +149,7 @@ private class KizamiMapImpl(
 ) : KizamiMap {
     private fun ensureContainerOwnership() {
         if (copyOnWrite) {
-            dataMap = Object2IntOpenHashMap<RegistryEntry<Kizami>>(dataMap).apply { defaultReturnValue(0) }
+            dataMap = Object2IntOpenHashMap(dataMap).apply { defaultReturnValue(0) }
             copyOnWrite = false
         }
     }

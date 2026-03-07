@@ -14,18 +14,24 @@ import org.jetbrains.annotations.ApiStatus
  */
 interface AttributeMapFactory {
 
-    companion object {
-
-        @get:JvmStatic
-        @get:JvmName("getInstance")
-        lateinit var INSTANCE: AttributeMapFactory private set
-
-        @ApiStatus.Internal
-        fun register(instance: AttributeMapFactory) {
-            this.INSTANCE = instance
+    companion object : AttributeMapFactory {
+        private var implementation: AttributeMapFactory = object : AttributeMapFactory {
+            override fun empty(): AttributeMap = EmptyAttributeMap
+            override fun create(player: Player): AttributeMap = EmptyAttributeMap
+            override fun create(entity: Entity): AttributeMap? = null
         }
 
+        @ApiStatus.Internal
+        fun setImplementation(implementation: AttributeMapFactory) {
+            this.implementation = implementation
+        }
+
+        override fun empty(): AttributeMap = implementation.empty()
+        override fun create(player: Player): AttributeMap = implementation.create(player)
+        override fun create(entity: Entity): AttributeMap? = implementation.create(entity)
     }
+
+    fun empty(): AttributeMap
 
     /**
      * 基于玩家 [player] 创建一个新的 [AttributeMap] 对象.
@@ -51,5 +57,4 @@ interface AttributeMapFactory {
      * @see AttributeMapAccess
      */
     fun create(entity: Entity): AttributeMap?
-
 }

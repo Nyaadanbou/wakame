@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.entity.player
 
-import cc.mewcraft.wakame.ecs.bridge.EComponent
-import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.util.KoishKey
@@ -23,9 +21,13 @@ import kotlin.math.max
  *
  * @see Player.itemCooldownContainer 访问该对象
  */
-sealed interface ItemCooldownContainer : EComponent<ItemCooldownContainer> {
+sealed interface ItemCooldownContainer {
 
-    companion object : EComponentType<ItemCooldownContainer>() {
+    companion object {
+
+        fun empty(): ItemCooldownContainer {
+            return EmptyItemCooldownContainer
+        }
 
         /**
          * 创建一个基于 NMS 实现的 [ItemCooldownContainer] 实例.
@@ -43,8 +45,6 @@ sealed interface ItemCooldownContainer : EComponent<ItemCooldownContainer> {
         }
 
     }
-
-    override fun type(): EComponentType<ItemCooldownContainer> = ItemCooldownContainer
 
     /**
      * “激活”指定冷却. 如果已存在将覆盖原有的冷却状态.
@@ -83,6 +83,15 @@ sealed interface ItemCooldownContainer : EComponent<ItemCooldownContainer> {
 // ------------
 // 内部实现
 // ------------
+
+private object EmptyItemCooldownContainer : ItemCooldownContainer {
+    override fun activate(id: KoishKey, ticks: Int) = Unit
+    override fun activate(id: KoishKey, entry: RegistryEntry<AttackSpeed>?) = Unit
+    override fun isActive(id: KoishKey): Boolean = false
+    override fun getRemainingRatio(id: KoishKey): Float = 0f
+    override fun getRemainingTicks(id: KoishKey): Int = 0
+    override fun reset(id: KoishKey) = Unit
+}
 
 /**
  * 该实现将冷却状态全部委托给 [net.minecraft.server.level.ServerPlayer.cooldowns].

@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.ecs.FamiliesBootstrapper
-import cc.mewcraft.wakame.ecs.SystemBootstrapper
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplier
@@ -237,18 +235,6 @@ object BuiltInRegistries {
      */
     @JvmField
     val LOOT_PREDICATE_TYPE: WritableRegistry<LootPredicateType<*>> = registerSimple(BuiltInRegistryKeys.LOOT_PREDICATE_TYPE) { LootPredicates }
-
-    /**
-     * ECS system 启动器.
-     */
-    @JvmField
-    val SYSTEM_BOOTSTRAPPER: WritableRegistry<SystemBootstrapper> = registerSimple(BuiltInRegistryKeys.SYSTEM_BOOTSTRAPPER)
-
-    /**
-     * ECS families 启动器.
-     */
-    @JvmField
-    val FAMILIES_BOOTSTRAPPER: WritableRegistry<FamiliesBootstrapper> = registerSimple(BuiltInRegistryKeys.FAMILIES_BOOTSTRAPPER)
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER
     init {

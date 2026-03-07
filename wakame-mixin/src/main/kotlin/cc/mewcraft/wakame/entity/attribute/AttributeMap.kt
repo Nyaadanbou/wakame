@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.entity.attribute
 
-import cc.mewcraft.wakame.ecs.bridge.EComponentType
-import com.github.quillraven.fleks.Component
 import com.google.common.collect.Multimap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
@@ -86,7 +84,7 @@ interface AttributeMapSnapshotable {
  * 该对象在实现上必须与一个主体绑定, 例如玩家, 怪物等.
  * **任何对该对象的修改都应该实时反应到绑定的主体上!**
  */
-interface AttributeMap : Component<AttributeMap>, AttributeMapLike, AttributeMapSnapshotable, Iterable<Map.Entry<Attribute, AttributeInstance>> {
+interface AttributeMap : AttributeMapLike, AttributeMapSnapshotable, Iterable<Map.Entry<Attribute, AttributeInstance>> {
     /**
      * 获取指定 [attribute] 的 [AttributeInstance].
      *
@@ -108,12 +106,6 @@ interface AttributeMap : Component<AttributeMap>, AttributeMapLike, AttributeMap
      * 注册指定 [attribute]. 这将覆盖任何已存在的 [AttributeInstance].
      */
     fun registerInstance(attribute: Attribute)
-
-    // Fleks
-
-    override fun type(): EComponentType<AttributeMap> = AttributeMap
-
-    companion object : EComponentType<AttributeMap>()
 }
 
 /**
@@ -133,6 +125,21 @@ interface ImaginaryAttributeMap : AttributeMapLike, AttributeMapSnapshotable {
 
 /* Implementations */
 
+
+internal object EmptyAttributeMap : AttributeMap {
+    override fun getSnapshot(): AttributeMapSnapshot = AttributeMapSnapshotImpl(Reference2ObjectOpenHashMap())
+    override fun getInstance(attribute: Attribute): AttributeInstance? = null
+    override fun getAttributes(): Set<Attribute> = emptySet()
+    override fun hasAttribute(attribute: Attribute): Boolean = false
+    override fun hasModifier(attribute: Attribute, id: Key): Boolean = false
+    override fun getValue(attribute: Attribute): Double = 0.0
+    override fun getBaseValue(attribute: Attribute): Double = 0.0
+    override fun getModifierValue(attribute: Attribute, id: Key): Double = 0.0
+    override fun addTransientModifiers(modifiersMap: Multimap<Attribute, AttributeModifier>) = Unit
+    override fun removeModifiers(modifiersMap: Multimap<Attribute, AttributeModifier>) = Unit
+    override fun registerInstance(attribute: Attribute) = Unit
+    override fun iterator(): Iterator<Map.Entry<Attribute, AttributeInstance>> = emptyList<Map.Entry<Attribute, AttributeInstance>>().iterator()
+}
 
 /**
  * This is a live object.
