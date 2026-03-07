@@ -27,6 +27,8 @@ interface AttributeMapFactory {
 
     }
 
+    fun empty(): AttributeMap
+
     /**
      * 基于玩家 [player] 创建一个新的 [AttributeMap] 对象.
      *

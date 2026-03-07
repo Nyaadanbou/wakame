@@ -21,9 +21,6 @@ dependencies {
     // Paper API + NMS
     paperweight.paperDevBundle(local.versions.paper)
 
-    // ECS
-    api(local.fleks)
-
     // 表达式解析
     api(local.mocha)
 

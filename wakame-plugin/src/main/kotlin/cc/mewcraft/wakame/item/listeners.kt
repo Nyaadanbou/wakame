@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.wakame.entity.player.OnlineUserTicker
+import cc.mewcraft.wakame.entity.player.User
 import cc.mewcraft.wakame.entity.player.isInventoryListenable
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.item.behavior.*
@@ -11,7 +13,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.toVector3d
-import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import io.papermc.paper.event.player.PrePlayerAttackEntityEvent
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
@@ -29,7 +30,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 
 @Init(InitStage.POST_WORLD)
-internal object ItemBehaviorListener : Listener {
+internal object ItemBehaviorListener : Listener, OnlineUserTicker {
 
     @InitFun
     fun init() {
@@ -51,8 +52,7 @@ internal object ItemBehaviorListener : Listener {
     @JvmStatic
     private val shouldCancelOffHandInteractEventPlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
 
-    @EventHandler
-    fun onServerTick(event: ServerTickStartEvent) {
+    override fun onTickUser(user: User, player: Player) {
         alreadySuccessfulUsePlayers.clear()
         alreadySuccessfulUseEntityPlayers.clear()
         alreadySuccessfulAttackPlayers.clear()

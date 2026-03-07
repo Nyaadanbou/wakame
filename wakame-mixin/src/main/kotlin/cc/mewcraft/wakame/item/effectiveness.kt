@@ -13,20 +13,10 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
 
-object ItemStackEffectivenessListener : Listener {
-
-    @EventHandler
-    fun on(event: PlayerLevelUpEvent) {
-        // 当玩家冒险等级升级时, 更新背包内的所有物品
-        val player = event.player
-        player.updateInventory()
-    }
-}
-
 /**
  * 用于判断玩家手中的物品堆叠是否生效.
  */
-object ItemStackEffectiveness {
+object ItemStackEffectiveness : Listener {
 
     /**
      * 检查物品在设定的生效槽位.
@@ -114,5 +104,12 @@ object ItemStackEffectiveness {
      */
     fun testDamaged(itemstack: ItemStack?): Boolean {
         return testDamaged(itemstack?.toNMS())
+    }
+
+    @EventHandler
+    private fun on(event: PlayerLevelUpEvent) {
+        // 当玩家冒险等级升级时, 更新背包内的所有物品
+        val player = event.player
+        player.updateInventory()
     }
 }

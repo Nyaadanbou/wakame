@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.ecs.FamiliesBootstrapper
-import cc.mewcraft.wakame.ecs.SystemBootstrapper
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplier
@@ -122,12 +120,6 @@ object BuiltInRegistryKeys {
 
     @JvmField
     val LOOT_PREDICATE_TYPE = createRegistryKey<LootPredicateType<*>>("loot_predicate_type")
-
-    @JvmField
-    val SYSTEM_BOOTSTRAPPER = createRegistryKey<SystemBootstrapper>("system_bootstrapper")
-
-    @JvmField
-    val FAMILIES_BOOTSTRAPPER = createRegistryKey<FamiliesBootstrapper>("families")
 
     ///
 

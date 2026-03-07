@@ -5,29 +5,25 @@ import cc.mewcraft.lazyconfig.access.optionalEntry
 import cc.mewcraft.wakame.damage.KoishDamageSources
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.hurt
-import cc.mewcraft.wakame.ecs.bridge.EComponent
-import cc.mewcraft.wakame.ecs.bridge.EComponentType
-import cc.mewcraft.wakame.ecs.bridge.EWorld
-import cc.mewcraft.wakame.ecs.bridge.koishify
-import cc.mewcraft.wakame.ecs.component.BukkitObject
-import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.entity.attribute.Attributes
+import cc.mewcraft.wakame.entity.player.OnlineUserTicker
+import cc.mewcraft.wakame.entity.player.User
 import cc.mewcraft.wakame.entity.player.attributeContainer
-import cc.mewcraft.wakame.item.ItemSlotChanges
+import cc.mewcraft.wakame.item.ItemStackEffectiveness
 import cc.mewcraft.wakame.item.behavior.*
 import cc.mewcraft.wakame.item.behavior.impl.weapon.WeaponUtils.getInputDirection
 import cc.mewcraft.wakame.item.extension.addCooldown
 import cc.mewcraft.wakame.item.extension.damageItem
 import cc.mewcraft.wakame.item.extension.isOnCooldown
+import cc.mewcraft.wakame.item.forEachChangingEntry
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.weapon.Katana
 import cc.mewcraft.wakame.util.adventure.SoundSource
 import cc.mewcraft.wakame.util.adventure.playSound
+import cc.mewcraft.wakame.util.metadata.metadata
+import cc.mewcraft.wakame.util.metadata.metadataKey
 import cc.mewcraft.wakame.util.runTaskLater
-import com.github.quillraven.fleks.ComponentType
-import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.IteratingSystem
 import io.papermc.paper.registry.keys.SoundEventKeys
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
@@ -45,14 +41,14 @@ private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "d
  * 太刀的物品行为.
  *
  * 该 `object` 里的所有逻辑都是与事件相关的, 不包含 tick 逻辑.
- * tick 逻辑全部由 [SwitchKatana] 和 [TickKatana] 实现.
+ * tick 逻辑全部由 [KatanaSwitchSystem] 和 [KatanaTickSystem] 实现.
  */
 object Katana : Weapon {
-
     override fun handleSimpleAttack(context: AttackContext): InteractionResult {
         val itemStack = context.itemstack
         val player = context.player
-        val katanaState = player.koishify().getOrNull(KatanaState) ?: return InteractionResult.FAIL
+        val metadata = player.metadata()
+        val katanaState = metadata.getOrNull(KatanaState.METADATA_KEY) ?: return InteractionResult.FAIL
         if (katanaState.isArmed.not()) return InteractionResult.FAIL
         if (itemStack.isOnCooldown(player)) return InteractionResult.FAIL
 
@@ -118,7 +114,8 @@ object Katana : Weapon {
         val player = context.player
         if (context.hand != InteractionHand.MAIN_HAND) return InteractionResult.FAIL
 
-        val katanaState = player.koishify().getOrNull(KatanaState) ?: return InteractionResult.FAIL
+        val metadata = player.metadata()
+        val katanaState = metadata.getOrNull(KatanaState.METADATA_KEY) ?: return InteractionResult.FAIL
         if (katanaState.isArmed.not()) return InteractionResult.FAIL
         if (itemStack.isOnCooldown(player)) return InteractionResult.FAIL
 
@@ -156,7 +153,8 @@ object Katana : Weapon {
 
     override fun handleReceiveDamage(context: ReceiveDamageContext): BehaviorResult {
         val player = context.player
-        val katanaState = player.koishify().getOrNull(KatanaState) ?: return BehaviorResult.PASS
+        val metadata = player.metadata()
+        val katanaState = metadata.getOrNull(KatanaState.METADATA_KEY) ?: return BehaviorResult.PASS
         if (katanaState.isArmed.not()) return BehaviorResult.PASS
 
         return foresightSlashCheck(player, katanaState, context)
@@ -478,20 +476,17 @@ object Katana : Weapon {
  *
  * 这同时也是一个标准的“监听”物品变化来执行逻辑的写法.
  */
-object SwitchKatana : IteratingSystem(
-    family = EWorld.family { all(BukkitObject, BukkitPlayer, ItemSlotChanges) }
-) {
-    override fun onTickEntity(entity: Entity) {
-        val player = entity[BukkitPlayer].unwrap()
-        val slotChanges = entity[ItemSlotChanges]
-        val katanaState = entity.getOrNull(KatanaState)
-
+object KatanaSwitchSystem : OnlineUserTicker {
+    override fun onTickUser(user: User, player: Player) {
+        val metadata = player.metadata()
+        val itemSlotChanges = user.itemSlotChanges
+        val katanaState = metadata.getOrNull(KatanaState.METADATA_KEY)
         // 99% 的情况应该只需要关注当前 tick 发生了变化的物品. 无变化的物品一般不需要关注.
         // 所以可以直接使用这个函数来快速遍历所有在当前 tick 发生了变化的物品.
         // 其中 slot 是物品槽位, curr 是新的物品, prev 是旧的物品.
-        slotChanges.forEachChangingEntry { slot, curr, prev ->
+        itemSlotChanges.forEachChangingEntry { slot, curr, prev ->
             if (prev != null &&
-                ItemSlotChanges.testSlot(slot, prev)
+                ItemStackEffectiveness.testSlot(slot, prev)
             ) {
                 val katanaItem = prev.getProp(ItemPropTypes.KATANA)
                 if (katanaItem != null && katanaState != null) {
@@ -499,9 +494,9 @@ object SwitchKatana : IteratingSystem(
                 }
             }
             if (curr != null &&
-                ItemSlotChanges.testSlot(slot, curr) &&
-                ItemSlotChanges.testLevel(player, curr) &&
-                ItemSlotChanges.testDurability(curr)
+                ItemStackEffectiveness.testSlot(slot, curr) &&
+                ItemStackEffectiveness.testLevel(player, curr) &&
+                ItemStackEffectiveness.testDamaged(curr)
             ) {
                 val katanaConfig = curr.getProp(ItemPropTypes.KATANA)
                 if (katanaConfig != null) {
@@ -510,9 +505,7 @@ object SwitchKatana : IteratingSystem(
                         katanaState.isArmed = true
                         katanaState.unarmedTicks = 0
                     } else {
-                        entity.configure {
-                            it += KatanaState(katanaConfig)
-                        }
+                        metadata.put(KatanaState.METADATA_KEY, KatanaState(katanaConfig))
                     }
                 }
             }
@@ -520,20 +513,13 @@ object SwitchKatana : IteratingSystem(
     }
 }
 
-// TODO #349: 也许可以把这部分逻辑放到 ItemBehavior 里, 但会存在比较大的局限性.
-//  相当于只有当物品[有效]时 tick 逻辑才能执行. 与[有效]相反的[无效]情况就包括了玩家把物品丢地上或者放箱子里,
-//  此时 ItemBehavior 是无法执行这个所谓的 tick 函数的, 因为我们无法轻易从这个已经离开玩家的物品上获取到除了物品本身以外的信息 (如玩家).
-//  这时候如果 tick 逻辑需要玩家则只能在构建一个 tick 任务时将玩家信息传递进去, 而这个任务一般都是一个追踪起来比较丑陋的 BukkitTask.
-//  而 Fleks 可以实现同样的效果, 并且也可以更清晰的管理跟 tick 相关的所有状态, 所以写个 Fleks system 从各方面来说都更好.
 /**
  * tick 太刀状态的逻辑.
  */
-object TickKatana : IteratingSystem(
-    family = EWorld.family { all(BukkitObject, BukkitPlayer, KatanaState) }
-) {
-    override fun onTickEntity(entity: Entity) {
-        val player = entity[BukkitPlayer].unwrap()
-        val katanaState = entity[KatanaState]
+object KatanaTickSystem : OnlineUserTicker {
+    override fun onTickUser(user: User, player: Player) {
+        val metadata = player.metadata()
+        val katanaState = metadata.getOrNull(KatanaState.METADATA_KEY) ?: return
         if (!katanaState.isArmed) {
             // 未手持太刀时, 气刃值自动降低
             if (katanaState.unarmedTicks++ >= 20) {
@@ -542,7 +528,7 @@ object TickKatana : IteratingSystem(
                 // 如果玩家的气刃值为0, 且气刃等级为无刃, 则不再记录数据, 也不再 tick
                 if (katanaState.currentBladeSpirit <= 0 && katanaState.currentBladeLevel == KatanaState.BladeLevel.NONE) {
                     katanaState.bossBar.removeViewer(player)
-                    entity.configure { it -= KatanaState }
+                    metadata.remove(KatanaState.METADATA_KEY)
                     return
                 }
             }
@@ -605,7 +591,7 @@ object TickKatana : IteratingSystem(
  */
 data class KatanaState(
     var config: Katana,
-) : EComponent<KatanaState> {
+) {
     var isArmed: Boolean = true
     var unarmedTicks: Int = 0
     var isForesightSlashHitTarget: Boolean = false
@@ -627,15 +613,15 @@ data class KatanaState(
      */
     val bossBar: BossBar = BossBar.bossBar(Component.empty(), 0f, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS)
 
-    companion object : EComponentType<KatanaState>() {
+    companion object {
+        val METADATA_KEY = metadataKey<KatanaState>("weapon:katana_state")
+
         /** 气刃值上限. */
         const val MAX_BLADE_SPIRIT = 100
 
         /** 气刃值下限. */
         const val MIN_BLADE_SPIRIT = 0
     }
-
-    override fun type(): ComponentType<KatanaState> = KatanaState
 
     /**
      * 增加气刃值.

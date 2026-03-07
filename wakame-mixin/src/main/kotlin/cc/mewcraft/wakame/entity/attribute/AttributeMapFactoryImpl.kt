@@ -8,6 +8,9 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
 object AttributeMapFactoryImpl : AttributeMapFactory {
+    override fun empty(): AttributeMap {
+        return EmptyAttributeMap
+    }
 
     override fun create(player: Player): AttributeMap {
         val key = EntityType.PLAYER.key // a bit faster than `player.type.key`

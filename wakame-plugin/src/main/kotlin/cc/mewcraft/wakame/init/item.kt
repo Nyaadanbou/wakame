@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.init
 import cc.mewcraft.wakame.catalog.OpenCatalogImpl
 import cc.mewcraft.wakame.item.CustomItemRegistryLoader
 import cc.mewcraft.wakame.item.ItemProxyRegistryLoader
-import cc.mewcraft.wakame.item.ItemStackEffectivenessListener
+import cc.mewcraft.wakame.item.ItemStackEffectiveness
 import cc.mewcraft.wakame.item.KoishTagManager
 import cc.mewcraft.wakame.item.behavior.impl.OpenCatalog
 import cc.mewcraft.wakame.item.display.ShowItemRenderer
@@ -38,7 +38,7 @@ object ItemEventInitializer {
 
     @InitFun
     fun init() {
-        ItemStackEffectivenessListener.registerEvents()
+        ItemStackEffectiveness.registerEvents()
     }
 }
 
