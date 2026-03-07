@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.enchantment.system
 
 import cc.mewcraft.wakame.enchantment.component.AutoReplant
 import cc.mewcraft.wakame.enchantment.effect.EnchantmentAutoReplantEffect
+import cc.mewcraft.wakame.item.extension.damageItem
 import cc.mewcraft.wakame.util.metadata.metadata
 import org.bukkit.block.Block
 import org.bukkit.block.data.Ageable
@@ -77,6 +78,8 @@ object EnchantmentAutoReplantSystem : Listener {
             newBlockData.age = 0
             block.setBlockData(newBlockData, true)
         }
+
+        player.damageItem(EquipmentSlot.HAND, 1)
         return true
     }
 }
