@@ -19,6 +19,7 @@ import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
 import org.bukkit.EntityEffect
+import org.bukkit.GameMode
 import org.bukkit.Particle
 import org.bukkit.Registry
 import org.bukkit.craftbukkit.util.WeakCollection
@@ -167,6 +168,7 @@ object DungeonEntry : ItemBehavior {
     private fun getPartyMembers(player: Player, dungeonEntry: DungeonEntry): Collection<Player> {
         return player.location.getNearbyPlayers(dungeonEntry.partyRadius) { p ->
             p != player
+                    && p.gameMode == GameMode.SURVIVAL // 仅包括生存模式玩家, 方便管理员开观察模式偷窥
                     && (!dungeonEntry.requireSneaking || p.isSneaking)
                     && !DungeonBridge.isAwaitingDungeon(p).getOrThrow()
                     && !DungeonBridge.isInsideDungeon(p).getOrThrow()
