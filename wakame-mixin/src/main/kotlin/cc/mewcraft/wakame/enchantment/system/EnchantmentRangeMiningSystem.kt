@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.enchantment.system
 import cc.mewcraft.wakame.enchantment.component.RangeMiningChild
 import cc.mewcraft.wakame.enchantment.effect.EnchantmentRangeMiningEffect
 import cc.mewcraft.wakame.util.metadata.metadata
-import cc.mewcraft.wakame.util.runTaskTimer
+import cc.mewcraft.wakame.util.runTaskTimerSelfAware
 import io.papermc.paper.event.block.BlockBreakProgressUpdateEvent
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
@@ -145,7 +145,7 @@ object EnchantmentRangeMiningSystem : Listener {
         }
 
         val child = RangeMiningChild(player, rangeMining, centerType, queue)
-        runTaskTimer(0, rangeMining.period) { task -> runChild(task, child) }
+        runTaskTimerSelfAware(0, rangeMining.period) { task -> runChild(task, child) }
     }
 
     private fun runChild(task: BukkitTask, child: RangeMiningChild) {

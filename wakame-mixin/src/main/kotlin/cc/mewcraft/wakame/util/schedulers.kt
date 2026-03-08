@@ -19,15 +19,15 @@ fun runTask(run: () -> Unit): BukkitTask {
 /**
  * Shortcut for [BukkitScheduler.runTask], registered under the Koish plugin.
  */
-fun runTask(run: (task: BukkitTask) -> Unit) {
+fun runTaskSelfAware(run: (task: BukkitTask) -> Unit) {
     Bukkit.getScheduler().runTask(PluginProvider.get(), run)
 }
 
 /**
  * Shortcut for [BukkitScheduler.runTask] but count aware, registered under the Koish plugin.
  */
-fun runTask(run: (task: BukkitTask, count: Long) -> Unit) {
-    runTask(countAwareTask(run))
+fun runTaskCountAware(run: (task: BukkitTask, count: Long) -> Unit) {
+    runTaskSelfAware(countAwareTask(run))
 }
 
 /**
@@ -40,15 +40,15 @@ fun runTaskLater(delay: Long, run: () -> Unit): BukkitTask {
 /**
  * Shortcut for [BukkitScheduler.runTaskLater], registered under the Koish plugin.
  */
-fun runTaskLater(delay: Long, run: (task: BukkitTask) -> Unit) {
+fun runTaskLaterSelfAware(delay: Long, run: (task: BukkitTask) -> Unit) {
     Bukkit.getScheduler().runTaskLater(PluginProvider.get(), run, delay)
 }
 
 /**
  * Shortcut for [BukkitScheduler.runTaskLater] but count aware, registered under the Koish plugin.
  */
-fun runTaskLater(delay: Long, run: (task: BukkitTask, count: Long) -> Unit) {
-    runTaskLater(delay, countAwareTask(run))
+fun runTaskLaterCountAware(delay: Long, run: (task: BukkitTask, count: Long) -> Unit) {
+    runTaskLaterSelfAware(delay, countAwareTask(run))
 }
 
 /**
@@ -61,15 +61,15 @@ fun runTaskTimer(delay: Long, period: Long, run: () -> Unit): BukkitTask {
 /**
  * Shortcut for [BukkitScheduler.runTaskTimer], registered under the Koish plugin.
  */
-fun runTaskTimer(delay: Long, period: Long, run: (task: BukkitTask) -> Unit) {
+fun runTaskTimerSelfAware(delay: Long, period: Long, run: (task: BukkitTask) -> Unit) {
     Bukkit.getScheduler().runTaskTimer(PluginProvider.get(), run, delay, period)
 }
 
 /**
  * Shortcut for [BukkitScheduler.runTaskTimer] but count aware, registered under the Koish plugin.
  */
-fun runTaskTimer(delay: Long, period: Long, run: (task: BukkitTask, count: Long) -> Unit) {
-    runTaskTimer(delay, period, countAwareTask(run))
+fun runTaskTimerCountAware(delay: Long, period: Long, run: (task: BukkitTask, count: Long) -> Unit) {
+    runTaskTimerSelfAware(delay, period, countAwareTask(run))
 }
 
 /**
@@ -82,15 +82,15 @@ fun runAsyncTask(run: () -> Unit): BukkitTask {
 /**
  * Shortcut for [BukkitScheduler.runTaskAsynchronously], registered under the Koish plugin.
  */
-fun runAsyncTask(run: (task: BukkitTask) -> Unit) {
+fun runAsyncTaskSelfAware(run: (task: BukkitTask) -> Unit) {
     Bukkit.getScheduler().runTaskAsynchronously(PluginProvider.get(), run)
 }
 
 /**
  * Shortcut for [BukkitScheduler.runTaskAsynchronously] but count aware, registered under the Koish plugin.
  */
-fun runAsyncTask(run: (task: BukkitTask, count: Long) -> Unit) {
-    runAsyncTask(countAwareTask(run))
+fun runAsyncTaskCountAware(run: (task: BukkitTask, count: Long) -> Unit) {
+    runAsyncTaskSelfAware(countAwareTask(run))
 }
 
 /**
@@ -103,15 +103,15 @@ fun runAsyncTaskLater(delay: Long, run: () -> Unit): BukkitTask {
 /**
  * Shortcut for [BukkitScheduler.runTaskLaterAsynchronously], registered under the Koish plugin.
  */
-fun runAsyncTaskLater(delay: Long, run: (task: BukkitTask) -> Unit) {
+fun runAsyncTaskLaterSelfAware(delay: Long, run: (task: BukkitTask) -> Unit) {
     Bukkit.getScheduler().runTaskLaterAsynchronously(PluginProvider.get(), run, delay)
 }
 
 /**
  * Shortcut for [BukkitScheduler.runTaskLaterAsynchronously] but count aware, registered under the Koish plugin.
  */
-fun runAsyncTaskLater(delay: Long, run: (task: BukkitTask, count: Long) -> Unit) {
-    runAsyncTaskLater(delay, countAwareTask(run))
+fun runAsyncTaskLaterCountAware(delay: Long, run: (task: BukkitTask, count: Long) -> Unit) {
+    runAsyncTaskLaterSelfAware(delay, countAwareTask(run))
 }
 
 /**
@@ -124,15 +124,15 @@ fun runAsyncTaskTimer(delay: Long, period: Long, run: () -> Unit): BukkitTask {
 /**
  * Shortcut for [BukkitScheduler.runTaskTimerAsynchronously], registered under the Koish plugin.
  */
-fun runAsyncTaskTimer(delay: Long, period: Long, run: (task: BukkitTask) -> Unit) {
+fun runAsyncTaskTimerSelfAware(delay: Long, period: Long, run: (task: BukkitTask) -> Unit) {
     Bukkit.getScheduler().runTaskTimerAsynchronously(PluginProvider.get(), run, delay, period)
 }
 
 /**
  * Shortcut for [BukkitScheduler.runTaskTimerAsynchronously] but count aware, registered under the Koish plugin.
  */
-fun runAsyncTaskTimer(delay: Long, period: Long, run: (task: BukkitTask, count: Long) -> Unit) {
-    runAsyncTaskTimer(delay, period, countAwareTask(run))
+fun runAsyncTaskTimerCountAware(delay: Long, period: Long, run: (task: BukkitTask, count: Long) -> Unit) {
+    runAsyncTaskTimerSelfAware(delay, period, countAwareTask(run))
 }
 
 /**
