@@ -2,10 +2,7 @@
 
 package cc.mewcraft.wakame.entity.player
 
-import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
-import cc.mewcraft.wakame.entity.player.component.InventoryListenable
-import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.kizami.KizamiMap
 import org.bukkit.entity.Player
 
@@ -17,32 +14,28 @@ import org.bukkit.entity.Player
  * 玩家的冒险等级.
  */
 val Player.koishLevel: Int
-    get() = PlayerLevelIntegration.getOrDefault(uniqueId, 1)
+    get() = UserManager.get(this).powerLevel
 
 /**
  * 玩家的物品冷却.
  */
 val Player.itemCooldownContainer: ItemCooldownContainer
-    get() = koishify()[ItemCooldownContainer]
+    get() = UserManager.get(this).itemCooldownContainer
 
 /**
  * 玩家的属性容器.
  */
 val Player.attributeContainer: AttributeMap
-    get() = koishify()[AttributeMap]
+    get() = UserManager.get(this).attributeContainer
 
 /**
  * 玩家的铭刻容器.
  */
 val Player.kizamiContainer: KizamiMap
-    get() = koishify()[KizamiMap]
+    get() = UserManager.get(this).inscriptionContainer
 
-/**
- * @see InventoryListenable
- */
-@get:Synchronized
-@set:Synchronized
-var Player.isInventoryListenable: Boolean
-    get() = koishify().has(InventoryListenable)
-    set(value) = if (value) koishify() += InventoryListenable
-    else koishify() -= InventoryListenable
+var Player.isDataSynced: Boolean
+    get() = UserManager.get(this).synced
+    set(value) {
+        UserManager.get(this).synced = value
+    }

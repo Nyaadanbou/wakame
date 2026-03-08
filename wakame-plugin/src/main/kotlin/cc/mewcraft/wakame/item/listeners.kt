@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.entity.player.isInventoryListenable
+import cc.mewcraft.wakame.entity.player.OnlineUserTicker
+import cc.mewcraft.wakame.entity.player.User
+import cc.mewcraft.wakame.entity.player.isDataSynced
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.item.behavior.*
 import cc.mewcraft.wakame.item.behavior.ItemStackActivationChecker.isActive
@@ -11,7 +13,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.toVector3d
-import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import io.papermc.paper.event.player.PrePlayerAttackEntityEvent
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
@@ -29,7 +30,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 
 @Init(InitStage.POST_WORLD)
-internal object ItemBehaviorListener : Listener {
+internal object ItemBehaviorListener : Listener, OnlineUserTicker {
 
     @InitFun
     fun init() {
@@ -51,8 +52,7 @@ internal object ItemBehaviorListener : Listener {
     @JvmStatic
     private val shouldCancelOffHandInteractEventPlayers: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
 
-    @EventHandler
-    fun onServerTick(event: ServerTickStartEvent) {
+    override fun onTickUser(user: User, player: Player) {
         alreadySuccessfulUsePlayers.clear()
         alreadySuccessfulUseEntityPlayers.clear()
         alreadySuccessfulAttackPlayers.clear()
@@ -80,7 +80,7 @@ internal object ItemBehaviorListener : Listener {
 
         val action = event.action
         val player = event.player
-        if (!player.isInventoryListenable) return // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
+        if (!player.isDataSynced) return // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
         if (player.gameMode == GameMode.SPECTATOR) return // 玩家处于旁观者模式 - 不处理
         if (!action.isRightClick) return // 玩家不是右键交互 - 不处理
 
@@ -169,7 +169,7 @@ internal object ItemBehaviorListener : Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onInteractEntity(event: PlayerInteractEntityEvent) {
         val player = event.player
-        if (!player.isInventoryListenable) return // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
+        if (!player.isDataSynced) return // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
         if (player.gameMode == GameMode.SPECTATOR) return // 玩家处于旁观者模式 - 不处理
         if (alreadySuccessfulUseEntityPlayers.contains(player)) { // 限制每 tick 只能成功交互一次, 并取消多余的交互事件
             event.isCancelled = true
@@ -224,7 +224,7 @@ internal object ItemBehaviorListener : Listener {
 
         val action = event.action
         val player = event.player
-        if (!player.isInventoryListenable) return // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
+        if (!player.isDataSynced) return // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
         if (player.gameMode == GameMode.SPECTATOR) return // 玩家处于旁观者模式 - 不处理
         if (!action.isLeftClick) return // 玩家不是左键交互 - 不处理
         if (alreadySuccessfulAttackPlayers.contains(player)) { // 限制每tick只能成功交互一次, 并取消多余的交互事件
@@ -270,7 +270,7 @@ internal object ItemBehaviorListener : Listener {
     @EventHandler(priority = EventPriority.LOW)
     fun onPreAttack(event: PrePlayerAttackEntityEvent) {
         val player = event.player
-        if (!player.isInventoryListenable) return // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
+        if (!player.isDataSynced) return // 玩家背包暂时不可监听(可能是在跨服同步) - 不处理
         if (player.gameMode == GameMode.SPECTATOR) return // 玩家处于旁观者模式 - 不处理
         if (alreadySuccessfulAttackPlayers.contains(player)) { // 限制每tick只能成功交互一次, 并取消多余的交互事件
             event.isCancelled = true
@@ -297,7 +297,7 @@ internal object ItemBehaviorListener : Listener {
     fun onPostprocessDamage(event: PostprocessDamageEvent) {
         val causingEntity = event.damageSource.causingEntity
         if (causingEntity is Player) {
-            if (!causingEntity.isInventoryListenable) return // 确保此时玩家的背包可以监听
+            if (!causingEntity.isDataSynced) return // 确保此时玩家的背包可以监听
             for (slot in ItemSlotRegistry.itemSlots()) { // 遍历所有 Koish 关心的槽位
                 val itemstack = slot.getItem(causingEntity) ?: continue // 该槽位没有物品 - 跳转至下一循环
                 if (!itemstack.isActive(slot, causingEntity)) continue // 该槽位的物品不处于激活状态 - 跳转至下一循环
@@ -317,7 +317,7 @@ internal object ItemBehaviorListener : Listener {
 
         val damagee = event.damagee
         if (damagee is Player) {
-            if (!damagee.isInventoryListenable) return // 确保此时玩家的背包可以监听
+            if (!damagee.isDataSynced) return // 确保此时玩家的背包可以监听
             for (slot in ItemSlotRegistry.itemSlots()) { // 遍历所有 Koish 关心的槽位
                 val itemstack = slot.getItem(damagee) ?: continue // 该槽位没有物品 - 跳转至下一循环
                 if (!itemstack.isActive(slot, damagee)) continue // 该槽位的物品不处于激活状态 - 跳转至下一循环
@@ -339,7 +339,7 @@ internal object ItemBehaviorListener : Listener {
     @EventHandler(priority = EventPriority.LOW)
     fun on(event: PlayerItemDamageEvent) {
         val player = event.player
-        if (!player.isInventoryListenable) return // 确保此时玩家的背包可以监听
+        if (!player.isDataSynced) return // 确保此时玩家的背包可以监听
         val itemstack = event.item
 
         val context = DurabilityDecreaseContext(player, itemstack, event.damage, event.originalDamage)
@@ -360,7 +360,7 @@ internal object ItemBehaviorListener : Listener {
     @EventHandler(priority = EventPriority.LOW)
     fun on(event: PlayerStopUsingItemEvent) {
         val player = event.player
-        if (!player.isInventoryListenable) return // 确保此时玩家的背包可以监听
+        if (!player.isDataSynced) return // 确保此时玩家的背包可以监听
         val itemstack = event.item
 
         val context = StopUseContext(player, itemstack, event.ticksHeldFor)
@@ -375,7 +375,7 @@ internal object ItemBehaviorListener : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(event: PlayerItemConsumeEvent) {
         val player = event.player
-        if (!player.isInventoryListenable) return // 确保此时玩家的背包可以监听
+        if (!player.isDataSynced) return // 确保此时玩家的背包可以监听
         val itemstack = event.item
         val hand = when (event.hand) {
             EquipmentSlot.HAND -> InteractionHand.MAIN_HAND

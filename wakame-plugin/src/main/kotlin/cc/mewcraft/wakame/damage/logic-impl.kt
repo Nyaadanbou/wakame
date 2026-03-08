@@ -401,7 +401,7 @@ internal object DamageManagerImpl : DamageManagerApi {
      */
     private fun createDefensePhaseMetadata(context: RawDamageContext): DefenseMetadata? {
         val damagee = context.damagee
-        val damageeAttributes = AttributeMapAccess.INSTANCE.get(damagee).getOrElse {
+        val damageeAttributes = AttributeMapAccess.get(damagee).getOrElse {
             LOGGER.warn("Failed to generate defense metadata because the entity $damagee does not have an attribute map.")
             return null
         }

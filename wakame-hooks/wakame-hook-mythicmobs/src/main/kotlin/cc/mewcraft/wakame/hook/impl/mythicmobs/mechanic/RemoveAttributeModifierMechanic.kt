@@ -22,14 +22,14 @@ class RemoveAttributeModifierMechanic(
     }
 
     private val attribute: Attribute = mlc.getString(arrayOf("attribute", "attr"))
-        ?.let { parsed -> AttributeProvider.INSTANCE.get(parsed) }
+        ?.let { parsed -> AttributeProvider.get(parsed) }
         ?: throw IllegalArgumentException("Invalid attribute from line: $line")
     private val name: PlaceholderString = mlc.getPlaceholderString(arrayOf("name"), null, *emptyArray())
         ?: throw IllegalArgumentException("Invalid attribute modifier name from line: $line")
 
     override fun cast(data: SkillMetadata): SkillResult {
         val targetEntity = data.caster.entity.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
-        val attributeMap = AttributeMapAccess.INSTANCE.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
+        val attributeMap = AttributeMapAccess.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
         val attributeInstance = attributeMap.getInstance(attribute) ?: return SkillResult.INVALID_TARGET
         attributeInstance.removeModifier(Key.key(name[data]))
 
@@ -38,7 +38,7 @@ class RemoveAttributeModifierMechanic(
 
     override fun castAtEntity(data: SkillMetadata, target: AbstractEntity): SkillResult {
         val targetEntity = target.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
-        val attributeMap = AttributeMapAccess.INSTANCE.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
+        val attributeMap = AttributeMapAccess.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
         val attributeInstance = attributeMap.getInstance(attribute) ?: return SkillResult.INVALID_TARGET
         attributeInstance.removeModifier(Key.key(name[data]))
 

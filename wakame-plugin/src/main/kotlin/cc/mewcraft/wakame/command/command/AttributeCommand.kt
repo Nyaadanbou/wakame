@@ -273,7 +273,7 @@ internal object AttributeCommand : KoishCommandFactory<Source> {
     }
 
     private fun getAttributeMap(entity: Entity): AttributeMap? {
-        return AttributeMapAccess.INSTANCE.get(entity).getOrNull()
+        return AttributeMapAccess.get(entity).getOrNull()
     }
 
 }

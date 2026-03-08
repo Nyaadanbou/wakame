@@ -13,15 +13,13 @@ object EnchantmentInitializer {
 
     @InitFun
     fun init() {
-        ApplyEnchantmentEffect.registerEvents()
-        TickAntigravShotEnchantment.registerEvents()
-        TickAttributeEnchantment.registerEvents()
-        TickAutoReplantEnchantment.registerEvents()
-        TickBlastMiningEnchantment.registerEvents()
-        TickFragileEnchantment.registerEvents()
-        TickRangeMiningEnchantment.registerEvents()
-        TickSmelterEnchantment.registerEvents()
-        TickVeinminerEnchantment.registerEvents()
-        TickVoidEscapeEnchantment.registerEvents()
+        EnchantmentAntigravShotSystem.registerEvents()
+        EnchantmentAutoReplantSystem.registerEvents()
+        EnchantmentBlastMiningSystem.registerEvents()
+        EnchantmentFragileSystem.registerEvents()
+        EnchantmentRangeMiningSystem.registerEvents()
+        EnchantmentSmelterSystem.registerEvents()
+        EnchantmentVeinminerSystem.registerEvents()
+        EnchantmentVoidEscapeSystem.registerEvents()
     }
 }

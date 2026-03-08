@@ -67,7 +67,7 @@ class DamageAttributeMapMechanic(
             is Player -> KoishDamageSources.playerAttack(casterEntity)
             else -> KoishDamageSources.mobAttack(casterEntity)
         }
-        val attributeContainer = AttributeMapAccess.INSTANCE.get(casterEntity).getOrNull() ?: run {
+        val attributeContainer = AttributeMapAccess.get(casterEntity).getOrNull() ?: run {
             logger.warn("No AttributeMap found for caster $casterEntity, aborting execution")
             return SkillResult.ERROR
         }

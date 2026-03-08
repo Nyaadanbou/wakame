@@ -37,12 +37,12 @@ class AttributeMechanic(
     private val amount: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("amount", "amt", "a"), 0.0, *arrayOfNulls(0))
     private val duration: PlaceholderInt = mlc.getPlaceholderInteger(arrayOf("duration", "dur"), 0, *arrayOfNulls(0))
     private val attribute: Attribute = mlc.getString(arrayOf("attribute", "attr"))
-        ?.let { parsed -> AttributeProvider.INSTANCE.get(parsed) }
+        ?.let { parsed -> AttributeProvider.get(parsed) }
         ?: throw IllegalArgumentException("Invalid attribute from line: $line")
 
     override fun cast(data: SkillMetadata): SkillResult {
         val targetEntity = data.caster?.entity?.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
-        val attributeMap = AttributeMapAccess.INSTANCE.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
+        val attributeMap = AttributeMapAccess.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
         val attributeInstance = attributeMap.getInstance(attribute) ?: return SkillResult.ERROR
         setBaseValueAndScheduleReset(attributeInstance, amount[data], duration[data])
         return SkillResult.SUCCESS
@@ -50,7 +50,7 @@ class AttributeMechanic(
 
     override fun castAtEntity(data: SkillMetadata, target: AbstractEntity): SkillResult {
         val targetEntity = target.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
-        val attributeMap = AttributeMapAccess.INSTANCE.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
+        val attributeMap = AttributeMapAccess.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
         val attributeInstance = attributeMap.getInstance(attribute) ?: return SkillResult.ERROR
         setBaseValueAndScheduleReset(attributeInstance, amount[data], duration[data])
         return SkillResult.SUCCESS

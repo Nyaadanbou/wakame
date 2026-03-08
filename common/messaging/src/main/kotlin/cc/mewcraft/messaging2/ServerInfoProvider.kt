@@ -31,7 +31,7 @@ interface ServerInfoProvider {
     /**
      * 持有当前 [ServerInfoProvider] 实现的伴生对象.
      */
-    companion object : ServerInfoProvider {
+    companion object Impl : ServerInfoProvider {
         private val default = object : ServerInfoProvider {
             override val serverId: UUID = UUID.randomUUID()
             override val serverKey: String = "unset"

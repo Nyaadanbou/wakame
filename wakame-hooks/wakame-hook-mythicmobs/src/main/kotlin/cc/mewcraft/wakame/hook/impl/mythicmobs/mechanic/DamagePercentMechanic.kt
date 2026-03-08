@@ -98,7 +98,7 @@ class DamagePercentMechanic(
 
     private fun calculateDamageValue(value: String, data: SkillMetadata, target: AbstractEntity): Double {
         val base = if (currentHealth) target.health
-        else (AttributeMapAccess.INSTANCE.get(target.bukkitEntity).getOrNull()?.getValue(Attributes.MAX_HEALTH) ?: 0.0)
+        else (AttributeMapAccess.get(target.bukkitEntity).getOrNull()?.getValue(Attributes.MAX_HEALTH) ?: 0.0)
         val percent = PlaceholderDouble.of(value)[data, target]
         return base * percent
     }
