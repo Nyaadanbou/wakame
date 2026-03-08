@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.condition
 
-import cc.mewcraft.wakame.entity.player.kizamiContainer
+import cc.mewcraft.wakame.entity.player.inscriptionContainer
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
@@ -32,7 +32,7 @@ class InscriptionCondition(
 
     override fun check(meta: SkillMetadata): Boolean {
         val player = meta.caster.entity.bukkitEntity as? Player ?: return false
-        val map = player.kizamiContainer
+        val map = player.inscriptionContainer
         val type = inscriptionType
         val testAmount = inscriptionAmount
         val actualAmount = map.getAmount(type)

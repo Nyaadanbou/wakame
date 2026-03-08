@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.init
 
+import cc.mewcraft.wakame.entity.player.KoishUserListener
 import cc.mewcraft.wakame.entity.player.ServerOnlineUserTicker
-import cc.mewcraft.wakame.entity.player.UserListener
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -14,7 +14,7 @@ object EntityInitializer {
 
     @InitFun
     fun init() {
-        UserListener.registerEvents()
+        KoishUserListener.registerEvents()
         ServerOnlineUserTicker.registerEvents()
     }
 }

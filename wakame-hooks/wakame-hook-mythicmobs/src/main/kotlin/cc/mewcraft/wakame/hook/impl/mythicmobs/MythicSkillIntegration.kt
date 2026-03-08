@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.hook.impl.mythicmobs
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.integration.skill.SkillIntegration
 import cc.mewcraft.wakame.item.property.impl.Castable
+import cc.mewcraft.wakame.util.decorate
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.bukkit.BukkitAdapter
 import io.lumine.mythic.bukkit.MythicBukkit
@@ -14,6 +15,7 @@ import kotlin.jvm.optionals.getOrNull
 
 object MythicSkillIntegration : SkillIntegration {
 
+    private val logger = LOGGER.decorate(MythicSkillIntegration::class)
     private val mythicApi: MythicBukkit
         get() = MythicBukkit.inst()
 
@@ -22,7 +24,6 @@ object MythicSkillIntegration : SkillIntegration {
         val entityTargets = listOf(MythicUtil.getTargetedEntity(player))
         val locationTargets = listOf(player.getLineOfSight(null, 32).last().location)
         mythicApi.apiHelper.castSkill(player, id, player, origin, entityTargets, locationTargets, 1f)
-        LOGGER.info("Trying to running block skill: $id")
     }
 
     override fun castInlineSkill(player: Player, line: String, ctx: Castable?) {
@@ -34,16 +35,16 @@ object MythicSkillIntegration : SkillIntegration {
         val locationTargets = listOf(BukkitAdapter.adapt(player.getLineOfSight(null, 32).last().location))
         val meta = SkillMetadataImpl(SkillTriggers.API, caster, entity, entity.location, entityTargets, locationTargets, 1f)
         if (skill == null) {
-            LOGGER.error("Invalid line supplied to MythicInlineSkillWrapper: $line")
+            logger.error("Invalid line supplied to MythicInlineSkillWrapper: $line")
         } else {
             skill.execute(meta)
-            LOGGER.info("Trying to running inline skill: $line")
         }
     }
 
     override fun isCooldown(player: Player, id: String, ctx: Castable?): Boolean {
         val skill = mythicApi.skillManager.getSkill(id).getOrNull() ?: return false
         val caster = mythicApi.skillManager.getCaster(BukkitAdapter.adapt(player))
-        return skill.onCooldown(caster)
+        val result = skill.onCooldown(caster)
+        return result
     }
 }

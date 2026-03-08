@@ -30,8 +30,8 @@ object ScanItemSlotChanges : OnlineUserTicker {
     override fun onTickUser(user: User, player: Player) {
         for (slot in ItemSlotRegistry.itemSlots()) {
             val curr = slot.getItem(player)
-            val slotChanges = user.itemSlotChanges
-            val entry = slotChanges[slot]
+            val itemSlotChanges = user.itemSlotChanges
+            val entry = itemSlotChanges[slot]
             entry.update(curr)
             if (entry.changing) {
                 val prev = entry.previous
@@ -44,33 +44,9 @@ object ScanItemSlotChanges : OnlineUserTicker {
 
 interface ItemSlotChanges {
     companion object {
-
-        fun empty(): ItemSlotChanges {
-            return EmptyItemSlotChanges
-        }
-
-        fun create(): ItemSlotChanges {
-            return MutableItemSlotChanges()
-        }
-
-        fun create(player: Player): ItemSlotChanges {
-            return create()
-        }
-
-        @Deprecated("use the new function", replaceWith = ReplaceWith("ItemStackEffectiveness.testSlot(slot, itemstack)"))
-        fun testSlot(slot: ItemSlot, itemstack: ItemStack?): Boolean {
-            return ItemStackEffectiveness.testSlot(slot, itemstack)
-        }
-
-        @Deprecated("use the new function", replaceWith = ReplaceWith("ItemStackEffectiveness.testLevel(player, itemstack)"))
-        fun testLevel(player: Player, itemstack: ItemStack?): Boolean {
-            return ItemStackEffectiveness.testLevel(player, itemstack)
-        }
-
-        @Deprecated("use the new function", replaceWith = ReplaceWith("ItemStackEffectiveness.testDamaged(itemstack)"))
-        fun testDurability(itemstack: ItemStack): Boolean {
-            return ItemStackEffectiveness.testDamaged(itemstack)
-        }
+        fun empty(): ItemSlotChanges = EmptyItemSlotChanges
+        fun create(): ItemSlotChanges = MutableItemSlotChanges()
+        fun create(player: Player): ItemSlotChanges = create()
     }
 
     fun fastIterator(): ObjectIterator<Reference2ObjectMap.Entry<ItemSlot, Entry>>
@@ -94,6 +70,10 @@ interface ItemSlotChanges {
          * 物品发生变化所在的 [ItemSlot].
          */
         val slot: ItemSlot,
+        /**
+         * 是否冻结. 冻结状态下 [update] 为 no-op, [changing] 永远为 `false`.
+         */
+        val frozen: Boolean = false,
     ) {
         /**
          * 发生变化后的物品.
@@ -118,14 +98,17 @@ interface ItemSlotChanges {
         operator fun component3(): ItemStack? = previous
 
         internal fun update(current: ItemStack?) {
-            require(current?.isEmpty != true) { "current cannot be empty" }
-
+            if (frozen) return
             if (current == null && this.current == null && this.previous == null) {
                 return // 都为空则可以直接返回, 不执行写操作以提升性能
             }
-
-            this.current = current?.clone().also { this.previous = this.current }
-            this.changing = this.current != this.previous
+            if (current == this.current) {
+                this.changing = false
+                return
+            }
+            this.previous = this.current
+            this.current = current?.clone()
+            this.changing = true
         }
     }
 }
@@ -144,7 +127,7 @@ inline fun ItemSlotChanges.forEachChangingEntry(
 }
 
 private data object EmptyItemSlotChanges : ItemSlotChanges {
-    private val NO_OP_ENTRY = ItemSlotChanges.Entry(ItemSlot.empty())
+    private val NO_OP_ENTRY = ItemSlotChanges.Entry(ItemSlot.empty(), frozen = true)
 
     override fun fastIterator(): ObjectIterator<Reference2ObjectMap.Entry<ItemSlot, ItemSlotChanges.Entry>> {
         return ObjectIterators.emptyIterator()

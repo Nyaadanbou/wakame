@@ -13,29 +13,32 @@ import org.bukkit.entity.Player
 /**
  * 玩家的冒险等级.
  */
-val Player.koishLevel: Int
-    get() = UserManager.get(this).powerLevel
+val Player.powerLevel: Int
+    get() = KoishUserManager.get(this).powerLevel
 
 /**
  * 玩家的物品冷却.
  */
 val Player.itemCooldownContainer: ItemCooldownContainer
-    get() = UserManager.get(this).itemCooldownContainer
+    get() = KoishUserManager.get(this).itemCooldownContainer
 
 /**
  * 玩家的属性容器.
  */
 val Player.attributeContainer: AttributeMap
-    get() = UserManager.get(this).attributeContainer
+    get() = KoishUserManager.get(this).attributeContainer
 
 /**
  * 玩家的铭刻容器.
  */
-val Player.kizamiContainer: KizamiMap
-    get() = UserManager.get(this).inscriptionContainer
+val Player.inscriptionContainer: KizamiMap
+    get() = KoishUserManager.get(this).inscriptionContainer
 
+/**
+ * 玩家的数据是否已经跨服同步完成.
+ */
 var Player.isDataSynced: Boolean
-    get() = UserManager.get(this).synced
+    get() = KoishUserManager.get(this).isSynced
     set(value) {
-        UserManager.get(this).synced = value
+        KoishUserManager.get(this).isSynced = value
     }

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.entity.player.koishLevel
+import cc.mewcraft.wakame.entity.player.powerLevel
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelUpEvent
 import cc.mewcraft.wakame.item.extension.level
 import cc.mewcraft.wakame.item.property.ItemPropTypes
@@ -72,7 +72,7 @@ object ItemStackEffectiveness : Listener {
         if (itemLevel == null) {
             return true // 物品没有等级 - 视为玩家的等级高于该物品的等级
         }
-        val playerLevel = player.koishLevel
+        val playerLevel = player.powerLevel
         return itemLevel <= playerLevel
     }
 

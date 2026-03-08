@@ -1,7 +1,10 @@
 package cc.mewcraft.wakame.integration.skill
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item.property.impl.Castable
+import cc.mewcraft.wakame.util.decorate
 import org.bukkit.entity.Player
+import org.slf4j.Logger
 
 interface SkillIntegration {
 
@@ -42,21 +45,38 @@ interface SkillIntegration {
         }
 
         private var implementation: SkillIntegration = NO_OP
+        private val logger: Logger = LOGGER.decorate(SkillIntegration::class)
 
         fun setImplementation(impl: SkillIntegration) {
             implementation = impl
         }
 
         override fun castBlockSkill(player: Player, id: String, ctx: Castable?) {
-            return implementation.castBlockSkill(player, id, ctx)
+            logger.info("Casting block skill: $id")
+            try {
+                implementation.castBlockSkill(player, id, ctx)
+            } catch (e: Exception) {
+                logger.error("An error occurred while casting block skill: $id", e)
+            }
         }
 
         override fun castInlineSkill(player: Player, line: String, ctx: Castable?) {
-            return implementation.castInlineSkill(player, line, ctx)
+            logger.info("Casting inline skill: $line")
+            try {
+                implementation.castInlineSkill(player, line, ctx)
+            } catch (e: Exception) {
+                logger.error("An error occurred while casting inline skill: $line", e)
+            }
         }
 
         override fun isCooldown(player: Player, id: String, ctx: Castable?): Boolean {
-            return implementation.isCooldown(player, id, ctx)
+            logger.info("Checking skill cooldown: $id")
+            try {
+                return implementation.isCooldown(player, id, ctx)
+            } catch (e: Exception) {
+                logger.error("An error occurred while checking skill cooldown: $id", e)
+                return true
+            }
         }
     }
 }

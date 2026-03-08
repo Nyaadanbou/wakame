@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.behavior
 
 import cc.mewcraft.wakame.damage.FinalDamageContext
-import cc.mewcraft.wakame.entity.player.koishLevel
+import cc.mewcraft.wakame.entity.player.powerLevel
 import cc.mewcraft.wakame.item.extension.level
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.koishItem
@@ -170,7 +170,7 @@ object ItemStackActivationChecker {
         // 如果物品没有等级, 那么认为玩家的等级足够
         val itemLevel = this.level?.level ?: return true
 
-        val playerLevel = player.koishLevel
+        val playerLevel = player.powerLevel
         return itemLevel <= playerLevel
     }
 

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.feature
 
 import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
-import cc.mewcraft.wakame.item.ItemSlotChanges
+import cc.mewcraft.wakame.item.ItemStackEffectiveness
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.InputCastableTrigger
@@ -34,7 +34,7 @@ object CastableFeature : Listener {
         val prev = event.oldItemStack
         val curr = event.newItemStack
         if (prev != null &&
-            ItemSlotChanges.testSlot(slot, prev)
+            ItemStackEffectiveness.testSlot(slot, prev)
         ) {
             val castables = prev.getProp(ItemPropTypes.CASTABLE)
             if (castables != null) {
@@ -47,9 +47,9 @@ object CastableFeature : Listener {
             }
         }
         if (curr != null &&
-            ItemSlotChanges.testSlot(slot, curr) &&
-            ItemSlotChanges.testLevel(player, curr) &&
-            ItemSlotChanges.testDurability(curr)
+            ItemStackEffectiveness.testSlot(slot, curr) &&
+            ItemStackEffectiveness.testLevel(player, curr) &&
+            ItemStackEffectiveness.testDamaged(curr)
         ) {
             val castables = curr.getProp(ItemPropTypes.CASTABLE)
             if (castables != null) {
@@ -79,9 +79,9 @@ object CastableFeature : Listener {
         for (slot in ItemSlotRegistry.itemSlots()) {
             val item = slot.getItem(player) ?: continue
             val castables = item.getProp(ItemPropTypes.CASTABLE) ?: continue
-            if (ItemSlotChanges.testSlot(slot, item) &&
-                ItemSlotChanges.testLevel(player, item) &&
-                ItemSlotChanges.testDurability(item)
+            if (ItemStackEffectiveness.testSlot(slot, item) &&
+                ItemStackEffectiveness.testLevel(player, item) &&
+                ItemStackEffectiveness.testDamaged(item)
             ) {
                 for (castable in castables.values) {
                     val trigger = castable.trigger.unwrap()

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.gui.explorer.item
 
-import cc.mewcraft.wakame.entity.player.koishLevel
+import cc.mewcraft.wakame.entity.player.powerLevel
 import cc.mewcraft.wakame.item.KoishItem
 import cc.mewcraft.wakame.item.KoishStackGenerator
 import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
@@ -105,7 +105,7 @@ internal class ExplorerItemMenu(
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             if (clickType == ClickType.LEFT) {
                 // 现场生成物品
-                val context = ItemGenerationContext(item, 1f, player.koishLevel)
+                val context = ItemGenerationContext(item, 1f, player.powerLevel)
                 val stack = KoishStackGenerator.generate(item, context)
                 // 并给予玩家 (参考 minecraft:give)
                 player.world.dropItem(player.location, stack) { item ->

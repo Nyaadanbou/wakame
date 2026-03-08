@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.feature
 
 import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.integration.playermana.PlayerManaIntegration
-import cc.mewcraft.wakame.item.ItemSlotChanges
+import cc.mewcraft.wakame.item.ItemStackEffectiveness
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.hasProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
@@ -94,17 +94,16 @@ class ElytraExtrasListener : Listener {
         val prev = event.oldItemStack
         val curr = event.newItemStack
         if (prev != null &&
-            ItemSlotChanges.testSlot(slot, prev)
+            ItemStackEffectiveness.testSlot(slot, prev)
         ) {
             if (prev.hasProp(ItemPropTypes.GLIDING_EXTRAS)) {
                 player.metadata().remove(ACTIVATED_GLIDING_EXTRAS)
             }
         }
-
         if (curr != null &&
-            ItemSlotChanges.testSlot(slot, curr) &&
-            ItemSlotChanges.testLevel(player, curr) &&
-            ItemSlotChanges.testDurability(curr)
+            ItemStackEffectiveness.testSlot(slot, curr) &&
+            ItemStackEffectiveness.testLevel(player, curr) &&
+            ItemStackEffectiveness.testDamaged(curr)
         ) {
             val glidingExtras = curr.getProp(ItemPropTypes.GLIDING_EXTRAS)
             if (glidingExtras != null) {

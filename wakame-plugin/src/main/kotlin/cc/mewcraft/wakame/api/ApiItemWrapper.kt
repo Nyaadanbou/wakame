@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.api
 
 import cc.mewcraft.wakame.api.block.KoishBlock
-import cc.mewcraft.wakame.entity.player.koishLevel
+import cc.mewcraft.wakame.entity.player.powerLevel
 import cc.mewcraft.wakame.item.KoishItem
 import cc.mewcraft.wakame.item.KoishStackGenerator
 import cc.mewcraft.wakame.item.datagen.ItemGenerationContext
@@ -41,7 +41,7 @@ internal class ApiItemWrapper(
         val itemStack = if (player == null) {
             KoishStackGenerator.generate(item, ItemGenerationContext(item, 0f, 1))
         } else {
-            KoishStackGenerator.generate(item, ItemGenerationContext(item, 0f, player.koishLevel))
+            KoishStackGenerator.generate(item, ItemGenerationContext(item, 0f, player.powerLevel))
         }
         return itemStack.apply { this.amount = amount }
     }
