@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.messaging
 
+import cc.mewcraft.wakame.messaging.handler.JEICompatPacketHandler
 import cc.mewcraft.wakame.messaging.handler.TeleportOnJoinPacketHandler
 import cc.mewcraft.wakame.messaging.handler.TownyNetworkPacketHandler
 import cc.mewcraft.wakame.messaging.packet.*
@@ -17,6 +18,11 @@ class MessagingHandler(
 
     override fun handlePacket(packet: Packet): Boolean {
         when (packet) {
+            /* JEI Compat */
+
+            is JEICompatSyncPacket -> {
+                JEICompatPacketHandler.handle(packet); return true
+            }
 
             /* TeleportOnJoin */
 

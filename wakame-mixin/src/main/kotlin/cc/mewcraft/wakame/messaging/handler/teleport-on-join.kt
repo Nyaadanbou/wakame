@@ -13,7 +13,7 @@ object TeleportOnJoinPacketHandler : SimplePacketHandler {
 
     private val pendingRequests: Cache<UUID, Unit> = CacheBuilder.newBuilder()
         .expireAfterWrite(30, TimeUnit.SECONDS)
-        .build<UUID, Unit>()
+        .build()
 
     fun has(uuid: UUID): Boolean {
         return pendingRequests.getIfPresent(uuid) != null

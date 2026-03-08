@@ -34,7 +34,7 @@ public record NeoforgeRecipeSyncPayload(
         if (recipeTypeSet.isEmpty()) {
             return new NeoforgeRecipeSyncPayload(recipeTypeSet, List.of());
         } else {
-            var recipeSubset = recipes.values().stream().filter(h -> recipeTypeSet.contains(h.value().getType())).toList();
+            var recipeSubset = recipes.values().stream().filter(h -> recipeTypeSet.contains(h.value().getType()) && h.id().identifier().getNamespace().equals(Identifier.DEFAULT_NAMESPACE)).toList();
             return new NeoforgeRecipeSyncPayload(recipeTypeSet, recipeSubset);
         }
     }

@@ -12,13 +12,16 @@ class MessagingManager(
     config: MessagingConfiguration,
 ) : AbstractMessagingManager(config) {
 
-    companion object : StaticAccessApi by StaticAccessApi.of(::MessagingManager)
+    companion object Impl : StaticAccessApi by StaticAccessApi.of(::MessagingManager)
 
     override val logger: Logger = LOGGER
     override val channelName: String = "koish:main"
     override val protocolVersion: Byte = 1
 
     override fun registerPackets() {
+        /* JEI Compat */
+        registerPacket(::JEICompatSyncPacket)
+
         /* TeleportOnJoin */
         registerPacket(::TeleportOnJoinRequestPacket)
 
