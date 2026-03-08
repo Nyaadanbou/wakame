@@ -42,7 +42,7 @@ data class EnchantmentSmelterEffect(
             instance.group(
                 Codec.BOOL.optionalFieldOf("disable_on_crouch", true).forGetter(EnchantmentSmelterEffect::disableOnCrouch),
                 KoishCodecs.KOISH_KEY.fieldOf("sound").forGetter(EnchantmentSmelterEffect::sound),
-                BukkitCodecs.MATERIAL.setOf().fieldOf("exempted_items").forGetter(EnchantmentSmelterEffect::exemptedItems)
+                BukkitCodecs.MATERIAL_ITEM.setOf().fieldOf("exempted_items").forGetter(EnchantmentSmelterEffect::exemptedItems)
             ).apply(instance, ::EnchantmentSmelterEffect)
         }
     }

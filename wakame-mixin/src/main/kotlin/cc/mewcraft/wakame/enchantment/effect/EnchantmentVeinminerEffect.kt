@@ -32,7 +32,7 @@ data class EnchantmentVeinminerEffect(
         val CODEC: Codec<EnchantmentVeinminerEffect> = RecordCodecBuilder.create { instance ->
             instance.group(
                 LevelBasedValue.CODEC.fieldOf("longest_chain_mining").forGetter(EnchantmentVeinminerEffect::longestChainMining),
-                BukkitCodecs.MATERIAL.setOf().fieldOf("allowed_block_types").forGetter(EnchantmentVeinminerEffect::allowedBlockTypes),
+                BukkitCodecs.MATERIAL_BLOCK.setOf().fieldOf("allowed_block_types").forGetter(EnchantmentVeinminerEffect::allowedBlockTypes),
                 KoishCodecs.KOISH_KEY.fieldOf("block_break_sound").forGetter(EnchantmentVeinminerEffect::blockBreakSound),
                 Codec.LONG.optionalFieldOf("period", 3L).forGetter(EnchantmentVeinminerEffect::period),
             ).apply(instance, ::EnchantmentVeinminerEffect)

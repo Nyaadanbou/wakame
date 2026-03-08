@@ -50,7 +50,7 @@ data class EnchantmentAutoReplantEffect(
         @JvmField
         val CODEC: Codec<EnchantmentAutoReplantEffect> = RecordCodecBuilder.create { instance ->
             instance.group(
-                Codec.unboundedMap(BukkitCodecs.MATERIAL, BukkitCodecs.MATERIAL)
+                Codec.unboundedMap(BukkitCodecs.MATERIAL_BLOCK, BukkitCodecs.MATERIAL_ITEM)
                     .fieldOf("crop_seed_map")
                     .forGetter(EnchantmentAutoReplantEffect::cropSeedMap),
                 LevelBasedValue.CODEC.optionalFieldOf("effect_radius", LevelBasedValue.constant(0f))
