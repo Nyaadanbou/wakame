@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.auraskills
 
+import cc.mewcraft.wakame.api.event.player.PlayerResourceLoadEvent
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.Attributes
@@ -82,6 +83,15 @@ class KoishAttributeTrait : Listener, BukkitTraitHandler {
 
     @EventHandler
     private fun on(event: PlayerChangedWorldEvent) {
+        for (trait in traits) {
+            val player = event.player
+            val user = AuraSkillsApi.get().getUser(player.uniqueId)
+            set(player, user, trait)
+        }
+    }
+
+    @EventHandler
+    private fun on(event: PlayerResourceLoadEvent) {
         for (trait in traits) {
             val player = event.player
             val user = AuraSkillsApi.get().getUser(player.uniqueId)
