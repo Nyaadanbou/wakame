@@ -20,10 +20,10 @@ object TownyFlight : ItemBehavior {
             TownFlightIntegration.addTempFlight(player, silent = false, seconds = townyFlight.duration)
         } catch (_: UnsupportedOperationException) {
             player.sendMessage(TranslatableMessages.MSG_ERR_NOT_INSIDE_TOWN)
-            return BehaviorResult.PASS
+            return BehaviorResult.FINISH_AND_CANCEL
         } catch (_: Exception) {
             player.sendMessage(TranslatableMessages.MSG_ERR_INTERNAL_ERROR)
-            return BehaviorResult.PASS
+            return BehaviorResult.FINISH_AND_CANCEL
         }
 
         if (TownFlightIntegration.canFly(player, silent = true)) {
