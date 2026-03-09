@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.entity.player
 
+import cc.mewcraft.wakame.enchantment.system.EnchantmentAttributeSystem
 import cc.mewcraft.wakame.enchantment.system.EnchantmentEffectSystem
 import cc.mewcraft.wakame.entity.attribute.system.ItemAttributeSystem
 import cc.mewcraft.wakame.item.ItemBehaviorListener
@@ -24,6 +25,7 @@ object ServerOnlineUserTicker : Listener {
             ItemAttributeSystem.onTickUser(user, player)
             ItemInscriptionSystem.onTickUser(user, player)
             EnchantmentEffectSystem.onTickUser(user, player)
+            EnchantmentAttributeSystem.onTickUser(user, player)
             KatanaTickSystem.onTickUser(user, player)
             KatanaSwitchSystem.onTickUser(user, player)
         }

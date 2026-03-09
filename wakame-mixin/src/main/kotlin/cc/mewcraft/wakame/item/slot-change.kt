@@ -67,10 +67,6 @@ interface ItemSlotChanges {
      */
     class Entry internal constructor(
         /**
-         * 物品发生变化所在的 [ItemSlot].
-         */
-        val slot: ItemSlot,
-        /**
          * 是否冻结. 冻结状态下 [update] 为 no-op, [changing] 永远为 `false`.
          */
         val frozen: Boolean = false,
@@ -93,9 +89,8 @@ interface ItemSlotChanges {
         var changing: Boolean = false
             private set
 
-        operator fun component1(): ItemSlot = slot
-        operator fun component2(): ItemStack? = current
-        operator fun component3(): ItemStack? = previous
+        operator fun component1(): ItemStack? = current
+        operator fun component2(): ItemStack? = previous
 
         internal fun update(current: ItemStack?) {
             if (frozen) return
@@ -127,7 +122,7 @@ inline fun ItemSlotChanges.forEachChangingEntry(
 }
 
 private data object EmptyItemSlotChanges : ItemSlotChanges {
-    private val NO_OP_ENTRY = ItemSlotChanges.Entry(ItemSlot.empty(), frozen = true)
+    private val NO_OP_ENTRY = ItemSlotChanges.Entry(frozen = true)
 
     override fun fastIterator(): ObjectIterator<Reference2ObjectMap.Entry<ItemSlot, ItemSlotChanges.Entry>> {
         return ObjectIterators.emptyIterator()
@@ -147,6 +142,6 @@ private data class MutableItemSlotChanges(
     }
 
     override operator fun get(itemSlot: ItemSlot): ItemSlotChanges.Entry {
-        return entries.computeIfAbsent(itemSlot, ItemSlotChanges::Entry)
+        return entries.computeIfAbsent(itemSlot) { _ -> ItemSlotChanges.Entry() }
     }
 }

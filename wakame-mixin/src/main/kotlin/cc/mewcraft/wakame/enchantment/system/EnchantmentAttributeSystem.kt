@@ -22,7 +22,9 @@ object EnchantmentAttributeSystem : OnlineUserTicker {
                 return
             }
             // 对于 prev (变化之前的物品), 我们需要从玩家身上 <移除> 其属性修饰器
-            if (prev != null && ItemStackEffectiveness.testSlot(slot, prev)) {
+            if (prev != null &&
+                ItemStackEffectiveness.testSlot(slot, prev)
+            ) {
                 prev.koishEnchantments.forEach { (enchant, level) ->
                     enchant.getEffectList(ExtraEnchantmentEffectComponents.ATTRIBUTES).forEach { attribute ->
                         attribute.remove(player, level, slot)
