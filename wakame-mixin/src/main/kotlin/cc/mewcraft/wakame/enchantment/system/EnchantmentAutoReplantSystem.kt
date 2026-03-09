@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.enchantment.system
 
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.enchantment.component.AutoReplant
 import cc.mewcraft.wakame.enchantment.effect.EnchantmentAutoReplantEffect
 import cc.mewcraft.wakame.item.extension.damageItem
@@ -64,7 +65,10 @@ object EnchantmentAutoReplantSystem : Listener {
         val seedMaterial = autoReplant.getSeed(block.type) ?: return false
         val inventory = player.inventory
         val seedSlot = inventory.contents.indexOfFirst { it != null && it.type == seedMaterial }
-        if (seedSlot == -1) return false
+        if (seedSlot == -1) {
+            player.sendActionBar(TranslatableMessages.MSG_ERR_ENCHANTMENT_AUTO_REPLANT_NO_SEEDS)
+            return false
+        }
 
         val cropType = block.type
         if (!player.breakBlock(block)) return false
