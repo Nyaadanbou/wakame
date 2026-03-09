@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.item.KoishStackData;
 import cc.mewcraft.wakame.mixin.support.KoishIngredient;
 import io.papermc.paper.inventory.recipe.ItemOrExact;
 import io.papermc.paper.inventory.recipe.StackedContentsExtrasMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.item.ItemStack;
@@ -75,12 +74,7 @@ public abstract class MixinStackedContentsExtrasMap {
         if (koish$accountAllItemStackToExact) {
             // 如果之前把输入物品统一识别为了 Exact, 在这里移除掉
             // 否则下次使用 StackedContentsExtrasMap 时会异常, 之前记录的物品没有正确清空
-            Object2IntOpenHashMap<ItemOrExact> amounts = this.contents.amounts;
-            for (ItemOrExact key : amounts.keySet()) {
-                if (key instanceof ItemOrExact.Exact) {
-                    amounts.removeInt(key);
-                }
-            }
+            this.contents.amounts.keySet().removeIf(key -> key instanceof ItemOrExact.Exact);
             // 移除标记
             koish$accountAllItemStackToExact = false;
         }
