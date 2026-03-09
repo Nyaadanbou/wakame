@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.hook.impl.mythicdungeons
 
 import cc.mewcraft.wakame.integration.dungeon.DungeonBridge
 import cc.mewcraft.wakame.integration.party.Party
+import cc.mewcraft.wakame.util.runTaskLater
 import net.playavalon.mythicdungeons.MythicDungeons
 import net.playavalon.mythicdungeons.player.party.partysystem.MythicParty
 import org.bukkit.entity.Player
@@ -29,8 +30,19 @@ class MythicDungeonBridge : DungeonBridge {
     override fun play(players: List<Player>, dungeon: String): Result<Boolean> {
         return runCatching {
             val mythicParty = createParty0(players)
-            val leader = mythicParty.leader
-            mdApi.sendToDungeon(leader, dungeon)
+            val bukkitLeader = mythicParty.leader
+            val result = mdApi.sendToDungeon(bukkitLeader, dungeon)
+
+            // 队长自动准备就绪, 需要延迟一点否则会出现 NPE: https://pastes.dev/BNxfsDqeDo
+            runTaskLater(10) {
+                val mythicLeader = mdApi.getMythicPlayer(bukkitLeader)
+                val queue = mdApi.queueManager.getQueue(mythicLeader)
+                if (queue != null && queue.isReadyCheckWaiting) {
+                    queue.ready(mythicLeader)
+                }
+            }
+
+            result
         }
     }
 
