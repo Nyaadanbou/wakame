@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
 import cc.mewcraft.wakame.catalog.item.CatalogItemRecipeNetwork
-import cc.mewcraft.wakame.catalog.item.recipe.*
+import cc.mewcraft.wakame.catalog.item.node.*
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.item.SlotDisplay
@@ -29,52 +29,52 @@ import xyz.xenondevs.invui.window.AbstractWindow
 import java.text.DecimalFormat
 
 /**
- * 用于创建 [CatalogItemRecipe] 在图鉴中展示的 [Gui].
+ * 用于创建 [CatalogItemNode] 在图鉴中展示的 [Gui].
  *
  * 设计这个单例是为了前后端代码分离.
  */
 internal object CatalogRecipeGuiManager {
 
-    private val GUI_CREATORS: HashMap<Class<out CatalogItemRecipe>, (CatalogItemRecipe) -> CatalogRecipeGui> = HashMap()
+    private val GUI_CREATORS: HashMap<Class<out CatalogItemNode>, (CatalogItemNode) -> CatalogRecipeGui> = HashMap()
 
     /**
-     * [CatalogItemRecipe] 的 [Gui] 在图鉴展示时的优先级, 数字小的类型将被排在前面.
+     * [CatalogItemNode] 的 [Gui] 在图鉴展示时的优先级, 数字小的类型将被排在前面.
      */
-    private val GUI_PRIORITIES: HashMap<Class<out CatalogItemRecipe>, Int> = HashMap()
+    private val GUI_PRIORITIES: HashMap<Class<out CatalogItemNode>, Int> = HashMap()
 
     private val CACHED_GUIS: HashMap<LookupKey, List<CatalogRecipeGui>> by ReloadableProperty { HashMap(1024) }
 
     private data class LookupKey(val item: ItemRef, val state: LookupState)
 
     init {
-        registerGuiCreator<CatalogItemBlastingRecipe>(::createCookingRecipeGui)
-        registerGuiCreator<CatalogItemCampfireRecipe>(::createCookingRecipeGui)
-        registerGuiCreator<CatalogItemFurnaceRecipe>(::createCookingRecipeGui)
-        registerGuiCreator<CatalogItemShapedRecipe>(::createShapedRecipeGui)
-        registerGuiCreator<CatalogItemShapelessRecipe>(::createShapelessRecipeGui)
-        registerGuiCreator<CatalogItemSmithingTransformRecipe>(::createSmithingTransformRecipeGui)
-        registerGuiCreator<CatalogItemSmithingTrimRecipe>(::createSmithingTrimRecipeGui)
-        registerGuiCreator<CatalogItemSmokingRecipe>(::createCookingRecipeGui)
-        registerGuiCreator<CatalogItemStonecuttingRecipe>(::createStonecuttingRecipeGui)
-        registerGuiCreator<CatalogItemLootTableRecipe>(::createLootTableRecipeGui)
+        registerGuiCreator<CatalogItemBlastingNode>(::createCookingRecipeGui)
+        registerGuiCreator<CatalogItemCampfireNode>(::createCookingRecipeGui)
+        registerGuiCreator<CatalogItemFurnaceNode>(::createCookingRecipeGui)
+        registerGuiCreator<CatalogItemShapedNode>(::createShapedRecipeGui)
+        registerGuiCreator<CatalogItemShapelessNode>(::createShapelessRecipeGui)
+        registerGuiCreator<CatalogItemSmithingTransformNode>(::createSmithingTransformRecipeGui)
+        registerGuiCreator<CatalogItemSmithingTrimNode>(::createSmithingTrimRecipeGui)
+        registerGuiCreator<CatalogItemSmokingNode>(::createCookingRecipeGui)
+        registerGuiCreator<CatalogItemStonecuttingNode>(::createStonecuttingRecipeGui)
+        registerGuiCreator<CatalogItemLootTableNode>(::createLootTableRecipeGui)
 
         // TODO 支持配置文件载入优先级
-        registerGuiPriority<CatalogItemBlastingRecipe>(500)
-        registerGuiPriority<CatalogItemCampfireRecipe>(600)
-        registerGuiPriority<CatalogItemFurnaceRecipe>(300)
-        registerGuiPriority<CatalogItemShapedRecipe>(100)
-        registerGuiPriority<CatalogItemShapelessRecipe>(200)
-        registerGuiPriority<CatalogItemSmithingTransformRecipe>(700)
-        registerGuiPriority<CatalogItemSmithingTrimRecipe>(800)
-        registerGuiPriority<CatalogItemSmokingRecipe>(400)
-        registerGuiPriority<CatalogItemStonecuttingRecipe>(900)
+        registerGuiPriority<CatalogItemBlastingNode>(500)
+        registerGuiPriority<CatalogItemCampfireNode>(600)
+        registerGuiPriority<CatalogItemFurnaceNode>(300)
+        registerGuiPriority<CatalogItemShapedNode>(100)
+        registerGuiPriority<CatalogItemShapelessNode>(200)
+        registerGuiPriority<CatalogItemSmithingTransformNode>(700)
+        registerGuiPriority<CatalogItemSmithingTrimNode>(800)
+        registerGuiPriority<CatalogItemSmokingNode>(400)
+        registerGuiPriority<CatalogItemStonecuttingNode>(900)
     }
 
-    private inline fun <reified T : CatalogItemRecipe> registerGuiCreator(noinline factory: (T) -> CatalogRecipeGui) {
+    private inline fun <reified T : CatalogItemNode> registerGuiCreator(noinline factory: (T) -> CatalogRecipeGui) {
         GUI_CREATORS[T::class.java] = { recipe -> factory(recipe as T) }
     }
 
-    private inline fun <reified T : CatalogItemRecipe> registerGuiPriority(priority: Int) {
+    private inline fun <reified T : CatalogItemNode> registerGuiPriority(priority: Int) {
         GUI_PRIORITIES[T::class.java] = priority
     }
 
@@ -90,7 +90,7 @@ internal object CatalogRecipeGuiManager {
             // 先基于类型优先级排序
             // 再基于唯一标识按字典序排序
             catalogRecipes.sortedWith(
-                compareBy<CatalogItemRecipe> { it.type.sortPriority }.thenBy { it.sortId }
+                compareBy<CatalogItemNode> { it.type.sortPriority }.thenBy { it.sortId }
             ).mapNotNull { catalogRecipe ->
                 buildGui(catalogRecipe) ?: return@mapNotNull null
             }
@@ -98,11 +98,11 @@ internal object CatalogRecipeGuiManager {
     }
 
     /**
-     * 创建 [CatalogItemRecipe] 在图鉴中展示的 [CatalogRecipeGui].
+     * 创建 [CatalogItemNode] 在图鉴中展示的 [CatalogRecipeGui].
      *
-     * 返回 `null` 意味着 [CatalogItemRecipe] 可被图鉴检索, 但代码没有指定对应 [CatalogRecipeGui] 创建方法.
+     * 返回 `null` 意味着 [CatalogItemNode] 可被图鉴检索, 但代码没有指定对应 [CatalogRecipeGui] 创建方法.
      */
-    private fun buildGui(recipe: CatalogItemRecipe): CatalogRecipeGui? {
+    private fun buildGui(recipe: CatalogItemNode): CatalogRecipeGui? {
         return GUI_CREATORS[recipe::class.java]?.invoke(recipe).also {
             if (it == null) LOGGER.warn("No gui creator for ${recipe::class.java}")
         }
@@ -111,14 +111,14 @@ internal object CatalogRecipeGuiManager {
     /**
      * 方便函数.
      */
-    private val CatalogItemStandardRecipe.menuSettings: BasicMenuSettings
+    private val CatalogItemStandardNode.menuSettings: BasicMenuSettings
         get() = CatalogItemMenuSettings.getMenuSettings(this.type.name)
 
     /**
      * 创建烧制配方 [CatalogRecipeGui] 的方法.
      * 烧制配方包括: 熔炉, 高炉, 烟熏炉, 营火配方.
      */
-    private fun createCookingRecipeGui(catalogRecipe: CatalogItemCookingRecipe): CatalogRecipeGui {
+    private fun createCookingRecipeGui(catalogRecipe: CatalogItemCookingNode): CatalogRecipeGui {
         val settings = catalogRecipe.menuSettings
         val gui = Gui.normal { builder ->
             builder.setStructure(*settings.structure)
@@ -135,7 +135,7 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建有序合成配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createShapedRecipeGui(catalogRecipe: CatalogItemShapedRecipe): CatalogRecipeGui {
+    private fun createShapedRecipeGui(catalogRecipe: CatalogItemShapedNode): CatalogRecipeGui {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
@@ -163,7 +163,7 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建无序合成配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createShapelessRecipeGui(catalogRecipe: CatalogItemShapelessRecipe): CatalogRecipeGui {
+    private fun createShapelessRecipeGui(catalogRecipe: CatalogItemShapelessNode): CatalogRecipeGui {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
@@ -179,7 +179,7 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建锻造台转化配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createSmithingTransformRecipeGui(catalogRecipe: CatalogItemSmithingTransformRecipe): CatalogRecipeGui {
+    private fun createSmithingTransformRecipeGui(catalogRecipe: CatalogItemSmithingTransformNode): CatalogRecipeGui {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
@@ -196,7 +196,7 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建锻造台纹饰配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createSmithingTrimRecipeGui(catalogRecipe: CatalogItemSmithingTrimRecipe): CatalogRecipeGui {
+    private fun createSmithingTrimRecipeGui(catalogRecipe: CatalogItemSmithingTrimNode): CatalogRecipeGui {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
@@ -214,7 +214,7 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建切石机配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createStonecuttingRecipeGui(catalogRecipe: CatalogItemStonecuttingRecipe): CatalogRecipeGui {
+    private fun createStonecuttingRecipeGui(catalogRecipe: CatalogItemStonecuttingNode): CatalogRecipeGui {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
@@ -229,7 +229,7 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建战利品表配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createLootTableRecipeGui(catalogRecipe: CatalogItemLootTableRecipe): CatalogRecipeGui {
+    private fun createLootTableRecipeGui(catalogRecipe: CatalogItemLootTableNode): CatalogRecipeGui {
         val settings = catalogRecipe.catalogMenuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
@@ -337,7 +337,7 @@ private class TrimResultItem(
  * **战利品表占位输入** 的图标.
  */
 class LootItem(
-    private val recipe: CatalogItemLootTableRecipe,
+    private val recipe: CatalogItemLootTableNode,
 ) : AbstractItem() {
 
     private val itemProvider: ItemProvider =

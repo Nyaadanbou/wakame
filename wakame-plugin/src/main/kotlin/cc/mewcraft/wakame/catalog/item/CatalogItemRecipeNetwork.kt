@@ -3,7 +3,7 @@
 package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemRecipe
+import cc.mewcraft.wakame.catalog.item.node.CatalogItemNode
 import cc.mewcraft.wakame.event.map.MinecraftRecipeRegistrationDoneEvent
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -32,7 +32,7 @@ object CatalogItemRecipeNetwork {
     /**
      * 获取特定物品的所有获取方式 (来源).
      */
-    fun getSource(node: ItemRef): Set<CatalogItemRecipe> {
+    fun getSource(node: ItemRef): Set<CatalogItemNode> {
         if (!network.nodes().contains(Optional.of(node))) return emptySet()
         return network.inEdges(Optional.of(node)).map(CatalogRecipeEdge::recipe).toSet()
     }
@@ -40,7 +40,7 @@ object CatalogItemRecipeNetwork {
     /**
      * 获取特定物品的所有可参与制作 (用途).
      */
-    fun getUsage(node: ItemRef): Set<CatalogItemRecipe> {
+    fun getUsage(node: ItemRef): Set<CatalogItemNode> {
         if (!network.nodes().contains(Optional.of(node))) return emptySet()
         return network.outEdges(Optional.of(node)).map(CatalogRecipeEdge::recipe).toSet()
     }
@@ -49,13 +49,13 @@ object CatalogItemRecipeNetwork {
      * 重建"来源&用途"网络.
      */
     fun rebuildNetwork() {
-        CatalogItemCraftingStationRecipeInitializer.reload()
-        CatalogItemCrateRecipeInitializer.reload()
-        CatalogItemLootTableRecipeInitializer.reload()
-        CatalogItemMythicDropRecipeInitializer.reload()
-        CatalogItemQuestRecipeInitializer.reload()
-        CatalogItemSignupRecipeInitializer.reload()
-        CatalogItemStandardRecipeInitializer.reload()
+        CatalogItemCraftingStationNodeInitializer.reload()
+        CatalogItemCrateNodeInitializer.reload()
+        CatalogItemLootTableNodeInitializer.reload()
+        CatalogItemMythicDropNodeInitializer.reload()
+        CatalogItemQuestNodeInitializer.reload()
+        CatalogItemSignupNodeInitializer.reload()
+        CatalogItemStandardNodeInitializer.reload()
 
         network = buildNetWork()
     }
@@ -117,20 +117,20 @@ object CatalogItemRecipeNetwork {
      * 方便函数.
      * 当配方的输入输出为空时会使用空节点占位.
      */
-    private fun MutableNetwork<Optional<ItemRef>, CatalogRecipeEdge>.addRecipe(catalogItemRecipe: CatalogItemRecipe) {
-        val lookupInputs = catalogItemRecipe.getLookupInputs()
-        val lookupOutputs = catalogItemRecipe.getLookupOutputs()
+    private fun MutableNetwork<Optional<ItemRef>, CatalogRecipeEdge>.addRecipe(catalogItemNode: CatalogItemNode) {
+        val lookupInputs = catalogItemNode.getLookupInputs()
+        val lookupOutputs = catalogItemNode.getLookupOutputs()
         if (lookupInputs.isEmpty()) {
             for (outputNode in lookupOutputs) {
                 addNode(Optional.of(outputNode))
-                addEdge(Optional.empty(), Optional.of(outputNode), CatalogRecipeEdge(catalogItemRecipe))
+                addEdge(Optional.empty(), Optional.of(outputNode), CatalogRecipeEdge(catalogItemNode))
             }
             return
         }
         if (lookupOutputs.isEmpty()) {
             for (inputNode in lookupInputs) {
                 addNode(Optional.of(inputNode))
-                addEdge(Optional.of(inputNode), Optional.empty(), CatalogRecipeEdge(catalogItemRecipe))
+                addEdge(Optional.of(inputNode), Optional.empty(), CatalogRecipeEdge(catalogItemNode))
             }
             return
         }
@@ -138,15 +138,15 @@ object CatalogItemRecipeNetwork {
             for (outputNode in lookupOutputs) {
                 addNode(Optional.of(inputNode))
                 addNode(Optional.of(outputNode))
-                addEdge(Optional.of(inputNode), Optional.of(outputNode), CatalogRecipeEdge(catalogItemRecipe))
+                addEdge(Optional.of(inputNode), Optional.of(outputNode), CatalogRecipeEdge(catalogItemNode))
             }
         }
     }
 
     /**
-     * 封装一个 [CatalogItemRecipe] 作为 [ImmutableNetwork] 的边.
+     * 封装一个 [CatalogItemNode] 作为 [ImmutableNetwork] 的边.
      */
     private class CatalogRecipeEdge(
-        val recipe: CatalogItemRecipe,
+        val recipe: CatalogItemNode,
     )
 }

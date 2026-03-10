@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
-import cc.mewcraft.wakame.catalog.item.recipe.*
+import cc.mewcraft.wakame.catalog.item.node.*
 
 /**
  * 这些 [Registry] 内的注册项是 *可变的* - 可以在游戏运行时添加或删除注册项.
@@ -57,49 +57,49 @@ object DynamicRegistries {
      * 这个配方的输入是一系列物品, 输出是一个物品.
      */
     @JvmField
-    val CATALOG_ITEM_CRAFTING_STATION_RECIPE: WritableRegistry<CatalogItemCraftingStationRecipe> = registerSimple(DynamicRegistryKeys.CATALOG_ITEM_CRAFTING_STATION_RECIPE)
+    val CATALOG_ITEM_CRAFTING_STATION_RECIPE: WritableRegistry<CatalogItemCraftingStationNode> = registerSimple(DynamicRegistryKeys.CATALOG_ITEM_CRAFTING_STATION_RECIPE)
 
     /**
      * 物品图鉴中的盲盒配方.
      * 这个配方的输入是一个盲盒, 输出是一系列物品.
      */
     @JvmField
-    val CATALOG_ITEM_CRATE_RECIPE: WritableRegistry<CatalogItemCrateRecipe> = registerSimple(DynamicRegistryKeys.CATALOG_ITEM_CRATE_RECIPE)
+    val CATALOG_ITEM_CRATE_RECIPE: WritableRegistry<CatalogItemCrateNode> = registerSimple(DynamicRegistryKeys.CATALOG_ITEM_CRATE_RECIPE)
 
     /**
      * 物品图鉴中的战利品表配方.
      * 这个配方的输入是一个 Minecraft 的战利品表, 输出是一系列物品.
      */
     @JvmField
-    val CATALOG_ITEM_LOOT_TABLE_RECIPE: WritableRegistry<CatalogItemLootTableRecipe> = registerSimple(DynamicRegistryKeys.CATALOG_ITEM_LOOT_TABLE_RECIPE)
+    val CATALOG_ITEM_LOOT_TABLE_RECIPE: WritableRegistry<CatalogItemLootTableNode> = registerSimple(DynamicRegistryKeys.CATALOG_ITEM_LOOT_TABLE_RECIPE)
 
     /**
      * 物品图鉴中的 MythicMobs 生物掉落配方.
      * 这个配方的输入是一个 MythicMobs 的生物, 输出是一系列物品.
      */
     @JvmField
-    val CATALOG_ITEM_MYTHIC_DROP_RECIPE: WritableRegistry<CatalogItemMythicDropRecipe> = registerSimple(DynamicRegistryKeys.CATALOG_ITEM_MYTHIC_DROP_RECIPE)
+    val CATALOG_ITEM_MYTHIC_DROP_RECIPE: WritableRegistry<CatalogItemMythicDropNode> = registerSimple(DynamicRegistryKeys.CATALOG_ITEM_MYTHIC_DROP_RECIPE)
 
     /**
      * 物品图鉴中的任务奖励配方.
      * 这个配方的输入是一个 NPC, 输出是一系列物品.
      */
     @JvmField
-    val CATALOG_ITEM_QUEST_RECIPE: WritableRegistry<CatalogItemQuestRecipe> = registerSimple(DynamicRegistryKeys.CATALOG_ITEM_QUEST_RECIPE)
+    val CATALOG_ITEM_QUEST_RECIPE: WritableRegistry<CatalogItemQuestNode> = registerSimple(DynamicRegistryKeys.CATALOG_ITEM_QUEST_RECIPE)
 
     /**
      * 物品图鉴中的签到奖励配方.
      * 这个配方的输入是签到事件, 输出是一系列物品.
      */
     @JvmField
-    val CATALOG_ITEM_SIGNUP_RECIPE: WritableRegistry<CatalogItemSignupRecipe> = registerSimple(DynamicRegistryKeys.CATALOG_ITEM_SIGNUP_RECIPE)
+    val CATALOG_ITEM_SIGNUP_RECIPE: WritableRegistry<CatalogItemSignupNode> = registerSimple(DynamicRegistryKeys.CATALOG_ITEM_SIGNUP_RECIPE)
 
     /**
      * 物品图鉴中的标准合成配方.
      * 这个配方的输入是一系列物品, 输出是一个物品.
      */
     @JvmField
-    val CATALOG_ITEM_STANDARD_RECIPE: WritableRegistry<CatalogItemStandardRecipe> = registerSimple(DynamicRegistryKeys.CATALOG_ITEM_STANDARD_RECIPE)
+    val CATALOG_ITEM_STANDARD_RECIPE: WritableRegistry<CatalogItemStandardNode> = registerSimple(DynamicRegistryKeys.CATALOG_ITEM_STANDARD_RECIPE)
 
     ///
 

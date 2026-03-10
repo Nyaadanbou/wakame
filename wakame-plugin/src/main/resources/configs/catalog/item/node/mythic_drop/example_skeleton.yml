@@ -1,0 +1,4 @@
+display_name: 示例骷髅
+output_items:
+  - minecraft:bone
+  - minecraft:arrow

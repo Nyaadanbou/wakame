@@ -1,0 +1,5 @@
+display_name: 建筑师每日签到
+output_items:
+  - minecraft:dirt
+  - minecraft:stone
+  - minecraft:grass_block
