@@ -27,16 +27,16 @@ internal class ItemCatalogCategoryParser<C : Any> : ArgumentParser<C, CatalogIte
 
     override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<CatalogItemCategory> {
         val peekStr = commandInput.peekString()
-        if (peekStr !in DynamicRegistries.ITEM_CATEGORY.ids.map(KoishKey::value)) {
+        if (peekStr !in DynamicRegistries.CATALOG_ITEM_CATEGORY.ids.map(KoishKey::value)) {
             return ArgumentParseResult.failure(ItemCatalogCategoryParseException(commandContext))
         }
 
         val readStr = commandInput.readString()
-        return ArgumentParseResult.success(DynamicRegistries.ITEM_CATEGORY[readStr]!!)
+        return ArgumentParseResult.success(DynamicRegistries.CATALOG_ITEM_CATEGORY[readStr]!!)
     }
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {
-        return DynamicRegistries.ITEM_CATEGORY.ids.map(KoishKey::value)
+        return DynamicRegistries.CATALOG_ITEM_CATEGORY.ids.map(KoishKey::value)
     }
 }
 

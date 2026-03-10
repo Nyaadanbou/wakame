@@ -5,25 +5,25 @@ import org.bukkit.inventory.*
 import org.bukkit.inventory.Recipe as BukkitRecipe
 
 /**
- * 标准的 [CatalogRecipe], 代表狭义上的 [物品合成配方](https://minecraft.wiki/w/Recipe).
+ * 标准的 [CatalogItemRecipe], 代表狭义上的 [物品合成配方](https://minecraft.wiki/w/Recipe).
  */
-abstract class CatalogStandardRecipe(
+abstract class CatalogItemStandardRecipe(
     private val recipe: BukkitRecipe,
-) : CatalogRecipe {
-
+) : CatalogItemRecipe {
     private val outputs: Set<ItemRef> = setOfNotNull(ItemRef.create(recipe.result))
-    override fun getLookupOutputs(): Set<ItemRef> = outputs
-    fun <T : BukkitRecipe> recipe(): T = recipe as T
 
+    override fun getLookupOutputs(): Set<ItemRef> = outputs
+    @Suppress("UNCHECKED_CAST")
+    fun <T : BukkitRecipe> recipe(): T = recipe as T
 }
 
 /**
  * 抽象的烧制配方.
  * 意在和原版一样减少一些重复代码.
  */
-abstract class CatalogCookingRecipe(
+abstract class CatalogItemCookingRecipe(
     recipe: CookingRecipe<*>,
-) : CatalogStandardRecipe(recipe) {
+) : CatalogItemStandardRecipe(recipe) {
     val cookingTime = recipe.cookingTime
     val experience = recipe.experience
 
@@ -39,68 +39,68 @@ abstract class CatalogCookingRecipe(
 }
 
 
-class CatalogBlastingRecipe(
+class CatalogItemBlastingRecipe(
     recipe: BlastingRecipe,
-) : CatalogCookingRecipe(recipe) {
-    override val type = CatalogRecipeType.BLASTING_RECIPE
+) : CatalogItemCookingRecipe(recipe) {
+    override val type = CatalogItemRecipeType.BLASTING_RECIPE
 }
 
-class CatalogCampfireRecipe(
+class CatalogItemCampfireRecipe(
     recipe: CampfireRecipe,
-) : CatalogCookingRecipe(recipe) {
-    override val type = CatalogRecipeType.CAMPFIRE_RECIPE
+) : CatalogItemCookingRecipe(recipe) {
+    override val type = CatalogItemRecipeType.CAMPFIRE_RECIPE
 }
 
-class CatalogFurnaceRecipe(
+class CatalogItemFurnaceRecipe(
     recipe: FurnaceRecipe,
-) : CatalogCookingRecipe(recipe) {
-    override val type = CatalogRecipeType.FURNACE_RECIPE
+) : CatalogItemCookingRecipe(recipe) {
+    override val type = CatalogItemRecipeType.FURNACE_RECIPE
 }
 
-class CatalogShapedRecipe(
+class CatalogItemShapedRecipe(
     recipe: ShapedRecipe,
-) : CatalogStandardRecipe(recipe) {
+) : CatalogItemStandardRecipe(recipe) {
     val shape: Array<out String> = recipe.shape
     val inputItems: Map<Char, List<ItemRef>> = recipe.choiceMap.mapValues { it.value.toItems() }
     val outputItem: ItemRef = ItemRef.create(recipe.result)
 
-    override val type = CatalogRecipeType.SHAPED_RECIPE
+    override val type = CatalogItemRecipeType.SHAPED_RECIPE
     override val sortId: String = recipe.key.value()
     override fun getLookupInputs(): Set<ItemRef> = inputItems.values.flatten().toSet()
 }
 
-class CatalogShapelessRecipe(
+class CatalogItemShapelessRecipe(
     recipe: ShapelessRecipe,
-) : CatalogStandardRecipe(recipe) {
+) : CatalogItemStandardRecipe(recipe) {
     val inputItems: List<List<ItemRef>> = recipe.choiceList.map { it.toItems() }
     val outputItems: ItemRef = ItemRef.create(recipe.result)
 
-    override val type = CatalogRecipeType.SHAPELESS_RECIPE
+    override val type = CatalogItemRecipeType.SHAPELESS_RECIPE
     override val sortId: String = recipe.key.value()
     override fun getLookupInputs(): Set<ItemRef> = inputItems.flatten().toSet()
 }
 
-class CatalogSmithingTransformRecipe(
+class CatalogItemSmithingTransformRecipe(
     recipe: SmithingTransformRecipe,
-) : CatalogStandardRecipe(recipe) {
+) : CatalogItemStandardRecipe(recipe) {
     val baseItems: List<ItemRef> = recipe.base.toItems()
     val templateItems: List<ItemRef> = recipe.template.toItems()
     val additionItems: List<ItemRef> = recipe.addition.toItems()
     val outputItemRef: ItemRef = ItemRef.create(recipe.result)
 
-    override val type = CatalogRecipeType.SMITHING_TRANSFORM_RECIPE
+    override val type = CatalogItemRecipeType.SMITHING_TRANSFORM_RECIPE
     override val sortId: String = recipe.key.value()
     override fun getLookupInputs(): Set<ItemRef> = (baseItems + templateItems + additionItems).toSet()
 }
 
-class CatalogSmithingTrimRecipe(
+class CatalogItemSmithingTrimRecipe(
     recipe: SmithingTrimRecipe,
-) : CatalogStandardRecipe(recipe) {
+) : CatalogItemStandardRecipe(recipe) {
     val baseItems: List<ItemRef> = recipe.base.toItems()
     val templateItems: List<ItemRef> = recipe.template.toItems()
     val additionItems: List<ItemRef> = recipe.addition.toItems()
 
-    override val type = CatalogRecipeType.SMITHING_TRIM_RECIPE
+    override val type = CatalogItemRecipeType.SMITHING_TRIM_RECIPE
     override val sortId: String = recipe.key.value()
     override fun getLookupInputs(): Set<ItemRef> = (baseItems + templateItems + additionItems).toSet()
 
@@ -108,20 +108,20 @@ class CatalogSmithingTrimRecipe(
     override fun getLookupOutputs(): Set<ItemRef> = emptySet()
 }
 
-class CatalogSmokingRecipe(
+class CatalogItemSmokingRecipe(
     recipe: SmokingRecipe,
-) : CatalogCookingRecipe(recipe) {
-    override val type = CatalogRecipeType.SMOKING_RECIPE
+) : CatalogItemCookingRecipe(recipe) {
+    override val type = CatalogItemRecipeType.SMOKING_RECIPE
     override val sortId: String = recipe.key.value()
 }
 
-class CatalogStonecuttingRecipe(
+class CatalogItemStonecuttingRecipe(
     recipe: StonecuttingRecipe,
-) : CatalogStandardRecipe(recipe) {
+) : CatalogItemStandardRecipe(recipe) {
     val inputItems: List<ItemRef> = recipe.inputChoice.toItems()
     val outputItem: ItemRef = ItemRef.create(recipe.result)
 
-    override val type = CatalogRecipeType.STONECUTTING_RECIPE
+    override val type = CatalogItemRecipeType.STONECUTTING_RECIPE
     override val sortId: String = recipe.key.value()
     override fun getLookupInputs(): Set<ItemRef> = inputItems.toSet()
 }

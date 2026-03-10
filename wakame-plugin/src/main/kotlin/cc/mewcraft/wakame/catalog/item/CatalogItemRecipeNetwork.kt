@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.LOGGER
@@ -24,7 +26,6 @@ object CatalogItemRecipeNetwork {
 
     @InitFun
     fun init() {
-
         // 当原版配方注册完成时 -> 重建网络
         MapEventBus.subscribe<MinecraftRecipeRegistrationDoneEvent> { rebuildNetwork() }
     }
@@ -32,7 +33,7 @@ object CatalogItemRecipeNetwork {
     /**
      * 获取特定物品的所有获取方式 (来源).
      */
-    fun getSource(node: ItemRef): Set<CatalogRecipe> {
+    fun getSource(node: ItemRef): Set<CatalogItemRecipe> {
         if (!network.nodes().contains(Optional.of(node))) return emptySet()
         return network.inEdges(Optional.of(node)).map(CatalogRecipeEdge::recipe).toSet()
     }
@@ -40,7 +41,7 @@ object CatalogItemRecipeNetwork {
     /**
      * 获取特定物品的所有可参与制作 (用途).
      */
-    fun getUsage(node: ItemRef): Set<CatalogRecipe> {
+    fun getUsage(node: ItemRef): Set<CatalogItemRecipe> {
         if (!network.nodes().contains(Optional.of(node))) return emptySet()
         return network.outEdges(Optional.of(node)).map(CatalogRecipeEdge::recipe).toSet()
     }
@@ -71,31 +72,34 @@ object CatalogItemRecipeNetwork {
         }
 
         // 战利品表配方
-        for (lootTableRecipe in DynamicRegistries.LOOT_TABLE_RECIPE) {
+        for (lootTableRecipe in DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_RECIPE) {
             network.addRecipe(lootTableRecipe)
         }
 
-        // TODO 工作站配方
+        // TODO 合成站配方
+        // TODO MythicMobs 生物掉落
+        // TODO NPC
+        // TODO 签到
+        // TODO 盲盒
 
         return ImmutableNetwork.copyOf(network)
     }
 
     /**
      * 方便函数.
-     *
-     * 返回 `null` 意味着无法转化, 即是一些图鉴不支持显示的特殊配方.
+     * 返回 `null` 意味着无法转化, 即图鉴不支持显示的特殊配方.
      */
-    private fun BukkitRecipe.toCatalogRecipe(): CatalogStandardRecipe? {
+    private fun BukkitRecipe.toCatalogRecipe(): CatalogItemStandardRecipe? {
         return when (this) {
-            is BlastingRecipe -> CatalogBlastingRecipe(this)
-            is CampfireRecipe -> CatalogCampfireRecipe(this)
-            is FurnaceRecipe -> CatalogFurnaceRecipe(this)
-            is ShapedRecipe -> CatalogShapedRecipe(this)
-            is ShapelessRecipe -> CatalogShapelessRecipe(this)
-            is SmithingTransformRecipe -> CatalogSmithingTransformRecipe(this)
-            is SmithingTrimRecipe -> CatalogSmithingTrimRecipe(this)
-            is SmokingRecipe -> CatalogSmokingRecipe(this)
-            is StonecuttingRecipe -> CatalogStonecuttingRecipe(this)
+            is BlastingRecipe -> CatalogItemBlastingRecipe(this)
+            is CampfireRecipe -> CatalogItemCampfireRecipe(this)
+            is FurnaceRecipe -> CatalogItemFurnaceRecipe(this)
+            is ShapedRecipe -> CatalogItemShapedRecipe(this)
+            is ShapelessRecipe -> CatalogItemShapelessRecipe(this)
+            is SmithingTransformRecipe -> CatalogItemSmithingTransformRecipe(this)
+            is SmithingTrimRecipe -> CatalogItemSmithingTrimRecipe(this)
+            is SmokingRecipe -> CatalogItemSmokingRecipe(this)
+            is StonecuttingRecipe -> CatalogItemStonecuttingRecipe(this)
             else -> null
         }
     }
@@ -104,14 +108,14 @@ object CatalogItemRecipeNetwork {
      * 方便函数.
      * 当配方的输入输出为空时会使用空节点占位.
      */
-    private fun MutableNetwork<Optional<ItemRef>, CatalogRecipeEdge>.addRecipe(catalogRecipe: CatalogRecipe) {
-        val lookupInputs = catalogRecipe.getLookupInputs()
-        val lookupOutputs = catalogRecipe.getLookupOutputs()
+    private fun MutableNetwork<Optional<ItemRef>, CatalogRecipeEdge>.addRecipe(catalogItemRecipe: CatalogItemRecipe) {
+        val lookupInputs = catalogItemRecipe.getLookupInputs()
+        val lookupOutputs = catalogItemRecipe.getLookupOutputs()
 
         if (lookupInputs.isEmpty()) {
             for (outputNode in lookupOutputs) {
                 addNode(Optional.of(outputNode))
-                addEdge(Optional.empty(), Optional.of(outputNode), CatalogRecipeEdge(catalogRecipe))
+                addEdge(Optional.empty(), Optional.of(outputNode), CatalogRecipeEdge(catalogItemRecipe))
             }
             return
         }
@@ -119,7 +123,7 @@ object CatalogItemRecipeNetwork {
         if (lookupOutputs.isEmpty()) {
             for (inputNode in lookupInputs) {
                 addNode(Optional.of(inputNode))
-                addEdge(Optional.of(inputNode), Optional.empty(), CatalogRecipeEdge(catalogRecipe))
+                addEdge(Optional.of(inputNode), Optional.empty(), CatalogRecipeEdge(catalogItemRecipe))
             }
             return
         }
@@ -128,15 +132,15 @@ object CatalogItemRecipeNetwork {
             for (outputNode in lookupOutputs) {
                 addNode(Optional.of(inputNode))
                 addNode(Optional.of(outputNode))
-                addEdge(Optional.of(inputNode), Optional.of(outputNode), CatalogRecipeEdge(catalogRecipe))
+                addEdge(Optional.of(inputNode), Optional.of(outputNode), CatalogRecipeEdge(catalogItemRecipe))
             }
         }
     }
 
     /**
-     * 封装一个 [CatalogRecipe] 作为 [ImmutableNetwork] 的边.
+     * 封装一个 [CatalogItemRecipe] 作为 [ImmutableNetwork] 的边.
      */
     private class CatalogRecipeEdge(
-        val recipe: CatalogRecipe,
+        val recipe: CatalogItemRecipe,
     )
 }

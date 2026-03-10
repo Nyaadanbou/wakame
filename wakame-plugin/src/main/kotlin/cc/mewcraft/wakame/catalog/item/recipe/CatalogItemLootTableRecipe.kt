@@ -42,17 +42,17 @@ data class CatalogItemLootTableRecipe(
      * 该配方在图鉴中展示时的菜单布局.
      */
     val catalogMenuSettings: BasicMenuSettings,
-) : CatalogRecipe {
+) : CatalogItemRecipe {
 
     override val type =
-        CatalogRecipeType.LOOT_TABLE_RECIPE
+        CatalogItemRecipeType.LOOT_TABLE_RECIPE
     override val sortId
         get() = lootTableId
 
     val lootItems: List<ItemRef> = flattenLootTable(lootTable).distinct().sortedBy(ItemRef::id)
 
     override fun getLookupInputs(): Set<ItemRef> {
-        return emptySet()
+        return emptySet() // 没有途径可以获取一个战利品表 (这句话很奇怪, 但符合框架逻辑)
     }
 
     override fun getLookupOutputs(): Set<ItemRef> {

@@ -1,0 +1,4 @@
+base: light
+slot_display_name: "<gold>❊ 示例类别"
+slot_display_lore:
+  - "示例类别描述"

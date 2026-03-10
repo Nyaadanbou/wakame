@@ -1,0 +1,91 @@
+# 用于配置图鉴系统中 entities 战利品表的相关设置
+
+# 更多说明参考默认配置文件 configs/catalog/item/recipe/loot_table/chests.yml
+
+menu_setting_mappings:
+  "^minecraft:entities/(?!sheep(/.*)?$).*$": loot_table_recipe_entity
+  "^minecraft:entities/sheep/white$": loot_table_recipe_entity
+input_icon_mappings:
+  # "^minecraft:entities/allay$": internal/menu/catalog/default/loot_table/entities/allay
+  # "^minecraft:entities/armadillo$": internal/menu/catalog/default/loot_table/entities/armadillo
+  # "^minecraft:entities/armor_stand$": internal/menu/catalog/default/loot_table/entities/armor_stand
+  # "^minecraft:entities/axolotl$": internal/menu/catalog/default/loot_table/entities/axolotl
+  # "^minecraft:entities/bat$": internal/menu/catalog/default/loot_table/entities/bat
+  # "^minecraft:entities/bee$": internal/menu/catalog/default/loot_table/entities/bee
+  "^minecraft:entities/blaze$": internal/menu/catalog/default/loot_table/entities/blaze
+  "^minecraft:entities/bogged$": internal/menu/catalog/default/loot_table/entities/bogged
+  "^minecraft:entities/breeze$": internal/menu/catalog/default/loot_table/entities/breeze
+  # "^minecraft:entities/camel$": internal/menu/catalog/default/loot_table/entities/camel #!
+  "^minecraft:entities/cat$": internal/menu/catalog/default/loot_table/entities/cat
+  "^minecraft:entities/cave_spider$": internal/menu/catalog/default/loot_table/entities/cave_spider
+  "^minecraft:entities/chicken$": internal/menu/catalog/default/loot_table/entities/chicken
+  "^minecraft:entities/cod$": internal/menu/catalog/default/loot_table/entities/cod
+  "^minecraft:entities/cow$": internal/menu/catalog/default/loot_table/entities/cow
+  "^minecraft:entities/creeper$": internal/menu/catalog/default/loot_table/entities/creeper
+  "^minecraft:entities/dolphin$": internal/menu/catalog/default/loot_table/entities/dolphin
+  "^minecraft:entities/donkey$": internal/menu/catalog/default/loot_table/entities/donkey
+  "^minecraft:entities/drowned$": internal/menu/catalog/default/loot_table/entities/drowned
+  "^minecraft:entities/elder_guardian$": internal/menu/catalog/default/loot_table/entities/elder_guardian
+  # "^minecraft:entities/ender_dragon$": internal/menu/catalog/default/loot_table/entities/ender_dragon
+  "^minecraft:entities/enderman$": internal/menu/catalog/default/loot_table/entities/enderman
+  # "^minecraft:entities/endermite$": internal/menu/catalog/default/loot_table/entities/endermite
+  "^minecraft:entities/evoker$": internal/menu/catalog/default/loot_table/entities/evoker
+  # "^minecraft:entities/fox$": internal/menu/catalog/default/loot_table/entities/fox #!
+  # "^minecraft:entities/frog$": internal/menu/catalog/default/loot_table/entities/frog
+  "^minecraft:entities/ghast$": internal/menu/catalog/default/loot_table/entities/ghast
+  # "^minecraft:entities/giant$": internal/menu/catalog/default/loot_table/entities/giant
+  "^minecraft:entities/glow_squid$": internal/menu/catalog/default/loot_table/entities/glow_squid
+  # "^minecraft:entities/goat$": internal/menu/catalog/default/loot_table/entities/goat #!
+  "^minecraft:entities/guardian$": internal/menu/catalog/default/loot_table/entities/guardian
+  "^minecraft:entities/hoglin$": internal/menu/catalog/default/loot_table/entities/hoglin
+  "^minecraft:entities/horse$": internal/menu/catalog/default/loot_table/entities/horse
+  "^minecraft:entities/husk$": internal/menu/catalog/default/loot_table/entities/husk
+  # "^minecraft:entities/illusioner$": internal/menu/catalog/default/loot_table/entities/illusioner
+  "^minecraft:entities/iron_golem$": internal/menu/catalog/default/loot_table/entities/iron_golem
+  "^minecraft:entities/llama$": internal/menu/catalog/default/loot_table/entities/llama
+  "^minecraft:entities/magma_cube$": internal/menu/catalog/default/loot_table/entities/magma_cube
+  "^minecraft:entities/mooshroom$": internal/menu/catalog/default/loot_table/entities/mooshroom
+  "^minecraft:entities/mule$": internal/menu/catalog/default/loot_table/entities/mule
+  # "^minecraft:entities/ocelot$": internal/menu/catalog/default/loot_table/entities/ocelot #!
+  "^minecraft:entities/panda$": internal/menu/catalog/default/loot_table/entities/panda
+  "^minecraft:entities/parrot$": internal/menu/catalog/default/loot_table/entities/parrot
+  "^minecraft:entities/phantom$": internal/menu/catalog/default/loot_table/entities/phantom
+  "^minecraft:entities/pig$": internal/menu/catalog/default/loot_table/entities/pig
+  # "^minecraft:entities/piglin_brute$": internal/menu/catalog/default/loot_table/entities/piglin_brute
+  "^minecraft:entities/pillager$": internal/menu/catalog/default/loot_table/entities/pillager
+  # "^minecraft:entities/player$": internal/menu/catalog/default/loot_table/entities/player
+  "^minecraft:entities/polar_bear$": internal/menu/catalog/default/loot_table/entities/polar_bear
+  "^minecraft:entities/pufferfish$": internal/menu/catalog/default/loot_table/entities/pufferfish
+  "^minecraft:entities/rabbit$": internal/menu/catalog/default/loot_table/entities/rabbit
+  "^minecraft:entities/ravager$": internal/menu/catalog/default/loot_table/entities/ravager
+  "^minecraft:entities/salmon$": internal/menu/catalog/default/loot_table/entities/salmon
+  "^minecraft:entities/sheep/white$": internal/menu/catalog/default/loot_table/entities/sheep
+  "^minecraft:entities/shulker$": internal/menu/catalog/default/loot_table/entities/shulker
+  # "^minecraft:entities/silverfish$": internal/menu/catalog/default/loot_table/entities/silverfish
+  "^minecraft:entities/skeleton_horse$": internal/menu/catalog/default/loot_table/entities/skeleton_horse
+  "^minecraft:entities/skeleton$": internal/menu/catalog/default/loot_table/entities/skeleton
+  "^minecraft:entities/slime$": internal/menu/catalog/default/loot_table/entities/slime
+  # "^minecraft:entities/sniffer$": internal/menu/catalog/default/loot_table/entities/sniffer
+  "^minecraft:entities/snow_golem$": internal/menu/catalog/default/loot_table/entities/snow_golem
+  "^minecraft:entities/spider$": internal/menu/catalog/default/loot_table/entities/spider
+  "^minecraft:entities/squid$": internal/menu/catalog/default/loot_table/entities/squid
+  "^minecraft:entities/stray$": internal/menu/catalog/default/loot_table/entities/stray
+  "^minecraft:entities/strider$": internal/menu/catalog/default/loot_table/entities/strider
+  # "^minecraft:entities/tadpole$": internal/menu/catalog/default/loot_table/entities/tadpole
+  "^minecraft:entities/trader_llama$": internal/menu/catalog/default/loot_table/entities/trader_llama
+  "^minecraft:entities/tropical_fish$": internal/menu/catalog/default/loot_table/entities/tropical_fish
+  "^minecraft:entities/turtle$": internal/menu/catalog/default/loot_table/entities/turtle
+  # "^minecraft:entities/vex$": internal/menu/catalog/default/loot_table/entities/vex
+  # "^minecraft:entities/villager$": internal/menu/catalog/default/loot_table/entities/villager
+  "^minecraft:entities/vindicator$": internal/menu/catalog/default/loot_table/entities/vindicator
+  # "^minecraft:entities/wandering_trader$": internal/menu/catalog/default/loot_table/entities/wandering_trader
+  "^minecraft:entities/warden$": internal/menu/catalog/default/loot_table/entities/warden
+  "^minecraft:entities/witch$": internal/menu/catalog/default/loot_table/entities/witch
+  "^minecraft:entities/wither_skeleton$": internal/menu/catalog/default/loot_table/entities/wither_skeleton
+  # "^minecraft:entities/wither$": internal/menu/catalog/default/loot_table/entities/wither #!
+  # "^minecraft:entities/wolf$": internal/menu/catalog/default/loot_table/entities/wolf #!
+  "^minecraft:entities/zoglin$": internal/menu/catalog/default/loot_table/entities/zoglin
+  # "^minecraft:entities/zombie_horse$": internal/menu/catalog/default/loot_table/entities/zombie_horse 有战利品表但生存遇不到
+  "^minecraft:entities/zombie_villager$": internal/menu/catalog/default/loot_table/entities/zombie_villager
+  "^minecraft:entities/zombie$": internal/menu/catalog/default/loot_table/entities/zombie
+  "^minecraft:entities/zombified_piglin$": internal/menu/catalog/default/loot_table/entities/zombified_piglin

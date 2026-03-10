@@ -9,13 +9,11 @@ import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.KoishKeys
 import net.kyori.adventure.key.Key
-import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
 import xyz.xenondevs.invui.gui.structure.Marker
 import xyz.xenondevs.invui.gui.structure.Markers
-import java.lang.reflect.Type
 
 /**
  * 物品图鉴中展示的一个物品类别.
@@ -32,39 +30,34 @@ data class CatalogItemCategory(
         HORIZONTAL,
         VERTICAL,
     }
-}
 
-/**
- * [CatalogItemCategory] 的序列化器.
- */
-internal object CategorySerializer : SimpleSerializer<CatalogItemCategory> {
+    companion object {
+        fun serializer(): SimpleSerializer<CatalogItemCategory> = SimpleSerializer { _, node ->
+            val id = node.hint(RepresentationHints.CATAGORY_ID) ?: throw SerializationException(
+                "The hint ${RepresentationHints.CATAGORY_ID.identifier()} is not present"
+            )
 
-    override fun deserialize(type: Type, node: ConfigurationNode): CatalogItemCategory {
-        val id = node.hint(RepresentationHints.CATAGORY_ID) ?: throw SerializationException(
-            "The hint ${RepresentationHints.CATAGORY_ID.identifier()} is not present"
-        )
-
-        val icon = node.node("icon").require<Key>()
-        val permission = node.node("permission").get<String>()
-        val settings = node.node("menu_settings").require<BasicMenuSettings>()
-        val contentMarker = when (node.node("content_marker").get<CatalogItemCategory.ContentMarker>(CatalogItemCategory.ContentMarker.HORIZONTAL)) {
-            CatalogItemCategory.ContentMarker.HORIZONTAL -> Markers.CONTENT_LIST_SLOT_HORIZONTAL
-            CatalogItemCategory.ContentMarker.VERTICAL -> Markers.CONTENT_LIST_SLOT_VERTICAL
-        }
-
-        // val itemIds = node.node("items").getList<ItemX>(emptyList())
-        // 不像上面这样写的原因: 若列表中的某个 id 有问题, 将跳过这个 id 而不是抛异常
-        val itemIds = node.node("items").getList<String>(emptyList())
-        val itemList = mutableListOf<ItemRef>()
-        for (itemId in itemIds) {
-            val item = ItemRef.create(KoishKeys.of(itemId))
-            if (item == null) {
-                LOGGER.warn("Cannot deserialize string '$itemId' into ItemRef, skipped adding it to category: '$itemId'")
-                continue
+            val icon = node.node("icon").require<Key>()
+            val permission = node.node("permission").get<String>()
+            val settings = node.node("menu_settings").require<BasicMenuSettings>()
+            val contentMarker = when (node.node("content_marker").get<ContentMarker>(ContentMarker.HORIZONTAL)) {
+                ContentMarker.HORIZONTAL -> Markers.CONTENT_LIST_SLOT_HORIZONTAL
+                ContentMarker.VERTICAL -> Markers.CONTENT_LIST_SLOT_VERTICAL
             }
-            itemList.add(item)
+
+            // val itemIds = node.node("items").getList<ItemRef>(emptyList())
+            // 不像上面这样写的原因: 若列表中的某个 id 有问题, 将跳过这个 id 而不是抛异常
+            val itemIds = node.node("items").getList<String>(emptyList())
+            val itemRefs = mutableListOf<ItemRef>()
+            for (itemId in itemIds) {
+                val itemRef = ItemRef.create(KoishKeys.of(itemId))
+                if (itemRef == null) {
+                    LOGGER.warn("Cannot deserialize string '$itemId' into ItemRef, skipped adding it to category: '$itemId'")
+                    continue
+                }
+                itemRefs.add(itemRef)
+            }
+            CatalogItemCategory(id, icon, settings, contentMarker, permission, itemRefs)
         }
-        return CatalogItemCategory(id, icon, settings, contentMarker, permission, itemList)
     }
 }
-

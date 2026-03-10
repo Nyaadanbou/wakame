@@ -1,4 +1,4 @@
-base: shulker_shell
+base: paper
 slot_display_name: "<!i>操作说明"
 slot_display_lore:
   - "<gray>[直接点击]    物品: 查询获取途径"

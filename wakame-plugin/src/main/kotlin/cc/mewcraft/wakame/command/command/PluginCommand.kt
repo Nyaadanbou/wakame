@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.command.command
 
 import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.wakame.api.event.KoishLoadDataEvent
-import cc.mewcraft.wakame.catalog.item.CatalogItemCategoryRegistryLoader
-import cc.mewcraft.wakame.catalog.item.CatalogItemLootTableRecipeRegistryLoader
+import cc.mewcraft.wakame.catalog.item.CatalogItemCategoryInitializer
+import cc.mewcraft.wakame.catalog.item.CatalogItemLootTableRecipeInitializer
 import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
@@ -20,11 +20,7 @@ import cc.mewcraft.wakame.entity.typeref.EntityRefRegistryLoader
 import cc.mewcraft.wakame.gui.BasicGuiInitializer
 import cc.mewcraft.wakame.gui.catalog.item.CatalogItemMenuStacks
 import cc.mewcraft.wakame.init.RecipeInitializer
-import cc.mewcraft.wakame.item.CustomItemRegistryLoader
-import cc.mewcraft.wakame.item.ItemProxyRegistryLoader
-import cc.mewcraft.wakame.item.KoishStackGenerator
-import cc.mewcraft.wakame.item.KoishTagManager
-import cc.mewcraft.wakame.item.SlotDisplay
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.display.implementation.crafting_station.CraftingStationItemRenderer
 import cc.mewcraft.wakame.item.display.implementation.merging_table.MergingTableItemRenderer
 import cc.mewcraft.wakame.item.display.implementation.repairing_table.RepairingTableItemRenderer
@@ -139,8 +135,8 @@ private object ReloadProcess {
         CraftingStationItemRenderer.reload()
 
         CatalogItemMenuSettings.reload()
-        CatalogItemLootTableRecipeRegistryLoader.reload()
-        CatalogItemCategoryRegistryLoader.reload()
+        CatalogItemLootTableRecipeInitializer.reload()
+        CatalogItemCategoryInitializer.reload()
         CatalogItemMenuStacks.clearStacks()
 
         AttackCharacteristicDamageMappings.reload()

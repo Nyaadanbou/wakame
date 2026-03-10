@@ -29,52 +29,52 @@ import xyz.xenondevs.invui.window.AbstractWindow
 import java.text.DecimalFormat
 
 /**
- * 用于创建 [CatalogRecipe] 在图鉴中展示的 [Gui].
+ * 用于创建 [CatalogItemRecipe] 在图鉴中展示的 [Gui].
  *
  * 设计这个单例是为了前后端代码分离.
  */
 internal object CatalogRecipeGuiManager {
 
-    private val GUI_CREATORS: HashMap<Class<out CatalogRecipe>, (CatalogRecipe) -> CatalogRecipeGui> = HashMap()
+    private val GUI_CREATORS: HashMap<Class<out CatalogItemRecipe>, (CatalogItemRecipe) -> CatalogRecipeGui> = HashMap()
 
     /**
-     * [CatalogRecipe] 的 [Gui] 在图鉴展示时的优先级, 数字小的类型将被排在前面.
+     * [CatalogItemRecipe] 的 [Gui] 在图鉴展示时的优先级, 数字小的类型将被排在前面.
      */
-    private val GUI_PRIORITIES: HashMap<Class<out CatalogRecipe>, Int> = HashMap()
+    private val GUI_PRIORITIES: HashMap<Class<out CatalogItemRecipe>, Int> = HashMap()
 
     private val CACHED_GUIS: HashMap<LookupKey, List<CatalogRecipeGui>> by ReloadableProperty { HashMap(1024) }
 
     private data class LookupKey(val item: ItemRef, val state: LookupState)
 
     init {
-        registerGuiCreator<CatalogBlastingRecipe>(::createCookingRecipeGui)
-        registerGuiCreator<CatalogCampfireRecipe>(::createCookingRecipeGui)
-        registerGuiCreator<CatalogFurnaceRecipe>(::createCookingRecipeGui)
-        registerGuiCreator<CatalogShapedRecipe>(::createShapedRecipeGui)
-        registerGuiCreator<CatalogShapelessRecipe>(::createShapelessRecipeGui)
-        registerGuiCreator<CatalogSmithingTransformRecipe>(::createSmithingTransformRecipeGui)
-        registerGuiCreator<CatalogSmithingTrimRecipe>(::createSmithingTrimRecipeGui)
-        registerGuiCreator<CatalogSmokingRecipe>(::createCookingRecipeGui)
-        registerGuiCreator<CatalogStonecuttingRecipe>(::createStonecuttingRecipeGui)
+        registerGuiCreator<CatalogItemBlastingRecipe>(::createCookingRecipeGui)
+        registerGuiCreator<CatalogItemCampfireRecipe>(::createCookingRecipeGui)
+        registerGuiCreator<CatalogItemFurnaceRecipe>(::createCookingRecipeGui)
+        registerGuiCreator<CatalogItemShapedRecipe>(::createShapedRecipeGui)
+        registerGuiCreator<CatalogItemShapelessRecipe>(::createShapelessRecipeGui)
+        registerGuiCreator<CatalogItemSmithingTransformRecipe>(::createSmithingTransformRecipeGui)
+        registerGuiCreator<CatalogItemSmithingTrimRecipe>(::createSmithingTrimRecipeGui)
+        registerGuiCreator<CatalogItemSmokingRecipe>(::createCookingRecipeGui)
+        registerGuiCreator<CatalogItemStonecuttingRecipe>(::createStonecuttingRecipeGui)
         registerGuiCreator<CatalogItemLootTableRecipe>(::createLootTableRecipeGui)
 
         // TODO 支持配置文件载入优先级
-        registerGuiPriority<CatalogBlastingRecipe>(500)
-        registerGuiPriority<CatalogCampfireRecipe>(600)
-        registerGuiPriority<CatalogFurnaceRecipe>(300)
-        registerGuiPriority<CatalogShapedRecipe>(100)
-        registerGuiPriority<CatalogShapelessRecipe>(200)
-        registerGuiPriority<CatalogSmithingTransformRecipe>(700)
-        registerGuiPriority<CatalogSmithingTrimRecipe>(800)
-        registerGuiPriority<CatalogSmokingRecipe>(400)
-        registerGuiPriority<CatalogStonecuttingRecipe>(900)
+        registerGuiPriority<CatalogItemBlastingRecipe>(500)
+        registerGuiPriority<CatalogItemCampfireRecipe>(600)
+        registerGuiPriority<CatalogItemFurnaceRecipe>(300)
+        registerGuiPriority<CatalogItemShapedRecipe>(100)
+        registerGuiPriority<CatalogItemShapelessRecipe>(200)
+        registerGuiPriority<CatalogItemSmithingTransformRecipe>(700)
+        registerGuiPriority<CatalogItemSmithingTrimRecipe>(800)
+        registerGuiPriority<CatalogItemSmokingRecipe>(400)
+        registerGuiPriority<CatalogItemStonecuttingRecipe>(900)
     }
 
-    private inline fun <reified T : CatalogRecipe> registerGuiCreator(noinline factory: (T) -> CatalogRecipeGui) {
+    private inline fun <reified T : CatalogItemRecipe> registerGuiCreator(noinline factory: (T) -> CatalogRecipeGui) {
         GUI_CREATORS[T::class.java] = { recipe -> factory(recipe as T) }
     }
 
-    private inline fun <reified T : CatalogRecipe> registerGuiPriority(priority: Int) {
+    private inline fun <reified T : CatalogItemRecipe> registerGuiPriority(priority: Int) {
         GUI_PRIORITIES[T::class.java] = priority
     }
 
@@ -90,7 +90,7 @@ internal object CatalogRecipeGuiManager {
             // 先基于类型优先级排序
             // 再基于唯一标识按字典序排序
             catalogRecipes.sortedWith(
-                compareBy<CatalogRecipe> { it.type.sortPriority }.thenBy { it.sortId }
+                compareBy<CatalogItemRecipe> { it.type.sortPriority }.thenBy { it.sortId }
             ).mapNotNull { catalogRecipe ->
                 buildGui(catalogRecipe) ?: return@mapNotNull null
             }
@@ -98,11 +98,11 @@ internal object CatalogRecipeGuiManager {
     }
 
     /**
-     * 创建 [CatalogRecipe] 在图鉴中展示的 [CatalogRecipeGui].
+     * 创建 [CatalogItemRecipe] 在图鉴中展示的 [CatalogRecipeGui].
      *
-     * 返回 `null` 意味着 [CatalogRecipe] 可被图鉴检索, 但代码没有指定对应 [CatalogRecipeGui] 创建方法.
+     * 返回 `null` 意味着 [CatalogItemRecipe] 可被图鉴检索, 但代码没有指定对应 [CatalogRecipeGui] 创建方法.
      */
-    private fun buildGui(recipe: CatalogRecipe): CatalogRecipeGui? {
+    private fun buildGui(recipe: CatalogItemRecipe): CatalogRecipeGui? {
         return GUI_CREATORS[recipe::class.java]?.invoke(recipe).also {
             if (it == null) LOGGER.warn("No gui creator for ${recipe::class.java}")
         }
@@ -111,14 +111,14 @@ internal object CatalogRecipeGuiManager {
     /**
      * 方便函数.
      */
-    private val CatalogStandardRecipe.menuSettings: BasicMenuSettings
+    private val CatalogItemStandardRecipe.menuSettings: BasicMenuSettings
         get() = CatalogItemMenuSettings.getMenuSettings(this.type.name)
 
     /**
      * 创建烧制配方 [CatalogRecipeGui] 的方法.
      * 烧制配方包括: 熔炉, 高炉, 烟熏炉, 营火配方.
      */
-    private fun createCookingRecipeGui(catalogRecipe: CatalogCookingRecipe): CatalogRecipeGui {
+    private fun createCookingRecipeGui(catalogRecipe: CatalogItemCookingRecipe): CatalogRecipeGui {
         val settings = catalogRecipe.menuSettings
         val gui = Gui.normal { builder ->
             builder.setStructure(*settings.structure)
@@ -135,7 +135,7 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建有序合成配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createShapedRecipeGui(catalogRecipe: CatalogShapedRecipe): CatalogRecipeGui {
+    private fun createShapedRecipeGui(catalogRecipe: CatalogItemShapedRecipe): CatalogRecipeGui {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
@@ -163,7 +163,7 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建无序合成配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createShapelessRecipeGui(catalogRecipe: CatalogShapelessRecipe): CatalogRecipeGui {
+    private fun createShapelessRecipeGui(catalogRecipe: CatalogItemShapelessRecipe): CatalogRecipeGui {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
@@ -179,7 +179,7 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建锻造台转化配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createSmithingTransformRecipeGui(catalogRecipe: CatalogSmithingTransformRecipe): CatalogRecipeGui {
+    private fun createSmithingTransformRecipeGui(catalogRecipe: CatalogItemSmithingTransformRecipe): CatalogRecipeGui {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
@@ -196,7 +196,7 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建锻造台纹饰配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createSmithingTrimRecipeGui(catalogRecipe: CatalogSmithingTrimRecipe): CatalogRecipeGui {
+    private fun createSmithingTrimRecipeGui(catalogRecipe: CatalogItemSmithingTrimRecipe): CatalogRecipeGui {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
@@ -214,7 +214,7 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建切石机配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createStonecuttingRecipeGui(catalogRecipe: CatalogStonecuttingRecipe): CatalogRecipeGui {
+    private fun createStonecuttingRecipeGui(catalogRecipe: CatalogItemStonecuttingRecipe): CatalogRecipeGui {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)

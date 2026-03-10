@@ -64,7 +64,7 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     .register(BuiltInRegistries.ATTRIBUTE.holderByNameTypeSerializer())
     .register(BuiltInRegistries.ELEMENT.holderByNameTypeSerializer())
     .register(BuiltInRegistries.ENTITY_REF.holderByNameTypeSerializer())
-    .register(DynamicRegistries.ITEM_CATEGORY.holderByNameTypeSerializer())
+    .register(DynamicRegistries.CATALOG_ITEM_CATEGORY.holderByNameTypeSerializer())
     .register(BuiltInRegistries.KIZAMI.holderByNameTypeSerializer())
     .register(BuiltInRegistries.LEVEL_TO_RARITY_MAPPING.holderByNameTypeSerializer())
     .register(BuiltInRegistries.RARITY.holderByNameTypeSerializer())

@@ -53,7 +53,6 @@ internal class CatalogItemCategoryMenu(
         builder.addIngredient('>', NextItem())
         builder.addIngredient('b', BackItem())
         builder.addIngredient('x', category.contentMarker)
-        // TODO 可以缓存, 只有重载时会变化
         // 类别菜单所展示的物品
         builder.setContent(category.items.map { itemRef -> DisplayItem(itemRef) })
     }

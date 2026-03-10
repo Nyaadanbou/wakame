@@ -1,0 +1,4 @@
+base: shulker_shell
+clientbound/item_model: minecraft:chest
+slot_display_name: "<!i><gold>堡垒遗迹"
+slot_display_lore: "<!i><gray>藏宝室"

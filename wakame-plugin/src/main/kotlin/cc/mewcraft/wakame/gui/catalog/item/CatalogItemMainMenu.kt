@@ -60,8 +60,7 @@ class CatalogItemMainMenu(
         builder.addIngredient('s', SearchItem())
         builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         // 对 CategoryItem 进行缓存
-        // TODO 权限检查代码美化
-        builder.setContent(DynamicRegistries.ITEM_CATEGORY.filter { category ->
+        builder.setContent(DynamicRegistries.CATALOG_ITEM_CATEGORY.filter { category ->
             val permission = category.permission ?: return@filter true
             val world = viewer.world
             val player = viewer.uniqueId
