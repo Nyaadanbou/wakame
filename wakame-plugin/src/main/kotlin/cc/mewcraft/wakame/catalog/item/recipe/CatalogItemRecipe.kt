@@ -28,7 +28,6 @@ interface CatalogItemRecipe {
      * 只会在网络构建时被调用一次.
      */
     fun getLookupOutputs(): Set<ItemRef>
-
 }
 
 data class CatalogItemRecipeType(

@@ -3,7 +3,7 @@
 package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.catalog.item.recipe.*
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemRecipe
 import cc.mewcraft.wakame.event.map.MinecraftRecipeRegistrationDoneEvent
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -14,20 +14,19 @@ import cc.mewcraft.wakame.util.eventbus.MapEventBus
 import com.google.common.graph.ImmutableNetwork
 import com.google.common.graph.MutableNetwork
 import com.google.common.graph.NetworkBuilder
-import org.bukkit.Bukkit
-import org.bukkit.inventory.*
 import java.util.*
-import org.bukkit.inventory.Recipe as BukkitRecipe
 
 @Init(InitStage.POST_WORLD)
 object CatalogItemRecipeNetwork {
-
     private lateinit var network: ImmutableNetwork<Optional<ItemRef>, CatalogRecipeEdge>
 
     @InitFun
     fun init() {
-        // 当原版配方注册完成时 -> 重建网络
-        MapEventBus.subscribe<MinecraftRecipeRegistrationDoneEvent> { rebuildNetwork() }
+        MapEventBus.subscribe<MinecraftRecipeRegistrationDoneEvent> {
+            // 当原版配方注册完成时 -> 重建图鉴物品网络
+            // 改进的地方 2026/03/10: 比这更好的时机?
+            rebuildNetwork()
+        }
     }
 
     /**
@@ -46,62 +45,72 @@ object CatalogItemRecipeNetwork {
         return network.outEdges(Optional.of(node)).map(CatalogRecipeEdge::recipe).toSet()
     }
 
-    private fun rebuildNetwork() {
+    /**
+     * 重建"来源&用途"网络.
+     */
+    fun rebuildNetwork() {
+        CatalogItemCraftingStationRecipeInitializer.reload()
+        CatalogItemCrateRecipeInitializer.reload()
+        CatalogItemLootTableRecipeInitializer.reload()
+        CatalogItemMythicDropRecipeInitializer.reload()
+        CatalogItemQuestRecipeInitializer.reload()
+        CatalogItemSignupRecipeInitializer.reload()
+        CatalogItemStandardRecipeInitializer.reload()
+
         network = buildNetWork()
     }
 
     private fun buildNetWork(): ImmutableNetwork<Optional<ItemRef>, CatalogRecipeEdge> {
-        LOGGER.info("Building catalog recipe network")
+        LOGGER.info("Building catalog item recipe network")
+
         // 自循环和平行边都是需要的, 举例说明:
         // 自循环: 锻造模板复制有序合成配方(模板+钻石等->模板*2)
         // 平行边: 淡灰色染料无序合成配方(白色染料+灰色染料->淡灰色染料*2 白色染料*2+黑色染料->灰色染料*3)
-        val network: MutableNetwork<Optional<ItemRef>, CatalogRecipeEdge> = NetworkBuilder
+        val network = NetworkBuilder
             .directed()
             .allowsSelfLoops(true)
             .allowsParallelEdges(true)
-            .build()
+            .build<Optional<ItemRef>, CatalogRecipeEdge>()
 
         // 添加起占位作用的空节点
         network.addNode(Optional.empty())
 
-        // 原版配方
-        for (bukkitRecipe in Bukkit.recipeIterator()) {
-            // 为空意味着是图鉴无法显示的原版特殊配方, 直接跳过
-            val catalogBukkitRecipe = bukkitRecipe.toCatalogRecipe() ?: continue
-            network.addRecipe(catalogBukkitRecipe)
+        // 合成站
+        for (craftingStationRecipe in DynamicRegistries.CATALOG_ITEM_CRAFTING_STATION_RECIPE) {
+            network.addRecipe(craftingStationRecipe)
         }
 
-        // 战利品表配方
+        // 盲盒
+        for (crateRecipe in DynamicRegistries.CATALOG_ITEM_CRATE_RECIPE) {
+            network.addRecipe(crateRecipe)
+        }
+
+        // 原版战利品表
         for (lootTableRecipe in DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_RECIPE) {
             network.addRecipe(lootTableRecipe)
         }
 
-        // TODO 合成站配方
-        // TODO MythicMobs 生物掉落
-        // TODO NPC
-        // TODO 签到
-        // TODO 盲盒
+        // MythicMobs 生物掉落
+        for (mythicDropRecipe in DynamicRegistries.CATALOG_ITEM_MYTHIC_DROP_RECIPE) {
+            network.addRecipe(mythicDropRecipe)
+        }
+
+        // NPC 任务奖励
+        for (questRecipe in DynamicRegistries.CATALOG_ITEM_QUEST_RECIPE) {
+            network.addRecipe(questRecipe)
+        }
+
+        // 签到奖励
+        for (signupRecipe in DynamicRegistries.CATALOG_ITEM_SIGNUP_RECIPE) {
+            network.addRecipe(signupRecipe)
+        }
+
+        // 原版合成配方
+        for (standardRecipe in DynamicRegistries.CATALOG_ITEM_STANDARD_RECIPE) {
+            network.addRecipe(standardRecipe)
+        }
 
         return ImmutableNetwork.copyOf(network)
-    }
-
-    /**
-     * 方便函数.
-     * 返回 `null` 意味着无法转化, 即图鉴不支持显示的特殊配方.
-     */
-    private fun BukkitRecipe.toCatalogRecipe(): CatalogItemStandardRecipe? {
-        return when (this) {
-            is BlastingRecipe -> CatalogItemBlastingRecipe(this)
-            is CampfireRecipe -> CatalogItemCampfireRecipe(this)
-            is FurnaceRecipe -> CatalogItemFurnaceRecipe(this)
-            is ShapedRecipe -> CatalogItemShapedRecipe(this)
-            is ShapelessRecipe -> CatalogItemShapelessRecipe(this)
-            is SmithingTransformRecipe -> CatalogItemSmithingTransformRecipe(this)
-            is SmithingTrimRecipe -> CatalogItemSmithingTrimRecipe(this)
-            is SmokingRecipe -> CatalogItemSmokingRecipe(this)
-            is StonecuttingRecipe -> CatalogItemStonecuttingRecipe(this)
-            else -> null
-        }
     }
 
     /**
@@ -111,7 +120,6 @@ object CatalogItemRecipeNetwork {
     private fun MutableNetwork<Optional<ItemRef>, CatalogRecipeEdge>.addRecipe(catalogItemRecipe: CatalogItemRecipe) {
         val lookupInputs = catalogItemRecipe.getLookupInputs()
         val lookupOutputs = catalogItemRecipe.getLookupOutputs()
-
         if (lookupInputs.isEmpty()) {
             for (outputNode in lookupOutputs) {
                 addNode(Optional.of(outputNode))
@@ -119,7 +127,6 @@ object CatalogItemRecipeNetwork {
             }
             return
         }
-
         if (lookupOutputs.isEmpty()) {
             for (inputNode in lookupInputs) {
                 addNode(Optional.of(inputNode))
@@ -127,7 +134,6 @@ object CatalogItemRecipeNetwork {
             }
             return
         }
-
         for (inputNode in lookupInputs) {
             for (outputNode in lookupOutputs) {
                 addNode(Optional.of(inputNode))

@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.command.command
 import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.wakame.api.event.KoishLoadDataEvent
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategoryInitializer
-import cc.mewcraft.wakame.catalog.item.CatalogItemLootTableRecipeInitializer
 import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
+import cc.mewcraft.wakame.catalog.item.CatalogItemRecipeNetwork
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
@@ -43,7 +43,6 @@ import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.paper.util.sender.Source
 import org.incendo.cloud.parser.standard.EnumParser
 import kotlin.system.measureTimeMillis
-
 
 // TODO 在 #439 后续的 PR 中慢慢完善此指令
 
@@ -134,17 +133,18 @@ private object ReloadProcess {
         RepairingTableItemRenderer.reload()
         CraftingStationItemRenderer.reload()
 
-        CatalogItemMenuSettings.reload()
-        CatalogItemLootTableRecipeInitializer.reload()
-        CatalogItemCategoryInitializer.reload()
-        CatalogItemMenuStacks.clearStacks()
-
         AttackCharacteristicDamageMappings.reload()
         DamageTypeDamageMappings.reload()
         NullCausingDamageMappings.reload()
         PlayerAdhocDamageMappings.reload()
 
         ResourcePackLifecycle.reload()
+
+        // 图鉴是游戏内容的汇总, 所以永远放在最后重新加载
+        CatalogItemRecipeNetwork.rebuildNetwork()
+        CatalogItemCategoryInitializer.reload()
+        CatalogItemMenuSettings.reload()
+        CatalogItemMenuStacks.clearStacks()
 
         //
 

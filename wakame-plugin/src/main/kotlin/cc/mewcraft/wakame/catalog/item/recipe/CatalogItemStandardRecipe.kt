@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.catalog.item.recipe
 
 import cc.mewcraft.wakame.item.ItemRef
+import cc.mewcraft.wakame.util.KoishKey
+import org.bukkit.Keyed
 import org.bukkit.inventory.*
 import org.bukkit.inventory.Recipe as BukkitRecipe
 
@@ -10,6 +12,11 @@ import org.bukkit.inventory.Recipe as BukkitRecipe
 abstract class CatalogItemStandardRecipe(
     private val recipe: BukkitRecipe,
 ) : CatalogItemRecipe {
+    /**
+     * 该配方在注册表中的唯一标识.
+     */
+    val recipeId: KoishKey = (recipe as Keyed).key()
+
     private val outputs: Set<ItemRef> = setOfNotNull(ItemRef.create(recipe.result))
 
     override fun getLookupOutputs(): Set<ItemRef> = outputs
