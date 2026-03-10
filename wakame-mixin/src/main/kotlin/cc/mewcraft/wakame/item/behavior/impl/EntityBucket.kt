@@ -62,7 +62,7 @@ object EntityBucket : ItemBehavior {
 
         val entityData = itemstack.getData(ItemDataTypes.ENTITY_BUCKET_DATA) ?: return InteractionResult.FAIL
         val deserializedEntity = Bukkit.getUnsafe().deserializeEntity(entityData, player.world)
-        val successfullySpawned = deserializedEntity.spawnAt(context.blockLocation.add(.0, 1.0, .0), CreatureSpawnEvent.SpawnReason.BUCKET)
+        val successfullySpawned = deserializedEntity.spawnAt(context.blockLocation.toCenterLocation().add(.0, .5, .0), CreatureSpawnEvent.SpawnReason.BUCKET)
 
         if (!successfullySpawned) {
             player.sendMessage(TranslatableMessages.MSG_ERR_CANNOT_SPAWN_ENTITY_HERE)
