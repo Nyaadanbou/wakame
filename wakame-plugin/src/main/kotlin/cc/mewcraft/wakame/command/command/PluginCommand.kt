@@ -4,7 +4,7 @@ import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.wakame.api.event.KoishLoadDataEvent
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategoryInitializer
 import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
-import cc.mewcraft.wakame.catalog.item.CatalogItemRecipeNetwork
+import cc.mewcraft.wakame.catalog.item.CatalogItemNetwork
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
@@ -141,7 +141,7 @@ private object ReloadProcess {
         ResourcePackLifecycle.reload()
 
         // 图鉴是游戏内容的汇总, 所以永远放在最后重新加载
-        CatalogItemRecipeNetwork.rebuildNetwork()
+        CatalogItemNetwork.rebuildNetwork()
         CatalogItemCategoryInitializer.reload()
         CatalogItemMenuSettings.reload()
         CatalogItemMenuStacks.clearStacks()

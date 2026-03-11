@@ -150,14 +150,14 @@ internal class CatalogItemCategoryMenu(
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            // 类别菜单无需判定是否套娃, 因为肯定是第一次对配方进行索引
+            // 类别菜单无需判定是否套娃, 因为肯定是第一次对节点进行索引
             val state = when (clickType) {
                 ClickType.LEFT, ClickType.RIGHT -> LookupState.SOURCE
                 ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> LookupState.USAGE
                 else -> return
             }
             // 要打开的菜单Gui列表为空，则不打开
-            val guis = CatalogRecipeGuiManager.getGui(item, state)
+            val guis = CatalogItemNodeGuiManager.getGui(item, state)
             if (guis.isEmpty()) return
 
             CatalogItemMenuStacks.push(viewer, CatalogItemFocusMenu(item, state, viewer, guis))

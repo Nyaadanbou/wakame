@@ -15,13 +15,13 @@ import org.bukkit.inventory.Recipe as BukkitRecipe
 @Init(
     stage = InitStage.POST_WORLD,
 )
-internal object CatalogItemStandardNodeInitializer : RegistryLoader {
+internal object CatalogItemRecipeNodeInitializer : RegistryLoader {
 
     @InitFun
     fun init() {
         DynamicRegistries.CATALOG_ITEM_STANDARD_RECIPE.resetRegistry()
         applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_STANDARD_RECIPE::add)
-        DynamicRegistries.CATALOG_ITEM_STANDARD_RECIPE.freeze()
+        //DynamicRegistries.CATALOG_ITEM_STANDARD_RECIPE.freeze()
     }
 
     fun reload() {

@@ -35,9 +35,9 @@ internal class CatalogItemFocusMenu(
      */
     val viewer: Player,
     /**
-     * 该菜单中的各页配方 [Gui].
+     * 该菜单中的各页节点 [Gui].
      */
-    val guis: List<CatalogRecipeGui>,
+    val guis: List<CatalogItemNodeGui>,
 ) : CatalogItemMenu {
 
     /**
@@ -48,7 +48,7 @@ internal class CatalogItemFocusMenu(
     /**
      * 菜单的 [PagedGui].
      *
-     * - `x`: catalog_recipe_gui
+     * - `x`: catalog_node_gui
      * - `.`: background
      * - `<`: prev_page
      * - `>`: next_page

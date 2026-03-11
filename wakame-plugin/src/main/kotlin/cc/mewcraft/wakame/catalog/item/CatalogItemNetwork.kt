@@ -17,7 +17,7 @@ import com.google.common.graph.NetworkBuilder
 import java.util.*
 
 @Init(InitStage.POST_WORLD)
-object CatalogItemRecipeNetwork {
+object CatalogItemNetwork {
     private lateinit var network: ImmutableNetwork<Optional<ItemRef>, CatalogRecipeEdge>
 
     @InitFun
@@ -55,7 +55,7 @@ object CatalogItemRecipeNetwork {
         CatalogItemMythicDropNodeInitializer.reload()
         CatalogItemQuestNodeInitializer.reload()
         CatalogItemSignupNodeInitializer.reload()
-        CatalogItemStandardNodeInitializer.reload()
+        CatalogItemRecipeNodeInitializer.reload()
 
         network = buildNetWork()
     }

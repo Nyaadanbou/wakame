@@ -39,7 +39,7 @@ internal object CatalogItemLootTableNodeInitializer : RegistryLoader {
         reloadMinecraftLootTables()
         DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_RECIPE.resetRegistry()
         applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_RECIPE::add)
-        DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_RECIPE.freeze()
+        //DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_RECIPE.freeze()
     }
 
     fun reload() {

@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.gui.catalog.item
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
-import cc.mewcraft.wakame.catalog.item.CatalogItemRecipeNetwork
+import cc.mewcraft.wakame.catalog.item.CatalogItemNetwork
 import cc.mewcraft.wakame.catalog.item.node.*
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.ItemRef
@@ -33,16 +33,16 @@ import java.text.DecimalFormat
  *
  * 设计这个单例是为了前后端代码分离.
  */
-internal object CatalogRecipeGuiManager {
+internal object CatalogItemNodeGuiManager {
 
-    private val GUI_CREATORS: HashMap<Class<out CatalogItemNode>, (CatalogItemNode) -> CatalogRecipeGui> = HashMap()
+    private val GUI_CREATORS: HashMap<Class<out CatalogItemNode>, (CatalogItemNode) -> CatalogItemNodeGui> = HashMap()
 
     /**
      * [CatalogItemNode] 的 [Gui] 在图鉴展示时的优先级, 数字小的类型将被排在前面.
      */
     private val GUI_PRIORITIES: HashMap<Class<out CatalogItemNode>, Int> = HashMap()
 
-    private val CACHED_GUIS: HashMap<LookupKey, List<CatalogRecipeGui>> by ReloadableProperty { HashMap(1024) }
+    private val CACHED_GUIS: HashMap<LookupKey, List<CatalogItemNodeGui>> by ReloadableProperty { HashMap(1024) }
 
     private data class LookupKey(val item: ItemRef, val state: LookupState)
 
@@ -56,7 +56,7 @@ internal object CatalogRecipeGuiManager {
         registerGuiCreator<CatalogItemSmithingTrimNode>(::createSmithingTrimRecipeGui)
         registerGuiCreator<CatalogItemSmokingNode>(::createCookingRecipeGui)
         registerGuiCreator<CatalogItemStonecuttingNode>(::createStonecuttingRecipeGui)
-        registerGuiCreator<CatalogItemLootTableNode>(::createLootTableRecipeGui)
+        registerGuiCreator<CatalogItemLootTableNode>(::createLootTableGui)
 
         // TODO 支持配置文件载入优先级
         registerGuiPriority<CatalogItemBlastingNode>(500)
@@ -70,8 +70,8 @@ internal object CatalogRecipeGuiManager {
         registerGuiPriority<CatalogItemStonecuttingNode>(900)
     }
 
-    private inline fun <reified T : CatalogItemNode> registerGuiCreator(noinline factory: (T) -> CatalogRecipeGui) {
-        GUI_CREATORS[T::class.java] = { recipe -> factory(recipe as T) }
+    private inline fun <reified T : CatalogItemNode> registerGuiCreator(noinline factory: (T) -> CatalogItemNodeGui) {
+        GUI_CREATORS[T::class.java] = { node -> factory(node as T) }
     }
 
     private inline fun <reified T : CatalogItemNode> registerGuiPriority(priority: Int) {
@@ -79,32 +79,32 @@ internal object CatalogRecipeGuiManager {
     }
 
     /**
-     * 根据 [ItemRef] 和 [LookupState] 获取图鉴中配方展示的 [CatalogRecipeGui] 列表.
+     * 根据 [ItemRef] 和 [LookupState] 获取图鉴中节点展示的 [CatalogItemNodeGui] 列表.
      */
-    fun getGui(item: ItemRef, state: LookupState): List<CatalogRecipeGui> {
+    fun getGui(item: ItemRef, state: LookupState): List<CatalogItemNodeGui> {
         return CACHED_GUIS.getOrPut(LookupKey(item, state)) {
-            val catalogRecipes = when (state) {
-                LookupState.SOURCE -> CatalogItemRecipeNetwork.getSource(item)
-                LookupState.USAGE -> CatalogItemRecipeNetwork.getUsage(item)
+            val catalogNodes = when (state) {
+                LookupState.SOURCE -> CatalogItemNetwork.getSource(item)
+                LookupState.USAGE -> CatalogItemNetwork.getUsage(item)
             }
             // 先基于类型优先级排序
             // 再基于唯一标识按字典序排序
-            catalogRecipes.sortedWith(
+            catalogNodes.sortedWith(
                 compareBy<CatalogItemNode> { it.type.sortPriority }.thenBy { it.sortId }
-            ).mapNotNull { catalogRecipe ->
-                buildGui(catalogRecipe) ?: return@mapNotNull null
+            ).mapNotNull { catalogNode ->
+                buildGui(catalogNode) ?: return@mapNotNull null
             }
         }
     }
 
     /**
-     * 创建 [CatalogItemNode] 在图鉴中展示的 [CatalogRecipeGui].
+     * 创建 [CatalogItemNode] 在图鉴中展示的 [CatalogItemNodeGui].
      *
-     * 返回 `null` 意味着 [CatalogItemNode] 可被图鉴检索, 但代码没有指定对应 [CatalogRecipeGui] 创建方法.
+     * 返回 `null` 意味着 [CatalogItemNode] 可被图鉴检索, 但代码没有指定对应 [CatalogItemNodeGui] 创建方法.
      */
-    private fun buildGui(recipe: CatalogItemNode): CatalogRecipeGui? {
-        return GUI_CREATORS[recipe::class.java]?.invoke(recipe).also {
-            if (it == null) LOGGER.warn("No gui creator for ${recipe::class.java}")
+    private fun buildGui(node: CatalogItemNode): CatalogItemNodeGui? {
+        return GUI_CREATORS[node::class.java]?.invoke(node).also {
+            if (it == null) LOGGER.warn("No gui creator for ${node::class.java}")
         }
     }
 
@@ -115,10 +115,10 @@ internal object CatalogRecipeGuiManager {
         get() = CatalogItemMenuSettings.getMenuSettings(this.type.name)
 
     /**
-     * 创建烧制配方 [CatalogRecipeGui] 的方法.
+     * 创建烧制配方 [CatalogItemNodeGui] 的方法.
      * 烧制配方包括: 熔炉, 高炉, 烟熏炉, 营火配方.
      */
-    private fun createCookingRecipeGui(catalogRecipe: CatalogItemCookingNode): CatalogRecipeGui {
+    private fun createCookingRecipeGui(catalogRecipe: CatalogItemCookingNode): CatalogItemNodeGui {
         val settings = catalogRecipe.menuSettings
         val gui = Gui.normal { builder ->
             builder.setStructure(*settings.structure)
@@ -129,13 +129,13 @@ internal object CatalogRecipeGuiManager {
             builder.addIngredient('i', DisplayItem(catalogRecipe.inputItems))
             builder.addIngredient('o', DisplayItem(catalogRecipe.outputItems, catalogRecipe.recipe<CookingRecipe<*>>().result.amount))
         }
-        return CatalogRecipeGui(settings.title, gui)
+        return CatalogItemNodeGui(settings.title, gui)
     }
 
     /**
-     * 创建有序合成配方 [CatalogRecipeGui] 的方法.
+     * 创建有序合成配方 [CatalogItemNodeGui] 的方法.
      */
-    private fun createShapedRecipeGui(catalogRecipe: CatalogItemShapedNode): CatalogRecipeGui {
+    private fun createShapedRecipeGui(catalogRecipe: CatalogItemShapedNode): CatalogItemNodeGui {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
@@ -156,14 +156,14 @@ internal object CatalogRecipeGuiManager {
                 return@map DisplayItem(itemRefs)
             })
         }
-        return CatalogRecipeGui(settings.title, gui)
+        return CatalogItemNodeGui(settings.title, gui)
     }
 
 
     /**
-     * 创建无序合成配方 [CatalogRecipeGui] 的方法.
+     * 创建无序合成配方 [CatalogItemNodeGui] 的方法.
      */
-    private fun createShapelessRecipeGui(catalogRecipe: CatalogItemShapelessNode): CatalogRecipeGui {
+    private fun createShapelessRecipeGui(catalogRecipe: CatalogItemShapelessNode): CatalogItemNodeGui {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
@@ -173,13 +173,13 @@ internal object CatalogRecipeGuiManager {
             builder.addIngredient('o', DisplayItem(catalogRecipe.outputItems, catalogRecipe.recipe<ShapelessRecipe>().result.amount))
             builder.setContent(catalogRecipe.inputItems.map { DisplayItem(it) })
         }
-        return CatalogRecipeGui(settings.title, gui)
+        return CatalogItemNodeGui(settings.title, gui)
     }
 
     /**
-     * 创建锻造台转化配方 [CatalogRecipeGui] 的方法.
+     * 创建锻造台转化配方 [CatalogItemNodeGui] 的方法.
      */
-    private fun createSmithingTransformRecipeGui(catalogRecipe: CatalogItemSmithingTransformNode): CatalogRecipeGui {
+    private fun createSmithingTransformRecipeGui(catalogRecipe: CatalogItemSmithingTransformNode): CatalogItemNodeGui {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
@@ -190,13 +190,13 @@ internal object CatalogRecipeGuiManager {
             builder.addIngredient('a', DisplayItem(catalogRecipe.additionItems))
             builder.addIngredient('o', DisplayItem(catalogRecipe.outputItemRef, catalogRecipe.recipe<SmithingRecipe>().result.amount))
         }
-        return CatalogRecipeGui(settings.title, gui)
+        return CatalogItemNodeGui(settings.title, gui)
     }
 
     /**
-     * 创建锻造台纹饰配方 [CatalogRecipeGui] 的方法.
+     * 创建锻造台纹饰配方 [CatalogItemNodeGui] 的方法.
      */
-    private fun createSmithingTrimRecipeGui(catalogRecipe: CatalogItemSmithingTrimNode): CatalogRecipeGui {
+    private fun createSmithingTrimRecipeGui(catalogRecipe: CatalogItemSmithingTrimNode): CatalogItemNodeGui {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
@@ -208,13 +208,13 @@ internal object CatalogRecipeGuiManager {
             // 锻造台纹饰配方的输出槽显示一个固定物品
             builder.addIngredient('r', TrimResultItem(settings))
         }
-        return CatalogRecipeGui(settings.title, gui)
+        return CatalogItemNodeGui(settings.title, gui)
     }
 
     /**
-     * 创建切石机配方 [CatalogRecipeGui] 的方法.
+     * 创建切石机配方 [CatalogItemNodeGui] 的方法.
      */
-    private fun createStonecuttingRecipeGui(catalogRecipe: CatalogItemStonecuttingNode): CatalogRecipeGui {
+    private fun createStonecuttingRecipeGui(catalogRecipe: CatalogItemStonecuttingNode): CatalogItemNodeGui {
         val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
@@ -223,13 +223,13 @@ internal object CatalogRecipeGuiManager {
             builder.addIngredient('i', DisplayItem(catalogRecipe.inputItems))
             builder.addIngredient('o', DisplayItem(catalogRecipe.outputItem, catalogRecipe.recipe<StonecuttingRecipe>().result.amount))
         }
-        return CatalogRecipeGui(settings.title, gui)
+        return CatalogItemNodeGui(settings.title, gui)
     }
 
     /**
-     * 创建战利品表配方 [CatalogRecipeGui] 的方法.
+     * 创建战利品表 [CatalogItemNodeGui] 的方法.
      */
-    private fun createLootTableRecipeGui(catalogRecipe: CatalogItemLootTableNode): CatalogRecipeGui {
+    private fun createLootTableGui(catalogRecipe: CatalogItemLootTableNode): CatalogItemNodeGui {
         val settings = catalogRecipe.catalogMenuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
@@ -241,7 +241,7 @@ internal object CatalogRecipeGuiManager {
             builder.addIngredient('o', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
             builder.setContent(catalogRecipe.lootItems.map(::DisplayItem))
         }
-        return CatalogRecipeGui(settings.title, gui)
+        return CatalogItemNodeGui(settings.title, gui)
     }
 
 }
@@ -337,11 +337,11 @@ private class TrimResultItem(
  * **战利品表占位输入** 的图标.
  */
 class LootItem(
-    private val recipe: CatalogItemLootTableNode,
+    private val node: CatalogItemLootTableNode,
 ) : AbstractItem() {
 
     private val itemProvider: ItemProvider =
-        SlotDisplay.get(recipe.catalogIcon).resolveToItemWrapper()
+        SlotDisplay.get(node.catalogIcon).resolveToItemWrapper()
 
     override fun getItemProvider(): ItemProvider {
         return itemProvider
@@ -430,11 +430,11 @@ private fun handleClickCommons(clickType: ClickType, player: Player, item: ItemR
     }
 
     // 要打开的菜单列表为空, 则不打开
-    val catalogRecipeGuis = CatalogRecipeGuiManager.getGui(item, lookupState)
-    if (catalogRecipeGuis.isEmpty())
+    val catalogNodeGuis = CatalogItemNodeGuiManager.getGui(item, lookupState)
+    if (catalogNodeGuis.isEmpty())
         return
 
-    CatalogItemMenuStacks.push(player, CatalogItemFocusMenu(item, lookupState, player, catalogRecipeGuis))
+    CatalogItemMenuStacks.push(player, CatalogItemFocusMenu(item, lookupState, player, catalogNodeGuis))
 }
 
 private class SingleDisplayItem(
@@ -519,7 +519,7 @@ internal enum class LookupState {
 /**
  * 封装了标题和对应的 [Gui].
  */
-internal data class CatalogRecipeGui(
+internal data class CatalogItemNodeGui(
     val title: Component,
     val gui: Gui,
 )
