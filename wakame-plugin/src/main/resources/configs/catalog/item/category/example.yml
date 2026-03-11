@@ -1,5 +1,5 @@
 # 该类别的图标
-icon: "internal/menu/catalog/default/category/test"
+icon: "internal/menu/catalog/default/category/example"
 
 # 在物品图鉴主菜单中查看该类别所需的权限
 # 移除该节点则无需权限

@@ -24,10 +24,10 @@ main:
     next_page: "internal/menu/catalog/default/next_page"
     search: "internal/menu/catalog/default/search"
 
-# 分页图鉴配方菜单布局
-# 展示一系列配方的菜单
-paged_catalog_recipes:
-  title: "写什么都无所谓, 标题取决于具体的配方菜单"
+# 分页图鉴节点菜单布局
+# 展示一系列节点的菜单
+paged_catalog_nodes:
+  title: "写什么都无所谓, 标题取决于具体的节点菜单"
   # x: catalog_recipe_gui
   # .: background
   # <: prev_page
@@ -46,7 +46,7 @@ paged_catalog_recipes:
     next_page: "internal/menu/catalog/default/next_page"
     back: "internal/menu/common/default/back"
 
-# 各配方菜单布局
+# 各节点菜单布局
 # structure 要与上面设置的x区域的格子面积相等
 # 否则将导致显示不全
 
@@ -223,7 +223,7 @@ stonecutting_recipe:
     hint: "internal/menu/catalog/default/hint"
     background: "internal/menu/common/default/background"
 
-# 战利品表配方-箱子
+# 战利品表-箱子
 loot_table_recipe_chest:
   title: "获取箱子中的战利品"
   # ?: hint
@@ -244,7 +244,7 @@ loot_table_recipe_chest:
     prev_page: "internal/menu/catalog/default/prev_page"
     next_page: "internal/menu/catalog/default/next_page"
 
-# 战利品表配方-木桶
+# 战利品表-木桶
 loot_table_recipe_barrel:
   title: 获取木桶中的战利品
   # ?: hint
@@ -265,7 +265,7 @@ loot_table_recipe_barrel:
     prev_page: "internal/menu/catalog/default/prev_page"
     next_page: "internal/menu/catalog/default/next_page"
 
-# 战利品表配方-宝库
+# 战利品表-宝库
 loot_table_recipe_vault:
   title: 获取宝库中的战利品
   # ?: hint
@@ -286,7 +286,7 @@ loot_table_recipe_vault:
     prev_page: "internal/menu/catalog/default/prev_page"
     next_page: "internal/menu/catalog/default/next_page"
 
-# 战利品表配方-实体掉落物
+# 战利品表-实体掉落物
 loot_table_recipe_entity:
   title: 实体掉落物
   # ?: hint
