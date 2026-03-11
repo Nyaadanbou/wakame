@@ -20,7 +20,7 @@ import java.util.stream.Stream
 /**
  * 合成站的输出.
  */
-internal sealed interface RecipeResult : Examinable {
+sealed interface RecipeResult : Examinable {
     /**
      * 将此 [RecipeResult] 的效果应用到玩家身上.
      * 所产生的效果包括但不仅限于: 扣除材料, 给予物品, 给予经验.

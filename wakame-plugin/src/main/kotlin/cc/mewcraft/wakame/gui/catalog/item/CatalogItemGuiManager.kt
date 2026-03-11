@@ -5,6 +5,9 @@ import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
 import cc.mewcraft.wakame.catalog.item.CatalogItemNetwork
 import cc.mewcraft.wakame.catalog.item.node.*
+import cc.mewcraft.wakame.craftingstation.recipe.ExpChoice
+import cc.mewcraft.wakame.craftingstation.recipe.ItemChoice
+import cc.mewcraft.wakame.craftingstation.recipe.ItemResult
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.item.SlotDisplay
@@ -12,6 +15,7 @@ import cc.mewcraft.wakame.item.resolveToItemWrapper
 import cc.mewcraft.wakame.util.ReloadableProperty
 import cc.mewcraft.wakame.util.runTaskTimer
 import net.kyori.adventure.text.Component
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -60,6 +64,7 @@ internal object CatalogItemNodeGuiManager {
         registerGuiCreator<CatalogItemSmokingNode>(::createCookingRecipeGui)
         registerGuiCreator<CatalogItemStonecuttingNode>(::createStonecuttingRecipeGui)
         registerGuiCreator<CatalogItemLootTableNode>(::createLootTableGui)
+        registerGuiCreator<CatalogItemCraftingStationNode>(::createCraftingStationGui)
 
         registerGuiPriority<CatalogItemBlastingNode>(500)
         registerGuiPriority<CatalogItemCampfireNode>(600)
@@ -71,6 +76,7 @@ internal object CatalogItemNodeGuiManager {
         registerGuiPriority<CatalogItemSmokingNode>(400)
         registerGuiPriority<CatalogItemStonecuttingNode>(900)
         registerGuiPriority<CatalogItemLootTableNode>(1000)
+        registerGuiPriority<CatalogItemCraftingStationNode>(1100)
     }
 
     private inline fun <reified T : CatalogItemNode> registerGuiCreator(noinline factory: (T) -> CatalogItemNodeGui) {
@@ -242,6 +248,36 @@ internal object CatalogItemNodeGuiManager {
             builder.addIngredient('i', LootItem(node))
             builder.addIngredient('o', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
             builder.setContent(node.lootItems.map(::DisplayItem))
+        }
+        return CatalogItemNodeGui(settings.title, gui)
+    }
+
+    /**
+     * 创建合成站配方 [CatalogItemNodeGui] 的方法.
+     *
+     * 合成站配方是多对一的关系: 多种输入物品合成一种输出物品.
+     * 输入物品展示在左侧 (i), 输出物品展示在右侧 (o).
+     */
+    private fun createCraftingStationGui(node: CatalogItemCraftingStationNode): CatalogItemNodeGui {
+        val settings = node.catalogMenuSettings
+        val gui = PagedGui.items { builder ->
+            builder.setStructure(*settings.structure)
+            builder.addIngredient('.', BackgroundItem(settings))
+            builder.addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+            // 将每一个 RecipeChoice 转化为展示物品
+            builder.setContent(node.inputChoices.map { choice ->
+                when (choice) {
+                    is ItemChoice -> DisplayItem(choice.item, choice.amount)
+                    is ExpChoice -> SimpleItem(ItemStack(Material.EXPERIENCE_BOTTLE, choice.amount.coerceIn(1, 64)))
+                }
+            })
+            // 输出物品 (可点击查找来源/用途)
+            val output = node.outputResult
+            if (output is ItemResult) {
+                builder.addIngredient('o', DisplayItem(output.item, output.amount))
+            } else {
+                builder.addIngredient('o', SimpleItem(ItemStack.empty()))
+            }
         }
         return CatalogItemNodeGui(settings.title, gui)
     }

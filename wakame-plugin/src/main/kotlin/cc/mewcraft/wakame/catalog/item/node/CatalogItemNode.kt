@@ -48,5 +48,6 @@ data class CatalogItemNodeType(
         val SMITHING_TRIM_RECIPE = CatalogItemNodeType("smithing_trim_recipe", 800)
         val STONECUTTING_RECIPE = CatalogItemNodeType("stonecutting_recipe", 900)
         val LOOT_TABLE = CatalogItemNodeType("loot_table", 1000)
+        val CRAFTING_STATION = CatalogItemNodeType("crafting_station", 1100)
     }
 }

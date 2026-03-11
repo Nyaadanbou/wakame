@@ -22,7 +22,7 @@ import java.util.stream.Stream
  * 合成站配方.
  * 包含若干项输入与若干项输出.
  */
-internal sealed interface Recipe : KoishKeyed, Examinable {
+sealed interface Recipe : KoishKeyed, Examinable {
     /**
      * 配方的输入.
      */
