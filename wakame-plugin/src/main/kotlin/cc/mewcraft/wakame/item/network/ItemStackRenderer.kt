@@ -69,10 +69,9 @@ object ItemStackRenderer : PacketListener {
     @PacketHandler
     private fun handleUpdateAdvancements(event: ClientboundUpdateAdvancementsPacketEvent) {
         val player = event.player
-        if (isCreative(player)) return
-        val changedAdded = event.added.map { advancementHolder ->
-            val advancement = advancementHolder.value
-            val changedDisplayInfo = advancement.display().map { displayInfo ->
+        val added = event.added.map { holder ->
+            val value = holder.value
+            val display = value.display().map { displayInfo ->
                 DisplayInfo(
                     displayInfo.icon.copy().modify(player),
                     displayInfo.title,
@@ -82,20 +81,25 @@ object ItemStackRenderer : PacketListener {
                     displayInfo.shouldShowToast(),
                     displayInfo.shouldAnnounceChat(),
                     displayInfo.isHidden
-                )
+                ).apply {
+                    setLocation(
+                        displayInfo.x,
+                        displayInfo.y
+                    )
+                }
             }
-            val changedAdvancement = Advancement(
-                advancement.parent,
-                changedDisplayInfo,
-                advancement.rewards,
-                advancement.criteria,
-                advancement.requirements,
-                advancement.sendsTelemetryEvent,
-                advancement.name
+            val advancement = Advancement(
+                value.parent,
+                display,
+                value.rewards,
+                value.criteria,
+                value.requirements,
+                value.sendsTelemetryEvent,
+                value.name
             )
-            AdvancementHolder(advancementHolder.id, changedAdvancement)
+            AdvancementHolder(holder.id, advancement)
         }
-        event.added = changedAdded
+        event.added = added
     }
 
     @PacketHandler
