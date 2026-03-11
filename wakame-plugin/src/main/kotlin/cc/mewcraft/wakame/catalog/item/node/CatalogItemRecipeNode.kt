@@ -7,9 +7,9 @@ import org.bukkit.inventory.*
 import org.bukkit.inventory.Recipe as BukkitRecipe
 
 /**
- * 标准的 [CatalogItemNode], 代表狭义上的 [物品合成配方](https://minecraft.wiki/w/Recipe).
+ * 代表一个 [Minecraft 合成配方](https://minecraft.wiki/w/Recipe) 形式的节点.
  */
-abstract class CatalogItemStandardNode(
+abstract class CatalogItemRecipeNode(
     private val recipe: BukkitRecipe,
 ) : CatalogItemNode {
     /**
@@ -30,7 +30,7 @@ abstract class CatalogItemStandardNode(
  */
 abstract class CatalogItemCookingNode(
     recipe: CookingRecipe<*>,
-) : CatalogItemStandardNode(recipe) {
+) : CatalogItemRecipeNode(recipe) {
     val cookingTime = recipe.cookingTime
     val experience = recipe.experience
 
@@ -49,65 +49,65 @@ abstract class CatalogItemCookingNode(
 class CatalogItemBlastingNode(
     recipe: BlastingRecipe,
 ) : CatalogItemCookingNode(recipe) {
-    override val type = CatalogItemRecipeType.BLASTING_RECIPE
+    override val type = CatalogItemNodeType.BLASTING_RECIPE
 }
 
 class CatalogItemCampfireNode(
     recipe: CampfireRecipe,
 ) : CatalogItemCookingNode(recipe) {
-    override val type = CatalogItemRecipeType.CAMPFIRE_RECIPE
+    override val type = CatalogItemNodeType.CAMPFIRE_RECIPE
 }
 
 class CatalogItemFurnaceNode(
     recipe: FurnaceRecipe,
 ) : CatalogItemCookingNode(recipe) {
-    override val type = CatalogItemRecipeType.FURNACE_RECIPE
+    override val type = CatalogItemNodeType.FURNACE_RECIPE
 }
 
 class CatalogItemShapedNode(
     recipe: ShapedRecipe,
-) : CatalogItemStandardNode(recipe) {
+) : CatalogItemRecipeNode(recipe) {
     val shape: Array<out String> = recipe.shape
     val inputItems: Map<Char, List<ItemRef>> = recipe.choiceMap.mapValues { it.value.toItems() }
     val outputItem: ItemRef = ItemRef.create(recipe.result)
 
-    override val type = CatalogItemRecipeType.SHAPED_RECIPE
+    override val type = CatalogItemNodeType.SHAPED_RECIPE
     override val sortId: String = recipe.key.value()
     override fun getLookupInputs(): Set<ItemRef> = inputItems.values.flatten().toSet()
 }
 
 class CatalogItemShapelessNode(
     recipe: ShapelessRecipe,
-) : CatalogItemStandardNode(recipe) {
+) : CatalogItemRecipeNode(recipe) {
     val inputItems: List<List<ItemRef>> = recipe.choiceList.map { it.toItems() }
     val outputItems: ItemRef = ItemRef.create(recipe.result)
 
-    override val type = CatalogItemRecipeType.SHAPELESS_RECIPE
+    override val type = CatalogItemNodeType.SHAPELESS_RECIPE
     override val sortId: String = recipe.key.value()
     override fun getLookupInputs(): Set<ItemRef> = inputItems.flatten().toSet()
 }
 
 class CatalogItemSmithingTransformNode(
     recipe: SmithingTransformRecipe,
-) : CatalogItemStandardNode(recipe) {
+) : CatalogItemRecipeNode(recipe) {
     val baseItems: List<ItemRef> = recipe.base.toItems()
     val templateItems: List<ItemRef> = recipe.template.toItems()
     val additionItems: List<ItemRef> = recipe.addition.toItems()
     val outputItemRef: ItemRef = ItemRef.create(recipe.result)
 
-    override val type = CatalogItemRecipeType.SMITHING_TRANSFORM_RECIPE
+    override val type = CatalogItemNodeType.SMITHING_TRANSFORM_RECIPE
     override val sortId: String = recipe.key.value()
     override fun getLookupInputs(): Set<ItemRef> = (baseItems + templateItems + additionItems).toSet()
 }
 
 class CatalogItemSmithingTrimNode(
     recipe: SmithingTrimRecipe,
-) : CatalogItemStandardNode(recipe) {
+) : CatalogItemRecipeNode(recipe) {
     val baseItems: List<ItemRef> = recipe.base.toItems()
     val templateItems: List<ItemRef> = recipe.template.toItems()
     val additionItems: List<ItemRef> = recipe.addition.toItems()
 
-    override val type = CatalogItemRecipeType.SMITHING_TRIM_RECIPE
+    override val type = CatalogItemNodeType.SMITHING_TRIM_RECIPE
     override val sortId: String = recipe.key.value()
     override fun getLookupInputs(): Set<ItemRef> = (baseItems + templateItems + additionItems).toSet()
 
@@ -118,17 +118,17 @@ class CatalogItemSmithingTrimNode(
 class CatalogItemSmokingNode(
     recipe: SmokingRecipe,
 ) : CatalogItemCookingNode(recipe) {
-    override val type = CatalogItemRecipeType.SMOKING_RECIPE
+    override val type = CatalogItemNodeType.SMOKING_RECIPE
     override val sortId: String = recipe.key.value()
 }
 
 class CatalogItemStonecuttingNode(
     recipe: StonecuttingRecipe,
-) : CatalogItemStandardNode(recipe) {
+) : CatalogItemRecipeNode(recipe) {
     val inputItems: List<ItemRef> = recipe.inputChoice.toItems()
     val outputItem: ItemRef = ItemRef.create(recipe.result)
 
-    override val type = CatalogItemRecipeType.STONECUTTING_RECIPE
+    override val type = CatalogItemNodeType.STONECUTTING_RECIPE
     override val sortId: String = recipe.key.value()
     override fun getLookupInputs(): Set<ItemRef> = inputItems.toSet()
 }

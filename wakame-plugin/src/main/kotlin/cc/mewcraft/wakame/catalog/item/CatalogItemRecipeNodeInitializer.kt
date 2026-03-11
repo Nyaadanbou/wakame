@@ -19,19 +19,19 @@ internal object CatalogItemRecipeNodeInitializer : RegistryLoader {
 
     @InitFun
     fun init() {
-        DynamicRegistries.CATALOG_ITEM_STANDARD_RECIPE.resetRegistry()
-        applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_STANDARD_RECIPE::add)
+        DynamicRegistries.CATALOG_ITEM_RECIPE_NODE.resetRegistry()
+        applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_RECIPE_NODE::add)
         //DynamicRegistries.CATALOG_ITEM_STANDARD_RECIPE.freeze()
     }
 
     fun reload() {
-        applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_STANDARD_RECIPE::upsert)
+        applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_RECIPE_NODE::upsert)
     }
 
-    private fun applyDataToRegistry(registryAction: (KoishKey, CatalogItemStandardNode) -> Unit) {
+    private fun applyDataToRegistry(registryAction: (KoishKey, CatalogItemRecipeNode) -> Unit) {
         var count = 0
         for (bukkitRecipe in Bukkit.recipeIterator()) {
-            val catalogRecipe = bukkitRecipe.toCatalogRecipe() ?: continue
+            val catalogRecipe = bukkitRecipe.toCatalogItemNode() ?: continue
             try {
                 registryAction(
                     catalogRecipe.recipeId,
@@ -39,17 +39,17 @@ internal object CatalogItemRecipeNodeInitializer : RegistryLoader {
                 )
                 count++
             } catch (e: Throwable) {
-                LOGGER.error("Failed to register catalog standard recipe for '${catalogRecipe.recipeId}'", e)
+                LOGGER.error("Failed to register catalog item recipe node for '${catalogRecipe.recipeId}'", e)
             }
         }
-        LOGGER.info("Applied $count standard recipes to catalog registry")
+        LOGGER.info("Applied $count catalog item recipe nodes to catalog item recipe node registry")
     }
 
     /**
      * 方便函数.
      * 返回 `null` 意味着无法转化, 即图鉴不支持显示的特殊配方.
      */
-    private fun BukkitRecipe.toCatalogRecipe(): CatalogItemStandardNode? {
+    private fun BukkitRecipe.toCatalogItemNode(): CatalogItemRecipeNode? {
         return when (this) {
             is BlastingRecipe -> CatalogItemBlastingNode(this)
             is CampfireRecipe -> CatalogItemCampfireNode(this)

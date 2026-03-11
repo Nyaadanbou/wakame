@@ -10,7 +10,7 @@ import xyz.xenondevs.invui.gui.Gui
  */
 interface CatalogItemNode {
 
-    val type: CatalogItemRecipeType
+    val type: CatalogItemNodeType
 
     /**
      * 获取节点排序时使用的唯一标识.
@@ -30,7 +30,7 @@ interface CatalogItemNode {
     fun getLookupOutputs(): Set<ItemRef>
 }
 
-data class CatalogItemRecipeType(
+data class CatalogItemNodeType(
     val name: String,
     /**
      * [CatalogItemNode] 的各实现的 [Gui] 在图鉴展示时的优先级. 数字小的类型将被排在前面.
@@ -38,15 +38,15 @@ data class CatalogItemRecipeType(
     val sortPriority: Int,
 ) {
     companion object {
-        val SHAPED_RECIPE = CatalogItemRecipeType("shaped_recipe", 100)
-        val SHAPELESS_RECIPE = CatalogItemRecipeType("shapeless_recipe", 200)
-        val FURNACE_RECIPE = CatalogItemRecipeType("furnace_recipe", 300)
-        val SMOKING_RECIPE = CatalogItemRecipeType("smoking_recipe", 400)
-        val BLASTING_RECIPE = CatalogItemRecipeType("blasting_recipe", 500)
-        val CAMPFIRE_RECIPE = CatalogItemRecipeType("campfire_recipe", 600)
-        val SMITHING_TRANSFORM_RECIPE = CatalogItemRecipeType("smithing_transform_recipe", 700)
-        val SMITHING_TRIM_RECIPE = CatalogItemRecipeType("smithing_trim_recipe", 800)
-        val STONECUTTING_RECIPE = CatalogItemRecipeType("stonecutting_recipe", 900)
-        val LOOT_TABLE_RECIPE = CatalogItemRecipeType("loot_table_recipe", 1000)
+        val SHAPED_RECIPE = CatalogItemNodeType("shaped_recipe", 100)
+        val SHAPELESS_RECIPE = CatalogItemNodeType("shapeless_recipe", 200)
+        val FURNACE_RECIPE = CatalogItemNodeType("furnace_recipe", 300)
+        val SMOKING_RECIPE = CatalogItemNodeType("smoking_recipe", 400)
+        val BLASTING_RECIPE = CatalogItemNodeType("blasting_recipe", 500)
+        val CAMPFIRE_RECIPE = CatalogItemNodeType("campfire_recipe", 600)
+        val SMITHING_TRANSFORM_RECIPE = CatalogItemNodeType("smithing_transform_recipe", 700)
+        val SMITHING_TRIM_RECIPE = CatalogItemNodeType("smithing_trim_recipe", 800)
+        val STONECUTTING_RECIPE = CatalogItemNodeType("stonecutting_recipe", 900)
+        val LOOT_TABLE = CatalogItemNodeType("loot_table", 1000)
     }
 }

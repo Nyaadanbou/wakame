@@ -43,7 +43,7 @@ internal class CatalogItemFocusMenu(
     /**
      * 菜单的 [BasicMenuSettings].
      */
-    private val settings: BasicMenuSettings = CatalogItemMenuSettings.getMenuSettings("paged_catalog_recipes")
+    private val settings: BasicMenuSettings = CatalogItemMenuSettings.getMenuSettings("paged_catalog_nodes")
 
     /**
      * 菜单的 [PagedGui].

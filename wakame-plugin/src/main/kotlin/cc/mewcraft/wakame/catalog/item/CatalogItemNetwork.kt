@@ -18,7 +18,7 @@ import java.util.*
 
 @Init(InitStage.POST_WORLD)
 object CatalogItemNetwork {
-    private lateinit var network: ImmutableNetwork<Optional<ItemRef>, CatalogRecipeEdge>
+    private lateinit var network: ImmutableNetwork<Optional<ItemRef>, CatalogItemNodeEdge>
 
     @InitFun
     fun init() {
@@ -34,7 +34,7 @@ object CatalogItemNetwork {
      */
     fun getSource(node: ItemRef): Set<CatalogItemNode> {
         if (!network.nodes().contains(Optional.of(node))) return emptySet()
-        return network.inEdges(Optional.of(node)).map(CatalogRecipeEdge::recipe).toSet()
+        return network.inEdges(Optional.of(node)).map(CatalogItemNodeEdge::node).toSet()
     }
 
     /**
@@ -42,7 +42,7 @@ object CatalogItemNetwork {
      */
     fun getUsage(node: ItemRef): Set<CatalogItemNode> {
         if (!network.nodes().contains(Optional.of(node))) return emptySet()
-        return network.outEdges(Optional.of(node)).map(CatalogRecipeEdge::recipe).toSet()
+        return network.outEdges(Optional.of(node)).map(CatalogItemNodeEdge::node).toSet()
     }
 
     /**
@@ -60,8 +60,8 @@ object CatalogItemNetwork {
         network = buildNetWork()
     }
 
-    private fun buildNetWork(): ImmutableNetwork<Optional<ItemRef>, CatalogRecipeEdge> {
-        LOGGER.info("Building catalog item recipe network")
+    private fun buildNetWork(): ImmutableNetwork<Optional<ItemRef>, CatalogItemNodeEdge> {
+        LOGGER.info("Building catalog item network")
 
         // 自循环和平行边都是需要的, 举例说明:
         // 自循环: 锻造模板复制有序合成配方(模板+钻石等->模板*2)
@@ -70,44 +70,44 @@ object CatalogItemNetwork {
             .directed()
             .allowsSelfLoops(true)
             .allowsParallelEdges(true)
-            .build<Optional<ItemRef>, CatalogRecipeEdge>()
+            .build<Optional<ItemRef>, CatalogItemNodeEdge>()
 
         // 添加起占位作用的空节点
         network.addNode(Optional.empty())
 
         // 合成站
-        for (craftingStationRecipe in DynamicRegistries.CATALOG_ITEM_CRAFTING_STATION_RECIPE) {
-            network.addRecipe(craftingStationRecipe)
+        for (craftingStationNode in DynamicRegistries.CATALOG_ITEM_CRAFTING_STATION_NODE) {
+            network.addNode(craftingStationNode)
         }
 
         // 盲盒
-        for (crateRecipe in DynamicRegistries.CATALOG_ITEM_CRATE_RECIPE) {
-            network.addRecipe(crateRecipe)
+        for (crateNode in DynamicRegistries.CATALOG_ITEM_CRATE_NODE) {
+            network.addNode(crateNode)
         }
 
         // 原版战利品表
-        for (lootTableRecipe in DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_RECIPE) {
-            network.addRecipe(lootTableRecipe)
+        for (lootTableNode in DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_NODE) {
+            network.addNode(lootTableNode)
         }
 
         // MythicMobs 生物掉落
-        for (mythicDropRecipe in DynamicRegistries.CATALOG_ITEM_MYTHIC_DROP_RECIPE) {
-            network.addRecipe(mythicDropRecipe)
+        for (mythicDropNode in DynamicRegistries.CATALOG_ITEM_MYTHIC_DROP_NODE) {
+            network.addNode(mythicDropNode)
         }
 
         // NPC 任务奖励
-        for (questRecipe in DynamicRegistries.CATALOG_ITEM_QUEST_RECIPE) {
-            network.addRecipe(questRecipe)
+        for (questNode in DynamicRegistries.CATALOG_ITEM_QUEST_NODE) {
+            network.addNode(questNode)
         }
 
         // 签到奖励
-        for (signupRecipe in DynamicRegistries.CATALOG_ITEM_SIGNUP_RECIPE) {
-            network.addRecipe(signupRecipe)
+        for (signupNode in DynamicRegistries.CATALOG_ITEM_SIGNUP_NODE) {
+            network.addNode(signupNode)
         }
 
         // 原版合成配方
-        for (standardRecipe in DynamicRegistries.CATALOG_ITEM_STANDARD_RECIPE) {
-            network.addRecipe(standardRecipe)
+        for (recipeNode in DynamicRegistries.CATALOG_ITEM_RECIPE_NODE) {
+            network.addNode(recipeNode)
         }
 
         return ImmutableNetwork.copyOf(network)
@@ -117,20 +117,20 @@ object CatalogItemNetwork {
      * 方便函数.
      * 当配方的输入输出为空时会使用空节点占位.
      */
-    private fun MutableNetwork<Optional<ItemRef>, CatalogRecipeEdge>.addRecipe(catalogItemNode: CatalogItemNode) {
+    private fun MutableNetwork<Optional<ItemRef>, CatalogItemNodeEdge>.addNode(catalogItemNode: CatalogItemNode) {
         val lookupInputs = catalogItemNode.getLookupInputs()
         val lookupOutputs = catalogItemNode.getLookupOutputs()
         if (lookupInputs.isEmpty()) {
             for (outputNode in lookupOutputs) {
                 addNode(Optional.of(outputNode))
-                addEdge(Optional.empty(), Optional.of(outputNode), CatalogRecipeEdge(catalogItemNode))
+                addEdge(Optional.empty(), Optional.of(outputNode), CatalogItemNodeEdge(catalogItemNode))
             }
             return
         }
         if (lookupOutputs.isEmpty()) {
             for (inputNode in lookupInputs) {
                 addNode(Optional.of(inputNode))
-                addEdge(Optional.of(inputNode), Optional.empty(), CatalogRecipeEdge(catalogItemNode))
+                addEdge(Optional.of(inputNode), Optional.empty(), CatalogItemNodeEdge(catalogItemNode))
             }
             return
         }
@@ -138,7 +138,7 @@ object CatalogItemNetwork {
             for (outputNode in lookupOutputs) {
                 addNode(Optional.of(inputNode))
                 addNode(Optional.of(outputNode))
-                addEdge(Optional.of(inputNode), Optional.of(outputNode), CatalogRecipeEdge(catalogItemNode))
+                addEdge(Optional.of(inputNode), Optional.of(outputNode), CatalogItemNodeEdge(catalogItemNode))
             }
         }
     }
@@ -146,7 +146,7 @@ object CatalogItemNetwork {
     /**
      * 封装一个 [CatalogItemNode] 作为 [ImmutableNetwork] 的边.
      */
-    private class CatalogRecipeEdge(
-        val recipe: CatalogItemNode,
+    private class CatalogItemNodeEdge(
+        val node: CatalogItemNode,
     )
 }

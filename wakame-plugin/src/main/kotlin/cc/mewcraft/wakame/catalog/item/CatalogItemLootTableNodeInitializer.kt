@@ -37,14 +37,14 @@ internal object CatalogItemLootTableNodeInitializer : RegistryLoader {
     @InitFun
     fun init() {
         reloadMinecraftLootTables()
-        DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_RECIPE.resetRegistry()
-        applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_RECIPE::add)
+        DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_NODE.resetRegistry()
+        applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_NODE::add)
         //DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_RECIPE.freeze()
     }
 
     fun reload() {
         reloadMinecraftLootTables()
-        applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_RECIPE::update)
+        applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_NODE::update)
     }
 
     // 重新读取服务端上的 Minecraft Loot Tables
@@ -58,7 +58,7 @@ internal object CatalogItemLootTableNodeInitializer : RegistryLoader {
     }
 
     private fun applyDataToRegistry(registryAction: (KoishKey, CatalogItemLootTableNode) -> Unit) {
-        val lootTableDir = KoishDataPaths.CONFIGS.resolve("catalog/item/recipe/loot_table/")
+        val lootTableDir = KoishDataPaths.CONFIGS.resolve("catalog/item/node/loot_table/")
 
         // 所有要在图鉴中展示的战利品表的路径
         val lootTableIds = HashSet<String>(1024)
@@ -98,7 +98,7 @@ internal object CatalogItemLootTableNodeInitializer : RegistryLoader {
                     }
                 } catch (e: Throwable) {
                     IdePauser.pauseInIde(e)
-                    LOGGER.error("Failed to register catalog loot table recipes in file: '${file.relativeTo(lootTableDir)}'")
+                    LOGGER.error("Failed to register catalog loot table nodes in file: '${file.relativeTo(lootTableDir)}'")
                 }
             }
 
@@ -120,7 +120,7 @@ internal object CatalogItemLootTableNodeInitializer : RegistryLoader {
                 )
             } catch (e: Throwable) {
                 IdePauser.pauseInIde(e)
-                LOGGER.error("Failed to register catalog loot table recipe for loot table '$lootTableId'")
+                LOGGER.error("Failed to register catalog loot table node for loot table '$lootTableId'")
             }
         }
     }

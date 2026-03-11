@@ -45,7 +45,7 @@ data class CatalogItemLootTableNode(
 ) : CatalogItemNode {
 
     override val type =
-        CatalogItemRecipeType.LOOT_TABLE_RECIPE
+        CatalogItemNodeType.LOOT_TABLE
     override val sortId
         get() = lootTableId
 
