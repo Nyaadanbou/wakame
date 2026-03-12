@@ -36,12 +36,12 @@ data class CatalogItemLootTableNode(
     /**
      * 该配方在图鉴中展示时输入物品位置展示的图标.
      */
-    val catalogIcon: Key,
+    val inputIcon: Key,
 
     /**
      * 该配方在图鉴中展示时的菜单布局.
      */
-    val catalogMenuSettings: BasicMenuSettings,
+    val menuCfg: BasicMenuSettings,
 ) : CatalogItemNode {
 
     override val type =

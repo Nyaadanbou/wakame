@@ -73,7 +73,7 @@ internal object CatalogItemCraftingStationNodeInitializer : RegistryLoader {
                     val node = CatalogItemCraftingStationNode(
                         stationId = stationId,
                         recipe = recipe,
-                        catalogMenuSettings = catalogMenuSettings,
+                        menuCfg = catalogMenuSettings,
                     )
                     registryAction(
                         recipe.key,

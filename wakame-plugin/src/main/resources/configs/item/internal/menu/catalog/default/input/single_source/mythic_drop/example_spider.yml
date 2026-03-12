@@ -1,3 +1,3 @@
 base: shulker_shell
 clientbound/item_model: minecraft:spider_spawn_egg
-slot_display_name: "<!i><gold><lang:entity.minecraft.spider>"
+slot_display_name: "<!i><gold>示例<lang:entity.minecraft.spider>"

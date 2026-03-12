@@ -23,7 +23,7 @@ data class CatalogItemCraftingStationNode(
     /**
      * 该配方在图鉴中展示时的菜单布局.
      */
-    val catalogMenuSettings: BasicMenuSettings,
+    val menuCfg: BasicMenuSettings,
 ) : CatalogItemNode {
 
     override val type: CatalogItemNodeType =

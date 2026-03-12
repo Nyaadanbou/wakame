@@ -109,8 +109,8 @@ internal object CatalogItemLootTableNodeInitializer : RegistryLoader {
                     CatalogItemLootTableNode(
                         lootTableId = lootTableId,
                         lootTable = MINECRAFT_LOOT_TABLE_MAP[lootTableId] ?: error("Loot table '$lootTableId' not found in Minecraft loot tables"),
-                        catalogIcon = inputIcon,
-                        catalogMenuSettings = menuSettings
+                        inputIcon = inputIcon,
+                        menuCfg = menuSettings
                     )
                 )
             } catch (e: Throwable) {

@@ -17,6 +17,7 @@ import cc.mewcraft.wakame.element.ElementRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.ImgAttributeMapRegistryLoader
 import cc.mewcraft.wakame.entity.typeref.EntityRefRegistryLoader
+import cc.mewcraft.wakame.event.map.ConfigurationReloadEvent
 import cc.mewcraft.wakame.gui.BasicGuiInitializer
 import cc.mewcraft.wakame.gui.catalog.item.CatalogItemMenuStacks
 import cc.mewcraft.wakame.init.RecipeInitializer
@@ -38,6 +39,7 @@ import cc.mewcraft.wakame.reforge.recycle.RecyclingStationRegistry
 import cc.mewcraft.wakame.reforge.repair.RepairingTableRegistry
 import cc.mewcraft.wakame.reforge.reroll.RerollingTableRegistry
 import cc.mewcraft.wakame.util.coroutine.minecraft
+import cc.mewcraft.wakame.util.eventbus.MapEventBus
 import kotlinx.coroutines.Dispatchers
 import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.paper.util.sender.Source
@@ -97,6 +99,8 @@ private object ReloadProcess {
 
     fun all() {
         ConfigAccess.reload()
+
+        MapEventBus.post(ConfigurationReloadEvent)
 
         GlobalTranslations.reload()
 

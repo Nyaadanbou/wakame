@@ -64,6 +64,7 @@ internal object CatalogItemNodeGuiManager {
         registerGuiCreator<CatalogItemStonecuttingNode>(::createStonecuttingRecipeGui)
         registerGuiCreator<CatalogItemLootTableNode>(::createLootTableGui)
         registerGuiCreator<CatalogItemCraftingStationNode>(::createCraftingStationGui)
+        registerGuiCreator<CatalogItemSingleSourceNode>(::createSingleSourceGui)
 
         registerGuiPriority<CatalogItemBlastingNode>(500)
         registerGuiPriority<CatalogItemCampfireNode>(600)
@@ -76,6 +77,7 @@ internal object CatalogItemNodeGuiManager {
         registerGuiPriority<CatalogItemStonecuttingNode>(900)
         registerGuiPriority<CatalogItemLootTableNode>(1000)
         registerGuiPriority<CatalogItemCraftingStationNode>(1100)
+        registerGuiPriority<CatalogItemSingleSourceNode>(2000)
     }
 
     private inline fun <reified T : CatalogItemNode> registerGuiCreator(noinline factory: (T) -> CatalogItemNodeGui) {
@@ -232,7 +234,7 @@ internal object CatalogItemNodeGuiManager {
      * 创建战利品表 [CatalogItemNodeGui] 的方法.
      */
     private fun createLootTableGui(node: CatalogItemLootTableNode): CatalogItemNodeGui {
-        val settings = node.catalogMenuSettings
+        val settings = node.menuCfg
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
             builder.addIngredient('?', HintItem(settings))
@@ -253,7 +255,7 @@ internal object CatalogItemNodeGuiManager {
      * 输入物品展示在左侧 (i), 输出物品展示在右侧 (o).
      */
     private fun createCraftingStationGui(node: CatalogItemCraftingStationNode): CatalogItemNodeGui {
-        val settings = node.catalogMenuSettings
+        val settings = node.menuCfg
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
             builder.addIngredient('.', BackgroundItem(settings))
@@ -272,6 +274,26 @@ internal object CatalogItemNodeGuiManager {
             } else {
                 builder.addIngredient('o', SimpleItem(ItemStack.empty()))
             }
+        }
+        return CatalogItemNodeGui(settings.title, gui)
+    }
+
+    /**
+     * 创建单源节点 [CatalogItemNodeGui] 的方法.
+     *
+     * 单源节点的输入是一个虚拟图标 (i), 输出是手动指定的物品列表 (o).
+     */
+    private fun createSingleSourceGui(node: CatalogItemSingleSourceNode): CatalogItemNodeGui {
+        val settings = node.menuCfg
+        val gui = PagedGui.items { builder ->
+            builder.setStructure(*settings.structure)
+            builder.addIngredient('?', HintItem(settings))
+            builder.addIngredient('.', BackgroundItem(settings))
+            builder.addIngredient('<', PrevItem(settings))
+            builder.addIngredient('>', NextItem(settings))
+            builder.addIngredient('i', SingleSourceItem(node))
+            builder.addIngredient('o', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+            builder.setContent(node.outputItems.map(::DisplayItem))
         }
         return CatalogItemNodeGui(settings.title, gui)
     }
@@ -372,7 +394,26 @@ class LootItem(
 ) : AbstractItem() {
 
     private val itemProvider: ItemProvider =
-        SlotDisplay.get(node.catalogIcon).resolveToItemWrapper()
+        SlotDisplay.get(node.inputIcon).resolveToItemWrapper()
+
+    override fun getItemProvider(): ItemProvider {
+        return itemProvider
+    }
+
+    override fun handleClick(p0: ClickType, p1: Player, p2: InventoryClickEvent) {
+
+    }
+}
+
+/**
+ * **单源节点占位输入** 的图标.
+ */
+private class SingleSourceItem(
+    private val node: CatalogItemSingleSourceNode,
+) : AbstractItem() {
+
+    private val itemProvider: ItemProvider =
+        SlotDisplay.get(node.inputIcon).resolveToItemWrapper()
 
     override fun getItemProvider(): ItemProvider {
         return itemProvider
