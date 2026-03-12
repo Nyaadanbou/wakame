@@ -16,7 +16,12 @@ import cc.mewcraft.wakame.util.configurate.yamlLoader
 import kotlin.io.path.*
 
 
-@Init(InitStage.POST_WORLD)
+@Init(
+    stage = InitStage.POST_WORLD,
+    runAfter = [
+        CatalogItemMenuSettings::class,
+    ]
+)
 internal object CatalogItemCategoryInitializer : RegistryLoader {
 
     @InitFun

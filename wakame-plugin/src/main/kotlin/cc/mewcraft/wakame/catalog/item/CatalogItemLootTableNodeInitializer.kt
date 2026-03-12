@@ -20,7 +20,8 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.Registries
-import kotlin.io.path.*
+import kotlin.io.path.name
+import kotlin.io.path.readText
 import kotlin.streams.asSequence
 
 @Init(
@@ -39,7 +40,6 @@ internal object CatalogItemLootTableNodeInitializer : RegistryLoader {
         reloadMinecraftLootTables()
         DynamicRegistries.CATALOG_ITEM_MINECRAFT_LOOT_TABLE_NODE.resetRegistry()
         applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_MINECRAFT_LOOT_TABLE_NODE::add)
-        //DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_RECIPE.freeze()
     }
 
     fun reload() {
@@ -58,7 +58,7 @@ internal object CatalogItemLootTableNodeInitializer : RegistryLoader {
     }
 
     private fun applyDataToRegistry(registryAction: (KoishKey, CatalogItemLootTableNode) -> Unit) {
-        val lootTableDir = KoishDataPaths.CONFIGS.resolve("catalog/item/node/loot_table/")
+        val mappingsFile = KoishDataPaths.CONFIGS.resolve("catalog/item/layout/node/loot_table/mappings.yml")
 
         // 所有要在图鉴中展示的战利品表的路径
         val lootTableIds = HashSet<String>(1024)
@@ -68,39 +68,34 @@ internal object CatalogItemLootTableNodeInitializer : RegistryLoader {
         // 为正则表达式创建临时缓存
         val regexCache = HashMap<String, Regex>(32)
 
-        // 遍历所有文件, 读取菜单布局和输入图标
-        lootTableDir.walk()
-            .filter { it.extension == "yml" }
-            .forEach { file ->
-                LOGGER.info("Found ${file.name}")
-                try {
-                    val loader = yamlLoader { withDefaults() }
-                    val rootNode = loader.buildAndLoadString(file.readText())
+        // 读取单个 mappings.yml 文件
+        try {
+            val loader = yamlLoader { withDefaults() }
+            val rootNode = loader.buildAndLoadString(mappingsFile.readText())
 
-                    for ((nodeKey, node) in rootNode.node("menu_setting_mappings").childrenMap()) {
-                        val regex = regexCache.computeIfAbsent(nodeKey.toString(), ::Regex)
-                        MINECRAFT_LOOT_TABLE_MAP.filter { (key, _) ->
-                            key.matches(regex)
-                        }.forEach { (key, _) ->
-                            lootTableIds.add(key)
-                            lootTableIdToMenuId.putIfAbsent(key, node.require<String>())
-                        }
-                    }
-
-                    for ((nodeKey, node) in rootNode.node("input_icon_mappings").childrenMap()) {
-                        val regex = regexCache.computeIfAbsent(nodeKey.toString(), ::Regex)
-                        MINECRAFT_LOOT_TABLE_MAP.filter { (key, _) ->
-                            key.matches(regex)
-                        }.forEach { (key, _) ->
-                            lootTableIds.add(key)
-                            lootTableIdToIconId.putIfAbsent(key, node.require<Key>())
-                        }
-                    }
-                } catch (e: Throwable) {
-                    IdePauser.pauseInIde(e)
-                    LOGGER.error("Failed to register catalog loot table nodes in file: '${file.relativeTo(lootTableDir)}'")
+            for ((nodeKey, node) in rootNode.node("menu_setting_mappings").childrenMap()) {
+                val regex = regexCache.computeIfAbsent(nodeKey.toString(), ::Regex)
+                MINECRAFT_LOOT_TABLE_MAP.filter { (key, _) ->
+                    key.matches(regex)
+                }.forEach { (key, _) ->
+                    lootTableIds.add(key)
+                    lootTableIdToMenuId.putIfAbsent(key, node.require<String>())
                 }
             }
+
+            for ((nodeKey, node) in rootNode.node("input_icon_mappings").childrenMap()) {
+                val regex = regexCache.computeIfAbsent(nodeKey.toString(), ::Regex)
+                MINECRAFT_LOOT_TABLE_MAP.filter { (key, _) ->
+                    key.matches(regex)
+                }.forEach { (key, _) ->
+                    lootTableIds.add(key)
+                    lootTableIdToIconId.putIfAbsent(key, node.require<Key>())
+                }
+            }
+        } catch (e: Throwable) {
+            IdePauser.pauseInIde(e)
+            LOGGER.error("Failed to read catalog loot table mappings from: '${mappingsFile.name}'", e)
+        }
 
         // 根据对应的菜单布局和图标, 注册战利品表配方
         for (lootTableId in lootTableIds) {

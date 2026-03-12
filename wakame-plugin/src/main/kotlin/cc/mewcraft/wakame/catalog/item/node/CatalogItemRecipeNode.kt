@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.catalog.item.node
 
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.util.KoishKey
 import org.bukkit.Keyed
@@ -11,6 +12,10 @@ import org.bukkit.inventory.Recipe as BukkitRecipe
  */
 abstract class CatalogItemRecipeNode(
     private val recipe: BukkitRecipe,
+    /**
+     * 该配方在图鉴中展示时的菜单布局.
+     */
+    val menuCfg: BasicMenuSettings,
 ) : CatalogItemNode {
     /**
      * 该配方在注册表中的唯一标识.
@@ -30,7 +35,8 @@ abstract class CatalogItemRecipeNode(
  */
 abstract class CatalogItemCookingNode(
     recipe: CookingRecipe<*>,
-) : CatalogItemRecipeNode(recipe) {
+    menuCfg: BasicMenuSettings,
+) : CatalogItemRecipeNode(recipe, menuCfg) {
     val cookingTime = recipe.cookingTime
     val experience = recipe.experience
 
@@ -45,28 +51,31 @@ abstract class CatalogItemCookingNode(
     override fun getLookupInputs(): Set<ItemRef> = inputItems.toSet()
 }
 
-
 class CatalogItemBlastingNode(
     recipe: BlastingRecipe,
-) : CatalogItemCookingNode(recipe) {
+    menuCfg: BasicMenuSettings,
+) : CatalogItemCookingNode(recipe, menuCfg) {
     override val type = CatalogItemNodeType.BLASTING_RECIPE
 }
 
 class CatalogItemCampfireNode(
     recipe: CampfireRecipe,
-) : CatalogItemCookingNode(recipe) {
+    menuCfg: BasicMenuSettings,
+) : CatalogItemCookingNode(recipe, menuCfg) {
     override val type = CatalogItemNodeType.CAMPFIRE_RECIPE
 }
 
 class CatalogItemFurnaceNode(
     recipe: FurnaceRecipe,
-) : CatalogItemCookingNode(recipe) {
+    menuCfg: BasicMenuSettings,
+) : CatalogItemCookingNode(recipe, menuCfg) {
     override val type = CatalogItemNodeType.FURNACE_RECIPE
 }
 
 class CatalogItemShapedNode(
     recipe: ShapedRecipe,
-) : CatalogItemRecipeNode(recipe) {
+    menuCfg: BasicMenuSettings,
+) : CatalogItemRecipeNode(recipe, menuCfg) {
     val shape: Array<out String> = recipe.shape
     val inputItems: Map<Char, List<ItemRef>> = recipe.choiceMap.mapValues { it.value.toItems() }
     val outputItem: ItemRef = ItemRef.create(recipe.result)
@@ -78,7 +87,8 @@ class CatalogItemShapedNode(
 
 class CatalogItemShapelessNode(
     recipe: ShapelessRecipe,
-) : CatalogItemRecipeNode(recipe) {
+    menuCfg: BasicMenuSettings,
+) : CatalogItemRecipeNode(recipe, menuCfg) {
     val inputItems: List<List<ItemRef>> = recipe.choiceList.map { it.toItems() }
     val outputItems: ItemRef = ItemRef.create(recipe.result)
 
@@ -89,7 +99,8 @@ class CatalogItemShapelessNode(
 
 class CatalogItemSmithingTransformNode(
     recipe: SmithingTransformRecipe,
-) : CatalogItemRecipeNode(recipe) {
+    menuCfg: BasicMenuSettings,
+) : CatalogItemRecipeNode(recipe, menuCfg) {
     val baseItems: List<ItemRef> = recipe.base.toItems()
     val templateItems: List<ItemRef> = recipe.template.toItems()
     val additionItems: List<ItemRef> = recipe.addition.toItems()
@@ -102,7 +113,8 @@ class CatalogItemSmithingTransformNode(
 
 class CatalogItemSmithingTrimNode(
     recipe: SmithingTrimRecipe,
-) : CatalogItemRecipeNode(recipe) {
+    menuCfg: BasicMenuSettings,
+) : CatalogItemRecipeNode(recipe, menuCfg) {
     val baseItems: List<ItemRef> = recipe.base.toItems()
     val templateItems: List<ItemRef> = recipe.template.toItems()
     val additionItems: List<ItemRef> = recipe.addition.toItems()
@@ -117,14 +129,16 @@ class CatalogItemSmithingTrimNode(
 
 class CatalogItemSmokingNode(
     recipe: SmokingRecipe,
-) : CatalogItemCookingNode(recipe) {
+    menuCfg: BasicMenuSettings,
+) : CatalogItemCookingNode(recipe, menuCfg) {
     override val type = CatalogItemNodeType.SMOKING_RECIPE
     override val sortId: String = recipe.key.value()
 }
 
 class CatalogItemStonecuttingNode(
     recipe: StonecuttingRecipe,
-) : CatalogItemRecipeNode(recipe) {
+    menuCfg: BasicMenuSettings,
+) : CatalogItemRecipeNode(recipe, menuCfg) {
     val inputItems: List<ItemRef> = recipe.inputChoice.toItems()
     val outputItem: ItemRef = ItemRef.create(recipe.result)
 

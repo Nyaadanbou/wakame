@@ -25,7 +25,7 @@ structure:
 # 菜单图标映射
 icons:
   hint: "internal/menu/catalog/default/layout/base/hint"
-  background: "internal/menu/common/default/layout/base/background"
+  background: "internal/menu/common/default/background"
   prev_page: "internal/menu/catalog/default/layout/base/prev_page"
   next_page: "internal/menu/catalog/default/layout/base/next_page"
   search: "internal/menu/catalog/default/layout/base/search"

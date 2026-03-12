@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.gui.catalog.item
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
 import cc.mewcraft.wakame.catalog.item.CatalogItemNetwork
 import cc.mewcraft.wakame.catalog.item.node.*
 import cc.mewcraft.wakame.craftingstation.recipe.ExpChoice
@@ -116,18 +115,13 @@ internal object CatalogItemNodeGuiManager {
         }
     }
 
-    /**
-     * 方便函数.
-     */
-    private val CatalogItemRecipeNode.menuSettings: BasicMenuSettings
-        get() = CatalogItemMenuSettings.getMenuSettings(this.type.name)
 
     /**
      * 创建烧制配方 [CatalogItemNodeGui] 的方法.
      * 烧制配方包括: 熔炉, 高炉, 烟熏炉, 营火配方.
      */
     private fun createCookingRecipeGui(node: CatalogItemCookingNode): CatalogItemNodeGui {
-        val settings = node.menuSettings
+        val settings = node.menuCfg
         val gui = Gui.normal { builder ->
             builder.setStructure(*settings.structure)
             builder.addIngredient('?', HintItem(settings))
@@ -144,7 +138,7 @@ internal object CatalogItemNodeGuiManager {
      * 创建有序合成配方 [CatalogItemNodeGui] 的方法.
      */
     private fun createShapedRecipeGui(node: CatalogItemShapedNode): CatalogItemNodeGui {
-        val settings = node.menuSettings
+        val settings = node.menuCfg
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
             builder.addIngredient('?', HintItem(settings))
@@ -172,7 +166,7 @@ internal object CatalogItemNodeGuiManager {
      * 创建无序合成配方 [CatalogItemNodeGui] 的方法.
      */
     private fun createShapelessRecipeGui(node: CatalogItemShapelessNode): CatalogItemNodeGui {
-        val settings = node.menuSettings
+        val settings = node.menuCfg
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
             builder.addIngredient('?', HintItem(settings))
@@ -188,7 +182,7 @@ internal object CatalogItemNodeGuiManager {
      * 创建锻造台转化配方 [CatalogItemNodeGui] 的方法.
      */
     private fun createSmithingTransformRecipeGui(node: CatalogItemSmithingTransformNode): CatalogItemNodeGui {
-        val settings = node.menuSettings
+        val settings = node.menuCfg
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
             builder.addIngredient('?', HintItem(settings))
@@ -205,7 +199,7 @@ internal object CatalogItemNodeGuiManager {
      * 创建锻造台纹饰配方 [CatalogItemNodeGui] 的方法.
      */
     private fun createSmithingTrimRecipeGui(node: CatalogItemSmithingTrimNode): CatalogItemNodeGui {
-        val settings = node.menuSettings
+        val settings = node.menuCfg
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
             builder.addIngredient('?', HintItem(settings))
@@ -223,7 +217,7 @@ internal object CatalogItemNodeGuiManager {
      * 创建切石机配方 [CatalogItemNodeGui] 的方法.
      */
     private fun createStonecuttingRecipeGui(node: CatalogItemStonecuttingNode): CatalogItemNodeGui {
-        val settings = node.menuSettings
+        val settings = node.menuCfg
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
             builder.addIngredient('?', HintItem(settings))

@@ -39,7 +39,7 @@ data class CatalogItemCategory(
 
             val icon = node.node("icon").require<Key>()
             val permission = node.node("permission").get<String>()
-            val settings = node.node("menu_settings").require<BasicMenuSettings>()
+            val settings = CatalogItemMenuSettings.getMenuSettings("category/${id.value()}")
             val contentMarker = when (node.node("content_marker").get<ContentMarker>(ContentMarker.HORIZONTAL)) {
                 ContentMarker.HORIZONTAL -> Markers.CONTENT_LIST_SLOT_HORIZONTAL
                 ContentMarker.VERTICAL -> Markers.CONTENT_LIST_SLOT_VERTICAL
