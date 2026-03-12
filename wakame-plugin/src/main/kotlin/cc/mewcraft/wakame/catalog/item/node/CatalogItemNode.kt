@@ -38,6 +38,7 @@ data class CatalogItemNodeType(
     val sortPriority: Int,
 ) {
     companion object {
+        // Minecraft 合成配方
         val SHAPED_RECIPE = CatalogItemNodeType("shaped_recipe", 100)
         val SHAPELESS_RECIPE = CatalogItemNodeType("shapeless_recipe", 200)
         val FURNACE_RECIPE = CatalogItemNodeType("furnace_recipe", 300)
@@ -47,7 +48,14 @@ data class CatalogItemNodeType(
         val SMITHING_TRANSFORM_RECIPE = CatalogItemNodeType("smithing_transform_recipe", 700)
         val SMITHING_TRIM_RECIPE = CatalogItemNodeType("smithing_trim_recipe", 800)
         val STONECUTTING_RECIPE = CatalogItemNodeType("stonecutting_recipe", 900)
+
+        // Minecraft 战利品表
         val LOOT_TABLE = CatalogItemNodeType("loot_table", 1000)
+
+        // Koish 合成站配方
         val CRAFTING_STATION = CatalogItemNodeType("crafting_station", 1100)
+
+        // 自定义单源节点
+        val SINGLE_SOURCE = CatalogItemNodeType("single_source", 2000)
     }
 }

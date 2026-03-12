@@ -1,0 +1,172 @@
+# 菜单设置: 高炉配方
+blasting:
+  title: "高炉烧炼"
+  # ?: hint
+  # .: background
+  # i: input
+  # o: output
+  # f: fuel
+  # !: cooking_info
+  structure:
+    - ". . . . . . . . ."
+    - ". . i . . . . . ."
+    - ". . ! . . . o . ?"
+    - ". . f . . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+    cooking_info: "internal/menu/catalog/default/layout/recipe/cooking_info"
+    fuel: "internal/menu/catalog/default/layout/recipe/fuel"
+
+# 菜单设置: 营火配方
+campfire:
+  title: "营火烧炼"
+  # ?: hint
+  # .: background
+  # i: input
+  # o: output
+  # !: cooking_info
+  structure:
+    - ". . . . . . . . ."
+    - ". . i . . . . . ."
+    - ". . ! . . . o . ?"
+    - ". . . . . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+    cooking_info: "internal/menu/catalog/default/layout/recipe/cooking_info"
+    fuel: "internal/menu/catalog/default/layout/recipe/fuel"
+
+# 菜单设置: 熔炉配方
+furnace:
+  title: "熔炉烧炼"
+  # ?: hint
+  # .: background
+  # i: input
+  # o: output
+  # f: fuel
+  # !: cooking_info
+  structure:
+    - ". . . . . . . . ."
+    - ". . i . . . . . ."
+    - ". . ! . . . o . ?"
+    - ". . f . . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+    cooking_info: "internal/menu/catalog/default/layout/recipe/cooking_info"
+    fuel: "internal/menu/catalog/default/layout/recipe/fuel"
+
+# 菜单设置: 有序合成配方
+shaped:
+  title: "工作台有序合成"
+  # ?: hint
+  # .: background
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". i i i . . . . ."
+    - ". i i i . . o . ?"
+    - ". i i i . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+
+# 菜单设置: 无序合成配方
+shapeless:
+  title: "工作台无序合成"
+  # ?: hint
+  # .: background
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". i i i . . . . ."
+    - ". i i i . . o . ?"
+    - ". i i i . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+
+# 菜单设置: 锻造台转化配方
+smithing_transform:
+  title: "锻造台"
+  # ?: hint
+  # .: background
+  # b: input(base)
+  # t: input(template)
+  # a: input(addition)
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". . . . . . . . ."
+    - ". t b a . . o . ?"
+    - ". . . . . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+
+# 菜单设置: 锻造台纹饰配方
+smithing_trim:
+  title: "锻造台"
+  # ?: hint
+  # .: background
+  # b: input(base)
+  # t: input(template)
+  # a: input(addition)
+  # r: trim_result
+  structure:
+    - ". . . . . . . . ."
+    - ". . . . . . . . ."
+    - ". t b a . . r . ?"
+    - ". . . . . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+    trim_result: "internal/menu/catalog/default/layout/recipe/trim_result"
+
+# 菜单设置: 烟熏炉配方
+smoking:
+  title: "烟熏炉烧炼"
+  # ?: hint
+  # .: background
+  # i: input
+  # o: output
+  # f: fuel
+  # !: cooking_info
+  structure:
+    - ". . . . . . . . ."
+    - ". . i . . . . . ."
+    - ". . ! . . . o . ?"
+    - ". . f . . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+    cooking_info: "internal/menu/catalog/default/layout/recipe/cooking_info"
+    fuel: "internal/menu/catalog/default/layout/recipe/fuel"
+
+# 菜单设置: 切石机配方
+stonecutting:
+  title: "切石机"
+  # ?: hint
+  # .: background
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". . . . . . . . ."
+    - ". . i . . . o . ?"
+    - ". . . . . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"

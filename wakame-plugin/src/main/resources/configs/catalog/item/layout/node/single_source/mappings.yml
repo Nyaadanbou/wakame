@@ -1,0 +1,63 @@
+# 用于配置图鉴系统中每一个单源节点 (class: CatalogItemSingleSourceNode) 所对应的菜单设置, 以及菜单设置中输入图标的样子
+
+# 这里指定了一个特定的自定义单源节点所使用的菜单设置
+#
+# key:
+#   正则表达式, 用于匹配单源节点的唯一标识, 引用自文件夹 configs/catalog/item/node/single_source/ 下面的文件名 (不带后缀)
+# value:
+#   菜单设置的唯一标识, 引用自文件 configs/catalog/item/layout/node/single_source/menus.yml 中预设的菜单设置 (一级 key)
+menu_setting_mappings:
+  # 盲盒奖励
+  "^crate/.*$": default_crate
+  # 地牢奖励
+  "^dungeon/.*$": default_dungeon
+  # Mythic 生物掉落
+  "^mythic_drop/.*$": default_mythic_mob
+  # 任务奖励
+  "^quest/.*$": default_quest
+  # 签到奖励
+  "^signup/.*$": default_signup
+
+# 这里指定了一个特定的自定义单源节点的菜单设置中的 "input" 的具体样子
+#
+# key:
+#   正则表达式, 用于匹配自定义单源节点的唯一标识
+# value:
+#   输入图标的唯一标识, 引用 configs/item/ 中预设的物品
+input_icon_mappings:
+  # 盲盒奖励
+  "^crate/dirt$": internal/menu/catalog/default/input/crate/dirt
+  "^crate/iron$": internal/menu/catalog/default/input/crate/iron
+  # 地牢奖励
+  "^dungeon/easy_boss$": internal/menu/catalog/default/input/dungeon/easy_boss
+  "^dungeon/hard_boss$": internal/menu/catalog/default/input/dungeon/hard_boss
+  # Mythic 生物掉落
+  "^mythic_drop/example_skeleton$": internal/menu/catalog/default/input/mythic_mob/example_skeleton
+  "^mythic_drop/example_spider$": internal/menu/catalog/default/input/mythic_mob/example_spider
+  # 任务奖励
+  "^quest/dirt_npc$": internal/menu/catalog/default/input/quest/dirt_npc
+  "^quest/iron_npc$": internal/menu/catalog/default/input/quest/iron_npc
+  # 签到奖励
+  "^signup/architect_normal_time$": internal/menu/catalog/default/input/quest/architect_normal_time
+  "^signup/artisan_normal_time$": internal/menu/catalog/default/input/quest/artisan_normal_time
+  "^signup/default_normal_time$": internal/menu/catalog/default/input/quest/default_normal_time
+  "^signup/default_special_dates_guoqing$": internal/menu/catalog/default/input/quest/default_special_dates_guoqing
+  "^signup/default_special_dates_shengdan$": internal/menu/catalog/default/input/quest/default_special_dates_shengdan
+  "^signup/default_special_dates_yuanxiao$": internal/menu/catalog/default/input/quest/default_special_dates_yuanxiao
+  "^signup/default_special_dates_zhongqiu$": internal/menu/catalog/default/input/quest/default_special_dates_zhongqiu
+  "^signup/default_special_ranking_1$": internal/menu/catalog/default/input/quest/default_special_ranking_1"
+  "^signup/default_special_time_periods_03_00_00$": internal/menu/catalog/default/input/quest/default_special_time_periods_03_00_00
+  "^signup/default_special_time_periods_22_30_00$": internal/menu/catalog/default/input/quest/default_special_time_periods_22_30_00
+  "^signup/default_special_times_3$": internal/menu/catalog/default/input/quest/default_special_times_3
+  "^signup/default_special_times_7$": internal/menu/catalog/default/input/quest/default_special_times_7
+  "^signup/default_special_times_cycle_2$": internal/menu/catalog/default/input/quest/default_special_times_cycle_2
+  "^signup/default_special_times_of_month_15$": internal/menu/catalog/default/input/quest/default_special_times_of_month_15
+  "^signup/default_special_weeks_7$": internal/menu/catalog/default/input/quest/default_special_weeks_7
+  "^signup/default_statistics_times_90$": internal/menu/catalog/default/input/quest/default_statistics_times_90
+  "^signup/default_statistics_times_cycle_90$": internal/menu/catalog/default/input/quest/default_statistics_times_cycle_90
+  "^signup/default_statistics_times_of_month_15$": internal/menu/catalog/default/input/quest/default/statistics_times_of_month_15
+  "^signup/designer_normal_time$": internal/menu/catalog/default/input/quest/designer_normal_time
+  "^signup/vip1_normal_time$": internal/menu/catalog/default/input/quest/vip1_normal_time
+  "^signup/vip2_normal_time$": internal/menu/catalog/default/input/quest/vip2_normal_time
+  "^signup/vip3_normal_time$": internal/menu/catalog/default/input/quest/vip3_normal_time
+  "^signup/vip4_normal_time$": internal/menu/catalog/default/input/quest/vip4_normal_time

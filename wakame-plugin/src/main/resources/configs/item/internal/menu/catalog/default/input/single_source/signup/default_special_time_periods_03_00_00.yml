@@ -1,0 +1,4 @@
+base: shulker_shell
+clientbound/item_model: minecraft:knowledge_book
+slot_display_name: "<!i><gold>所有人 凌晨签到奖励"
+

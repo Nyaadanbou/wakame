@@ -1,0 +1,114 @@
+# id 为 "default_crate" 的菜单设置
+default_crate:
+  # 菜单标题
+  title: "盲盒开启奖励"
+  # 菜单结构
+  #
+  # 占位符说明:
+  # ?: hint
+  # .: background
+  # <: prev_page
+  # >: next_page
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". . . o o o o o ."
+    - ". i . o o o o o ."
+    - ". . . o o o o o ."
+    - ". . . < . ? . > ."
+  # 菜单图标映射
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+    prev_page: "internal/menu/catalog/default/layout/base/prev_page"
+    next_page: "internal/menu/catalog/default/layout/base/next_page"
+
+# id 为 "default_dungeon" 的菜单设置
+default_dungeon:
+  # 菜单标题
+  title: "地牢通关奖励"
+  # 菜单结构
+  #
+  # 占位符说明:
+  # ?: hint
+  # .: background
+  # <: prev_page
+  # >: next_page
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". . . o o o o o ."
+    - ". i . o o o o o ."
+    - ". . . o o o o o ."
+    - ". . . < . ? . > ."
+  # 菜单图标映射
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+    prev_page: "internal/menu/catalog/default/layout/base/prev_page"
+    next_page: "internal/menu/catalog/default/layout/base/next_page"
+
+# id 为 "default_mythic_drop" 的菜单设置
+default_mythic_drop:
+  title: "幻境实体掉落物"
+  # ?: hint
+  # .: background
+  # <: prev_page
+  # >: next_page
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". . . o o o o o ."
+    - ". i . o o o o o ."
+    - ". . . o o o o o ."
+    - ". . . < . ? . > ."
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+    prev_page: "internal/menu/catalog/default/layout/base/prev_page"
+    next_page: "internal/menu/catalog/default/layout/base/next_page"
+
+# id 为 "default_quest" 菜单设置
+default_quest:
+  title: "任务完成奖励"
+  # ?: hint
+  # .: background
+  # <: prev_page
+  # >: next_page
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". . . o o o o o ."
+    - ". i . o o o o o ."
+    - ". . . o o o o o ."
+    - ". . . < . ? . > ."
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+    prev_page: "internal/menu/catalog/default/layout/base/prev_page"
+    next_page: "internal/menu/catalog/default/layout/base/next_page"
+
+# id 为 "default_signup" 菜单设置
+default_signup:
+  title: "签到完成奖励"
+  # ?: hint
+  # .: background
+  # <: prev_page
+  # >: next_page
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". . . o o o o o ."
+    - ". i . o o o o o ."
+    - ". . . o o o o o ."
+    - ". . . < . ? . > ."
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+    prev_page: "internal/menu/catalog/default/layout/base/prev_page"
+    next_page: "internal/menu/catalog/default/layout/base/next_page"

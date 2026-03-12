@@ -50,12 +50,9 @@ object CatalogItemNetwork {
      */
     fun rebuildNetwork() {
         CatalogItemCraftingStationNodeInitializer.reload()
-        CatalogItemCrateNodeInitializer.reload()
         CatalogItemLootTableNodeInitializer.reload()
-        CatalogItemMythicDropNodeInitializer.reload()
-        CatalogItemQuestNodeInitializer.reload()
-        CatalogItemSignupNodeInitializer.reload()
         CatalogItemRecipeNodeInitializer.reload()
+        CatalogItemSingleSourceNodeInitializer.reload()
 
         network = buildNetWork()
     }
@@ -75,39 +72,24 @@ object CatalogItemNetwork {
         // 添加起占位作用的空节点
         network.addNode(Optional.empty())
 
-        // 合成站
+        // Koish 合成站配方
         for (craftingStationNode in DynamicRegistries.CATALOG_ITEM_CRAFTING_STATION_NODE) {
             network.addNode(craftingStationNode)
         }
 
-        // 盲盒
-        for (crateNode in DynamicRegistries.CATALOG_ITEM_CRATE_NODE) {
-            network.addNode(crateNode)
-        }
-
-        // 原版战利品表
-        for (lootTableNode in DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_NODE) {
+        // Minecraft 战利品表
+        for (lootTableNode in DynamicRegistries.CATALOG_ITEM_MINECRAFT_LOOT_TABLE_NODE) {
             network.addNode(lootTableNode)
         }
 
-        // MythicMobs 生物掉落
-        for (mythicDropNode in DynamicRegistries.CATALOG_ITEM_MYTHIC_DROP_NODE) {
-            network.addNode(mythicDropNode)
-        }
-
-        // NPC 任务奖励
-        for (questNode in DynamicRegistries.CATALOG_ITEM_QUEST_NODE) {
-            network.addNode(questNode)
-        }
-
-        // 签到奖励
-        for (signupNode in DynamicRegistries.CATALOG_ITEM_SIGNUP_NODE) {
-            network.addNode(signupNode)
-        }
-
-        // 原版合成配方
-        for (recipeNode in DynamicRegistries.CATALOG_ITEM_RECIPE_NODE) {
+        // Minecraft 合成配方
+        for (recipeNode in DynamicRegistries.CATALOG_ITEM_MINECRAFT_RECIPE_NODE) {
             network.addNode(recipeNode)
+        }
+
+        // 自定义单源节点
+        for (mythicDropNode in DynamicRegistries.CATALOG_ITEM_SINGLE_SOURCE_NODE) {
+            network.addNode(mythicDropNode)
         }
 
         return ImmutableNetwork.copyOf(network)

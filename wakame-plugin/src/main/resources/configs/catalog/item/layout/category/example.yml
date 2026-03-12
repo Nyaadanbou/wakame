@@ -1,0 +1,29 @@
+# menu class: CatalogItemCategoryMenu
+
+# [图鉴类别]菜单设置: 用于展示一个图鉴类别下的所有节点
+
+# 菜单标题
+title: "❊ 测试"
+
+# 菜单结构
+#
+# 占位符说明:
+# x: item, 图鉴节点
+# .: background
+# <: prev_page
+# >: next_page
+# b: back
+structure:
+  - ". . . . . . . . ."
+  - ". x x x x x x x ."
+  - ". x x x x x x x ."
+  - ". x x x x x x x ."
+  - ". x x x x x x x ."
+  - "< . . . b . . . >"
+
+# 菜单图标映射
+icons:
+  background: "internal/menu/common/default/background"
+  prev_page: "internal/menu/catalog/default/layout/base/prev_page"
+  next_page: "internal/menu/catalog/default/layout/base/next_page"
+  back: "internal/menu/common/default/back"

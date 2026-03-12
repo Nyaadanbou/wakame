@@ -37,14 +37,14 @@ internal object CatalogItemLootTableNodeInitializer : RegistryLoader {
     @InitFun
     fun init() {
         reloadMinecraftLootTables()
-        DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_NODE.resetRegistry()
-        applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_NODE::add)
+        DynamicRegistries.CATALOG_ITEM_MINECRAFT_LOOT_TABLE_NODE.resetRegistry()
+        applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_MINECRAFT_LOOT_TABLE_NODE::add)
         //DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_RECIPE.freeze()
     }
 
     fun reload() {
         reloadMinecraftLootTables()
-        applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_LOOT_TABLE_NODE::update)
+        applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_MINECRAFT_LOOT_TABLE_NODE::update)
     }
 
     // 重新读取服务端上的 Minecraft Loot Tables

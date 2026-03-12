@@ -1,0 +1,5 @@
+display_name: 所有人 签到90次奖励
+output_items:
+  - minecraft:dirt
+  - minecraft:stone
+  - minecraft:grass_block

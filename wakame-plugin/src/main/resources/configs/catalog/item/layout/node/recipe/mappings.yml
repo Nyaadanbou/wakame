@@ -1,0 +1,23 @@
+# 用于配置图鉴系统中每一个 Minecraft 合成配方节点 (class: CatalogItemRecipeNode) 所对应的菜单设置
+
+# 这里指定了一类特定的 Minecraft 合成配方所使用的菜单设置
+#
+# key:
+#   正则表达式, 用于匹配 Minecraft 合成配方类型的唯一标识
+# value:
+#   菜单设置的唯一标识, 引用自文件 configs/catalog/item/layout/node/recipe/menus.yml 中预设的菜单设置 (一级 key)
+menu_setting_mappings:
+  "^blasting_recipe$": blasting
+  "^campfire_recipe$": campfire
+  "^furnace_recipe$": furnace
+  "^shaped_recipe$": shaped
+  "^shapeless_recipe$": shapeless
+  "^smithing_transform_recipe$": smithing_transform
+  "^smithing_trim_recipe$": smithing_trim
+  "^smoking_recipe$": smoking
+  "^stonecutting_recipe$": stonecutting
+
+# <由程序自动生成>
+#
+# 不需要指定 Minecraft 合成配方的输入图标映射, 因为 Minecraft 合成配方的输入图标是根据它的配方自动生成的, 不需要手动指定
+input_icon_mappings: {}

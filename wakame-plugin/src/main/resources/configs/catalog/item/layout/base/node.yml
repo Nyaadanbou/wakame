@@ -1,0 +1,29 @@
+# menu class: CatalogItemFocusMenu
+
+# [节点聚焦]菜单设置: 用于展示一个图鉴节点的来源&用途
+
+# 菜单标题
+title: "写什么都无所谓, 标题取决于具体的节点菜单"
+
+# 菜单结构
+#
+# 占位符说明:
+# x: catalog_node_gui, 这个区域将嵌套 configs/catalog/item/layout/node/ 中的菜单
+# .: background
+# <: prev_page
+# >: next_page
+# b: back
+structure:
+  - "x x x x x x x x x"
+  - "x x x x x x x x x"
+  - "x x x x x x x x x"
+  - "x x x x x x x x x"
+  - "x x x x x x x x x"
+  - "< . . . b . . . >"
+
+# 菜单图标映射
+icons:
+  background: "internal/menu/common/default/background"
+  prev_page: "internal/menu/catalog/default/layout/base/prev_page"
+  next_page: "internal/menu/catalog/default/layout/base/next_page"
+  back: "internal/menu/common/default/back"

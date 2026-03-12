@@ -1,0 +1,5 @@
+display_name: 所有人 连续签到3天奖励
+output_items:
+  - minecraft:dirt
+  - minecraft:stone
+  - minecraft:grass_block

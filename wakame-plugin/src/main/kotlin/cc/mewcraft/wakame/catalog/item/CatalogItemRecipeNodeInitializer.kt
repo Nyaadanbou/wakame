@@ -19,13 +19,13 @@ internal object CatalogItemRecipeNodeInitializer : RegistryLoader {
 
     @InitFun
     fun init() {
-        DynamicRegistries.CATALOG_ITEM_RECIPE_NODE.resetRegistry()
-        applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_RECIPE_NODE::add)
+        DynamicRegistries.CATALOG_ITEM_MINECRAFT_RECIPE_NODE.resetRegistry()
+        applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_MINECRAFT_RECIPE_NODE::add)
         //DynamicRegistries.CATALOG_ITEM_STANDARD_RECIPE.freeze()
     }
 
     fun reload() {
-        applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_RECIPE_NODE::upsert)
+        applyDataToRegistry(DynamicRegistries.CATALOG_ITEM_MINECRAFT_RECIPE_NODE::upsert)
     }
 
     private fun applyDataToRegistry(registryAction: (KoishKey, CatalogItemRecipeNode) -> Unit) {

@@ -1,0 +1,31 @@
+# menu class: CatalogItemMainMenu
+
+# [主]菜单设置: 展示所有图鉴类别
+
+# 菜单标题
+title: "物品图鉴"
+
+# 菜单结构
+#
+# 占位符说明:
+# x: category, 图鉴类别, 每一个图标对应一个 configs/catalog/item/category/ 下的文件
+# ?: hint
+# .: background
+# <: prev_page
+# >: next_page
+# s: search
+structure:
+  - ". . . . ? . . . ."
+  - ". x x x x x x x ."
+  - ". x x x x x x x ."
+  - ". x x x x x x x ."
+  - ". x x x x x x x ."
+  - "< . . . s . . . >"
+
+# 菜单图标映射
+icons:
+  hint: "internal/menu/catalog/default/layout/base/hint"
+  background: "internal/menu/common/default/layout/base/background"
+  prev_page: "internal/menu/catalog/default/layout/base/prev_page"
+  next_page: "internal/menu/catalog/default/layout/base/next_page"
+  search: "internal/menu/catalog/default/layout/base/search"

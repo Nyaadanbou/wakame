@@ -1,0 +1,12 @@
+# key:
+#   正则表达式, 用于匹配合成站的唯一标识
+# value:
+#   菜单设置的唯一标识, 引用自文件 configs/catalog/item/layout/node/crafting_station/menus.yml 中预设的菜单设置 (一级 key)
+menu_setting_mappings:
+  ^simple$: simple
+  ^complex$: complex
+
+# <由程序自动生成>
+#
+# 不需要指定合成站的输入图标映射, 因为合成站的输入图标是根据它的配方自动生成的, 不需要手动指定
+input_icon_mappings: {}
