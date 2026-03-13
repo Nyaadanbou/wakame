@@ -1,13 +1,11 @@
 package cc.mewcraft.wakame.catalog.item.node
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.mixin.support.KoishLootItem
 import cc.mewcraft.wakame.shadow.loot.*
-import cc.mewcraft.wakame.util.MINECRAFT_SERVER
-import cc.mewcraft.wakame.util.MojangLootTable
-import cc.mewcraft.wakame.util.namespacedKey
-import cc.mewcraft.wakame.util.shadow
+import cc.mewcraft.wakame.util.*
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.shadow
 import net.kyori.adventure.key.Key
@@ -44,6 +42,10 @@ data class CatalogItemLootTableNode(
     val menuCfg: BasicMenuSettings,
 ) : CatalogItemNode {
 
+    companion object {
+        private val logger = LOGGER.decorate(CatalogItemLootTableNode::class)
+    }
+
     override val type =
         CatalogItemNodeType.LOOT_TABLE
     override val sortId
@@ -52,7 +54,11 @@ data class CatalogItemLootTableNode(
     val lootItems: List<ItemRef> = flattenLootTable(lootTable).distinct().sortedBy(ItemRef::id)
 
     override fun getLookupInputs(): Set<ItemRef> {
-        return emptySet() // 没有途径可以获取一个战利品表 (这句话很奇怪, 但符合框架逻辑)
+        val itemRef = ItemRef.create(inputIcon) ?: run {
+            logger.warn("Invalid input icon for $lootTableId: $inputIcon")
+            return emptySet()
+        }
+        return setOf(itemRef)
     }
 
     override fun getLookupOutputs(): Set<ItemRef> {

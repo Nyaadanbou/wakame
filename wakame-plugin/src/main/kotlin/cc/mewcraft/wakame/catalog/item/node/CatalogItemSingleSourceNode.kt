@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.catalog.item.node
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.ItemRef
+import cc.mewcraft.wakame.util.decorate
 import net.kyori.adventure.key.Key
 
 /**
@@ -38,6 +40,10 @@ data class CatalogItemSingleSourceNode(
     val menuCfg: BasicMenuSettings,
 ) : CatalogItemNode {
 
+    companion object {
+        private val logger = LOGGER.decorate(CatalogItemSingleSourceNode::class)
+    }
+
     override val type: CatalogItemNodeType =
         CatalogItemNodeType.SINGLE_SOURCE
 
@@ -45,7 +51,11 @@ data class CatalogItemSingleSourceNode(
         get() = nodeId
 
     override fun getLookupInputs(): Set<ItemRef> {
-        return emptySet() // 单源节点没有实际的输入物品
+        val itemRef = ItemRef.create(inputIcon) ?: run {
+            logger.warn("Invalid input icon for $nodeId: $inputIcon")
+            return emptySet()
+        }
+        return setOf(itemRef)
     }
 
     override fun getLookupOutputs(): Set<ItemRef> {
