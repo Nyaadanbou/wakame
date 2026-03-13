@@ -145,10 +145,10 @@ private object ReloadProcess {
         ResourcePackLifecycle.reload()
 
         // 图鉴是游戏内容的汇总, 所以永远放在最后重新加载
-        CatalogItemNetwork.rebuildNetwork()
-        CatalogItemCategoryInitializer.reload()
         CatalogItemMenuSettings.reload()
         CatalogItemMenuStacks.clearStacks()
+        CatalogItemNetwork.rebuildNetwork()
+        CatalogItemCategoryInitializer.reload()
 
         //
 
