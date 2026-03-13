@@ -1,4 +1,4 @@
 base: shulker_shell
 persistent_item_model: minecraft:chest
-slot_display_name: "<!i><gold>沉船"
-slot_display_lore: "<!i><gray>补给箱"
+persistent_item_name: "<!i><gold>沉船"
+persistent_lore: "<!i><gray>补给箱"

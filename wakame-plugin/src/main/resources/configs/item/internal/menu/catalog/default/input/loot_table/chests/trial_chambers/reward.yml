@@ -1,4 +1,4 @@
 base: shulker_shell
 persistent_item_model: minecraft:chest
-slot_display_name: "<!i><gold>试炼密室"
-slot_display_lore: "<!i><gray>开启宝库"
+persistent_item_name: "<!i><gold>试炼密室"
+persistent_lore: "<!i><gray>开启宝库"

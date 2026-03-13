@@ -1,7 +1,7 @@
 base: shulker_shell
 persistent_item_model: minecraft:book
-slot_display_name: "<!i><yellow>泥土NPC: 任务奖励"
-slot_display_lore:
+persistent_item_name: "<!i><yellow>泥土NPC: 任务奖励"
+persistent_lore:
   - "<!i><white>位面: <gray>主世界"
   - "<!i><gray>完成泥土NPC的任务后可以获得"
   - "<!i><gray>泥土NPC的专属奖励"

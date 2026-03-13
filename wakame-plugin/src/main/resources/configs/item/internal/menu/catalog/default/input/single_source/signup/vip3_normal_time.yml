@@ -1,4 +1,4 @@
 base: shulker_shell
 persistent_item_model: minecraft:knowledge_book
-slot_display_name: "<!i><gold>米团LV3 每日签到奖励"
+persistent_item_name: "<!i><gold>米团LV3 每日签到奖励"
 
