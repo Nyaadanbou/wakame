@@ -5,15 +5,18 @@ simple:
   # 菜单结构
   #
   # 占位符说明:
+  # ?: hint
   # .: background
+  # <: prev_page
+  # >: next_page
   # i: input
   # o: output
   structure:
-    - ". . . . . . . . ."
+    - ". . ? . . . . . ."
     - ". i i i . . . . ."
     - ". i i i . . o . ."
     - ". i i i . . . . ."
-    - ". . . . . . . . ."
+    - ". < . > . . . . ."
   # 菜单图标映射
   icons:
     background: "internal/menu/common/default/background"
@@ -22,10 +25,10 @@ simple:
 complex:
   title: "高级合成站"
   structure:
-    - ". . . . . . . . ."
+    - ". . ? . . . . . ."
     - ". i i i . . . . ."
     - ". i i i . . o . ."
     - ". i i i . . . . ."
-    - ". . . . . . . . ."
+    - ". < . > . . . . ."
   icons:
     background: "internal/menu/common/default/background"

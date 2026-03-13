@@ -258,16 +258,17 @@ internal object CatalogItemNodeGuiManager {
         val settings = node.menuCfg
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
+            builder.addIngredient('?', HintItem(settings))
             builder.addIngredient('.', BackgroundItem(settings))
+            builder.addIngredient('<', PrevItem(settings))
+            builder.addIngredient('>', NextItem(settings))
             builder.addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-            // 将每一个 RecipeChoice 转化为展示物品
             builder.setContent(node.inputChoices.map { choice ->
                 when (choice) {
                     is ItemChoice -> DisplayItem(choice.item, choice.amount)
                     is ExpChoice -> SimpleItem(ItemStack(Material.EXPERIENCE_BOTTLE, choice.amount.coerceIn(1, 64)))
                 }
             })
-            // 输出物品 (可点击查找来源/用途)
             val output = node.outputResult
             if (output is ItemResult) {
                 builder.addIngredient('o', DisplayItem(output.item, output.amount))
@@ -393,8 +394,7 @@ class LootItem(
     private val node: CatalogItemLootTableNode,
 ) : AbstractItem() {
 
-    private val itemProvider: ItemProvider =
-        SlotDisplay.get(node.inputIcon).resolveToItemWrapper()
+    private val itemProvider = SlotDisplay.get(node.inputIcon).resolveToItemWrapper()
 
     override fun getItemProvider(): ItemProvider {
         return itemProvider
@@ -412,8 +412,7 @@ private class SingleSourceItem(
     private val node: CatalogItemSingleSourceNode,
 ) : AbstractItem() {
 
-    private val itemProvider: ItemProvider =
-        SlotDisplay.get(node.inputIcon).resolveToItemWrapper()
+    private val itemProvider = SlotDisplay.get(node.inputIcon).resolveToItemWrapper()
 
     override fun getItemProvider(): ItemProvider {
         return itemProvider
