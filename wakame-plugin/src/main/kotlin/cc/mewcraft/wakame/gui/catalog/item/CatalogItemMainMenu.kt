@@ -53,7 +53,6 @@ class CatalogItemMainMenu(
      */
     private val primaryGui: PagedGui<Item> = PagedGui.items { builder ->
         builder.setStructure(*settings.structure)
-        builder.addIngredient('?', HintItem())
         builder.addIngredient('.', BackgroundItem())
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
@@ -85,20 +84,6 @@ class CatalogItemMainMenu(
 
     override fun close() {
         primaryWindow.close()
-    }
-
-    /**
-     * `提示占位`的图标.
-     */
-    inner class HintItem : AbstractItem() {
-
-        override fun getItemProvider(): ItemProvider {
-            return settings.getSlotDisplay("hint").resolveToItemWrapper()
-        }
-
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-
-        }
     }
 
     /**
@@ -170,7 +155,7 @@ class CatalogItemMainMenu(
         private val category: CatalogItemCategory,
     ) : AbstractItem() {
 
-        private val itemProvider: ItemProvider = SlotDisplay.get(category.icon).resolveToItemWrapper()
+        private val itemProvider = SlotDisplay.get(category.icon).resolveToItemWrapper()
 
         override fun getItemProvider(): ItemProvider {
             return itemProvider
