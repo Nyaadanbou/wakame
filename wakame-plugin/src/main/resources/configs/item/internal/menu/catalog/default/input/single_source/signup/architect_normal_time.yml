@@ -1,4 +1,4 @@
 base: shulker_shell
-clientbound/item_model: minecraft:knowledge_book
+persistent_item_model: minecraft:knowledge_book
 slot_display_name: "<!i><gold>建筑师 每日签到奖励"
 

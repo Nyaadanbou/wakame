@@ -1,5 +1,5 @@
 base: shulker_shell
-clientbound/item_model: minecraft:book
+persistent_item_model: minecraft:book
 slot_display_name: "<!i><yellow>泥土NPC: 任务奖励"
 slot_display_lore:
   - "<!i><white>位面: <gray>主世界"

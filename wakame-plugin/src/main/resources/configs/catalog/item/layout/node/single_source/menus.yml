@@ -13,10 +13,10 @@ default_crate:
   # o: output
   structure:
     - ". . . . . . . . ."
-    - ". . . o o o o o ."
+    - ". ? . o o o o o ."
     - ". i . o o o o o ."
     - ". . . o o o o o ."
-    - ". . . < . ? . > ."
+    - ". . . < . . . > ."
   # 菜单图标映射
   icons:
     hint: "internal/menu/catalog/default/layout/base/hint"
@@ -39,10 +39,10 @@ default_dungeon:
   # o: output
   structure:
     - ". . . . . . . . ."
-    - ". . . o o o o o ."
+    - ". ? . o o o o o ."
     - ". i . o o o o o ."
     - ". . . o o o o o ."
-    - ". . . < . ? . > ."
+    - ". . . < . . . > ."
   # 菜单图标映射
   icons:
     hint: "internal/menu/catalog/default/layout/base/hint"
@@ -61,10 +61,10 @@ default_mythic_drop:
   # o: output
   structure:
     - ". . . . . . . . ."
-    - ". . . o o o o o ."
+    - ". ? . o o o o o ."
     - ". i . o o o o o ."
     - ". . . o o o o o ."
-    - ". . . < . ? . > ."
+    - ". . . < . . . > ."
   icons:
     hint: "internal/menu/catalog/default/layout/base/hint"
     background: "internal/menu/common/default/background"
@@ -82,10 +82,10 @@ default_quest:
   # o: output
   structure:
     - ". . . . . . . . ."
-    - ". . . o o o o o ."
+    - ". ? . o o o o o ."
     - ". i . o o o o o ."
     - ". . . o o o o o ."
-    - ". . . < . ? . > ."
+    - ". . . < . . . > ."
   icons:
     hint: "internal/menu/catalog/default/layout/base/hint"
     background: "internal/menu/common/default/background"
@@ -103,10 +103,10 @@ default_signup:
   # o: output
   structure:
     - ". . . . . . . . ."
-    - ". . . o o o o o ."
+    - ". ? . o o o o o ."
     - ". i . o o o o o ."
     - ". . . o o o o o ."
-    - ". . . < . ? . > ."
+    - ". . . < . . . > ."
   icons:
     hint: "internal/menu/catalog/default/layout/base/hint"
     background: "internal/menu/common/default/background"

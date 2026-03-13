@@ -16,6 +16,7 @@ items:
   - minecraft:cake
   - minecraft:cooked_beef
   - minecraft:iron_ingot
+  - minecraft:netherite_chestplate
   - minecraft:netherite_upgrade_smithing_template
   - minecraft:ward_armor_trim_smithing_template
   - minecraft:silence_armor_trim_smithing_template
@@ -25,3 +26,4 @@ items:
   - minecraft:rotten_flesh
   - minecraft:dirt
   - minecraft:bone
+  - koish:example/bronze_ingot

@@ -1,4 +1,4 @@
 base: shulker_shell
-clientbound/item_model: minecraft:chest
+persistent_item_model: minecraft:chest
 slot_display_name: "<!i><gold>要塞"
 slot_display_lore: "<!i><gray>走廊"

@@ -9,10 +9,10 @@ chest:
   # o: output
   structure:
     - ". . . . . . . . ."
-    - ". . . o o o o o ."
+    - ". ? . o o o o o ."
     - ". i . o o o o o ."
     - ". . . o o o o o ."
-    - ". . . < . ? . > ."
+    - ". . . < . . . > ."
   icons:
     hint: "internal/menu/catalog/default/layout/base/hint"
     background: "internal/menu/common/default/background"
@@ -30,10 +30,10 @@ barrel:
   # o: output
   structure:
     - ". . . . . . . . ."
-    - ". . . o o o o o ."
+    - ". ? . o o o o o ."
     - ". i . o o o o o ."
     - ". . . o o o o o ."
-    - ". . . < . ? . > ."
+    - ". . . < . . . > ."
   icons:
     hint: "internal/menu/catalog/default/layout/base/hint"
     background: "internal/menu/common/default/background"
@@ -51,10 +51,10 @@ vault:
   # o: output
   structure:
     - ". . . . . . . . ."
-    - ". . . o o o o o ."
+    - ". ? . o o o o o ."
     - ". i . o o o o o ."
     - ". . . o o o o o ."
-    - ". . . < . ? . > ."
+    - ". . . < . . . > ."
   icons:
     hint: "internal/menu/catalog/default/layout/base/hint"
     background: "internal/menu/common/default/background"
@@ -72,10 +72,10 @@ entity:
   # o: output
   structure:
     - ". . . . . . . . ."
-    - ". . . o o o o o ."
+    - ". ? . o o o o o ."
     - ". i . o o o o o ."
     - ". . . o o o o o ."
-    - ". . . < . ? . > ."
+    - ". . . < . . . > ."
   icons:
     hint: "internal/menu/catalog/default/layout/base/hint"
     background: "internal/menu/common/default/background"
