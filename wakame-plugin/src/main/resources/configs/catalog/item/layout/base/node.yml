@@ -8,7 +8,7 @@ title: "写什么都无所谓, 标题取决于具体的节点菜单"
 # 菜单结构
 #
 # 占位符说明:
-# x: catalog_node_gui, 这个区域将嵌套 configs/catalog/item/layout/node/ 中的菜单
+# x: node_gui, 这个区域将嵌套 configs/catalog/item/layout/node/ 中的菜单
 # .: background
 # <: prev_page
 # >: next_page

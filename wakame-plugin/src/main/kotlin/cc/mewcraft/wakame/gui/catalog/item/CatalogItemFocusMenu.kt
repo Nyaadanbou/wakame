@@ -48,7 +48,7 @@ internal class CatalogItemFocusMenu(
     /**
      * 菜单的 [PagedGui].
      *
-     * - `x`: catalog_node_gui
+     * - `x`: node_gui
      * - `.`: background
      * - `<`: prev_page
      * - `>`: next_page
