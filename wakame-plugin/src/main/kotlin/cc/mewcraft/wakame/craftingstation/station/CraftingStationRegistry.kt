@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.craftingstation.recipe.RecipeChoice
 import cc.mewcraft.wakame.craftingstation.recipe.RecipeResult
+import cc.mewcraft.wakame.event.map.CraftingStationRegistrationDoneEvent
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -15,6 +16,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.IdePauser
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.configurate.yamlLoader
+import cc.mewcraft.wakame.util.eventbus.MapEventBus
 import cc.mewcraft.wakame.util.runTaskLater
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
@@ -41,6 +43,7 @@ internal object CraftingStationRegistry {
             loadRecipesIntoRegistry()
             registerStationRecipes()
             loadStationsIntoRegistry()
+            MapEventBus.post(CraftingStationRegistrationDoneEvent)
         }
     }
 
@@ -48,6 +51,7 @@ internal object CraftingStationRegistry {
         loadRecipesIntoRegistry()
         registerStationRecipes()
         loadStationsIntoRegistry()
+        MapEventBus.post(CraftingStationRegistrationDoneEvent)
     }
 
     fun getRecipe(key: Key): Recipe? {

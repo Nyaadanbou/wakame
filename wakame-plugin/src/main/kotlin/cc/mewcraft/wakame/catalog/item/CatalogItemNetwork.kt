@@ -4,6 +4,7 @@ package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.catalog.item.node.CatalogItemNode
+import cc.mewcraft.wakame.event.map.CraftingStationRegistrationDoneEvent
 import cc.mewcraft.wakame.event.map.MinecraftRecipeRegistrationDoneEvent
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -25,6 +26,11 @@ object CatalogItemNetwork {
         MapEventBus.subscribe<MinecraftRecipeRegistrationDoneEvent> {
             // 当原版配方注册完成时 -> 重建图鉴物品网络
             // 改进的地方 2026/03/10: 比这更好的时机?
+            rebuildNetwork()
+        }
+        MapEventBus.subscribe<CraftingStationRegistrationDoneEvent> {
+            // 合成站在启动时是延迟加载的, 这里需要在其就绪后再次重建网络
+            // 改进的地方 2026/03/13: 比这更好的时机?
             rebuildNetwork()
         }
     }
