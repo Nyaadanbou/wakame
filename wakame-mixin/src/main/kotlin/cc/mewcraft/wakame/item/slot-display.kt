@@ -23,7 +23,6 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
-import xyz.xenondevs.commons.provider.map
 import java.lang.reflect.Type
 import java.util.concurrent.ConcurrentHashMap
 
@@ -33,10 +32,17 @@ import java.util.concurrent.ConcurrentHashMap
 
 class SlotDisplay
 private constructor(
-    private val koishItem: RegistryEntry<KoishItem>,
+    private val itemType: RegistryEntry<KoishItem>,
 ) {
+    // FIXME 修复 RegistryEntry#reactive 实际上不会重载的问题
+    //private val itemstack: ItemStack by koishItem.reactive().map { KoishStackGenerator.generate(it, ItemGenerationContext(koishItem.unwrap(), 0f)) }
 
-    private val itemstack: ItemStack by koishItem.reactive().map { KoishStackGenerator.generate(it, ItemGenerationContext(koishItem.unwrap(), 0f)) }
+    private val itemStack: ItemStack
+        get() {
+            val type = itemType.unwrap()
+            val context = ItemGenerationContext(type, 0f)
+            return KoishStackGenerator.generate(type, context)
+        }
 
     companion object {
 
@@ -81,7 +87,7 @@ private constructor(
      * 该对象包含了可以单独使用的 `minecraft:item_name`, `minecraft:lore` 等有用的数据.
      */
     fun resolve(dsl: SlotDisplayLoreData.LineConfig.Builder.() -> Unit = {}): Resolved {
-        val koishItem = koishItem.unwrap()
+        val koishItem = itemType.unwrap()
         val dict = koishItem.getPropOrDefault(ItemPropTypes.SLOT_DISPLAY_DICT, SlotDisplayDictData())
         val conf = SlotDisplayLoreData.LineConfig.Builder(dict).apply(dsl).build()
         val name = koishItem.getProp(ItemPropTypes.SLOT_DISPLAY_NAME)?.resolve(conf.getPlaceholders())
@@ -94,7 +100,7 @@ private constructor(
      * 解析得到一个 [ItemStack], 该物品已经应用了解析后的所有数据.
      */
     fun resolveToItemStack(dsl: SlotDisplayLoreData.LineConfig.Builder.() -> Unit = {}): ItemStack {
-        return resolve(dsl).applyInPlace(itemstack.clone().apply {
+        return resolve(dsl).applyInPlace(itemStack.clone().apply {
             isNetworkRewrite = false
         })
     }
