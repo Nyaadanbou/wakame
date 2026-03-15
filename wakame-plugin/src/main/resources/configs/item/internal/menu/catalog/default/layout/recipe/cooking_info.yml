@@ -1,8 +1,8 @@
 base: paper
-# 支持的占位符:
+# 支持的占位符 (在 name 和 lore 里均有效):
 # <cooking_time>
 # <exp>
-# 这些占位符写在 slot_display_name 或者 slot_display_lore 里均有效
-slot_display_name: "<!i><gold>烧炼耗时:</gold> <white><cooking_time></white> <gold>秒</gold>"
-slot_display_lore:
-  - "<!i><gold>烧炼经验:</gold> <white><exp></white>"
+icon:
+  name: "<!i><gold>烧炼耗时:</gold> <white><cooking_time></white> <gold>秒</gold>"
+  lore:
+    - "<!i><gold>烧炼经验:</gold> <white><exp></white>"

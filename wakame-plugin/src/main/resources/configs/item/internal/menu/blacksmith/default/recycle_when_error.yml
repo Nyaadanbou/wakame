@@ -1,2 +1,3 @@
 base: barrier
-slot_display_name: "<red>内部错误"
+icon:
+  name: "<red>内部错误"

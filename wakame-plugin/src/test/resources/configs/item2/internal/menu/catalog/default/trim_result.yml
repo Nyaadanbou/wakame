@@ -2,4 +2,5 @@ base: iron_chestplate
 trim:
   pattern: minecraft:coast
   material: minecraft:gold
-slot_display_name: "<!i><gold>带纹饰的盔甲"
+icon:
+  name: "<!i><gold>带纹饰的盔甲"
