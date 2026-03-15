@@ -1,0 +1,4 @@
+base: shulker_shell
+persistent_item_model: minecraft:chest
+persistent_item_name: "<!i><gold>要塞"
+persistent_lore: "<!i><gray>图书馆"

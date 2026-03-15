@@ -5,12 +5,15 @@ import cc.mewcraft.lazyconfig.configurate.registerExact
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.integration.skill.SkillWrapper
+import cc.mewcraft.wakame.item.SlotDisplayBundleData
 import cc.mewcraft.wakame.item.SlotDisplayDictData
 import cc.mewcraft.wakame.item.SlotDisplayLoreData
 import cc.mewcraft.wakame.item.SlotDisplayNameData
 import cc.mewcraft.wakame.item.data.impl.Core
 import cc.mewcraft.wakame.item.data.impl.CoreContainer
 import cc.mewcraft.wakame.item.data.impl.ItemLevel
+import cc.mewcraft.wakame.item.property.ItemPropTypes.ICON
+import cc.mewcraft.wakame.item.property.ItemPropTypes.SLOT_DISPLAY
 import cc.mewcraft.wakame.item.property.impl.*
 import cc.mewcraft.wakame.item.property.impl.weapon.*
 import cc.mewcraft.wakame.kizami.Kizami
@@ -109,17 +112,41 @@ data object ItemPropTypes {
      * 箱子菜单相关.
      */
     @JvmField
+    val ICON: ItemPropType<SlotDisplayBundleData> = typeOf("icon") {
+        serializers {
+            register(SlotDisplayLoreData.SERIALIZER)
+        }
+    }
+
+    /**
+     * 旧版配置兼容: 请改用 [ICON].
+     */
+    @Deprecated("Use ICON")
+    @JvmField
+    val SLOT_DISPLAY: ItemPropType<SlotDisplayBundleData> = typeOf("slot_display") {
+        serializers {
+            register(SlotDisplayLoreData.SERIALIZER)
+        }
+    }
+
+    /**
+     * 旧版配置兼容: 请改用 [SLOT_DISPLAY].
+     */
+    @Deprecated("Use SLOT_DISPLAY")
+    @JvmField
     val SLOT_DISPLAY_DICT: ItemPropType<SlotDisplayDictData> = typeOf("slot_display_dict")
 
     /**
-     * 箱子菜单相关.
+     * 旧版配置兼容: 请改用 [SLOT_DISPLAY].
      */
+    @Deprecated("Use SLOT_DISPLAY")
     @JvmField
     val SLOT_DISPLAY_NAME: ItemPropType<SlotDisplayNameData> = typeOf("slot_display_name")
 
     /**
-     * 箱子菜单相关.
+     * 旧版配置兼容: 请改用 [SLOT_DISPLAY].
      */
+    @Deprecated("Use SLOT_DISPLAY")
     @JvmField
     val SLOT_DISPLAY_LORE: ItemPropType<SlotDisplayLoreData> = typeOf("slot_display_lore") {
         serializers {

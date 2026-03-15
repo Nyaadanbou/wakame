@@ -1,0 +1,83 @@
+# 菜单设置: 战利品表/箱子
+chest:
+  title: "获取箱子中的战利品"
+  # ?: hint
+  # .: background
+  # <: prev_page
+  # >: next_page
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". ? . o o o o o ."
+    - ". i . o o o o o ."
+    - ". . . o o o o o ."
+    - ". . . < . . . > ."
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+    prev_page: "internal/menu/catalog/default/layout/base/prev_page"
+    next_page: "internal/menu/catalog/default/layout/base/next_page"
+
+# 菜单设置: 战利品表/木桶
+barrel:
+  title: 获取木桶中的战利品
+  # ?: hint
+  # .: background
+  # <: prev_page
+  # >: next_page
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". ? . o o o o o ."
+    - ". i . o o o o o ."
+    - ". . . o o o o o ."
+    - ". . . < . . . > ."
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+    prev_page: "internal/menu/catalog/default/layout/base/prev_page"
+    next_page: "internal/menu/catalog/default/layout/base/next_page"
+
+# 菜单设置: 战利品表/宝库
+vault:
+  title: 获取宝库中的战利品
+  # ?: hint
+  # .: background
+  # <: prev_page
+  # >: next_page
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". ? . o o o o o ."
+    - ". i . o o o o o ."
+    - ". . . o o o o o ."
+    - ". . . < . . . > ."
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+    prev_page: "internal/menu/catalog/default/layout/base/prev_page"
+    next_page: "internal/menu/catalog/default/layout/base/next_page"
+
+# 菜单设置: 战利品表/实体
+entity:
+  title: 实体掉落物
+  # ?: hint
+  # .: background
+  # <: prev_page
+  # >: next_page
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". ? . o o o o o ."
+    - ". i . o o o o o ."
+    - ". . . o o o o o ."
+    - ". . . < . . . > ."
+  icons:
+    hint: "internal/menu/catalog/default/layout/base/hint"
+    background: "internal/menu/common/default/background"
+    prev_page: "internal/menu/catalog/default/layout/base/prev_page"
+    next_page: "internal/menu/catalog/default/layout/base/next_page"

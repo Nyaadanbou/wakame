@@ -1,0 +1,6 @@
+base: paper
+icon:
+  name: "<!i>操作说明"
+  lore:
+    - "<gray>[直接点击]    物品: 查询获取途径"
+    - "<gray>[Shift-点击] 物品: 查询物品用途"

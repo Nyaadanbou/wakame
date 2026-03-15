@@ -1,0 +1,3 @@
+class: CatalogItemLootTableNode
+
+将由程序自动读取服务端上的 Minecraft Loot Table 并将其转换为 CatalogItemLootTableNode 对象, 最后添加进注册表.

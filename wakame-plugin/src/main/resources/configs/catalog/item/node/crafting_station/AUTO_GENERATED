@@ -1,0 +1,3 @@
+class: CatalogItemCraftingStationNode
+
+将由程序自动读取 Koish 合成站配方 并将其转换为 CatalogItemCraftingStationNode 对象, 最后添加进注册表.

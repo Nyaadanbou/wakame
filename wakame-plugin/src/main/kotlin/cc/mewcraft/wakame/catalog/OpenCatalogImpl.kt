@@ -42,7 +42,7 @@ object OpenCatalogImpl : SimpleInteract {
             val menu = CatalogItemMainMenu(player)
             CatalogItemMenuStacks.rewrite(player, menu)
         } else {
-            val category = DynamicRegistries.ITEM_CATEGORY[catalogId] ?: run {
+            val category = DynamicRegistries.CATALOG_ITEM_CATEGORY[catalogId] ?: run {
                 LOGGER.error("Found an unknown catalog item category id '$catalogId' for type '$catalogType' when opening catalog from item")
                 return InteractionResult.PASS
             }

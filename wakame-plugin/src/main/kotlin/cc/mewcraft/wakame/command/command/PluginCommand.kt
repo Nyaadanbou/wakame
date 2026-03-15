@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.command.command
 
 import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.wakame.api.event.KoishLoadDataEvent
-import cc.mewcraft.wakame.catalog.item.CatalogItemCategoryRegistryLoader
-import cc.mewcraft.wakame.catalog.item.CatalogItemLootTableRecipeRegistryLoader
+import cc.mewcraft.wakame.catalog.item.CatalogItemCategoryInitializer
 import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
+import cc.mewcraft.wakame.catalog.item.CatalogItemNetwork
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
@@ -17,14 +17,11 @@ import cc.mewcraft.wakame.element.ElementRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.ImgAttributeMapRegistryLoader
 import cc.mewcraft.wakame.entity.typeref.EntityRefRegistryLoader
+import cc.mewcraft.wakame.event.map.ConfigurationReloadEvent
 import cc.mewcraft.wakame.gui.BasicGuiInitializer
 import cc.mewcraft.wakame.gui.catalog.item.CatalogItemMenuStacks
 import cc.mewcraft.wakame.init.RecipeInitializer
-import cc.mewcraft.wakame.item.CustomItemRegistryLoader
-import cc.mewcraft.wakame.item.ItemProxyRegistryLoader
-import cc.mewcraft.wakame.item.KoishStackGenerator
-import cc.mewcraft.wakame.item.KoishTagManager
-import cc.mewcraft.wakame.item.SlotDisplay
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.display.implementation.crafting_station.CraftingStationItemRenderer
 import cc.mewcraft.wakame.item.display.implementation.merging_table.MergingTableItemRenderer
 import cc.mewcraft.wakame.item.display.implementation.repairing_table.RepairingTableItemRenderer
@@ -42,12 +39,12 @@ import cc.mewcraft.wakame.reforge.recycle.RecyclingStationRegistry
 import cc.mewcraft.wakame.reforge.repair.RepairingTableRegistry
 import cc.mewcraft.wakame.reforge.reroll.RerollingTableRegistry
 import cc.mewcraft.wakame.util.coroutine.minecraft
+import cc.mewcraft.wakame.util.eventbus.MapEventBus
 import kotlinx.coroutines.Dispatchers
 import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.paper.util.sender.Source
 import org.incendo.cloud.parser.standard.EnumParser
 import kotlin.system.measureTimeMillis
-
 
 // TODO 在 #439 后续的 PR 中慢慢完善此指令
 
@@ -103,6 +100,8 @@ private object ReloadProcess {
     fun all() {
         ConfigAccess.reload()
 
+        MapEventBus.post(ConfigurationReloadEvent)
+
         GlobalTranslations.reload()
 
         EntityRefRegistryLoader.reload()
@@ -138,17 +137,18 @@ private object ReloadProcess {
         RepairingTableItemRenderer.reload()
         CraftingStationItemRenderer.reload()
 
-        CatalogItemMenuSettings.reload()
-        CatalogItemLootTableRecipeRegistryLoader.reload()
-        CatalogItemCategoryRegistryLoader.reload()
-        CatalogItemMenuStacks.clearStacks()
-
         AttackCharacteristicDamageMappings.reload()
         DamageTypeDamageMappings.reload()
         NullCausingDamageMappings.reload()
         PlayerAdhocDamageMappings.reload()
 
         ResourcePackLifecycle.reload()
+
+        // 图鉴是游戏内容的汇总, 所以永远放在最后重新加载
+        CatalogItemMenuSettings.reload()
+        CatalogItemMenuStacks.clearStacks()
+        CatalogItemNetwork.rebuildNetwork()
+        CatalogItemCategoryInitializer.reload()
 
         //
 

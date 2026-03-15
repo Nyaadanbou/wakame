@@ -53,7 +53,6 @@ internal class CatalogItemCategoryMenu(
         builder.addIngredient('>', NextItem())
         builder.addIngredient('b', BackItem())
         builder.addIngredient('x', category.contentMarker)
-        // TODO 可以缓存, 只有重载时会变化
         // 类别菜单所展示的物品
         builder.setContent(category.items.map { itemRef -> DisplayItem(itemRef) })
     }
@@ -151,14 +150,21 @@ internal class CatalogItemCategoryMenu(
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            // 类别菜单无需判定是否套娃, 因为肯定是第一次对配方进行索引
-            val state = when (clickType) {
+            val preferredState = when (clickType) {
                 ClickType.LEFT, ClickType.RIGHT -> LookupState.SOURCE
                 ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> LookupState.USAGE
                 else -> return
             }
-            // 要打开的菜单Gui列表为空，则不打开
-            val guis = CatalogRecipeGuiManager.getGui(item, state)
+
+            // 兜底查询另一个方向: 允许像 loot table / single source 这类输入图标直接点开对应节点输出
+            val fallbackState = if (preferredState == LookupState.SOURCE) LookupState.USAGE else LookupState.SOURCE
+            val preferredGuis = CatalogItemNodeGuiManager.getGui(item, preferredState)
+            val (state, guis) = if (preferredGuis.isNotEmpty()) {
+                preferredState to preferredGuis
+            } else {
+                fallbackState to CatalogItemNodeGuiManager.getGui(item, fallbackState)
+            }
+
             if (guis.isEmpty()) return
 
             CatalogItemMenuStacks.push(viewer, CatalogItemFocusMenu(item, state, viewer, guis))

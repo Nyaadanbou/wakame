@@ -1,4 +1,4 @@
-slot_display_name: "输入"
-
-slot_display_lore:
-  - "<dark_gray>放入装备开始定制."
+icon:
+  name: "输入"
+  lore:
+    - "<dark_gray>放入装备开始定制."

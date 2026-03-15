@@ -42,7 +42,7 @@ internal object RecipeMatcher {
  * @param recipe 与该结果所关联的合成配方
  * @param matchResultMap 匹配的结果映射: [合成配方的输入材料][RecipeChoice] -> [输入材料是否满足][Boolean]
  */
-internal class RecipeMatcherResult(
+class RecipeMatcherResult(
     val recipe: Recipe,
     matchResultMap: Map<RecipeChoice, Boolean>,
 ) {

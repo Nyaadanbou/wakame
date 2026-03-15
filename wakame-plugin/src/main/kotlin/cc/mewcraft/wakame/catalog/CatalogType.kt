@@ -10,8 +10,11 @@ enum class CatalogType {
     ENCHANTMENT,
     ENTITY,
     ITEM,
+    GENERATED_STRUCTURE,
 
     // Custom
 
-    KIZAMI,
+    ELEMENT,
+    INSCRIPTION,
+    MULTIBLOCK_STRUCTURE,
 }

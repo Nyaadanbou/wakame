@@ -53,15 +53,13 @@ class CatalogItemMainMenu(
      */
     private val primaryGui: PagedGui<Item> = PagedGui.items { builder ->
         builder.setStructure(*settings.structure)
-        builder.addIngredient('?', HintItem())
         builder.addIngredient('.', BackgroundItem())
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
         builder.addIngredient('s', SearchItem())
         builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         // 对 CategoryItem 进行缓存
-        // TODO 权限检查代码美化
-        builder.setContent(DynamicRegistries.ITEM_CATEGORY.filter { category ->
+        builder.setContent(DynamicRegistries.CATALOG_ITEM_CATEGORY.filter { category ->
             val permission = category.permission ?: return@filter true
             val world = viewer.world
             val player = viewer.uniqueId
@@ -86,20 +84,6 @@ class CatalogItemMainMenu(
 
     override fun close() {
         primaryWindow.close()
-    }
-
-    /**
-     * `提示占位`的图标.
-     */
-    inner class HintItem : AbstractItem() {
-
-        override fun getItemProvider(): ItemProvider {
-            return settings.getSlotDisplay("hint").resolveToItemWrapper()
-        }
-
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-
-        }
     }
 
     /**
@@ -171,7 +155,7 @@ class CatalogItemMainMenu(
         private val category: CatalogItemCategory,
     ) : AbstractItem() {
 
-        private val itemProvider: ItemProvider = SlotDisplay.get(category.icon).resolveToItemWrapper()
+        private val itemProvider = SlotDisplay.get(category.icon).resolveToItemWrapper()
 
         override fun getItemProvider(): ItemProvider {
             return itemProvider

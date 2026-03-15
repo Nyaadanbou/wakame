@@ -43,11 +43,16 @@ data class BasicMenuSettings(
      *   id_2: "menu:icon_2"
      * ```
      */
-    fun getSlotDisplay(id: String): SlotDisplay {
+    fun getIcon(id: String): SlotDisplay {
         val itemId = icons[id] ?: run {
             LOGGER.warn("Menu icon '$id' not found in the settings of '${title.plain}', using default icon")
             BuiltInRegistries.ITEM.defaultId
         }
         return SlotDisplay.get(itemId)
+    }
+
+    @Deprecated("Use getIcon")
+    fun getSlotDisplay(id: String): SlotDisplay {
+        return getIcon(id)
     }
 }

@@ -23,7 +23,6 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
-import xyz.xenondevs.commons.provider.map
 import java.lang.reflect.Type
 import java.util.concurrent.ConcurrentHashMap
 
@@ -33,10 +32,19 @@ import java.util.concurrent.ConcurrentHashMap
 
 class SlotDisplay
 private constructor(
-    private val koishItem: RegistryEntry<KoishItem>,
+    private val itemType: RegistryEntry<KoishItem>,
 ) {
+    private val emptyDict = SlotDisplayDictData()
 
-    private val itemstack: ItemStack by koishItem.reactive().map { KoishStackGenerator.generate(it, ItemGenerationContext(koishItem.unwrap(), 0f)) }
+    // FIXME 修复 RegistryEntry#reactive 实际上不会重载的问题
+    //private val itemstack: ItemStack by koishItem.reactive().map { KoishStackGenerator.generate(it, ItemGenerationContext(koishItem.unwrap(), 0f)) }
+
+    private val itemStack: ItemStack
+        get() {
+            val type = itemType.unwrap()
+            val context = ItemGenerationContext(type, 0f)
+            return KoishStackGenerator.generate(type, context)
+        }
 
     companion object {
 
@@ -65,7 +73,7 @@ private constructor(
          */
         fun get(id: KoishKey): SlotDisplay {
             if (!BuiltInRegistries.ITEM.containsId(id)) {
-                // 不缓存不存在的物品 id, 始终记录错误并返回新的 SlotDisplay
+                // 不缓存不存在的物品 id, 始终记录错误并返回新的 Icon
                 LOGGER.error("'$id' not found in the item registry, fallback to default one")
                 return SlotDisplay(BuiltInRegistries.ITEM.getDefaultEntry())
             }
@@ -81,20 +89,35 @@ private constructor(
      * 该对象包含了可以单独使用的 `minecraft:item_name`, `minecraft:lore` 等有用的数据.
      */
     fun resolve(dsl: SlotDisplayLoreData.LineConfig.Builder.() -> Unit = {}): Resolved {
-        val koishItem = koishItem.unwrap()
-        val dict = koishItem.getPropOrDefault(ItemPropTypes.SLOT_DISPLAY_DICT, SlotDisplayDictData())
+        val koishItem = itemType.unwrap()
+        @Suppress("DEPRECATION")
+        val data = koishItem.getProp(ItemPropTypes.ICON)
+            ?: koishItem.getProp(ItemPropTypes.SLOT_DISPLAY)
+            ?: koishItem.resolveLegacySlotDisplay()
+        val dict = data?.dict ?: emptyDict
         val conf = SlotDisplayLoreData.LineConfig.Builder(dict).apply(dsl).build()
-        val name = koishItem.getProp(ItemPropTypes.SLOT_DISPLAY_NAME)?.resolve(conf.getPlaceholders())
-        val lore = koishItem.getProp(ItemPropTypes.SLOT_DISPLAY_LORE)?.resolve(conf)
+        val name = data?.name?.resolve(conf.getPlaceholders())
+        val lore = data?.lore?.resolve(conf)
         // TODO 还需要解析 item_model, tooltip_style. 等资源包重构完后再写
         return Resolved(name, lore)
+    }
+
+    @Suppress("DEPRECATION")
+    private fun KoishItem.resolveLegacySlotDisplay(): SlotDisplayBundleData? {
+        val name = getProp(ItemPropTypes.SLOT_DISPLAY_NAME)
+        val lore = getProp(ItemPropTypes.SLOT_DISPLAY_LORE)
+        val dict = getProp(ItemPropTypes.SLOT_DISPLAY_DICT)
+        if (name == null && lore == null && dict == null) {
+            return null
+        }
+        return SlotDisplayBundleData(name = name, lore = lore, dict = dict ?: emptyDict)
     }
 
     /**
      * 解析得到一个 [ItemStack], 该物品已经应用了解析后的所有数据.
      */
     fun resolveToItemStack(dsl: SlotDisplayLoreData.LineConfig.Builder.() -> Unit = {}): ItemStack {
-        return resolve(dsl).applyInPlace(itemstack.clone().apply {
+        return resolve(dsl).applyInPlace(itemStack.clone().apply {
             isNetworkRewrite = false
         })
     }
@@ -181,6 +204,16 @@ interface SlotDisplayData {
 }
 
 /**
+ * 箱子菜单显示专用配置, 统一管理 `name` / `lore` / `dict`.
+ */
+@ConfigSerializable
+data class SlotDisplayBundleData(
+    val name: SlotDisplayNameData? = null,
+    val lore: SlotDisplayLoreData? = null,
+    val dict: SlotDisplayDictData = SlotDisplayDictData(),
+) : SlotDisplayData
+
+/**
  * 菜单图标的字符串字典.
  */
 @ConfigSerializable
@@ -234,6 +267,8 @@ data class SlotDisplayLoreData(
         @JvmField
         val SERIALIZER: SimpleSerializer<SlotDisplayLoreData> = Serializer
 
+        private val FOLDED_TAG_REGEX = """(?<!\\)\{([a-z0-9_]+)}""".toRegex()
+
         /**
          * 配置并创建一个 [SlotDisplayLoreData] 实例.
          */
@@ -246,31 +281,21 @@ data class SlotDisplayLoreData(
 
         override fun deserialize(type: Type, node: ConfigurationNode): SlotDisplayLoreData {
             val rawTextList = node.getList<String>(emptyList())
-            val resultLines = mutableListOf<Line>()
-            for (rawText in rawTextList) {
-                // 找出字符串中匹配 {...} 的内容, 但不包括被转义的 \{...\}
-                val foldedRegex = """(?<!\\)\{([a-z0-9_]+)}""".toRegex()
-                val foldedMatches = foldedRegex.findAll(rawText)
-                // 一行只允许匹配一个折叠的占位符, 否则抛出异常
-                if (foldedMatches.count() > 1) {
-                    LOGGER.error("Only one folded tag is allowed in a line of ${SlotDisplayLoreData::class.simpleName}! Treating it as a standard line. Line: \"$rawText\"")
-                    resultLines.add(Line.Standard(rawText))
-                    continue
-                }
-                // 如果匹配到了折叠的占位符, 则将其提取出来
-                val foldedMatch = foldedMatches.firstOrNull()
-                if (foldedMatch != null) {
-                    val key = foldedMatch.groupValues[1]
-                    // 再把 {} 替换成 <> 以便之后解析为 Tag;
-                    // 转义过的 {} 不会被替换!
-                    val foldedText = foldedMatch.value.replace("{", "<").replace("}", ">")
-                    val rawText2 = rawText.replace(foldedMatch.value, foldedText)
-                    resultLines.add(Line.Folded(key, rawText2))
-                } else {
-                    resultLines.add(Line.Standard(rawText))
-                }
-            }
+            val resultLines = rawTextList.map(::deserializeLine)
             return SlotDisplayLoreData(resultLines)
+        }
+
+        private fun deserializeLine(rawText: String): Line {
+            val foldedMatches = FOLDED_TAG_REGEX.findAll(rawText).toList()
+            if (foldedMatches.size > 1) {
+                LOGGER.error("Only one folded tag is allowed in a line of ${SlotDisplayLoreData::class.simpleName}! Treating it as a standard line. Line: \"$rawText\"")
+                return Line.Standard(rawText)
+            }
+            val foldedMatch = foldedMatches.firstOrNull() ?: return Line.Standard(rawText)
+            val key = foldedMatch.groupValues[1]
+            // 把 {key} 转换为 <key>, 以便 MiniMessage 解析.
+            val foldedText = foldedMatch.value.replace("{", "<").replace("}", ">")
+            return Line.Folded(key, rawText.replace(foldedMatch.value, foldedText))
         }
 
     }
@@ -488,24 +513,13 @@ data class SlotDisplayLoreData(
             return foldedLineMap[tag]
         }
 
-        /**
-         * ### 注意事项!
-         * 使用上必须让 [standard] 先于 [folded] 调用,
-         * 否则 [folded] 不会使用全部的 [TagResolver].
-         */
         @SlotDisplayDataDsl
         class Builder(
             private val dictionary: SlotDisplayDictData,
         ) {
-            private var placeholders: TagResolver? = null
             private val placeholderBuilder: TagResolver.Builder = TagResolver.builder()
-            private val foldedLineMap: MutableMap<String, List<Component>> = mutableMapOf()
-
-            private fun freezePlaceholders() {
-                if (placeholders == null) {
-                    placeholders = placeholderBuilder.build()
-                }
-            }
+            private val staticFoldedLineMap: MutableMap<String, List<Component>> = mutableMapOf()
+            private val dslFoldedLineMap: MutableMap<String, Line.Folded.Builder.() -> Unit> = mutableMapOf()
 
             fun dict(key: String): String {
                 // 开发日记 2024/12/25: 返回空字符串?
@@ -520,29 +534,28 @@ data class SlotDisplayLoreData(
 
             // 使用该函数来直接添加折叠的占位符.
             fun folded(key: String, lines: List<Component>) {
-                foldedLineMap[key] = lines
+                staticFoldedLineMap[key] = lines
             }
 
             // 使用该函数来直接添加折叠的占位符.
             fun folded(key: String, vararg lines: Component) {
-                foldedLineMap[key] = lines.toList()
+                staticFoldedLineMap[key] = lines.toList()
             }
 
             // 使用该函数以 DSL 的形式添加折叠的占位符.
             // DSL 可快速使用 SlotDisplayDict 中的映射.
-            // TODO: 如果在 build 之前就调用了这个函数, 那么最终的 Global Placeholder 相当于提前构建了.
-            //  试试通过代码的方式来强制实行以下限制:
-            //  1. 要求 standard 函数必须先于所有 folded 函数调用
-            //  2. 如果在 build 之前就调用了 folded, 应该给出提示?
             fun folded(key: String, dsl: Line.Folded.Builder.() -> Unit) {
-                freezePlaceholders()
-                foldedLineMap[key] = Line.Folded.Builder(dictionary, placeholders!!).apply(dsl).build()
+                dslFoldedLineMap[key] = dsl
             }
 
             @ApiStatus.Internal
             fun build(): LineConfig {
-                freezePlaceholders()
-                return LineConfig(placeholders!!, foldedLineMap)
+                val placeholders = placeholderBuilder.build()
+                val foldedLineMap = staticFoldedLineMap.toMutableMap()
+                dslFoldedLineMap.forEach { (key, dsl) ->
+                    foldedLineMap[key] = Line.Folded.Builder(dictionary, placeholders).apply(dsl).build()
+                }
+                return LineConfig(placeholders, foldedLineMap)
             }
         }
     }

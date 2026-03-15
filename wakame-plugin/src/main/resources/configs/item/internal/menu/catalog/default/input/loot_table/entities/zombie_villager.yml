@@ -1,0 +1,3 @@
+base: shulker_shell
+persistent_item_model: minecraft:zombie_villager_spawn_egg
+persistent_item_name: "<!i><gold><lang:entity.minecraft.zombie_villager>"
