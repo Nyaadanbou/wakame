@@ -1,0 +1,4 @@
+base: shulker_shell
+persistent_item_model: minecraft:chest
+persistent_item_name: "<!i><gold>远古城市"
+persistent_lore: "<!i><gray>冰窖"

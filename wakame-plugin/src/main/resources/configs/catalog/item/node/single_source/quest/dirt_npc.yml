@@ -1,0 +1,5 @@
+display_name: 泥土NPC
+pos_in_server: 主城位面
+pos_in_dimension: 结云村
+output_items:
+  - minecraft:dirt

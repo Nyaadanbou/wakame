@@ -1,2 +1,3 @@
 base: anvil
-slot_display_name: "点击切换至修理"
+icon:
+  name: "点击切换至修理"

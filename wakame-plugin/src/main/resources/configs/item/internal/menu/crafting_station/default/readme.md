@@ -6,16 +6,17 @@
 
 这里用于指定物品的提示框的整体布局, 也就是可以在物品原本的信息上添加一些额外的东西.
 参考下面的示例:
-物品最终的 `minecraft:item_name` 是 slot_display_name, 其中的 <item_name> 会被替换成物品原本的 `minecraft:item_name`.
-物品最终的 `minecraft:lore` 是 slot_display_lore, 其中的 <item_lore> 会被替换成物品原本的 `minecraft:lore`.
+物品最终的 `minecraft:item_name` 来自 `icon.name`, 其中的 <item_name> 会被替换成物品原本的 `minecraft:item_name`.
+物品最终的 `minecraft:lore` 来自 `icon.lore`, 其中的 <item_lore> 会被替换成物品原本的 `minecraft:lore`.
 
 ```yaml
-# 额外占位符
-# <item_name>: 原始物品的 `minecraft:item_name`
-slot_display_name: "<item_name>"
+icon:
+  # 额外占位符
+  # <item_name>: 原始物品的 `minecraft:item_name`
+  name: "<item_name>"
 
-# 额外占位符
-# {item_lore}: 原始物品的 `minecraft:lore`
-slot_display_lore:
-- "{item_lore}"
+  # 额外占位符
+  # {item_lore}: 原始物品的 `minecraft:lore`
+  lore:
+    - "{item_lore}"
 ```

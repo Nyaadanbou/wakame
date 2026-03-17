@@ -11,7 +11,7 @@ recipes:
 # 该菜单显示所有可以合成的物品, 也是玩家刚打开合成站看到的样子
 listing_menu_settings:
 
-  title: "示例合成站"
+  title: "简单合成站"
 
   # .: background
   # x: recipe

@@ -1,0 +1,3 @@
+base: shulker_shell
+persistent_item_model: minecraft:chest
+persistent_item_name: "<!i><gray>泥土盲盒"

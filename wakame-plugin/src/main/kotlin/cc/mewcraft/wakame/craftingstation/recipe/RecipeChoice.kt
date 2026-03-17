@@ -22,7 +22,7 @@ import java.util.stream.Stream
 /**
  * 合成站的一项输入要求.
  */
-internal sealed interface RecipeChoice : Examinable {
+sealed interface RecipeChoice : Examinable {
     /**
      * 用于检查该 [RecipeChoice] 所要求的输入是否被满足.
      */

@@ -1,0 +1,4 @@
+display_name: 示例蜘蛛
+output_items:
+  - minecraft:string
+  - minecraft:spider_eye

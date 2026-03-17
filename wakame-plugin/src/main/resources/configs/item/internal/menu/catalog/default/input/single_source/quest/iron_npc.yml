@@ -1,0 +1,3 @@
+base: shulker_shell
+persistent_item_model: minecraft:book
+persistent_item_name: "<!i><yellow>铁质NPC: 任务奖励"

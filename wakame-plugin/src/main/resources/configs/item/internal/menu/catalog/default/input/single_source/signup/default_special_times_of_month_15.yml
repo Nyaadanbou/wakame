@@ -1,0 +1,4 @@
+base: shulker_shell
+persistent_item_model: minecraft:knowledge_book
+persistent_item_name: "<!i><gold>所有人 本月连续签到15天奖励"
+

@@ -1,0 +1,5 @@
+display_name: 铁质NPC
+pos_in_server: 冒险位面
+pos_in_dimension: 重生点
+output_items:
+  - minecraft:iron_ingot

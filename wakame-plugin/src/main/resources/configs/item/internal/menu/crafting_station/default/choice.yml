@@ -1,3 +1,4 @@
-slot_display_name: "<item_name>"
-slot_display_lore:
-  - "{item_lore}"
+icon:
+  name: "<item_name>"
+  lore:
+    - "{item_lore}"

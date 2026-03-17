@@ -41,7 +41,7 @@ object PersistentHeadFeature : Listener {
         val itemInHand = event.itemInHand.takeIf { it.isKoish } ?: return
         val blockPlaced = event.blockPlaced.takeIf { it.type == Material.PLAYER_HEAD || it.type == Material.PLAYER_WALL_HEAD } ?: return
         val skull = blockPlaced.getState(true) as? Skull ?: return
-        skull.persistentDataContainer.set(STORED_ITEM_KEY, ItemStackDataType, itemInHand)
+        skull.persistentDataContainer.set(STORED_ITEM_KEY, ItemStackDataType, itemInHand.asQuantity(1))
         if (skull.isSnapshot) skull.update()
     }
 

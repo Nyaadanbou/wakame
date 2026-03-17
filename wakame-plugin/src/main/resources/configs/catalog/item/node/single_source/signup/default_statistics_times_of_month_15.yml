@@ -1,0 +1,5 @@
+display_name: 所有人 本月连续签到15天奖励
+output_items:
+  - minecraft:dirt
+  - minecraft:stone
+  - minecraft:grass_block

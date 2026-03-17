@@ -1,0 +1,34 @@
+# 菜单设置: id 为 "simple" 的合成站
+simple:
+  # 菜单标题
+  title: "简单合成站"
+  # 菜单结构
+  #
+  # 占位符说明:
+  # ?: hint
+  # .: background
+  # <: prev_page
+  # >: next_page
+  # i: input
+  # o: output
+  structure:
+    - ". . ? . . . . . ."
+    - ". i i i . . . . ."
+    - ". i i i . . o . ."
+    - ". i i i . . . . ."
+    - ". < . > . . . . ."
+  # 菜单图标映射
+  icons:
+    background: "internal/menu/common/default/background"
+
+# 菜单设置: id 为 "complex" 的合成站
+complex:
+  title: "高级合成站"
+  structure:
+    - ". . ? . . . . . ."
+    - ". i i i . . . . ."
+    - ". i i i . . o . ."
+    - ". i i i . . . . ."
+    - ". < . > . . . . ."
+  icons:
+    background: "internal/menu/common/default/background"

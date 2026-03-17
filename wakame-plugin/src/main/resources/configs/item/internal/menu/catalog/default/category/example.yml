@@ -1,0 +1,4 @@
+base: structure_void
+persistent_item_name: "<gold>❊ 示例类别"
+persistent_lore:
+  - "<!i><gray>示例类别描述"

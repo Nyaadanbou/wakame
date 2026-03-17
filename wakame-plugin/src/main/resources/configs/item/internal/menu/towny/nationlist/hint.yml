@@ -1,4 +1,5 @@
 base: paper
-slot_display_name: "<yellow>商铺网络 (国家)"
-slot_display_lore:
-  - "<gray>这里展示了所有已加入商铺网络的国家"
+icon:
+  name: "<yellow>商铺网络 (国家)"
+  lore:
+    - "<gray>这里展示了所有已加入商铺网络的国家"
