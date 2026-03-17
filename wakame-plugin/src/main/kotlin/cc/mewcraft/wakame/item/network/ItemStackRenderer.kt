@@ -67,6 +67,13 @@ object ItemStackRenderer : PacketListener {
     }
 
     @PacketHandler
+    private fun handleSetPlayerInventory(event: ClientboundSetPlayerInventoryPacketEvent) {
+        val player = event.player
+        if (isCreative(player)) return
+        event.contents = event.contents.copy().modify(player)
+    }
+
+    @PacketHandler
     private fun handleUpdateAdvancements(event: ClientboundUpdateAdvancementsPacketEvent) {
         val player = event.player
         val added = event.added.map { holder ->

@@ -527,6 +527,12 @@ data object ItemPropTypes {
     @JvmField
     val SETS_RETROACTIVE_CARD: ItemPropType<SetsRetroactiveCard> = typeOf("sets_retroactive_card")
 
+    /**
+     * 储存了 [cc.mewcraft.wakame.item.behavior.impl.VirtualBook] 行为的全局配置项.
+     */
+    @JvmField
+    val VIRTUAL_BOOK: ItemPropType<VirtualBook> = typeOf("virtual_book")
+
     // ------------
     // 方便函数
     // ------------

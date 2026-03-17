@@ -240,6 +240,12 @@ object ItemBehaviorTypes {
     @JvmField
     val SETS_RETROACTIVE_CARD = typeOf("sets_retroactive_card", SetsRetroactionCard)
 
+    /**
+     * 物品具有该行为时, 右键使用将为玩家打开一本虚拟书.
+     */
+    @JvmField
+    val VIRTUAL_BOOK = typeOf("virtual_book", VirtualBook)
+
     // ------------
     // 方便函数
     // ------------
