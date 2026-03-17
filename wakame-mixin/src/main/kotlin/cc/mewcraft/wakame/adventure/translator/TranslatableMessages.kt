@@ -123,6 +123,10 @@ object TranslatableMessages {
     val MSG_ERR_RANDOM_TELEPORT_FOUND_NO_SAFE_LOCATION = create("msg_err_random_teleport_found_no_safe_location")
     val MSG_SEARCHING_SAFE_LOCATION_FOR_RANDOM_TELEPORT = create("msg_searching_safe_location_for_random_teleport")
     val MSG_ERR_ENCHANTMENT_AUTO_REPLANT_NO_SEEDS = create("msg_err_enchantment_auto_replant_no_seeds")
+    val MSG_ERR_SIGN_IN_NOT_AVAILABLE = create("msg_err_sign_in_not_available")
+    val MSG_SIGN_IN_RETROACTIVE_CARD_ADDED = create("msg_sign_in_retroactive_card_added")
+    val MSG_SIGN_IN_RETROACTIVE_CARD_TAKEN = create("msg_sign_in_retroactive_card_taken")
+    val MSG_SIGN_IN_RETROACTIVE_CARD_SET = create("msg_sign_in_retroactive_card_set")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

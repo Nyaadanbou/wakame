@@ -521,6 +521,12 @@ data object ItemPropTypes {
     @JvmField
     val RANDOM_TELEPORT: ItemPropType<RandomTeleport> = typeOf("random_teleport")
 
+    /**
+     * 储存了 [cc.mewcraft.wakame.item.behavior.impl.SetsRetroactionCard] 行为的全局配置项.
+     */
+    @JvmField
+    val SETS_RETROACTIVE_CARD: ItemPropType<SetsRetroactiveCard> = typeOf("sets_retroactive_card")
+
     // ------------
     // 方便函数
     // ------------

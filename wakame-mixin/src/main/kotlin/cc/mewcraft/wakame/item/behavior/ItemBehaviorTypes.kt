@@ -234,6 +234,12 @@ object ItemBehaviorTypes {
     @JvmField
     val RANDOM_TELEPORT = typeOf("random_teleport", RandomTeleport)
 
+    /**
+     * 物品具有该行为时, 消耗时将更新玩家的补签卡数量.
+     */
+    @JvmField
+    val SETS_RETROACTIVE_CARD = typeOf("sets_retroactive_card", SetsRetroactionCard)
+
     // ------------
     // 方便函数
     // ------------
@@ -241,5 +247,4 @@ object ItemBehaviorTypes {
     private fun typeOf(id: String, type: ItemBehavior): ItemBehavior {
         return type.also { BuiltInRegistries.ITEM_BEHAVIOR.add(id, it) }
     }
-
 }
