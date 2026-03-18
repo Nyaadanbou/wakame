@@ -36,6 +36,7 @@ invui = "1.49"
 jarrelocator = "1.7"
 jgit = "6.9.0.202403050737-r"
 koin = "4.0.0"
+ktor = "3.4.1"
 mariadb-jdbc = "3.5.4"
 mocha = "3.0.0"
 mysql-jdbc = "8.0.33"
@@ -164,6 +165,10 @@ koin-core = { group = "io.insert-koin", name = "koin-core" }
 koin-core-coroutines = { group = "io.insert-koin", name = "koin-core-coroutines" }
 koin-test = { group = "io.insert-koin", name = "koin-test" }
 koin-test-junit5 = { group = "io.insert-koin", name = "koin-test-junit5" }
+ktor-server-core = { group = "io.ktor", name = "ktor-server-core", version.ref = "ktor" }
+ktor-server-cio = { group = "io.ktor", name = "ktor-server-cio", version.ref = "ktor" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref = "ktor" }
 mariadb-jdbc = { group = "org.mariadb.jdbc", name = "mariadb-java-client", version.ref = "mariadb-jdbc" }
 messenger = { group = "de.hexaoxi", name = "messenger-api", version.ref = "messenger" }
 messenger-nats = { group = "de.hexaoxi", name = "messenger-nats", version.ref = "messenger" }

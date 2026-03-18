@@ -116,6 +116,12 @@ dependencies {
     // Git
     koishLoader(local.jgit)
 
+    // Ktor
+    koishLoader(local.ktor.server.core)
+    koishLoader(local.ktor.server.cio)
+    koishLoader(local.ktor.client.core)
+    koishLoader(local.ktor.client.java)
+
     /* test environment (just add whatever it needs to compile) */
 
     testImplementation(project(":wakame-mixin"))

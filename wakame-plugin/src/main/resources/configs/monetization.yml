@@ -1,0 +1,30 @@
+version: 1
+
+# 是否启用该模块
+enabled: false
+
+# Z-PAY 接口配置
+z_pay_api:
+  # 接口地址
+  url: https://zpayz.cn/
+  # 商户 ID
+  pid: 0000000000000000
+  # 商户密钥
+  pkey: AAAAAAAAAAAAAAAA
+
+# 内嵌回调服务器配置
+callback_server:
+  # 监听地址
+  host: "0.0.0.0"
+  # 监听端口
+  port: 18080
+  # Z-PAY 异步回调的完整公网 URL (必须外网可达)
+  # 如果服务器在 NAT/反向代理后面, 这里填公网地址
+  notify_url: "http://your-server-ip:18080/zpay/notify"
+
+# 订单相关配置
+order:
+  # 订单超时时间 (秒), 超过此时间未支付的订单将被标记为过期
+  timeout_seconds: 300
+  # 同一玩家最多同时存在的待支付订单数
+  max_pending_per_player: 1

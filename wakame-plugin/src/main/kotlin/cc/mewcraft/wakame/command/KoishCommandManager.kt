@@ -51,6 +51,7 @@ internal object KoishCommandManager {
                 command(CraftCommand)
                 command(DebugCommand)
                 command(ItemCommand)
+                command(MonetizationCommand)
                 command(NationListCommand)
                 command(PluginCommand)
                 command(ReforgeCommand)
