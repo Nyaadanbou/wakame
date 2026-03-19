@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import cc.mewcraft.wakame.util.registerEvents
+import cc.mewcraft.wakame.util.runTaskLater
 import cc.mewcraft.wakame.util.unregisterEvents
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.MapId
@@ -120,11 +121,12 @@ object QRCodeMapDisplay {
         val deferred = CompletableDeferred<DisplayResult>()
         activeDisplays[player.uniqueId] = deferred
 
-        val listener = QRCodeFreezeListener(player.uniqueId, deferred)
-
         // 用于保存并还原玩家的原始视角
         var originalYaw = 0f
         var originalPitch = 0f
+
+        // listener 需要引用 fakeMap, mapView 和 originalSlot, 在主线程中初始化后设置
+        lateinit var listener: QRCodeFreezeListener
 
         // 3. 主线程: 创建 MapView, 发包展示, 冻结玩家
         withContext(Dispatchers.minecraft) {
@@ -136,6 +138,9 @@ object QRCodeMapDisplay {
                 setData(DataComponentTypes.MAP_ID, MapId.mapId(mapView.id))
             }
 
+            // 记录发起订单时的物品栏位置, 后续所有发包都固定更新此位置
+            val originalSlot = player.inventory.heldItemSlot
+
             // 保存原始视角, 强制向下看 (pitch=90) 使地图平整无畸变
             originalYaw = player.location.yaw
             originalPitch = player.location.pitch
@@ -144,7 +149,8 @@ object QRCodeMapDisplay {
             player.sendEquipmentChange(player, EquipmentSlot.HAND, fakeMap)
             player.sendMap(mapView)
 
-            // 注册监听器, 冻结玩家操作
+            // 注册监听器, 冻结玩家操作; 传入 originalSlot 以确保重发时固定更新原始位置
+            listener = QRCodeFreezeListener(player.uniqueId, deferred, fakeMap, mapView, originalSlot)
             listener.registerEvents()
         }
 
@@ -177,8 +183,7 @@ object QRCodeMapDisplay {
         withContext(Dispatchers.minecraft) {
             listener.unregisterEvents()
             if (player.isOnline) {
-                val realMainHand = player.inventory.itemInMainHand
-                player.sendEquipmentChange(player, EquipmentSlot.HAND, realMainHand)
+                player.updateInventory()
                 player.setRotation(originalYaw, originalPitch)
             }
         }
@@ -242,11 +247,41 @@ private class StaticImageRenderer(private val image: BufferedImage) : MapRendere
  * - 监听 [PlayerToggleSneakEvent] 来触发取消
  * - 监听 [PlayerQuitEvent] 来处理断线
  * - 拦截一切可能影响游戏状态的玩家事件
+ * - 当玩家交互导致假物品被服务器纠正时, 延迟 1 tick 重新发送假物品
+ *
+ * @param originalSlot 发起展示时玩家的物品栏位置 (0-8),
+ *   所有重发操作都固定更新此位置, 避免因切换物品栏导致假物品发到错误位置.
  */
 private class QRCodeFreezeListener(
     private val playerId: UUID,
     private val deferred: CompletableDeferred<QRCodeMapDisplay.DisplayResult>,
+    private val fakeMap: ItemStack,
+    private val mapView: MapView,
+    private val originalSlot: Int,
 ) : Listener {
+
+    /**
+     * 延迟 1 tick 重新发送假地图物品和地图数据.
+     *
+     * 当玩家进行交互 (丢弃、切换物品栏等) 时, 即使事件被取消,
+     * 服务器仍可能发送库存纠正包覆盖我们的假物品.
+     * 延迟 1 tick 可确保在服务器纠正之后再次发送假物品.
+     *
+     * 发送前先强制将客户端的选中物品栏位设回 [originalSlot],
+     * 再通过 [EquipmentSlot.HAND] 更新该位置的显示,
+     * 保证假物品始终出现在发起订单时的那个物品栏位上.
+     */
+    private fun resendFakeMap(delay: Long = 1L) {
+        runTaskLater(delay) {
+            val player = Bukkit.getPlayer(playerId) ?: return@runTaskLater
+            if (QRCodeMapDisplay.displaying(playerId)) {
+                // 强制选中原始物品栏位, 确保 HAND 指向正确位置
+                player.inventory.heldItemSlot = originalSlot
+                player.sendEquipmentChange(player, EquipmentSlot.HAND, fakeMap)
+                player.sendMap(mapView)
+            }
+        }
+    }
 
     // ---- 取消信号检测 ----
 
@@ -264,7 +299,7 @@ private class QRCodeFreezeListener(
         deferred.complete(QRCodeMapDisplay.DisplayResult.DISCONNECTED)
     }
 
-    // ---- 禁止一切操作 ----
+    // ---- 禁止一切操作 (交互后重发假物品) ----
 
     @EventHandler(priority = EventPriority.LOWEST)
     fun onCommand(event: PlayerCommandPreprocessEvent) {
@@ -276,18 +311,23 @@ private class QRCodeFreezeListener(
     fun onHeldChange(event: PlayerItemHeldEvent) {
         if (event.player.uniqueId != playerId) return
         event.isCancelled = true
+        // 立即将客户端选中栏位强制回原位, 防止短暂闪烁
+        event.player.inventory.heldItemSlot = originalSlot
+        resendFakeMap()
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     fun onDrop(event: PlayerDropItemEvent) {
         if (event.player.uniqueId != playerId) return
         event.isCancelled = true
+        resendFakeMap(10)
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     fun onInventoryClick(event: InventoryClickEvent) {
         if (event.whoClicked.uniqueId != playerId) return
         event.isCancelled = true
+        resendFakeMap()
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -300,12 +340,14 @@ private class QRCodeFreezeListener(
     fun onSwapHand(event: PlayerSwapHandItemsEvent) {
         if (event.player.uniqueId != playerId) return
         event.isCancelled = true
+        resendFakeMap()
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     fun onInteract(event: PlayerInteractEvent) {
         if (event.player.uniqueId != playerId) return
         event.isCancelled = true
+        resendFakeMap()
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
