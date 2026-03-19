@@ -57,4 +57,8 @@ data class OrderConfig(
 data class QrcodeDisplay(
     /** 二维码在地图上的显示尺寸 (像素, 1~128). 小于 128 时居中显示, 周围留白. */
     val mapSize: Int = 128,
+    /** 二维码展示时长 (秒). 超时后自动结束展示. */
+    val displayDuration: Long = 120,
+    /** 聊天提示的周期间隔 (秒). */
+    val reminderInterval: Long = 3,
 )

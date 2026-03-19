@@ -8,7 +8,6 @@ import cc.mewcraft.wakame.util.unregisterEvents
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.MapId
 import kotlinx.coroutines.*
-import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -28,6 +27,7 @@ import org.bukkit.map.MapView
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.net.URI
+import java.time.Duration
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.imageio.ImageIO
@@ -61,12 +61,6 @@ object QRCodeMapDisplay {
         /** 支付已完成 (收到回调通知). */
         PAID,
     }
-
-    /** 二维码在地图上显示的时长 (毫秒). */
-    private const val DISPLAY_DURATION_MS = 120_000L // 120 秒
-
-    /** 聊天提示的周期间隔 (毫秒). */
-    private const val REMINDER_INTERVAL_MS = 10_000L // 10 秒
 
     /** 当前正在展示二维码的玩家 → 取消信号. */
     private val activeDisplays = ConcurrentHashMap<UUID, CompletableDeferred<DisplayResult>>()
@@ -155,8 +149,10 @@ object QRCodeMapDisplay {
         }
 
         // 4. 挂起等待 + 周期性聊天提醒
+        val displayDurationMs = Duration.ofSeconds(MonetizationConfig.qrcodeDisplay.displayDuration).toMillis()
+        val reminderIntervalMs = Duration.ofSeconds(MonetizationConfig.qrcodeDisplay.reminderInterval).toMillis()
         val result = coroutineScope {
-            // 启动周期性提醒协程 (立即发送第一条, 然后每隔 REMINDER_INTERVAL_MS 重复)
+            // 启动周期性提醒协程 (立即发送第一条, 然后按配置间隔重复)
             val reminderJob = launch {
                 while (isActive) {
                     withContext(Dispatchers.minecraft) {
@@ -164,11 +160,11 @@ object QRCodeMapDisplay {
                             remind(player, paymentType)
                         }
                     }
-                    delay(REMINDER_INTERVAL_MS)
+                    delay(reminderIntervalMs)
                 }
             }
 
-            val displayResult = withTimeoutOrNull(DISPLAY_DURATION_MS) {
+            val displayResult = withTimeoutOrNull(displayDurationMs) {
                 deferred.await()
             } ?: DisplayResult.TIMEOUT
 
@@ -200,9 +196,7 @@ object QRCodeMapDisplay {
             PaymentType.ALIPAY -> TranslatableMessages.MSG_MONETIZATION_QR_HINT_ALIPAY
             PaymentType.WXPAY -> TranslatableMessages.MSG_MONETIZATION_QR_HINT_WXPAY
         }
-        player.sendMessage(Component.empty())
         player.sendMessage(hint.build())
-        player.sendMessage(Component.empty())
     }
 
     /**
