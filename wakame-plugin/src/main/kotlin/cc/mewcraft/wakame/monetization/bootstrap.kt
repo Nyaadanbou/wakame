@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.monetization
 
+import cc.mewcraft.messaging2.ServerInfoProvider
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.database.DatabaseManager
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -23,30 +25,47 @@ internal object MonetizationBootstrap {
 
     @InitFun
     fun init() {
-        if (!MonetizationConfig.enabled) {
+        if (!(MonetizationConfig.enabled && MonetizationConfig.enabledServer == ServerInfoProvider.serverKey)) {
             LOGGER.info("[Monetization] Module is disabled by config.")
             return
         }
 
         LOGGER.info("[Monetization] Initializing payment system...")
 
+        // 1. 根据配置选择存储实现
+        val storage = MonetizationConfig.storage
+        val repository: OrderRepository = when (storage) {
+            StorageType.IN_MEMORY -> {
+                LOGGER.info("[Monetization] Using in-memory storage (data will be lost on restart).")
+                InMemoryOrderRepository()
+            }
+
+            StorageType.DATABASE -> {
+                LOGGER.info("[Monetization] Using database storage (global connection).")
+                ExposedOrderRepository(DatabaseManager.database()).apply {
+                    createSchemaIfNeeded()
+                }
+            }
+        }
+
+        // 2. 创建支付服务
         val signature = ZPaySignatureImpl(MonetizationConfig.zPayApi.pkey)
         val client = ZPayClientImpl(MonetizationConfig.zPayApi, signature)
-        val repository = InMemoryOrderRepository()
         val service = PaymentServiceImpl(client, repository)
 
+        // 3. 启动回调服务器
         val server = ZPayCallbackServerImpl(MonetizationConfig.callbackServer, signature, service)
         server.start()
         callbackServer = server
 
         Monetization.setImplementation(MonetizationImpl(service, repository))
 
-        LOGGER.info("[Monetization] Payment system initialized.")
+        LOGGER.info("[Monetization] Payment system initialized. (storage=$storage)")
     }
 
     @DisableFun
     fun disable() {
-        if (!MonetizationConfig.enabled) {
+        if (!(MonetizationConfig.enabled && MonetizationConfig.enabledServer == ServerInfoProvider.serverKey)) {
             return
         }
 

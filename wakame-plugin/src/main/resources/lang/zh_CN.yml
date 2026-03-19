@@ -121,6 +121,11 @@ msg_err_sign_in_not_available: "<red>你不在主城位面."
 msg_sign_in_retroactive_card_added: "<gray>你获得了补签卡 x<arg:0:'#'>."
 msg_sign_in_retroactive_card_taken: "<gray>你失去了补签卡 x<arg:0:'#'>."
 msg_sign_in_retroactive_card_set: "<gray>你现在拥有补签卡 x<arg:0:'#'>."
+msg_monetization_qr_hint_alipay: "<gray>请使用<aqua>支付宝</aqua>扫码支付 | 按下<yellow>[<key:key.sneak>]</yellow>来取消订单"
+msg_monetization_qr_hint_wxpay: "<gray>请使用<green>微信</green>扫码支付 | 按下<yellow>[<key:key.sneak>]</yellow>来取消订单"
+msg_monetization_order_cancelled: "<yellow>订单已取消."
+msg_monetization_order_timeout: "<yellow>二维码展示超时, 订单已取消."
+msg_monetization_order_paid: "<yellow>支付成功! 感谢您的支持!"
 
 # 像这样制定一个数字的格式, '#' 是 Java 的 DecimalFormat 的语法
 msg_number_format: "This is a decimal number: <arg:0:'zh-CN':'#'>."

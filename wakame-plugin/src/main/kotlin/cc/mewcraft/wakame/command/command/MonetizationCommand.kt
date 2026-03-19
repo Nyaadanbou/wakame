@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.command.command
 
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
@@ -10,8 +12,12 @@ import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
+import org.bukkit.Bukkit
+import org.bukkit.entity.Player
+import org.incendo.cloud.bukkit.data.SinglePlayerSelector
+import org.incendo.cloud.bukkit.parser.selector.SinglePlayerSelectorParser
 import org.incendo.cloud.context.CommandContext
-import org.incendo.cloud.paper.util.sender.PlayerSource
+import org.incendo.cloud.description.Description
 import org.incendo.cloud.paper.util.sender.Source
 import org.incendo.cloud.parser.standard.EnumParser
 import org.incendo.cloud.parser.standard.StringParser
@@ -28,14 +34,15 @@ internal object MonetizationCommand : KoishCommandFactory<Source> {
             literal("pay")
         }
 
-        // <root> pay create <product_name> <amount> <payment_type> <command>
+        // <root> pay create <player> <product_name> <amount> <payment_type> [-s] <command>
         buildAndAdd(commonBuilder) {
-            senderType<PlayerSource>()
             literal("create")
+            required("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
             required("product_name", StringParser.quotedStringParser())
             required("amount", StringParser.quotedStringParser())
             required("payment_type", EnumParser.enumParser(PaymentType::class.java))
-            required("command", StringParser.greedyStringParser())
+            required("command", StringParser.quotedStringParser())
+            flag("s", description = Description.of("Silent mode: do not send order details to the target player"))
             koishHandler(handler = ::handleCreate)
         }
 
@@ -53,34 +60,36 @@ internal object MonetizationCommand : KoishCommandFactory<Source> {
             koishHandler(handler = ::handleCancel)
         }
 
-        // <root> pay expire
+        // <root> pay expire <player>
         buildAndAdd(commonBuilder) {
-            senderType<PlayerSource>()
             literal("expire")
+            required("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
             koishHandler(handler = ::handleExpire)
         }
 
-        // <root> pay list
+        // <root> pay list <player>
         buildAndAdd(commonBuilder) {
-            senderType<PlayerSource>()
             literal("list")
+            required("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
             koishHandler(handler = ::handleList)
         }
     }
 
     // ================================================================
-    //  /pay create <product_name> <amount> <payment_type> <command>
+    //  /pay create <player> <product_name> <amount> <payment_type> <command> [--s]
     // ================================================================
 
     private suspend fun handleCreate(context: CommandContext<Source>) {
-        val player = (context.sender() as PlayerSource).source()
+        val sender = context.sender().source()
+        val player = context.get<SinglePlayerSelector>("player").single()
         val productName = context.get<String>("product_name")
         val amount = context.get<String>("amount")
         val paymentType = context.get<PaymentType>("payment_type")
         val command = context.get<String>("command")
+        val silent = context.flags().contains("s")
 
-        player.sendMessage(
-            Component.text("Creating payment order...", NamedTextColor.YELLOW)
+        sender.sendMessage(
+            Component.text("Creating payment order for ${player.name}...", NamedTextColor.YELLOW)
         )
 
         val order: PaymentOrder
@@ -94,102 +103,79 @@ internal object MonetizationCommand : KoishCommandFactory<Source> {
                 command = command,
             )
         } catch (e: PaymentException) {
-            player.sendMessage(
+            sender.sendMessage(
                 Component.text("Failed to create order: ${e.message}", NamedTextColor.RED)
             )
             return
         }
 
-        // Build success message with clickable QR code link
-        val header = Component.text("--- Payment Order Created ---", NamedTextColor.GREEN, TextDecoration.BOLD)
-        val orderNoLine = Component.text()
-            .append(Component.text("Order No: ", NamedTextColor.GRAY))
-            .append(
-                Component.text(order.outTradeNo, NamedTextColor.WHITE)
-                    .clickEvent(ClickEvent.copyToClipboard(order.outTradeNo))
-                    .hoverEvent(HoverEvent.showText(Component.text("Click to copy", NamedTextColor.GRAY)))
-            )
-            .build()
-        val productLine = Component.text()
-            .append(Component.text("Product: ", NamedTextColor.GRAY))
-            .append(
-                Component.text(order.productName, NamedTextColor.WHITE)
-                    .clickEvent(ClickEvent.copyToClipboard(order.productName))
-                    .hoverEvent(HoverEvent.showText(Component.text("Click to copy", NamedTextColor.GRAY)))
-            )
-            .build()
-        val amountLine = Component.text()
-            .append(Component.text("Amount: ", NamedTextColor.GRAY))
-            .append(
-                Component.text("¥${order.amount}", NamedTextColor.GOLD)
-                    .clickEvent(ClickEvent.copyToClipboard(order.amount))
-                    .hoverEvent(HoverEvent.showText(Component.text("Click to copy", NamedTextColor.GRAY)))
-            )
-            .build()
-        val typeLine = Component.text()
-            .append(Component.text("Payment: ", NamedTextColor.GRAY))
-            .append(
-                Component.text(order.paymentType.name, NamedTextColor.WHITE)
-                    .clickEvent(ClickEvent.copyToClipboard(order.paymentType.name))
-                    .hoverEvent(HoverEvent.showText(Component.text("Click to copy", NamedTextColor.GRAY)))
-            )
-            .build()
+        // 始终输出详细信息到控制台
+        val detailMessage = formatOrderDetails(order)
+        Bukkit.getConsoleSender().sendMessage(detailMessage)
 
-        val lines = mutableListOf(header, orderNoLine, productLine, amountLine, typeLine)
+        // 也发给指令发送者 (如果发送者不是控制台)
+        if (sender is Player) {
+            sender.sendMessage(detailMessage)
+        }
 
-        // QR code image link (clickable)
+        // 如果非 silent 模式, 也发给目标玩家 (如果目标不是发送者)
+        if (!silent && sender !== player) {
+            player.sendMessage(detailMessage)
+        }
+
+        // 向目标玩家展示二维码地图 (内部自动处理 IO 下载 → 主线程展示 → 冻结 → 还原)
         val qrcodeImgUrl = order.qrcodeImgUrl
         if (qrcodeImgUrl != null) {
-            lines += Component.text()
-                .append(Component.text("QR Code: ", NamedTextColor.GRAY))
-                .append(
-                    Component.text("[Click to open QR image]", NamedTextColor.AQUA, TextDecoration.UNDERLINED)
-                        .clickEvent(ClickEvent.openUrl(qrcodeImgUrl))
-                        .hoverEvent(HoverEvent.showText(Component.text(qrcodeImgUrl, NamedTextColor.WHITE)))
-                )
-                .build()
+            val result = QRCodeMapDisplay.show(player, qrcodeImgUrl, order.paymentType)
+            LOGGER.info("[Monetization] QR code display ended for ${player.name}, order ${order.outTradeNo}: $result")
+
+            when (result) {
+                QRCodeMapDisplay.DisplayResult.CANCELLED_BY_SNEAK -> {
+                    val cancelled = Monetization.cancelPayment(order.outTradeNo)
+                    if (cancelled) {
+                        if (player.isOnline) {
+                            player.sendMessage(Component.empty())
+                            player.sendMessage(TranslatableMessages.MSG_MONETIZATION_ORDER_CANCELLED)
+                            player.sendMessage(Component.empty())
+                        }
+                        if (sender is Player && sender !== player) {
+                            sender.sendMessage(Component.text("Order cancelled by player: ${order.outTradeNo}", NamedTextColor.YELLOW))
+                        }
+                    }
+                }
+
+                QRCodeMapDisplay.DisplayResult.DISCONNECTED -> {
+                    val cancelled = Monetization.cancelPayment(order.outTradeNo)
+                    if (cancelled) {
+                        LOGGER.info("[Monetization] Order ${order.outTradeNo} cancelled due to player disconnect.")
+                    }
+                }
+
+                QRCodeMapDisplay.DisplayResult.TIMEOUT -> {
+                    val cancelled = Monetization.cancelPayment(order.outTradeNo)
+                    if (cancelled) {
+                        if (player.isOnline) {
+                            player.sendMessage(Component.empty())
+                            player.sendMessage(TranslatableMessages.MSG_MONETIZATION_ORDER_TIMEOUT)
+                            player.sendMessage(Component.empty())
+                        }
+                    }
+                }
+
+                QRCodeMapDisplay.DisplayResult.PAID -> {
+                    if (player.isOnline) {
+                        player.sendMessage(Component.empty())
+                        player.sendMessage(TranslatableMessages.MSG_MONETIZATION_ORDER_PAID)
+                        player.sendMessage(Component.empty())
+                    }
+                }
+
+                null -> {
+                    // 图片下载失败或玩家已在展示中, 不取消订单
+                    LOGGER.warn("[Monetization] QR code display could not start for ${player.name}, order ${order.outTradeNo}")
+                }
+            }
         }
-
-        // QR code raw link (clickable)
-        val qrcodeUrl = order.qrcodeUrl
-        if (qrcodeUrl != null) {
-            lines += Component.text()
-                .append(Component.text("QR Link: ", NamedTextColor.GRAY))
-                .append(
-                    Component.text("[Click to open payment link]", NamedTextColor.AQUA, TextDecoration.UNDERLINED)
-                        .clickEvent(ClickEvent.openUrl(qrcodeUrl))
-                        .hoverEvent(HoverEvent.showText(Component.text(qrcodeUrl, NamedTextColor.WHITE)))
-                )
-                .build()
-        }
-
-        // Pay URL (clickable)
-        val payUrl = order.payUrl
-        if (payUrl != null) {
-            lines += Component.text()
-                .append(Component.text("Pay URL: ", NamedTextColor.GRAY))
-                .append(
-                    Component.text("[Click to open payment page]", NamedTextColor.AQUA, TextDecoration.UNDERLINED)
-                        .clickEvent(ClickEvent.openUrl(payUrl))
-                        .hoverEvent(HoverEvent.showText(Component.text(payUrl, NamedTextColor.WHITE)))
-                )
-                .build()
-        }
-
-        val commandLine = Component.text()
-            .append(Component.text("Command: ", NamedTextColor.GRAY))
-            .append(
-                Component.text(order.command, NamedTextColor.DARK_GRAY)
-                    .clickEvent(ClickEvent.copyToClipboard(order.command))
-                    .hoverEvent(HoverEvent.showText(Component.text("Click to copy", NamedTextColor.GRAY)))
-            )
-            .build()
-        lines += commandLine
-
-        val footer = Component.text("Scan the QR code to complete payment.", NamedTextColor.YELLOW)
-        lines += footer
-
-        player.sendMessage(Component.join(JoinConfiguration.newlines(), lines))
     }
 
     // ================================================================
@@ -236,40 +222,42 @@ internal object MonetizationCommand : KoishCommandFactory<Source> {
     }
 
     // ================================================================
-    //  /pay expire
+    //  /pay expire <player>
     // ================================================================
 
     private suspend fun handleExpire(context: CommandContext<Source>) {
-        val player = (context.sender() as PlayerSource).source()
+        val sender = context.sender().source()
+        val player = context.get<SinglePlayerSelector>("player").single()
 
         val count = Monetization.expireTimeoutOrders(player.uniqueId)
         if (count > 0) {
-            player.sendMessage(
-                Component.text("Expired $count timeout order(s).", NamedTextColor.GREEN)
+            sender.sendMessage(
+                Component.text("Expired $count timeout order(s) for ${player.name}.", NamedTextColor.GREEN)
             )
         } else {
-            player.sendMessage(
-                Component.text("No timeout orders to expire.", NamedTextColor.GRAY)
+            sender.sendMessage(
+                Component.text("No timeout orders to expire for ${player.name}.", NamedTextColor.GRAY)
             )
         }
     }
 
     // ================================================================
-    //  /pay list
+    //  /pay list <player>
     // ================================================================
 
     private suspend fun handleList(context: CommandContext<Source>) {
-        val player = (context.sender() as PlayerSource).source()
+        val sender = context.sender().source()
+        val player = context.get<SinglePlayerSelector>("player").single()
 
         val orders = Monetization.findOrdersByPlayer(player.uniqueId)
         if (orders.isEmpty()) {
-            player.sendMessage(
-                Component.text("You have no orders.", NamedTextColor.GRAY)
+            sender.sendMessage(
+                Component.text("${player.name} has no orders.", NamedTextColor.GRAY)
             )
             return
         }
 
-        val header = Component.text("--- Your Orders (${orders.size}) ---", NamedTextColor.GREEN, TextDecoration.BOLD)
+        val header = Component.text("--- Orders for ${player.name} (${orders.size}) ---", NamedTextColor.GREEN, TextDecoration.BOLD)
         val lines = mutableListOf<Component>(header)
 
         for (order in orders) {
@@ -300,19 +288,21 @@ internal object MonetizationCommand : KoishCommandFactory<Source> {
                         .clickEvent(ClickEvent.copyToClipboard(order.outTradeNo))
                         .hoverEvent(HoverEvent.showText(Component.text("Click to copy order no", NamedTextColor.GRAY)))
                 )
-                .hoverEvent(HoverEvent.showText(
-                    Component.text()
-                        .append(Component.text("Click to query this order", NamedTextColor.AQUA))
-                        .append(Component.newline())
-                        .append(Component.text("Created: ${TIME_FORMATTER.format(order.createdAt)}", NamedTextColor.GRAY))
-                        .build()
-                ))
-                .clickEvent(ClickEvent.runCommand("/wakame pay query ${order.outTradeNo}"))
+                .hoverEvent(
+                    HoverEvent.showText(
+                        Component.text()
+                            .append(Component.text("Click to query this order", NamedTextColor.AQUA))
+                            .append(Component.newline())
+                            .append(Component.text("Created: ${TIME_FORMATTER.format(order.createdAt)}", NamedTextColor.GRAY))
+
+                    )
+                )
+                .clickEvent(ClickEvent.runCommand("/koish pay query ${order.outTradeNo}"))
                 .build()
             lines += line
         }
 
-        player.sendMessage(Component.join(JoinConfiguration.newlines(), lines))
+        sender.sendMessage(Component.join(JoinConfiguration.newlines(), lines))
     }
 
     // ================================================================

@@ -69,4 +69,3 @@ data class PaymentOrder(
     /** 支付完成时间. */
     val paidAt: Instant?,
 )
-

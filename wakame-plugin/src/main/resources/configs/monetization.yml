@@ -3,6 +3,14 @@ version: 1
 # 是否启用该模块
 enabled: false
 
+# 启用该模块的服务器
+enabled_server: xcity1
+
+# 订单存储方式
+# in_memory - 内存存储, 重启后数据丢失 (适合调试)
+# database  - 数据库持久化, 使用全局数据库连接 (sqlite/mariadb, 配置见 database.yml)
+storage: database
+
 # Z-PAY 接口配置
 z_pay_api:
   # 接口地址
@@ -28,3 +36,10 @@ order:
   timeout_seconds: 300
   # 同一玩家最多同时存在的待支付订单数
   max_pending_per_player: 1
+
+# 二维码展示配置
+qrcode_display:
+  # 二维码在地图上的显示尺寸 (像素, 1~128, 默认 128)
+  # 地图总尺寸固定为 128x128, 此值控制二维码缩放后的大小
+  # 小于 128 时将居中显示, 周围留白 (避免被其他 UI 遮挡)
+  map_size: 128

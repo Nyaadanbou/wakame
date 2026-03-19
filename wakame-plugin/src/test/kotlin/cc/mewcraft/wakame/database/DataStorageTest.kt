@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.config.KoishConfigs
 import cc.mewcraft.wakame.util.test.TestOnly
 import cc.mewcraft.wakame.util.test.TestPath
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
@@ -23,9 +24,9 @@ class DataStorageTest {
         fun setup() {
             KoishDataPaths.initializeForTest(TestPath.TEST)
             ConfigAccess.setImplementation(KoishConfigs)
-            DataStorageInitializer.init()
+            DatabaseManager.init()
 
-            transaction {
+            transaction(DatabaseManager.database()) {
                 SchemaUtils.drop(Users)
                 SchemaUtils.create(Users)
             }
@@ -34,16 +35,16 @@ class DataStorageTest {
         @AfterAll
         @JvmStatic
         fun tearDown() {
-            transaction {
+            transaction(DatabaseManager.database()) {
                 SchemaUtils.drop(Users)
             }
-            DataStorageInitializer.disable()
+            DatabaseManager.disable()
         }
     }
 
     @Test
     fun `test inserting and reading data by dsl`() {
-        transaction {
+        transaction(DatabaseManager.database()) {
             Users.insert {
                 it[name] = "test_user"
                 it[password] = "test_password"
@@ -63,7 +64,7 @@ class DataStorageTest {
 
     @Test
     fun `test modifying and reading data by dsl`() {
-        transaction {
+        transaction(DatabaseManager.database()) {
             Users.insert {
                 it[name] = "test_user_to_ban"
                 it[password] = "test_password"
@@ -85,7 +86,7 @@ class DataStorageTest {
 
     @Test
     fun `test inserting and reading data by dao`() {
-        transaction {
+        transaction(DatabaseManager.database()) {
             DaoUser.new {
                 name = "dao_test_user"
                 password = "dao_test_password"
@@ -102,7 +103,7 @@ class DataStorageTest {
 
     @Test
     fun `test modifying and reading data by dao`() {
-        transaction {
+        transaction(DatabaseManager.database()) {
             val user = DaoUser.new {
                 name = "dao_test_user_to_unban"
                 password = "dao_test_password"

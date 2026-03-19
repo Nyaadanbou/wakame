@@ -9,9 +9,23 @@ private val MONETIZATION_CONFIG = ConfigAccess["monetization"]
 object MonetizationConfig {
     val version by MONETIZATION_CONFIG.entryOrElse<Int>(1, "version")
     val enabled by MONETIZATION_CONFIG.entryOrElse<Boolean>(false, "enabled")
+    val enabledServer by MONETIZATION_CONFIG.entryOrElse<String>("test", "enabled_server")
     val zPayApi by MONETIZATION_CONFIG.entryOrElse<ZPayApi>(ZPayApi(), "z_pay_api")
     val callbackServer by MONETIZATION_CONFIG.entryOrElse<CallbackServer>(CallbackServer(), "callback_server")
     val order by MONETIZATION_CONFIG.entryOrElse<OrderConfig>(OrderConfig(), "order")
+    val storage by MONETIZATION_CONFIG.entryOrElse<StorageType>(StorageType.DATABASE, "storage")
+    val qrcodeDisplay by MONETIZATION_CONFIG.entryOrElse<QrcodeDisplay>(QrcodeDisplay(), "qrcode_display")
+}
+
+/**
+ * 订单存储方式.
+ */
+enum class StorageType {
+    /** 内存存储, 服务器重启后数据丢失 (适合调试). */
+    IN_MEMORY,
+
+    /** 数据库持久化, 使用全局数据库连接 (配置见 database.yml, 支持 SQLite / MariaDB). */
+    DATABASE,
 }
 
 @ConfigSerializable
@@ -39,3 +53,8 @@ data class OrderConfig(
     val maxPendingPerPlayer: Int = 1,
 )
 
+@ConfigSerializable
+data class QrcodeDisplay(
+    /** 二维码在地图上的显示尺寸 (像素, 1~128). 小于 128 时居中显示, 周围留白. */
+    val mapSize: Int = 128,
+)

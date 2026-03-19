@@ -127,6 +127,11 @@ object TranslatableMessages {
     val MSG_SIGN_IN_RETROACTIVE_CARD_ADDED = create("msg_sign_in_retroactive_card_added")
     val MSG_SIGN_IN_RETROACTIVE_CARD_TAKEN = create("msg_sign_in_retroactive_card_taken")
     val MSG_SIGN_IN_RETROACTIVE_CARD_SET = create("msg_sign_in_retroactive_card_set")
+    val MSG_MONETIZATION_QR_HINT_ALIPAY = create("msg_monetization_qr_hint_alipay")
+    val MSG_MONETIZATION_QR_HINT_WXPAY = create("msg_monetization_qr_hint_wxpay")
+    val MSG_MONETIZATION_ORDER_CANCELLED = create("msg_monetization_order_cancelled")
+    val MSG_MONETIZATION_ORDER_TIMEOUT = create("msg_monetization_order_timeout")
+    val MSG_MONETIZATION_ORDER_PAID = create("msg_monetization_order_paid")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)
