@@ -237,10 +237,13 @@ internal class PaymentServiceImpl(
             // 6. 通知二维码展示: 支付已完成 (如果玩家正在查看二维码)
             QRCodeMapDisplay.notifyPaid(order.playerId)
 
-            // 7. 在主线程执行控制台指令
+            // 7. 使缓存失效, 让 LuckPerms/PAPI 等尽快拿到最新数据
+            MonetizationCache.invalidate(order.playerId)
+
+            // 8. 在主线程执行控制台指令
             executeCommand(order)
 
-            // 8. 清理锁
+            // 9. 清理锁
             orderLocks.remove(outTradeNo)
 
             true
@@ -265,6 +268,7 @@ internal class PaymentServiceImpl(
                         repository.updateTradeNo(outTradeNo, response.tradeNo)
                     }
                     LOGGER.info("[Monetization] Order $outTradeNo confirmed paid via active query, executing command for ${order.playerName}")
+                    MonetizationCache.invalidate(order.playerId)
                     executeCommand(order)
                     return repository.findByOutTradeNo(outTradeNo)
                 }

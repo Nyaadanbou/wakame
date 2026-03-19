@@ -8,8 +8,7 @@ import cc.mewcraft.wakame.feature.FEATURE_CONFIG
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.integration.playermana.PlayerManaIntegration
-import cc.mewcraft.wakame.monetization.Monetization
-import kotlinx.coroutines.runBlocking
+import cc.mewcraft.wakame.monetization.MonetizationCache
 import me.clip.placeholderapi.expansion.PlaceholderExpansion
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
@@ -52,13 +51,13 @@ object PlaceholderAPIHook : PlaceholderExpansion() {
             return attributeMap.getValue(attribute).toString()
         } else if (params == "total_paid") {
             // 累计充值金额 (例如 "130.00")
-            return runBlocking { Monetization.getTotalPaidAmount(player.uniqueId) }
+            return MonetizationCache.getTotalPaidAmount(player.uniqueId)
         } else if (params == "paid_count") {
             // 已支付订单数 (例如 "5")
-            return runBlocking { Monetization.getPaidOrderCount(player.uniqueId) }.toString()
+            return MonetizationCache.getPaidOrderCount(player.uniqueId).toString()
         } else if (params == "has_paid") {
             // 是否有过充值记录 ("true" / "false")
-            return runBlocking { Monetization.getPaidOrderCount(player.uniqueId) > 0 }.toString()
+            return (MonetizationCache.getPaidOrderCount(player.uniqueId) > 0).toString()
         }
 
         return null

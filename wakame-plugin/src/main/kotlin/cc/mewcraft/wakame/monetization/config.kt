@@ -15,6 +15,7 @@ object MonetizationConfig {
     val order by MONETIZATION_CONFIG.entryOrElse<OrderConfig>(OrderConfig(), "order")
     val storage by MONETIZATION_CONFIG.entryOrElse<StorageType>(StorageType.DATABASE, "storage")
     val qrcodeDisplay by MONETIZATION_CONFIG.entryOrElse<QrcodeDisplay>(QrcodeDisplay(), "qrcode_display")
+    val luckpermsIntegration by MONETIZATION_CONFIG.entryOrElse<LuckPermsIntegration>(LuckPermsIntegration(), "luckperms_integration")
 }
 
 /**
@@ -62,3 +63,12 @@ data class QrcodeDisplay(
     /** 聊天提示的周期间隔 (秒). */
     val reminderInterval: Long = 3,
 )
+
+@ConfigSerializable
+data class LuckPermsIntegration(
+    /** 是否启用 LuckPerms 集成. */
+    val enabled: Boolean = true,
+    /** 累积充值金额档位 (单位: 元). */
+    val thresholds: List<Int> = listOf(60, 240, 480, 720),
+)
+
