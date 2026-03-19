@@ -128,6 +128,10 @@ object QRCodeMapDisplay {
 
         val listener = QRCodeFreezeListener(player.uniqueId, deferred)
 
+        // 用于保存并还原玩家的原始视角
+        var originalYaw = 0f
+        var originalPitch = 0f
+
         // 3. 主线程: 创建 MapView, 发包展示, 冻结玩家
         withContext(Dispatchers.minecraft) {
             val mapView = Bukkit.createMap(player.world)
@@ -137,6 +141,11 @@ object QRCodeMapDisplay {
             val fakeMap = ItemStack.of(Material.FILLED_MAP).apply {
                 setData(DataComponentTypes.MAP_ID, MapId.mapId(mapView.id))
             }
+
+            // 保存原始视角, 强制向下看 (pitch=90) 使地图平整无畸变
+            originalYaw = player.location.yaw
+            originalPitch = player.location.pitch
+            player.setRotation(originalYaw, 90f)
 
             player.sendEquipmentChange(player, EquipmentSlot.HAND, fakeMap)
             player.sendMap(mapView)
@@ -174,6 +183,7 @@ object QRCodeMapDisplay {
             if (player.isOnline) {
                 val realMainHand = player.inventory.itemInMainHand
                 player.sendEquipmentChange(player, EquipmentSlot.HAND, realMainHand)
+                player.setRotation(originalYaw, originalPitch)
             }
         }
 
@@ -325,12 +335,10 @@ private class QRCodeFreezeListener(
     @EventHandler(priority = EventPriority.LOWEST)
     fun onMove(event: PlayerMoveEvent) {
         if (event.player.uniqueId != playerId) return
-        if (event.hasChangedPosition()) {
-            // 允许转头, 但禁止移动位置
-            val to = event.from.clone()
-            to.yaw = event.to.yaw
-            to.pitch = event.to.pitch
-            event.to = to
-        }
+        // 禁止移动位置, 允许水平转头, 但强制向下看 (pitch=90)
+        val to = event.from.clone()
+        to.yaw = event.to.yaw
+        to.pitch = 90f
+        event.to = to
     }
 }
