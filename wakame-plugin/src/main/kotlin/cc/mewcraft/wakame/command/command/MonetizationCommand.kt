@@ -297,7 +297,7 @@ internal object MonetizationCommand : KoishCommandFactory<Source> {
 
                     )
                 )
-                .clickEvent(ClickEvent.runCommand("/koish pay query ${order.outTradeNo}"))
+                .clickEvent(ClickEvent.runCommand("/wakame pay query ${order.outTradeNo}"))
                 .build()
             lines += line
         }
