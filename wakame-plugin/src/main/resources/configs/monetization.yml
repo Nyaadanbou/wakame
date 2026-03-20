@@ -55,7 +55,7 @@ luckperms_integration:
   # 累积充值金额档位 (单位: 元), 支持任意数量
   # 注册后可在 LuckPerms 权限条件中使用, 例如:
   #   lp user <player> permission set <perm> true paid-above-60=true
-  thresholds:
+  paid_above_thresholds:
     - 60
     - 240
     - 480

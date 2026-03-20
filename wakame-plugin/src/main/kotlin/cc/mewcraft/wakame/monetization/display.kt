@@ -320,7 +320,7 @@ private class QRCodeFreezeListener(
     fun onDrop(event: PlayerDropItemEvent) {
         if (event.player.uniqueId != playerId) return
         event.isCancelled = true
-        resendFakeMap(10)
+        resendFakeMap(20)
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

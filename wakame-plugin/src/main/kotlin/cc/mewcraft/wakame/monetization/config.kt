@@ -69,6 +69,5 @@ data class LuckPermsIntegration(
     /** 是否启用 LuckPerms 集成. */
     val enabled: Boolean = true,
     /** 累积充值金额档位 (单位: 元). */
-    val thresholds: List<Int> = listOf(60, 240, 480, 720),
+    val paidAboveThresholds: List<Int> = listOf(60, 240, 480, 720),
 )
-

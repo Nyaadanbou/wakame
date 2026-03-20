@@ -15,7 +15,7 @@ object LuckPermsHook : PermissionIntegration by LuckPermsPermissionIntegration()
         val luckpermsIntegration = MonetizationConfig.luckpermsIntegration
         if (luckpermsIntegration.enabled) {
             LuckPermsProvider.get().contextManager.registerCalculator(
-                MonetizationContextCalculator(luckpermsIntegration.thresholds)
+                MonetizationContextCalculator(luckpermsIntegration.paidAboveThresholds)
             )
         }
     }

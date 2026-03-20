@@ -16,7 +16,7 @@ import java.math.BigDecimal
  * lp user <player> permission set <perm> true paid-above-60=true
  * ```
  *
- * 档位由配置文件 `monetization.yml` 中的 `luckperms_integration.thresholds` 驱动.
+ * 档位由配置文件 `monetization.yml` 中的 `luckperms_integration.paid_above_thresholds` 驱动.
  */
 internal class MonetizationContextCalculator(
     thresholds: List<Int>,
