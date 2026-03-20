@@ -178,26 +178,40 @@ interface Monetization {
 
 /**
  * [Monetization] 的内部实现, 桥接 [PaymentService] 和 [OrderRepository].
+ *
+ * @param service 支付服务. 仅在 Z-PAY 通讯启用的服务器上非空;
+ *                其他服务器上为 `null`, 此时仅支持订单查询, 不支持创建/主动查询支付.
+ * @param repository 订单仓库. 在所有启用了 monetization 的服务器上都可用.
  */
 internal class MonetizationImpl(
-    private val service: PaymentService,
+    private val service: PaymentService?,
     private val repository: OrderRepository,
 ) : Monetization {
-
 
     override suspend fun createPayment(
         playerId: UUID, playerName: String, productName: String,
         amount: String, paymentType: PaymentType, command: String,
-    ): PaymentOrder = service.createPayment(playerId, playerName, productName, amount, paymentType, command)
+    ): PaymentOrder {
+        val svc = service ?: throw PaymentException("Payment service is not available on this server. Orders can only be created on the designated payment server.")
+        return svc.createPayment(playerId, playerName, productName, amount, paymentType, command)
+    }
 
-    override suspend fun queryPayment(outTradeNo: String): PaymentOrder? =
-        service.queryPayment(outTradeNo)
+    override suspend fun queryPayment(outTradeNo: String): PaymentOrder? {
+        // 有支付服务时, 向 Z-PAY 发起主动查询并同步状态
+        if (service != null) return service.queryPayment(outTradeNo)
+        // 无支付服务时, 仅返回本地数据库中的订单快照
+        return repository.findByOutTradeNo(outTradeNo)
+    }
 
-    override suspend fun cancelPayment(outTradeNo: String): Boolean =
-        service.cancelPayment(outTradeNo)
+    override suspend fun cancelPayment(outTradeNo: String): Boolean {
+        val svc = service ?: throw PaymentException("Payment service is not available on this server. Orders can only be cancelled on the designated payment server.")
+        return svc.cancelPayment(outTradeNo)
+    }
 
-    override suspend fun expireTimeoutOrders(playerId: UUID): Int =
-        service.expireTimeoutOrders(playerId)
+    override suspend fun expireTimeoutOrders(playerId: UUID): Int {
+        val svc = service ?: throw PaymentException("Payment service is not available on this server. Orders can only be expired on the designated payment server.")
+        return svc.expireTimeoutOrders(playerId)
+    }
 
     // ---- 订单查询: 委托给 OrderRepository ----
 
