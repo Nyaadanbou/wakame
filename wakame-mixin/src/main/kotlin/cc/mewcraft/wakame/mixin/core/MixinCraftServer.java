@@ -13,7 +13,7 @@ public abstract class MixinCraftServer implements Server {
 
     @Inject(
             method = "loadPlugins()V",
-            at = @At("HEAD")
+            at = @At("TAIL")
     )
     private void inject(CallbackInfo ci) {
         PreWorldStageTasks.INSTANCE.run();

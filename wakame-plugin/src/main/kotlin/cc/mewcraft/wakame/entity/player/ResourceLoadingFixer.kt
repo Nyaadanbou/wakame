@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.entity.player
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.integration.HooksLoader
+import cc.mewcraft.wakame.integration.PostWorldHooksLoader
+import cc.mewcraft.wakame.integration.PreWorldHooksLoader
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
@@ -44,7 +45,7 @@ fun interface ResourceLoadingFixHandler {
  */
 @Init(
     stage = InitStage.POST_WORLD,
-    runAfter = [HooksLoader::class /* 依赖于 PlayerLevelManager */]
+    runAfter = [PreWorldHooksLoader::class, PostWorldHooksLoader::class /* 依赖于 PlayerLevelManager */]
 )
 internal object ResourceLoadingFixBootstrap {
 

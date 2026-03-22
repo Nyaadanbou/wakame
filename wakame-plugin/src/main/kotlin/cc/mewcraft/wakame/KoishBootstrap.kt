@@ -104,7 +104,7 @@ internal class KoishBootstrap : PluginBootstrap {
             KoishCommandManager.bootstrap(context)
 
         } catch (e: Exception) {
-            LOGGER.error("", e)
+            e.printStackTrace()
             (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
             Runtime.getRuntime().halt(-1) // force-quit
         }

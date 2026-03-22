@@ -16,16 +16,28 @@ import org.bukkit.Bukkit
 import org.objectweb.asm.Type
 import kotlin.reflect.KClass
 
-@Init(InitStage.POST_WORLD)
-internal object HooksLoader {
+@Init(InitStage.PRE_WORLD)
+internal object PreWorldHooksLoader {
 
     @InitFun
     fun init() {
-        loadHooks()
+        HooksLoader.loadHooks(HookStage.PRE_WORLD)
     }
+}
+
+@Init(InitStage.POST_WORLD)
+internal object PostWorldHooksLoader {
+
+    @InitFun
+    fun init() {
+        HooksLoader.loadHooks(HookStage.POST_WORLD)
+    }
+}
+
+private object HooksLoader {
 
     @Suppress("UNCHECKED_CAST")
-    private fun loadHooks() {
+    fun loadHooks(targetStage: HookStage) {
         val pluginJar = BootstrapContexts.PLUGIN_JAR.toFile()
         JarUtils.findAnnotatedClasses(
             pluginJar,
@@ -37,18 +49,36 @@ internal object HooksLoader {
                 val plugins = (annotation["plugins"] as? List<String>) ?: emptyList()
                 val unless = (annotation["unless"] as? List<String>) ?: emptyList()
                 val requireAll = (annotation["requireAll"] as? Boolean) == true
-                val loadListener = annotation["loadListener"] as? Type
+                val loadAwaiter = annotation["loadAwaiter"] as? Type
+                val stage = resolveHookStage(annotation["stage"])
                 if (plugins.isEmpty()) {
                     throw IllegalStateException("Hook annotation on $className does not specify any plugins")
                 }
+                if (stage != targetStage) {
+                    return@forEach
+                }
                 if (shouldLoadHook(plugins, unless, requireAll)) {
-                    loadHook(className.replace('/', '.'), loadListener)
-                    LOGGER.info(Component.text("Hook ${className.substringAfterLast('/')} loaded").color(NamedTextColor.AQUA))
+                    loadHook(className.replace('/', '.'), loadAwaiter)
+                    LOGGER.info(Component.text("Hook ${className.substringAfterLast('/')} loaded (${targetStage.name})").color(NamedTextColor.AQUA))
                 }
             } catch (t: Throwable) {
                 LOGGER.error("Failed to load hook $className", t)
             }
         }
+    }
+
+    /**
+     * Resolves the [HookStage] from an ASM annotation enum value.
+     *
+     * ASM stores enum values as a `String[2]` array: `[descriptor, constantName]`.
+     * If the annotation parameter is absent (i.e., using the default), returns [HookStage.POST_WORLD].
+     */
+    private fun resolveHookStage(value: Any?): HookStage {
+        if (value is Array<*> && value.size == 2) {
+            val name = value[1] as? String ?: return HookStage.POST_WORLD
+            return HookStage.valueOf(name)
+        }
+        return HookStage.POST_WORLD
     }
 
     private fun shouldLoadHook(plugins: List<String>, unless: List<String>, requireAll: Boolean): Boolean {
@@ -63,10 +93,10 @@ internal object HooksLoader {
         }
     }
 
-    private fun loadHook(className: String, loadListener: Type?) {
-        if (loadListener != null) {
-            val objectInstance = (Class.forName(loadListener.className).kotlin as KClass<out LoadAwaiter>).objectInstance
-                ?: throw IllegalStateException("$loadListener is not an object class")
+    private fun loadHook(className: String, loadAwaiter: Type?) {
+        if (loadAwaiter != null) {
+            val objectInstance = (Class.forName(loadAwaiter.className).kotlin as KClass<out LoadAwaiter>).objectInstance
+                ?: throw IllegalStateException("$loadAwaiter is not an object class")
             if (!objectInstance.loaded.get()) { // blocking call
                 return
             }
