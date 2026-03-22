@@ -18,4 +18,5 @@ dependencies {
 
     // libraries
     compileOnly(local.thebrewingproject)
+    compileOnly(local.mythicmobs) { isTransitive = false /* we don't want trash from the MM jar */ }
 }
