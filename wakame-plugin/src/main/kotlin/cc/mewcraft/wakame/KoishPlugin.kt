@@ -24,6 +24,10 @@ internal object KoishPlugin : JavaPlugin(), IKoish {
     override fun onLoad() {
         PluginProvider.set(this)
         KoishProvider.register(this)
+
+        // 执行所有 InitFun (PRE_WORLD)
+        // 利用 paper-plugin.yml 中的 load 配置来控制与其他插件的 onLoad 的先后顺序
+        Initializer.performPreWorld()
     }
 
     override fun onEnable() {

@@ -15,7 +15,6 @@
     "MixinCraftEntityType",
     "MixinCraftingRecipe",
     "MixinCraftPlayer",
-    "MixinCraftServer",
     "MixinCriteriaTriggers",
     "MixinDataComponentPatch$3",
     "MixinDataComponentPatch$Builder",

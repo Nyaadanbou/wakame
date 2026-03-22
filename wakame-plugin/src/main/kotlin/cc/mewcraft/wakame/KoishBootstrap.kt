@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.config.PermanentStorage
 import cc.mewcraft.wakame.config.PrimaryConfigImpl
 import cc.mewcraft.wakame.lang.LanguageExtractor
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
-import cc.mewcraft.wakame.mixin.support.PreWorldStageTasks
 import cc.mewcraft.wakame.pack.AssetExtractor
 import cc.mewcraft.wakame.util.data.Version
 import cc.mewcraft.wakame.util.data.VersionRange
@@ -94,9 +93,6 @@ internal class KoishBootstrap : PluginBootstrap {
 
             // 执行所有 InitFun (BOOTSTRAP)
             Initializer.performBootstrap()
-
-            // 注册所有 InitFun (PRE_WORLD), 会在 org.bukkit.craftbukkit.CraftServer.loadPlugins 之前运行
-            PreWorldStageTasks.register(Initializer::performPreWorld)
 
             // 让指令注册发生在所有 PRE_WORLD 的 InitFun 之后,
             // 这样如果之前发生了异常那么指令将不会注册,
