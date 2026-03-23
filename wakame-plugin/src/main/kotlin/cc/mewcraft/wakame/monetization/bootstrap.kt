@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.monetization.zpay.ZPayCallbackServer
 import cc.mewcraft.wakame.monetization.zpay.ZPayCallbackServerImpl
 import cc.mewcraft.wakame.monetization.zpay.ZPayClientImpl
 import cc.mewcraft.wakame.monetization.zpay.ZPaySignatureImpl
@@ -28,7 +27,8 @@ import cc.mewcraft.wakame.monetization.zpay.ZPaySignatureImpl
 @Init(InitStage.POST_WORLD)
 internal object MonetizationBootstrap {
 
-    private var callbackServer: ZPayCallbackServer? = null
+    private var client: ZPayClientImpl? = null
+    private var callbackServer: ZPayCallbackServerImpl? = null
 
     @InitFun
     fun init() {
@@ -60,7 +60,9 @@ internal object MonetizationBootstrap {
         val service: PaymentService? = if (isPaymentServer) {
             LOGGER.info("[Monetization] This server is the payment server — starting Z-PAY communication.")
             val signature = ZPaySignatureImpl(MonetizationConfig.zPayApi.pkey)
-            val client = ZPayClientImpl(MonetizationConfig.zPayApi, signature)
+            val client = ZPayClientImpl(MonetizationConfig.zPayApi, signature).also {
+                client = it
+            }
             val svc = PaymentServiceImpl(client, repository)
 
             // 启动回调服务器
@@ -89,6 +91,9 @@ internal object MonetizationBootstrap {
 
         callbackServer?.stop()
         callbackServer = null
+
+        client?.close()
+        client = null
 
         Monetization.clearImplementation()
 
