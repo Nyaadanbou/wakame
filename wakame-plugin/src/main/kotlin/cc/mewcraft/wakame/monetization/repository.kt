@@ -154,10 +154,10 @@ object PaymentOrdersTable : Table("koish_payment_orders") {
 /**
  * 基于 Exposed 的 [OrderRepository] 数据库持久化实现.
  *
- * 使用模块自己管理的独立数据库连接, 与全局数据库隔离.
+ * 使用提供的 Exposed [Database] 实例进行数据访问.
  * 订单数据持久化到 [PaymentOrdersTable] 表中, 服务器重启后数据不会丢失.
  *
- * @param db 模块专用的 Exposed [Database] 实例
+ * @param db 用于该仓库的 Exposed [Database] 实例
  */
 class ExposedOrderRepository(
     private val db: Database,
