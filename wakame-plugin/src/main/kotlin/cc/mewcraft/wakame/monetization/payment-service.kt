@@ -255,29 +255,40 @@ internal class PaymentServiceImpl(
     // ================================================================
 
     override suspend fun queryPayment(outTradeNo: String): PaymentOrder? {
-        val order = repository.findByOutTradeNo(outTradeNo) ?: return null
+        val mutex = lockFor(outTradeNo)
+        val result = mutex.withLock {
+            val order = repository.findByOutTradeNo(outTradeNo) ?: return@withLock null
 
-        // 如果订单还在 PENDING, 主动向 Z-PAY 查询最新状态
-        if (order.status == OrderStatus.PENDING) {
-            try {
-                val response = client.queryOrder(outTradeNo)
-                if (response.isSuccess && response.isPaid) {
-                    val now = Instant.now()
-                    repository.updateStatus(outTradeNo, OrderStatus.PAID, now)
-                    if (response.tradeNo != null) {
-                        repository.updateTradeNo(outTradeNo, response.tradeNo)
+            // 如果订单还在 PENDING, 主动向 Z-PAY 查询最新状态
+            if (order.status == OrderStatus.PENDING) {
+                try {
+                    val response = client.queryOrder(outTradeNo)
+                    if (response.isSuccess && response.isPaid) {
+                        val now = Instant.now()
+
+                        // 再次从仓库读取当前订单状态, 避免与异步回调并发处理导致重复执行指令
+                        val current = repository.findByOutTradeNo(outTradeNo)
+                        if (current == null || current.status != OrderStatus.PENDING) {
+                            // 订单已经被其他流程处理, 直接返回最新状态
+                            return@withLock current
+                        }
+
+                        repository.updateStatus(outTradeNo, OrderStatus.PAID, now)
+                        if (response.tradeNo != null) {
+                            repository.updateTradeNo(outTradeNo, response.tradeNo)
+                        }
+                        LOGGER.info("[Monetization] Order $outTradeNo confirmed paid via active query, executing command for ${current.playerName}: ${current.command}")
+                        MonetizationCache.invalidate(current.playerId)
+                        executeCommand(current)
                     }
-                    LOGGER.info("[Monetization] Order $outTradeNo confirmed paid via active query, executing command for ${order.playerName}")
-                    MonetizationCache.invalidate(order.playerId)
-                    executeCommand(order)
-                    return repository.findByOutTradeNo(outTradeNo)
+                } catch (e: ZPayApiException) {
+                    LOGGER.warn("[Monetization] Failed to query order $outTradeNo from Z-PAY: ${e.message}")
                 }
-            } catch (e: ZPayApiException) {
-                LOGGER.warn("[Monetization] Failed to query order $outTradeNo from Z-PAY: ${e.message}")
             }
-        }
 
-        return repository.findByOutTradeNo(outTradeNo)
+            repository.findByOutTradeNo(outTradeNo)
+        }
+        return result
     }
 
     // ================================================================
