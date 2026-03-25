@@ -5,7 +5,7 @@ package cc.mewcraft.wakame.hook.impl.towny
 import cc.mewcraft.messaging2.ServerInfoProvider
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.feature.ProxyServerSwitcher
-import cc.mewcraft.wakame.integration.townynetwork.TownyNetworkBridge
+import cc.mewcraft.wakame.integration.townybridgenetwork.TownyNetworkBridge
 import cc.mewcraft.wakame.messaging.MessagingManager
 import cc.mewcraft.wakame.messaging.handler.TownyBridgeNetworkPacketHandler
 import cc.mewcraft.wakame.messaging.packet.NationSpawnRequestPacket

@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.command.command
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
-import cc.mewcraft.wakame.integration.townynetwork.TownyNetworkBridge
+import cc.mewcraft.wakame.integration.townybridgenetwork.TownyNetworkBridge
 import cc.mewcraft.wakame.util.coroutine.async
 import kotlinx.coroutines.Dispatchers
 import org.incendo.cloud.context.CommandContext

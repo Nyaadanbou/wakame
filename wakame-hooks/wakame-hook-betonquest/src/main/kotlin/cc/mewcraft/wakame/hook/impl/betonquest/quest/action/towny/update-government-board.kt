@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.quest.action.towny
 
-import cc.mewcraft.wakame.integration.towny.GovernmentType
-import cc.mewcraft.wakame.integration.towny.TownyLocalBridge
+import cc.mewcraft.wakame.integration.townybridgelocal.GovernmentType
+import cc.mewcraft.wakame.integration.townybridgelocal.TownyLocalBridge
 import cc.mewcraft.wakame.util.dialog.DialogUtils
 import io.papermc.paper.registry.data.dialog.input.TextDialogInput
 import net.kyori.adventure.text.Component

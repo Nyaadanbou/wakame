@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.gui.towny
 
 import cc.mewcraft.lazyconfig.access.entryOrElse
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.integration.towny.TOWNY_HOOK_CONFIG
-import cc.mewcraft.wakame.integration.towny.Town
-import cc.mewcraft.wakame.integration.towny.TownyLocalBridge
+import cc.mewcraft.wakame.integration.townybridgelocal.TOWNY_HOOK_CONFIG
+import cc.mewcraft.wakame.integration.townybridgelocal.Town
+import cc.mewcraft.wakame.integration.townybridgelocal.TownyLocalBridge
 import cc.mewcraft.wakame.util.KoishKeys
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player

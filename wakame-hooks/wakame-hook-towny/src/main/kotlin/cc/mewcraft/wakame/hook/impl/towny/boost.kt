@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.hook.impl.towny
 
 import cc.mewcraft.lazyconfig.access.entryOrElse
-import cc.mewcraft.wakame.integration.towny.TOWNY_HOOK_CONFIG
-import cc.mewcraft.wakame.integration.towny.TownyBoost
-import cc.mewcraft.wakame.integration.towny.TownyBoost.ActivateResult
+import cc.mewcraft.wakame.integration.townyboost.TownyBoost
+import cc.mewcraft.wakame.integration.townyboost.TownyBoost.ActivateResult
+import cc.mewcraft.wakame.integration.townybridgelocal.TOWNY_HOOK_CONFIG
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.palmergames.bukkit.towny.TownyAPI

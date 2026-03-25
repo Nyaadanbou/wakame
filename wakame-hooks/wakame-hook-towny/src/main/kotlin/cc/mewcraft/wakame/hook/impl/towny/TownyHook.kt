@@ -4,9 +4,9 @@ import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration.ExecutionMode
 import cc.mewcraft.wakame.integration.Hook
-import cc.mewcraft.wakame.integration.towny.TownyBoost
-import cc.mewcraft.wakame.integration.towny.TownyLocalBridge
-import cc.mewcraft.wakame.integration.townynetwork.TownyNetworkBridge
+import cc.mewcraft.wakame.integration.townyboost.TownyBoost
+import cc.mewcraft.wakame.integration.townybridgelocal.TownyLocalBridge
+import cc.mewcraft.wakame.integration.townybridgenetwork.TownyNetworkBridge
 import cc.mewcraft.wakame.messaging.handler.TownyBridgeNetworkPacketHandler
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import cc.mewcraft.wakame.util.registerEvents

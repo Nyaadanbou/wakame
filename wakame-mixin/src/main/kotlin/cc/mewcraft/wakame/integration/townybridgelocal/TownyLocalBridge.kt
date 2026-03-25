@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.integration.towny
+package cc.mewcraft.wakame.integration.townybridgelocal
 
 import java.util.*
 

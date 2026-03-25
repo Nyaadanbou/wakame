@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.integration.townynetwork
+package cc.mewcraft.wakame.integration.townybridgenetwork
 
 import org.bukkit.entity.Player
 

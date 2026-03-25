@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.integration.towny
+package cc.mewcraft.wakame.integration.townyboost
 
 import org.bukkit.World
 import org.bukkit.entity.Player
@@ -55,4 +55,3 @@ interface TownyBoost {
         override fun deactivate(playerId: UUID, world: World): Boolean = implementation.deactivate(playerId, world)
     }
 }
-

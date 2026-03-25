@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.integration.townynetwork
+package cc.mewcraft.wakame.integration.townybridgenetwork
 
 import cc.mewcraft.messaging2.ServerInfoProvider
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages

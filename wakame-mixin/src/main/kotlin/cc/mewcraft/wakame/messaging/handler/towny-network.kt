@@ -20,7 +20,7 @@
 package cc.mewcraft.wakame.messaging.handler
 
 import cc.mewcraft.messaging2.packet.SimplePacketHandler
-import cc.mewcraft.wakame.integration.townynetwork.TownylessNetworkBridge
+import cc.mewcraft.wakame.integration.townybridgenetwork.TownylessNetworkBridge
 import cc.mewcraft.wakame.messaging.packet.NationSpawnRequestPacket
 import cc.mewcraft.wakame.messaging.packet.NationSpawnResponsePacket
 import cc.mewcraft.wakame.messaging.packet.TownSpawnRequestPacket

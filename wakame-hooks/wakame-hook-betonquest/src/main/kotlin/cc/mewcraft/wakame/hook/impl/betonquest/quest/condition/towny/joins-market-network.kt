@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.towny
 
-import cc.mewcraft.wakame.integration.towny.GovernmentType
-import cc.mewcraft.wakame.integration.towny.TownyLocalBridge
+import cc.mewcraft.wakame.integration.townybridgelocal.GovernmentType
+import cc.mewcraft.wakame.integration.townybridgelocal.TownyLocalBridge
 import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
 import org.betonquest.betonquest.api.logger.BetonQuestLogger

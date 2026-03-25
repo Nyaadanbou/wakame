@@ -3,7 +3,7 @@
 package cc.mewcraft.wakame.hook.impl.towny
 
 import cc.mewcraft.lazyconfig.access.entryOrElse
-import cc.mewcraft.wakame.integration.towny.*
+import cc.mewcraft.wakame.integration.townybridgelocal.*
 import com.palmergames.bukkit.towny.TownyAPI
 import com.palmergames.bukkit.towny.`object`.TownyObject
 import com.palmergames.bukkit.towny.`object`.metadata.ByteDataField

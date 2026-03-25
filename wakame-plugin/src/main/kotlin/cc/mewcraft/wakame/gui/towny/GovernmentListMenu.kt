@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.gui.towny
 
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.integration.towny.MenuListEntry
+import cc.mewcraft.wakame.integration.townybridgelocal.MenuListEntry
 import cc.mewcraft.wakame.item.resolveToItemWrapper
 import cc.mewcraft.wakame.util.cooldown.Cooldown
 import cc.mewcraft.wakame.util.metadata.metadata

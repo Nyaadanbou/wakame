@@ -1,6 +1,6 @@
 @file:JvmName("TownyHookConfig")
 
-package cc.mewcraft.wakame.integration.towny
+package cc.mewcraft.wakame.integration.townybridgelocal
 
 import cc.mewcraft.lazyconfig.access.ConfigAccess
 
