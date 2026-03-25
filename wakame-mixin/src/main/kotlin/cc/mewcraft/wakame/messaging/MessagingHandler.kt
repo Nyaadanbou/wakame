@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.messaging
 
 import cc.mewcraft.wakame.messaging.handler.JEICompatPacketHandler
 import cc.mewcraft.wakame.messaging.handler.TeleportOnJoinPacketHandler
-import cc.mewcraft.wakame.messaging.handler.TownyNetworkPacketHandler
+import cc.mewcraft.wakame.messaging.handler.TownyBridgeNetworkPacketHandler
 import cc.mewcraft.wakame.messaging.packet.*
 import ninja.egg82.messenger.handler.AbstractMessagingHandler
 import ninja.egg82.messenger.packets.Packet
@@ -33,19 +33,19 @@ class MessagingHandler(
             /* TownyNetwork */
 
             is TownSpawnRequestPacket -> {
-                TownyNetworkPacketHandler.handle(packet); return true
+                TownyBridgeNetworkPacketHandler.handle(packet); return true
             }
 
             is TownSpawnResponsePacket -> {
-                TownyNetworkPacketHandler.handle(packet); return true
+                TownyBridgeNetworkPacketHandler.handle(packet); return true
             }
 
             is NationSpawnRequestPacket -> {
-                TownyNetworkPacketHandler.handle(packet); return true
+                TownyBridgeNetworkPacketHandler.handle(packet); return true
             }
 
             is NationSpawnResponsePacket -> {
-                TownyNetworkPacketHandler.handle(packet); return true
+                TownyBridgeNetworkPacketHandler.handle(packet); return true
             }
         }
 

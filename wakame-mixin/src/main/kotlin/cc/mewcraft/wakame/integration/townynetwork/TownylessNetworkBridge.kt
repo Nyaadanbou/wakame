@@ -4,7 +4,7 @@ import cc.mewcraft.messaging2.ServerInfoProvider
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.feature.ProxyServerSwitcher
 import cc.mewcraft.wakame.messaging.MessagingManager
-import cc.mewcraft.wakame.messaging.handler.TownyNetworkPacketHandler
+import cc.mewcraft.wakame.messaging.handler.TownyBridgeNetworkPacketHandler
 import cc.mewcraft.wakame.messaging.packet.NationSpawnRequestPacket
 import cc.mewcraft.wakame.messaging.packet.NationSpawnResponsePacket
 import cc.mewcraft.wakame.messaging.packet.TownSpawnRequestPacket
@@ -19,7 +19,7 @@ import java.util.*
 /**
  * 服务器上没有安装 Towny 时的实现.
  */
-internal object TownylessNetworkImpl : TownyNetworkIntegration, TownyNetworkPacketHandler {
+internal object TownylessNetworkBridge : TownyNetworkBridge, TownyBridgeNetworkPacketHandler {
 
     override suspend fun reqTownSpawn(player: Player, targetServer: String) =
         TownylessTeleportImpl.requestTeleportTown(player, targetServer)

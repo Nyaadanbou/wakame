@@ -1,3 +1,45 @@
+# TODO 新物品 & 新机制: 城镇权益激活卡
+#
+# 设计思路:
+# 米团玩家可以使用特殊道具: 城镇权益激活卡
+# 在城镇领地内使用时, 根据玩家当前的米团等级, 向玩家当前位置上的城镇施加一个永久的*城镇权益效果*
+# *城镇权益效果*包括:
+# - 领地上限数量的加成
+# - 圈地花费的修饰系数
+# - 维护费的修饰系数
+# 在一个家园位面里, 每名米团玩家最多将他的城镇权益效果施加到一个城镇上; 不同家园位面的城镇权益效果互不影响
+
+# 城镇权益配置
+#
+# 每个权限组下可以配置不同的权益类型, 未配置的权益不会生效
+# 在配置文件中越靠后的权限组优先级越高
+# 当城镇有多个玩家激活了权益时:
+#   claim_block_bonus — 所有数量求和
+#   claim_cost_multiplier — 所有系数相乘
+#   town_upkeep_cost_multiplier — 所有系数相乘
+#   nation_upkeep_cost_multiplier — 所有系数相乘
+boost:
+  "group.vip1":
+    claim_block_bonus: 16
+    claim_cost_multiplier: 0.95
+    town_upkeep_cost_multiplier: 0.95
+    nation_upkeep_cost_multiplier: 0.95
+  "group.vip2":
+    claim_block_bonus: 32
+    claim_cost_multiplier: 0.88
+    town_upkeep_cost_multiplier: 0.88
+    nation_upkeep_cost_multiplier: 0.88
+  "group.vip3":
+    claim_block_bonus: 64
+    claim_cost_multiplier: 0.81
+    town_upkeep_cost_multiplier: 0.81
+    nation_upkeep_cost_multiplier: 0.81
+  "group.vip4":
+    claim_block_bonus: 128
+    claim_cost_multiplier: 0.74
+    town_upkeep_cost_multiplier: 0.74
+    nation_upkeep_cost_multiplier: 0.74
+
 # 城镇列表菜单设置
 town_list_menu:
   # 默认公告板

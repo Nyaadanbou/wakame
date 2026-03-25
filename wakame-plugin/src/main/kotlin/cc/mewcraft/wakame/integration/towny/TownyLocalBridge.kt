@@ -5,7 +5,7 @@ import java.util.*
 /**
  * 用来获取服务器上所有 [Town] 和 [Nation] 的接口.
  */
-interface TownyLocal {
+interface TownyLocalBridge {
 
     /**
      * 获取服务器上的所有 [Town].
@@ -37,9 +37,9 @@ interface TownyLocal {
      */
     fun isKing(playerId: UUID): Boolean
 
-    companion object Impl : TownyLocal {
+    companion object Impl : TownyLocalBridge {
 
-        private var implementation: TownyLocal = object : TownyLocal {
+        private var implementation: TownyLocalBridge = object : TownyLocalBridge {
             override fun getTowns(): Collection<Town> = emptyList()
             override fun getNations(): Collection<Nation> = emptyList()
             override fun getTown(playerId: UUID): Town? = null
@@ -48,7 +48,7 @@ interface TownyLocal {
             override fun isKing(playerId: UUID): Boolean = false
         }
 
-        fun setImplementation(provider: TownyLocal) {
+        fun setImplementation(provider: TownyLocalBridge) {
             implementation = provider
         }
 

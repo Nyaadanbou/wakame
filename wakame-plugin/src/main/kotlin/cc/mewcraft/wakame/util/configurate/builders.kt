@@ -11,16 +11,16 @@ import java.io.BufferedReader
 import java.io.BufferedWriter
 
 
-internal fun yamlLoader(block: YamlLoaderDsl.() -> Unit): YamlConfigurationLoader.Builder {
+fun yamlLoader(block: YamlLoaderDsl.() -> Unit): YamlConfigurationLoader.Builder {
     return YamlLoaderDsl().apply(block).builder
 }
 
-internal fun gsonLoader(block: GsonLoaderDsl.() -> Unit): GsonConfigurationLoader.Builder {
+fun gsonLoader(block: GsonLoaderDsl.() -> Unit): GsonConfigurationLoader.Builder {
     return GsonLoaderDsl().apply(block).builder
 }
 
-internal class YamlLoaderDsl {
-    /* private */ val builder: YamlConfigurationLoader.Builder = YamlConfigurationLoader.builder()
+class YamlLoaderDsl {
+    internal val builder: YamlConfigurationLoader.Builder = YamlConfigurationLoader.builder()
 
     // 应用默认设置的逻辑
     fun withDefaults(): YamlLoaderDsl {
@@ -51,8 +51,8 @@ internal class YamlLoaderDsl {
     }
 }
 
-internal class GsonLoaderDsl {
-    /* private */ val builder: GsonConfigurationLoader.Builder = GsonConfigurationLoader.builder()
+class GsonLoaderDsl {
+    internal val builder: GsonConfigurationLoader.Builder = GsonConfigurationLoader.builder()
 
     fun withDefaults(): GsonLoaderDsl {
         return this
@@ -78,14 +78,14 @@ internal class GsonLoaderDsl {
     }
 }
 
-internal fun YamlConfigurationLoader.Builder.withDefaultYamlConfigs(): YamlConfigurationLoader.Builder {
+fun YamlConfigurationLoader.Builder.withDefaultYamlConfigs(): YamlConfigurationLoader.Builder {
     return apply {
         indent(2) // use 2 spaces indent
         nodeStyle(NodeStyle.BLOCK) // always use block style
     }
 }
 
-internal fun YamlConfigurationLoader.Builder.withDefaultConfigOptions(): YamlConfigurationLoader.Builder {
+fun YamlConfigurationLoader.Builder.withDefaultConfigOptions(): YamlConfigurationLoader.Builder {
     return defaultOptions { options ->
         options.shouldCopyDefaults(false) // don't automatically write default values from serializers back to config files
             .implicitInitialization(true) // enable implicit initialization
@@ -97,12 +97,12 @@ private val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.bui
     .registerAll(STANDARD_SERIALIZERS)
     .build()
 
-internal fun YamlConfigurationLoader.Builder.withDefaultSerializers(): YamlConfigurationLoader.Builder {
+fun YamlConfigurationLoader.Builder.withDefaultSerializers(): YamlConfigurationLoader.Builder {
     return defaultOptions { options ->
         options.serializers(SERIALIZERS)
     }
 }
 
-internal fun YamlConfigurationLoader.Builder.withDefaultEverything(): YamlConfigurationLoader.Builder {
+fun YamlConfigurationLoader.Builder.withDefaultEverything(): YamlConfigurationLoader.Builder {
     return withDefaultYamlConfigs().withDefaultConfigOptions().withDefaultSerializers()
 }

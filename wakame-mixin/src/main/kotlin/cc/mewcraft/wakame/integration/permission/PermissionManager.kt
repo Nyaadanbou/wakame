@@ -62,7 +62,7 @@ object PermissionManager {
 
     private fun hasPermissionWhenOffline(world: World, player: OfflinePlayer, permission: String): CompletableFuture<Boolean> {
         require(!Bukkit.isPrimaryThread()) {
-            "offline player permissions should never be checked from the main thread"
+            "Offline player permissions should never be checked from the main thread"
         }
         return _integrations[0].hasPermission(world, player, permission).thenApply { it == true }
     }

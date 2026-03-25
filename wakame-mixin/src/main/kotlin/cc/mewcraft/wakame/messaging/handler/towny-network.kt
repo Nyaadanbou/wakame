@@ -20,7 +20,7 @@
 package cc.mewcraft.wakame.messaging.handler
 
 import cc.mewcraft.messaging2.packet.SimplePacketHandler
-import cc.mewcraft.wakame.integration.townynetwork.TownylessNetworkImpl
+import cc.mewcraft.wakame.integration.townynetwork.TownylessNetworkBridge
 import cc.mewcraft.wakame.messaging.packet.NationSpawnRequestPacket
 import cc.mewcraft.wakame.messaging.packet.NationSpawnResponsePacket
 import cc.mewcraft.wakame.messaging.packet.TownSpawnRequestPacket
@@ -34,18 +34,18 @@ import cc.mewcraft.wakame.messaging.packet.TownSpawnResponsePacket
  * - [NationSpawnRequestPacket]
  * - [NationSpawnResponsePacket]
  */
-interface TownyNetworkPacketHandler : SimplePacketHandler {
+interface TownyBridgeNetworkPacketHandler : SimplePacketHandler {
 
     fun handle(packet: TownSpawnRequestPacket)
     fun handle(packet: TownSpawnResponsePacket)
     fun handle(packet: NationSpawnRequestPacket)
     fun handle(packet: NationSpawnResponsePacket)
 
-    companion object : TownyNetworkPacketHandler {
+    companion object : TownyBridgeNetworkPacketHandler {
 
-        private var implementation: TownyNetworkPacketHandler = TownylessNetworkImpl
+        private var implementation: TownyBridgeNetworkPacketHandler = TownylessNetworkBridge
 
-        fun setImplementation(impl: TownyNetworkPacketHandler) {
+        fun setImplementation(impl: TownyBridgeNetworkPacketHandler) {
             this.implementation = impl
         }
 

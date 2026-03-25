@@ -1,13 +1,13 @@
-@file:JvmName("TownyNetwork")
+@file:JvmName("TownyBridgeNetwork")
 
 package cc.mewcraft.wakame.hook.impl.towny
 
 import cc.mewcraft.messaging2.ServerInfoProvider
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.feature.ProxyServerSwitcher
-import cc.mewcraft.wakame.integration.townynetwork.TownyNetworkIntegration
+import cc.mewcraft.wakame.integration.townynetwork.TownyNetworkBridge
 import cc.mewcraft.wakame.messaging.MessagingManager
-import cc.mewcraft.wakame.messaging.handler.TownyNetworkPacketHandler
+import cc.mewcraft.wakame.messaging.handler.TownyBridgeNetworkPacketHandler
 import cc.mewcraft.wakame.messaging.packet.NationSpawnRequestPacket
 import cc.mewcraft.wakame.messaging.packet.NationSpawnResponsePacket
 import cc.mewcraft.wakame.messaging.packet.TownSpawnRequestPacket
@@ -28,8 +28,6 @@ import org.bukkit.event.player.PlayerTeleportEvent
 import java.time.Duration
 import java.util.*
 
-private val townyApi: TownyAPI
-    get() = TownyAPI.getInstance()
 private val serverId: UUID
     get() = ServerInfoProvider.serverId
 private val serverKey: String
@@ -40,7 +38,7 @@ private val serverGroup: String
 /**
  * 服务器上有安装 Towny 时的实现.
  */
-object TownyNetworkImpl : TownyNetworkIntegration, TownyNetworkPacketHandler, Listener {
+object TownyNetworkBridgeImpl : TownyNetworkBridge, TownyBridgeNetworkPacketHandler, Listener {
 
     override suspend fun reqTownSpawn(player: Player, targetServer: String) =
         TownyTeleportImpl.reqTownSpawn(player, targetServer)
@@ -129,7 +127,7 @@ private object TownyTeleportImpl {
         val playerId = packet.playerId
 
         // resident 为 null 时通常说明玩家从没来过本服务器
-        val resident = townyApi.getResident(playerId)
+        val resident = TownyAPI.getInstance().getResident(playerId)
         // town 为 null 时说明玩家不属于任何城镇
         val town = resident?.townOrNull
 
@@ -165,7 +163,7 @@ private object TownyTeleportImpl {
         val targetServer = packet.targetServer
         if (targetServer != serverKey) return
         val playerId = packet.playerId
-        val resident = townyApi.getResident(playerId)
+        val resident = TownyAPI.getInstance().getResident(playerId)
         val nation = resident?.nationOrNull
         if (resident == null || nation == null) {
             MessagingManager.queuePacket { NationSpawnResponsePacket(serverId, playerId, NationSpawnResponsePacket.ResponseType.DENY_FOR_NO_NATION) }
@@ -191,7 +189,7 @@ private object TownyTeleportImpl {
         // 根据正在排队的传送请求, 将玩家传送到他的城镇/国家传送点
 
         val playerId = event.connection.profile.id ?: return
-        val resident = townyApi.getResident(playerId) ?: return
+        val resident = TownyAPI.getInstance().getResident(playerId) ?: return
         handleNetworkTownSpawn(playerId, resident, event::setSpawnLocation)
         handleNetworkNationSpawn(playerId, resident, event::setSpawnLocation)
     }
@@ -215,7 +213,7 @@ private object TownyTeleportImpl {
     }
 
     private fun handleLocalTownSpawn(player: Player) {
-        val spawn = townyApi.getTown(player)?.spawnOrNull
+        val spawn = TownyAPI.getInstance().getTown(player)?.spawnOrNull
         if (spawn == null) {
             player.sendMessage(TranslatableMessages.MSG_ERR_NO_TOWN_AT_TARGET_SERVER)
             return
@@ -224,7 +222,7 @@ private object TownyTeleportImpl {
     }
 
     private fun handleLocalNationSpawn(player: Player) {
-        val spawn = townyApi.getNation(player)?.spawnOrNull
+        val spawn = TownyAPI.getInstance().getNation(player)?.spawnOrNull
         if (spawn == null) {
             player.sendMessage(TranslatableMessages.MSG_ERR_NO_NATION_AT_TARGET_SERVER)
             return

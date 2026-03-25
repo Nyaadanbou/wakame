@@ -1,9 +1,8 @@
-@file:JvmName("TownyLocal")
+@file:JvmName("TownyBridgeLocal")
 
 package cc.mewcraft.wakame.hook.impl.towny
 
 import cc.mewcraft.lazyconfig.access.entryOrElse
-import cc.mewcraft.wakame.gui.towny.townyHookConfig
 import cc.mewcraft.wakame.integration.towny.*
 import com.palmergames.bukkit.towny.TownyAPI
 import com.palmergames.bukkit.towny.`object`.TownyObject
@@ -16,36 +15,33 @@ import com.palmergames.bukkit.towny.`object`.Government as TownyGovernment
 import com.palmergames.bukkit.towny.`object`.Nation as TownyNation
 import com.palmergames.bukkit.towny.`object`.Town as TownyTown
 
-private val townyApi: TownyAPI
-    get() = TownyAPI.getInstance()
-
-class TownyLocalImpl : TownyLocal {
+class TownyLocalBridgeImpl : TownyLocalBridge {
     override fun getTowns(): Collection<Town> {
-        return townyApi.towns.map(::TownImpl)
+        return TownyAPI.getInstance().towns.map(::TownImpl)
     }
 
     override fun getNations(): Collection<Nation> {
-        return townyApi.nations.map(::NationImpl)
+        return TownyAPI.getInstance().nations.map(::NationImpl)
     }
 
     override fun isMayor(playerId: UUID): Boolean {
-        val resident = townyApi.getResident(playerId) ?: return false
+        val resident = TownyAPI.getInstance().getResident(playerId) ?: return false
         return resident.isMayor
     }
 
     override fun isKing(playerId: UUID): Boolean {
-        val resident = townyApi.getResident(playerId) ?: return false
+        val resident = TownyAPI.getInstance().getResident(playerId) ?: return false
         return resident.isKing
     }
 
     override fun getTown(playerId: UUID): Town? {
-        val resident = townyApi.getResident(playerId) ?: return null
+        val resident = TownyAPI.getInstance().getResident(playerId) ?: return null
         val town = resident.town ?: return null
         return TownImpl(town)
     }
 
     override fun getNation(playerId: UUID): Nation? {
-        val resident = townyApi.getResident(playerId) ?: return null
+        val resident = TownyAPI.getInstance().getResident(playerId) ?: return null
         val nation = resident.nation ?: return null
         return NationImpl(nation)
     }
@@ -131,8 +127,8 @@ private class TownImpl(
     MenuListEntry by MenuListEntryComponent(government, defaultBoard, entryFilter),
     MarketNetworkEntity by MarketNetworkEntityComponent(government) {
     companion object {
-        private val defaultBoard: List<String> by townyHookConfig.entryOrElse(listOf(), "town_list_menu", "default_board")
-        private val entryFilter: List<EntryFilter> by townyHookConfig.entryOrElse(listOf(), "town_list_menu", "entry_filter")
+        private val defaultBoard: List<String> by TOWNY_HOOK_CONFIG.entryOrElse(listOf(), "town_list_menu", "default_board")
+        private val entryFilter: List<EntryFilter> by TOWNY_HOOK_CONFIG.entryOrElse(listOf(), "town_list_menu", "entry_filter")
     }
 }
 
@@ -144,7 +140,7 @@ private class NationImpl(
     MenuListEntry by MenuListEntryComponent(government, defaultBoard, entryFilter),
     MarketNetworkEntity by MarketNetworkEntityComponent(government) {
     companion object {
-        private val defaultBoard: List<String> by townyHookConfig.entryOrElse(listOf(), "nation_list_menu", "default_board")
-        private val entryFilter: List<EntryFilter> by townyHookConfig.entryOrElse(listOf(), "nation_list_menu", "entry_filter")
+        private val defaultBoard: List<String> by TOWNY_HOOK_CONFIG.entryOrElse(listOf(), "nation_list_menu", "default_board")
+        private val entryFilter: List<EntryFilter> by TOWNY_HOOK_CONFIG.entryOrElse(listOf(), "nation_list_menu", "entry_filter")
     }
 }

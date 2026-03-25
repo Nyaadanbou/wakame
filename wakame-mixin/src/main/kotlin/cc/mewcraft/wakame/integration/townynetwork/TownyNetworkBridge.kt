@@ -7,7 +7,7 @@ import org.bukkit.entity.Player
  *
  * 使用该接口来执行所有关于跨服的操作.
  */
-interface TownyNetworkIntegration {
+interface TownyNetworkBridge {
 
     /**
      * 将玩家 [player] 传送到指定服务器 [targetServer] 里面的(玩家所属的)城镇传送点.
@@ -20,12 +20,12 @@ interface TownyNetworkIntegration {
     suspend fun reqNationSpawn(player: Player, targetServer: String)
 
     /**
-     * 该伴生对象持有了 [TownyNetworkIntegration] 的当前实现.
+     * 该伴生对象持有了 [TownyNetworkBridge] 的当前实现.
      */
-    companion object : TownyNetworkIntegration {
-        private var implementation: TownyNetworkIntegration = TownylessNetworkImpl
+    companion object : TownyNetworkBridge {
+        private var implementation: TownyNetworkBridge = TownylessNetworkBridge
 
-        fun setImplementation(impl: TownyNetworkIntegration) {
+        fun setImplementation(impl: TownyNetworkBridge) {
             this.implementation = impl
         }
 
