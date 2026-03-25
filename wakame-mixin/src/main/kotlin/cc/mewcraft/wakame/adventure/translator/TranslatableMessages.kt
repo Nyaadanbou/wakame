@@ -132,6 +132,10 @@ object TranslatableMessages {
     val MSG_MONETIZATION_ORDER_CANCELLED = create("msg_monetization_order_cancelled")
     val MSG_MONETIZATION_ORDER_TIMEOUT = create("msg_monetization_order_timeout")
     val MSG_MONETIZATION_ORDER_PAID = create("msg_monetization_order_paid")
+    val MSG_TOWNY_BOOST_ACTIVATE_SUCCESS = create("msg_towny_boost_activate_success")
+    val MSG_TOWNY_BOOST_ACTIVATE_NO_VIP_GROUP = create("msg_towny_boost_activate_no_vip_group")
+    val MSG_TOWNY_BOOST_ACTIVATE_ALREADY_ACTIVATED = create("msg_towny_boost_activate_already_activated")
+    val MSG_TOWNY_BOOST_STATUS_NO_BOOST = create("msg_towny_boost_status_no_boost")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

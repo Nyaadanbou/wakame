@@ -38,6 +38,8 @@ interface TownyBoost {
         NOT_IN_TOWN,
         /** 玩家没有任何匹配的权限组. */
         NO_VIP_GROUP,
+        /** 玩家已在该城镇上激活了相同等级的权益. */
+        ALREADY_ACTIVATED,
     }
 
     companion object Impl : TownyBoost {

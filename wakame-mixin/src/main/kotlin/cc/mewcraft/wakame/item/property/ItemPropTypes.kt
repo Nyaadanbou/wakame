@@ -533,6 +533,12 @@ data object ItemPropTypes {
     @JvmField
     val VIRTUAL_BOOK: ItemPropType<VirtualBook> = typeOf("virtual_book")
 
+    /**
+     * 标记一个物品具有 [cc.mewcraft.wakame.item.behavior.impl.TownyBoost] 行为.
+     */
+    @JvmField
+    val TOWNY_BOOST = typeOf<Unit>("towny_boost")
+
     // ------------
     // 方便函数
     // ------------

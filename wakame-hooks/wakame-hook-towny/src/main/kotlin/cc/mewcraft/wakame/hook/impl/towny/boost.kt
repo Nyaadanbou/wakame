@@ -1,22 +1,28 @@
 package cc.mewcraft.wakame.hook.impl.towny
 
 import cc.mewcraft.lazyconfig.access.entryOrElse
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.townyboost.TownyBoost
 import cc.mewcraft.wakame.integration.townyboost.TownyBoost.ActivateResult
 import cc.mewcraft.wakame.integration.townybridgelocal.TOWNY_HOOK_CONFIG
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.palmergames.bukkit.towny.TownyAPI
-import com.palmergames.bukkit.towny.event.NationUpkeepCalculationEvent
 import com.palmergames.bukkit.towny.event.TownBlockClaimCostCalculationEvent
 import com.palmergames.bukkit.towny.event.TownUpkeepCalculationEvent
+import com.palmergames.bukkit.towny.event.statusscreen.TownStatusScreenEvent
 import com.palmergames.bukkit.towny.`object`.metadata.CustomDataField
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.JoinConfiguration
+import net.kyori.adventure.text.event.HoverEvent
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.World
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import java.util.*
+import kotlin.math.roundToInt
 import com.palmergames.bukkit.towny.`object`.Town as TownyTown
 
 // ============================================================
@@ -33,7 +39,6 @@ data class GroupBoost(
     val claimBlockBonus: Int = 0,
     val claimCostMultiplier: Double = 1.0,
     val townUpkeepCostMultiplier: Double = 1.0,
-    val nationUpkeepCostMultiplier: Double = 1.0,
 )
 
 // ============================================================
@@ -62,13 +67,32 @@ class BoostMapDataField : CustomDataField<Map<UUID, String>> {
         return gson.toJson(raw)
     }
 
-    override fun displayFormattedValue(): String = value?.toString() ?: "{}"
+    override fun displayFormattedValue(): String {
+        val v = value
+        if (v.isNullOrEmpty()) return ""
+
+        // group → 在配置中的位置 (1-indexed), 即"等级"
+        val groupToLevel = BoostConfig.boosts.keys.withIndex()
+            .associate { (index, group) -> group to (index + 1) }
+
+        // 统计每个等级的数量, 并按等级排序输出
+        return v.values
+            .groupingBy { it }.eachCount()
+            .entries
+            .mapNotNull { (group, count) ->
+                val level = groupToLevel[group] ?: return@mapNotNull null
+                level to count
+            }
+            .sortedBy { (level, _) -> level }
+            .joinToString(", ") { (level, count) -> "等级$level: $count" }
+    }
 
     override fun clone(): CustomDataField<Map<UUID, String>> =
         BoostMapDataField(key, value ?: emptyMap())
 
     companion object {
         const val TYPE_ID = "koish_boost_map"
+
         private val gson = Gson()
         private val MAP_TYPE = object : TypeToken<Map<String, String>>() {}.type
     }
@@ -103,8 +127,9 @@ object TownBoostData {
     private const val KEY = "koish_boosts"
 
     /** 读取城镇上所有已激活的权益. */
-    fun get(town: TownyTown): Map<UUID, String> =
-        town.getMeta<BoostMapDataField>(KEY)?.value ?: emptyMap()
+    fun get(town: TownyTown): Map<UUID, String> {
+        return town.getMeta<BoostMapDataField>(KEY)?.value ?: emptyMap()
+    }
 
     /** 写入城镇上所有已激活的权益, 并保存. */
     fun set(town: TownyTown, boosts: Map<UUID, String>) {
@@ -140,32 +165,24 @@ class TownyBoostImpl : TownyBoost {
         val boost = BoostConfig[group]
             ?: return ActivateResult.NO_VIP_GROUP
 
-        // 3. 移除玩家在同一位面中旧城镇上的权益
-        val townyWorld = townyApi.getTownyWorld(location.world)
-        if (townyWorld != null) {
-            for (existingTown in townyWorld.towns.values) {
-                if (existingTown == town) continue
-                val boosts = TownBoostData.get(existingTown)
-                val oldGroup = boosts[player.uniqueId] ?: continue
-                val oldBonus = BoostConfig[oldGroup]?.claimBlockBonus ?: 0
-                if (oldBonus != 0) existingTown.addBonusBlocks(-oldBonus)
-                TownBoostData.set(existingTown, boosts - player.uniqueId)
-                break // 每个位面最多只有一个, 找到就停
-            }
+        // 3. 如果玩家已在该城镇上激活了相同等级的权益, 则无需重复激活
+        val currentBoosts = TownBoostData.get(town)
+        if (currentBoosts[player.uniqueId] == group) {
+            return ActivateResult.ALREADY_ACTIVATED
         }
 
-        // 4. 在新城镇上激活权益
-        val currentBoosts = TownBoostData.get(town).toMutableMap()
-        val previousGroup = currentBoosts.put(player.uniqueId, group)
+        // 4. 移除玩家在同一位面中的旧权益 (包括当前城镇上的)
+        deactivate(player.uniqueId, location.world)
 
-        // 处理 bonus blocks: 减去旧值, 加上新值
-        val oldBonus = previousGroup?.let { BoostConfig[it]?.claimBlockBonus } ?: 0
-        if (boost.claimBlockBonus - oldBonus != 0) {
-            town.addBonusBlocks(boost.claimBlockBonus - oldBonus)
+        // 5. 在城镇上激活新权益
+        val newBoosts = TownBoostData.get(town).toMutableMap()
+        newBoosts[player.uniqueId] = group
+
+        if (boost.claimBlockBonus != 0) {
+            town.addBonusBlocks(boost.claimBlockBonus)
         }
 
-        // 5. 保存
-        TownBoostData.set(town, currentBoosts)
+        TownBoostData.set(town, newBoosts)
 
         return ActivateResult.SUCCESS
     }
@@ -196,7 +213,6 @@ class TownyBoostImpl : TownyBoost {
  *
  * - [TownBlockClaimCostCalculationEvent] — 圈地花费: 所有权益的修饰系数相乘
  * - [TownUpkeepCalculationEvent] — 城镇维护费: 所有权益的修饰系数相乘
- * - [NationUpkeepCalculationEvent] — 国家维护费: 国家下所有城镇的权益修饰系数相乘
  */
 class TownyBoostListener : Listener {
 
@@ -219,13 +235,63 @@ class TownyBoostListener : Listener {
     }
 
     @EventHandler
-    fun on(event: NationUpkeepCalculationEvent) {
-        val multiplier = event.nation.towns
-            .flatMap { TownBoostData.get(it).values }
-            .computeProduct { it.nationUpkeepCostMultiplier }
-        if (multiplier != 1.0) {
-            event.upkeep *= multiplier
+    fun on(event: TownStatusScreenEvent) {
+        val boosts = TownBoostData.get(event.town)
+
+        val allGroups = BoostConfig.boosts.keys.toList()
+        val groupToLevel = allGroups.withIndex().associate { (index, group) -> group to (index + 1) }
+
+        // 统计每个等级的激活数量
+        val levelCounts = sortedMapOf<Int, Int>()
+        for (group in allGroups) {
+            levelCounts[groupToLevel[group]!!] = 0
         }
+        for ((_, group) in boosts) {
+            val level = groupToLevel[group] ?: continue
+            levelCounts.merge(level, 1, Int::plus)
+        }
+
+        // 聚合计算最终效果
+        var totalClaimBlockBonus = 0
+        var claimCostProduct = 1.0
+        var townUpkeepProduct = 1.0
+        for ((_, group) in boosts) {
+            val gb = BoostConfig[group] ?: continue
+            totalClaimBlockBonus += gb.claimBlockBonus
+            claimCostProduct *= gb.claimCostMultiplier
+            townUpkeepProduct *= gb.townUpkeepCostMultiplier
+        }
+
+        // 构建 hover 文本
+        val hoverText = Component.join(
+            JoinConfiguration.newlines(),
+            buildList<Component> {
+                add(Component.text("城镇权益为你的城镇提供增益!", NamedTextColor.YELLOW))
+                if (boosts.isEmpty()) {
+                    add(Component.empty())
+                    add(TranslatableMessages.MSG_TOWNY_BOOST_STATUS_NO_BOOST.build())
+                }
+                add(Component.empty())
+                add(Component.text("每级权益数量:", NamedTextColor.AQUA))
+                for ((level, count) in levelCounts) {
+                    add(Component.text("  等级${romanNumeral(level)} = $count", NamedTextColor.WHITE))
+                }
+                add(Component.empty())
+                add(Component.text("最终权益效果:", NamedTextColor.AQUA))
+                add(Component.text("  额外领地上限 = +$totalClaimBlockBonus", NamedTextColor.WHITE))
+                add(Component.text("  圈地价格调整 = ${formatMultiplier(claimCostProduct)}", NamedTextColor.WHITE))
+                add(Component.text("  维护费调整 = ${formatMultiplier(townUpkeepProduct)}", NamedTextColor.WHITE))
+            }
+        )
+
+        // 直接通过 StatusScreen#addComponentOf 添加, 使其追加到现有最后一行而非新起一行
+        val label = Component.text()
+            .append(Component.text("[", NamedTextColor.GRAY))
+            .append(Component.text("城镇权益", NamedTextColor.GOLD))
+            .append(Component.text("]", NamedTextColor.GRAY))
+            .hoverEvent(HoverEvent.showText(hoverText))
+            .build()
+        event.statusScreen.addComponentOf("koish_boost", label)
     }
 
     /**
@@ -233,4 +299,15 @@ class TownyBoostListener : Listener {
      */
     private fun Collection<String>.computeProduct(selector: (GroupBoost) -> Double): Double =
         mapNotNull { BoostConfig[it] }.fold(1.0) { acc, boost -> acc * selector(boost) }
+
+    private fun romanNumeral(n: Int): String = when (n) {
+        1 -> "I"; 2 -> "II"; 3 -> "III"; 4 -> "IV"; 5 -> "V"
+        6 -> "VI"; 7 -> "VII"; 8 -> "VIII"; 9 -> "IX"; 10 -> "X"
+        else -> n.toString()
+    }
+
+    private fun formatMultiplier(product: Double): String {
+        val percentChange = ((product - 1.0) * 100).roundToInt()
+        return if (percentChange >= 0) "+$percentChange%" else "$percentChange%"
+    }
 }
