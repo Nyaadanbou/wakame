@@ -1,9 +1,6 @@
 package cc.mewcraft.wakame.init
 
-import cc.mewcraft.wakame.feature.EquipmentSlotsToKeepOnDeath
-import cc.mewcraft.wakame.feature.ResetContainerOnLootGenerate
-import cc.mewcraft.wakame.feature.StopBreakingLootChests
-import cc.mewcraft.wakame.feature.TeleportOnJoinListener
+import cc.mewcraft.wakame.feature.*
 import cc.mewcraft.wakame.feature.jeicompat.ClientRecipeHandler
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -29,5 +26,8 @@ object FeatureInitializer {
 
         // stop breaking loot chests
         StopBreakingLootChests().registerEvents()
+
+        // sneak swap actions
+        SneakSwapActionListener().registerEvents()
     }
 }

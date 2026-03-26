@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.config
 import cc.mewcraft.lazyconfig.access.ConfigsBase
 import cc.mewcraft.lazyconfig.configurate.registerExact
 import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.feature.SneakSwapAction
 import cc.mewcraft.wakame.feature.TeleportOnJoinCondition
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import cc.mewcraft.wakame.util.configurate.KOISH_SERIALIZERS
@@ -43,6 +44,7 @@ internal object KoishConfigs : ConfigsBase() {
             .childBuilder()
             .registerAll(KOISH_SERIALIZERS)
             .registerExact(TeleportOnJoinCondition.serializer())
+            .registerExact(SneakSwapAction.serializer())
             .build()
         return children
     }
