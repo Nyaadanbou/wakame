@@ -157,18 +157,18 @@ class TownyBoostImpl : TownyBoost {
 
         // 1. 获取玩家所在位置的城镇
         val town = townyApi.getTown(location)
-            ?: return ActivateResult.NOT_IN_TOWN
+            ?: return ActivateResult.NotInTown
 
         // 2. 检测玩家的最高优先级权限组及其权益
         val group = BoostConfig.boosts.keys.lastOrNull { player.hasPermission(it) }
-            ?: return ActivateResult.NO_VIP_GROUP
+            ?: return ActivateResult.NoVipGroup
         val boost = BoostConfig[group]
-            ?: return ActivateResult.NO_VIP_GROUP
+            ?: return ActivateResult.NoVipGroup
 
         // 3. 如果玩家已在该城镇上激活了相同等级的权益, 则无需重复激活
         val currentBoosts = TownBoostData.get(town)
         if (currentBoosts[player.uniqueId] == group) {
-            return ActivateResult.ALREADY_ACTIVATED
+            return ActivateResult.AlreadyActivated(town.name)
         }
 
         // 4. 移除玩家在同一位面中的旧权益 (包括当前城镇上的)
@@ -184,7 +184,7 @@ class TownyBoostImpl : TownyBoost {
 
         TownBoostData.set(town, newBoosts)
 
-        return ActivateResult.SUCCESS
+        return ActivateResult.Success(town.name)
     }
 
     override fun deactivate(playerId: UUID, world: World): Boolean {

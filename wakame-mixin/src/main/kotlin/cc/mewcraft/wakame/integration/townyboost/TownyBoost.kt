@@ -31,21 +31,21 @@ interface TownyBoost {
     /**
      * 激活结果.
      */
-    enum class ActivateResult {
-        /** 成功激活. */
-        SUCCESS,
+    sealed class ActivateResult {
+        /** 成功激活. [townName] 为目标城镇名称. */
+        data class Success(val townName: String) : ActivateResult()
         /** 玩家不在任何城镇的领地内. */
-        NOT_IN_TOWN,
+        data object NotInTown : ActivateResult()
         /** 玩家没有任何匹配的权限组. */
-        NO_VIP_GROUP,
-        /** 玩家已在该城镇上激活了相同等级的权益. */
-        ALREADY_ACTIVATED,
+        data object NoVipGroup : ActivateResult()
+        /** 玩家已在该城镇上激活了相同等级的权益. [townName] 为目标城镇名称. */
+        data class AlreadyActivated(val townName: String) : ActivateResult()
     }
 
     companion object Impl : TownyBoost {
 
         private var implementation: TownyBoost = object : TownyBoost {
-            override fun activate(player: Player): ActivateResult = ActivateResult.NOT_IN_TOWN
+            override fun activate(player: Player): ActivateResult = ActivateResult.NotInTown
             override fun deactivate(playerId: UUID, world: World): Boolean = false
         }
 
