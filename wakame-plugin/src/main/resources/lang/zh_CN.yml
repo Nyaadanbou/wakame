@@ -130,6 +130,9 @@ msg_towny_boost_activate_success: "<gray>城镇权益已成功激活到 <white><
 msg_towny_boost_activate_no_vip_group: "<red>只有米团玩家可以使用."
 msg_towny_boost_activate_already_activated: "<red>城镇权益早已经激活到 <white><arg:0></white>."
 msg_towny_boost_status_no_boost: "<red>[未激活]</red> 由米团玩家手动激活权益!"
+msg_repair_stone_success: "<gray>修复成功!"
+msg_repair_stone_already_full: "<red>该物品的耐久度已经满了."
+msg_repair_stone_target_not_repairable: "<red>修复石无法修复该物品."
 
 # 像这样制定一个数字的格式, '#' 是 Java 的 DecimalFormat 的语法
 msg_number_format: "This is a decimal number: <arg:0:'zh-CN':'#'>."

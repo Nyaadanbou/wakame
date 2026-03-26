@@ -142,6 +142,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<MojangStack, Player>
         StandardRenderingHandlerRegistry.FUEL.process(collector, item.getProp(ItemPropTypes.FUEL))
         StandardRenderingHandlerRegistry.CASTABLE.process(collector, item.getProp(ItemPropTypes.CASTABLE))
         StandardRenderingHandlerRegistry.RANDOM_TELEPORT.process(collector, item.getProp(ItemPropTypes.RANDOM_TELEPORT))
+        StandardRenderingHandlerRegistry.REPAIR_STONE.process(collector, item.getProp(ItemPropTypes.REPAIR_STONE))
         StandardRenderingHandlerRegistry.EFFECTIVENESS.process(collector, player, item)
         StandardRenderingHandlerRegistry.ITEM_NAME.process(collector, item.getMeta(ItemMetaTypes.ITEM_NAME)) // 对于最可能被频繁修改的 `item_name`, `custom_name`
         StandardRenderingHandlerRegistry.CUSTOM_NAME.process(collector, item.getMeta(ItemMetaTypes.CUSTOM_NAME))
@@ -357,5 +358,10 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
             Placeholder.component("search_radius", Component.text(data.searchRadius.toInt())),
             Placeholder.component("search_height", Component.text(data.searchHeight.toInt())),
         )
+    }
+
+    @JvmField
+    val REPAIR_STONE: RenderingHandler<RepairStoneData, RepairStoneRendererFormat> = configure("repair_stone") { data, format ->
+        format.render(data)
     }
 }

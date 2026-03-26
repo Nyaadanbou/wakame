@@ -136,6 +136,9 @@ object TranslatableMessages {
     val MSG_TOWNY_BOOST_ACTIVATE_NO_VIP_GROUP = create("msg_towny_boost_activate_no_vip_group")
     val MSG_TOWNY_BOOST_ACTIVATE_ALREADY_ACTIVATED = create("msg_towny_boost_activate_already_activated")
     val MSG_TOWNY_BOOST_STATUS_NO_BOOST = create("msg_towny_boost_status_no_boost")
+    val MSG_REPAIR_STONE_SUCCESS = create("msg_repair_stone_success")
+    val MSG_REPAIR_STONE_ALREADY_FULL = create("msg_repair_stone_already_full")
+    val MSG_REPAIR_STONE_TARGET_NOT_REPAIRABLE = create("msg_repair_stone_target_not_repairable")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

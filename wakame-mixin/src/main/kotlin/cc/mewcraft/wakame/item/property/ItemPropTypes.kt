@@ -528,6 +528,24 @@ data object ItemPropTypes {
     val SETS_RETROACTIVE_CARD: ItemPropType<SetsRetroactiveCard> = typeOf("sets_retroactive_card")
 
     /**
+     * 修复石的数据, 用于修复物品耐久度.
+     *
+     * @see cc.mewcraft.wakame.item.property.impl.RepairStoneData
+     */
+    @JvmField
+    val REPAIR_STONE: ItemPropType<RepairStoneData> = typeOf("repair_stone") {
+        serializers {
+            registerExact<RepairStoneData>(RepairStoneData.SERIALIZER)
+        }
+    }
+
+    /**
+     * 用于标记一个物品可被修复石修复.
+     */
+    @JvmField
+    val REPAIRABLE_BY_REPAIR_STONE = typeOf<Unit>("repairable_by_repair_stone")
+
+    /**
      * 储存了 [cc.mewcraft.wakame.item.behavior.impl.VirtualBook] 行为的全局配置项.
      */
     @JvmField
