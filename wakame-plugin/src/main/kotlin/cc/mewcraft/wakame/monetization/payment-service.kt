@@ -196,8 +196,7 @@ internal class PaymentServiceImpl(
     override suspend fun onPaymentSuccess(notification: ZPayNotification): Boolean {
         val outTradeNo = notification.outTradeNo
         val mutex = lockFor(outTradeNo)
-
-        return mutex.withLock {
+        val result = mutex.withLock {
             // 1. 查找本地订单
             val order = repository.findByOutTradeNo(outTradeNo)
             if (order == null) {
@@ -217,8 +216,8 @@ internal class PaymentServiceImpl(
                 return@withLock false
             }
 
-            // 4. 金额校验
-            if (order.amount != notification.money) {
+            // 4. 金额校验 (使用 BigDecimal 比较, 避免 "1.0" != "1.00" 等字符串差异)
+            if (order.amount.toBigDecimal().compareTo(notification.money.toBigDecimal()) != 0) {
                 LOGGER.error("[Monetization] Amount mismatch for order $outTradeNo: expected=${order.amount}, got=${notification.money}")
                 return@withLock false
             }
@@ -248,6 +247,8 @@ internal class PaymentServiceImpl(
 
             true
         }
+
+        return result
     }
 
     // ================================================================
@@ -327,6 +328,7 @@ internal class PaymentServiceImpl(
         if (count > 0) {
             LOGGER.info("[Monetization] Expired $count timeout order(s) for player $playerId")
         }
+
         return count
     }
 
@@ -341,9 +343,7 @@ internal class PaymentServiceImpl(
      */
     private fun executeCommand(order: PaymentOrder) {
         val command = order.command.replace("{player}", order.playerName)
-        runTask {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command)
-        }
+        runTask { Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command) }
     }
 
     /**
