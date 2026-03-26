@@ -22,6 +22,7 @@ import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
 import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.ServerFilter
 import cc.mewcraft.wakame.util.typeTokenOf
 import cc.mewcraft.wakame.world.WeatherControl
 import net.kyori.adventure.key.Key
@@ -546,6 +547,19 @@ data object ItemPropTypes {
     val REPAIRABLE_BY_REPAIR_STONE = typeOf<Unit>("repairable_by_repair_stone")
 
     /**
+     * 兑换券的数据, 储存了消耗后执行的动作列表.
+     *
+     * @see cc.mewcraft.wakame.item.property.impl.VoucherData
+     */
+    @JvmField
+    val VOUCHER: ItemPropType<VoucherData> = typeOf("voucher") {
+        serializers {
+            registerExact<VoucherAction>(VoucherAction.SERIALIZER)
+            registerExact<ServerFilter>(ServerFilter.SERIALIZER)
+        }
+    }
+
+    /**
      * 储存了 [cc.mewcraft.wakame.item.behavior.impl.VirtualBook] 行为的全局配置项.
      */
     @JvmField
@@ -591,5 +605,4 @@ data object ItemPropTypes {
 
         return collection.build()
     }
-
 }

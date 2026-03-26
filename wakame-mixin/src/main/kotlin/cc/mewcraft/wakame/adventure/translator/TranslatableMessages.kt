@@ -139,6 +139,9 @@ object TranslatableMessages {
     val MSG_REPAIR_STONE_SUCCESS = create("msg_repair_stone_success")
     val MSG_REPAIR_STONE_ALREADY_FULL = create("msg_repair_stone_already_full")
     val MSG_REPAIR_STONE_TARGET_NOT_REPAIRABLE = create("msg_repair_stone_target_not_repairable")
+    val MSG_VOUCHER_ALREADY_REDEEMED = create("msg_voucher_already_redeemed")
+    val MSG_VOUCHER_NO_CODE = create("msg_voucher_no_code")
+    val MSG_VOUCHER_SERVER_NOT_ALLOWED = create("msg_voucher_server_not_allowed")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

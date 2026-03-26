@@ -176,6 +176,18 @@ data object ItemDataTypes {
     }
 
     /**
+     * 一次性令牌.
+     *
+     * 用于防止高价值消耗品被重复消耗, 在物品生成时写入, 消耗时校验.
+     *
+     * @see cc.mewcraft.wakame.item.token.SingleUseTokenRepository
+     */
+    @JvmField
+    val SINGLE_USE_TOKEN: ItemDataType<String> = typeOf("single_use_token") {
+        persistent(true)
+    }
+
+    /**
      * 该数据仅存在于网络物品上!
      *
      * 物品堆叠所在的物品槽位.
@@ -231,5 +243,4 @@ data object ItemDataTypes {
 
         return collection.build()
     }
-
 }
