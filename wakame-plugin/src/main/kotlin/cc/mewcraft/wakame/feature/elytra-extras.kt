@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item.ItemStackEffectiveness
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.hasProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
-import cc.mewcraft.wakame.item.property.impl.GlidingExtras
+import cc.mewcraft.wakame.item.property.impl.GlidingProfile
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -49,7 +49,10 @@ private data class GlideState(
 class ElytraExtrasListener : Listener {
 
     companion object {
-        val ACTIVATED_GLIDING_EXTRAS = metadataKey<GlidingExtras>("elytra_extras:activated_gliding_extras")
+        /**
+         * 缓存的是 *解析后* 的 [GlidingProfile], 即已根据玩家权限选定的配置. 玩家需要重新穿戴来触发重新解析.
+         */
+        val ACTIVATED_GLIDING_PROFILE = metadataKey<GlidingProfile>("elytra_extras:activated_gliding_profile")
     }
 
     // 追踪玩家的滑翔状态: 玩家 -> 滑翔状态
@@ -75,9 +78,9 @@ class ElytraExtrasListener : Listener {
             if (glideState.ticksElapsed - glideState.lastDrainTick >= 20) {
                 glideState.lastDrainTick = glideState.ticksElapsed
 
-                val glidingExtras = player.metadata().getOrNull(ACTIVATED_GLIDING_EXTRAS) ?: continue
+                val profile = player.metadata().getOrNull(ACTIVATED_GLIDING_PROFILE) ?: continue
 
-                if (!PlayerManaIntegration.consumeMana(player, glidingExtras.glideDrainPerSecond)) {
+                if (!PlayerManaIntegration.consumeMana(player, profile.glideDrainPerSecond)) {
                     // 魔法值不足，停止滑翔
                     player.isGliding = false
                     player.fallDistance = 0f
@@ -97,7 +100,7 @@ class ElytraExtrasListener : Listener {
             ItemStackEffectiveness.testSlot(slot, prev)
         ) {
             if (prev.hasProp(ItemPropTypes.GLIDING_EXTRAS)) {
-                player.metadata().remove(ACTIVATED_GLIDING_EXTRAS)
+                player.metadata().remove(ACTIVATED_GLIDING_PROFILE)
             }
         }
         if (curr != null &&
@@ -107,7 +110,9 @@ class ElytraExtrasListener : Listener {
         ) {
             val glidingExtras = curr.getProp(ItemPropTypes.GLIDING_EXTRAS)
             if (glidingExtras != null) {
-                player.metadata().put(ACTIVATED_GLIDING_EXTRAS, glidingExtras)
+                // 穿戴时根据玩家权限解析一次, 之后使用缓存的结果
+                val resolved = glidingExtras.resolve(player)
+                player.metadata().put(ACTIVATED_GLIDING_PROFILE, resolved)
             }
         }
     }
@@ -119,16 +124,14 @@ class ElytraExtrasListener : Listener {
         if (event.isGliding) {
             // 进入滑翔状态:
 
-            val glidingExtras = player.metadata().getOrNull(ACTIVATED_GLIDING_EXTRAS) ?: return
+            val profile = player.metadata().getOrNull(ACTIVATED_GLIDING_PROFILE) ?: return
 
-            if (PlayerManaIntegration.consumeMana(player, glidingExtras.enterGlideManaCost)) {
+            if (PlayerManaIntegration.consumeMana(player, profile.enterGlideManaCost)) {
                 // 进入滑翔状态, 并且魔法值足够:
-
-                // 初始化滑翔状态, 缓存 glidingExtras
+                // 初始化滑翔状态
                 glideStateMap[player] = GlideState()
             } else {
                 // 进入滑翔状态, 但是魔法值不足:
-
                 event.isCancelled = true
                 player.fallDistance = 0f
                 glideStateMap.remove(player)
@@ -143,11 +146,10 @@ class ElytraExtrasListener : Listener {
     @EventHandler
     fun on(event: PlayerElytraBoostEvent) {
         val player = event.player
-        val glidingExtras = player.metadata().getOrNull(ACTIVATED_GLIDING_EXTRAS) ?: return
+        val profile = player.metadata().getOrNull(ACTIVATED_GLIDING_PROFILE) ?: return
 
-        if (!PlayerManaIntegration.consumeMana(player, glidingExtras.rocketBoostManaCost)) {
+        if (!PlayerManaIntegration.consumeMana(player, profile.rocketBoostManaCost)) {
             // 使用烟花, 但是魔法值不足:
-
             event.isCancelled = true
         }
     }
