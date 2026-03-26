@@ -2,6 +2,7 @@ package cc.mewcraft.bettergui
 
 import cc.mewcraft.bettergui.action.GiveBalance
 import cc.mewcraft.bettergui.action.OpenCatalog
+import cc.mewcraft.bettergui.action.OpenVault
 import cc.mewcraft.bettergui.action.RequestTeleportOnJoin
 import cc.mewcraft.bettergui.modifier.KoishItemModifier
 import cc.mewcraft.bettergui.requirement.AccBalanceReq
@@ -21,6 +22,7 @@ class KoishBridge : Expansion {
     override fun onEnable() {
         ActionBuilder.INSTANCE.register(::GiveBalance, "give-balance")
         ActionBuilder.INSTANCE.register(::OpenCatalog, "open-catalog")
+        ActionBuilder.INSTANCE.register(::OpenVault, "open-vault")
         ActionBuilder.INSTANCE.register(::RequestTeleportOnJoin, "request-teleport-on-join")
         ItemModifierBuilder.INSTANCE.register(::KoishItemModifier, "koish")
         RequirementBuilder.INSTANCE.register(::BalanceReq, "balance")

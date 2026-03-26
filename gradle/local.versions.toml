@@ -87,6 +87,7 @@ economybridge = "1.2.1"
 huskhomes = "4.9.9"
 husksync = "3.8.7+1.21.8"
 luckperms = "5.4"
+malts = "1.0.3"
 mythicdungeons = "1.3.0-SNAPSHOT"
 mythicmobs = "5.11.2"
 nightcore = "2.7.8"
@@ -235,6 +236,7 @@ huskhomes-bukkit = { group = "net.william278.huskhomes", name = "huskhomes-bukki
 huskhomes-common = { group = "net.william278.huskhomes", name = "huskhomes-common", version.ref = "huskhomes" }
 husksync = { group = "net.william278.husksync", name = "husksync-bukkit", version.ref = "husksync" }
 luckperms = { group = "net.luckperms", name = "api", version.ref = "luckperms" }
+malts = { group = "dev.jsinco.malts", name = "Malts", version.ref = "malts" }
 mythicdungeons = { group = "net.playavalon", name = "MythicDungeons", version.ref = "mythicdungeons" }
 mythicmobs = { group = "io.lumine", name = "Mythic-Dist", version.ref = "mythicmobs" }
 nightcore = { group = "su.nightexpress.nightcore", name = "main", version.ref = "nightcore" }

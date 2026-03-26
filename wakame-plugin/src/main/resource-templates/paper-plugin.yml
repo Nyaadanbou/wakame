@@ -67,6 +67,9 @@ dependencies:
     LuckPerms:
       required: false
       load: OMIT
+    Malts:
+      required: false
+      load: BEFORE
     MythicDungeons:
       required: false
       load: OMIT # 游戏中才需要用到其 API
