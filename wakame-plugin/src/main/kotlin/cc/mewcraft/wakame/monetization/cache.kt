@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.monetization
 
+import cc.mewcraft.wakame.monetization.MonetizationCache.getPaidOrderCount
+import cc.mewcraft.wakame.monetization.MonetizationCache.getTotalPaidAmount
 import cc.mewcraft.wakame.monetization.MonetizationCache.invalidate
 import kotlinx.coroutines.runBlocking
 import java.util.*
@@ -20,6 +22,10 @@ object MonetizationCache {
     /** 缓存过期时间 (毫秒). */
     private const val TTL_MS = 5_000L
 
+    /** 关闭标志. 一旦为 true, 所有查询直接返回安全默认值, 不再触发 [runBlocking]. */
+    @Volatile
+    private var closed = false
+
     private class Entry<T>(val value: T, val expireAt: Long)
 
     private val totalPaidCache = ConcurrentHashMap<UUID, Entry<String>>()
@@ -29,9 +35,19 @@ object MonetizationCache {
      * 获取玩家的累计充值金额 (带缓存).
      */
     fun getTotalPaidAmount(playerId: UUID): String {
+        if (closed) return "0"
         val now = System.currentTimeMillis()
         totalPaidCache[playerId]?.let { if (now < it.expireAt) return it.value }
-        val value = runBlocking { Monetization.getTotalPaidAmount(playerId) }
+        // runCatching 兜底: 若 shutdown() 在 closed 检查之后、runBlocking 之前被调用,
+        // 或底层资源 (数据库连接池等) 已关闭, 则静默返回安全默认值.
+        val value = runCatching {
+            runBlocking {
+                Monetization.getTotalPaidAmount(playerId)
+            }
+        }.getOrElse {
+            if (!closed) throw it; "0"
+        }
+        if (closed) return value // shutdown 期间不写回缓存
         totalPaidCache[playerId] = Entry(value, now + TTL_MS)
         return value
     }
@@ -40,9 +56,17 @@ object MonetizationCache {
      * 获取玩家的已支付订单数 (带缓存).
      */
     fun getPaidOrderCount(playerId: UUID): Int {
+        if (closed) return 0
         val now = System.currentTimeMillis()
         paidCountCache[playerId]?.let { if (now < it.expireAt) return it.value }
-        val value = runBlocking { Monetization.getPaidOrderCount(playerId) }
+        val value = runCatching {
+            runBlocking {
+                Monetization.getPaidOrderCount(playerId)
+            }
+        }.getOrElse {
+            if (!closed) throw it; 0
+        }
+        if (closed) return value
         paidCountCache[playerId] = Entry(value, now + TTL_MS)
         return value
     }
@@ -55,5 +79,17 @@ object MonetizationCache {
     fun invalidate(playerId: UUID) {
         totalPaidCache.remove(playerId)
         paidCountCache.remove(playerId)
+    }
+
+    /**
+     * 关闭缓存, 清除所有条目.
+     *
+     * 调用后, [getTotalPaidAmount] 和 [getPaidOrderCount] 将直接返回安全默认值,
+     * 不再尝试 [runBlocking] 查询 (避免在关服时访问已关闭的数据库连接池).
+     */
+    fun shutdown() {
+        closed = true
+        totalPaidCache.clear()
+        paidCountCache.clear()
     }
 }

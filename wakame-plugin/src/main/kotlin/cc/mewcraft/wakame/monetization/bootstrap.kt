@@ -10,6 +10,8 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.monetization.zpay.ZPayCallbackServerImpl
 import cc.mewcraft.wakame.monetization.zpay.ZPayClientImpl
 import cc.mewcraft.wakame.monetization.zpay.ZPaySignatureImpl
+import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 
 /**
  * 支付模块的生命周期管理.
@@ -26,6 +28,9 @@ import cc.mewcraft.wakame.monetization.zpay.ZPaySignatureImpl
  */
 @Init(InitStage.POST_WORLD)
 internal object MonetizationBootstrap {
+
+    /** Ktor stop/close 清理线程的最大等待时间 (秒). */
+    private const val SHUTDOWN_TIMEOUT_SECONDS = 5L
 
     private var client: ZPayClientImpl? = null
     private var callbackServer: ZPayCallbackServerImpl? = null
@@ -89,13 +94,33 @@ internal object MonetizationBootstrap {
 
         LOGGER.info("[Monetization] Shutting down payment system...")
 
-        callbackServer?.stop()
-        callbackServer = null
+        // 1. 立即切换到 NoOp 实现, 使所有并发调用方 (如 LuckPerms ContextCalculator) 不再访问已关闭的数据库
+        Monetization.clearImplementation()
+        MonetizationCache.shutdown()
 
-        client?.close()
+        // 2. 在后台线程执行 Ktor 的 stop/close, 设置硬性超时以避免阻塞 Server 线程
+        //    Ktor CIO 的 stop() 依赖协程调度器, 如果调度器已在关服流程中被销毁, stop() 可能永远阻塞
+        val callbackServer = callbackServer
+        val httpClient = client
+
+        this.callbackServer = null
         client = null
 
-        Monetization.clearImplementation()
+        if (callbackServer != null || httpClient != null) {
+            val cleanupThread = thread(isDaemon = true, name = "Monetization-Shutdown") {
+                runCatching { callbackServer?.stop() }.onFailure { LOGGER.warn("[Monetization] Exception while stopping callback server: ${it.message}") }
+                runCatching { httpClient?.close() }.onFailure { LOGGER.warn("[Monetization] Exception while closing HTTP client: ${it.message}") }
+            }
+            try {
+                cleanupThread.join(TimeUnit.SECONDS.toMillis(SHUTDOWN_TIMEOUT_SECONDS))
+                if (cleanupThread.isAlive) {
+                    LOGGER.warn("[Monetization] Cleanup thread did not finish within ${SHUTDOWN_TIMEOUT_SECONDS}s, proceeding with shutdown.")
+                    cleanupThread.interrupt()
+                }
+            } catch (_: InterruptedException) {
+                Thread.currentThread().interrupt()
+            }
+        }
 
         LOGGER.info("[Monetization] Payment system shut down.")
     }

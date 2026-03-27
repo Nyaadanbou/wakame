@@ -102,6 +102,11 @@ internal class PaymentServiceImpl(
     private val repository: OrderRepository,
 ) : PaymentService, PaymentCallbackHandler {
 
+    companion object {
+        /** 拥有此权限的玩家, 实际支付金额将被覆盖为 0.01 元 (用于测试). */
+        private const val FREE_TEST_PERMISSION = "koish.monetization.free"
+    }
+
     /**
      * 订单处理互斥锁, 防止同一订单并发回调导致重复发放.
      *
@@ -125,6 +130,18 @@ internal class PaymentServiceImpl(
         paymentType: PaymentType,
         command: String,
     ): PaymentOrder {
+        // 如果玩家拥有免费测试权限, 将实际支付金额覆盖为 0.01 元.
+        // 注意: 权限在此刻一次性判定, 金额随即锁定到 Z-PAY 订单和本地记录中. 若之后权限发生变更, 已创建的订单不受影响 — 这是预期行为.
+        val actualAmount = run {
+            val player = Bukkit.getPlayer(playerId)
+            if (player != null && player.hasPermission(FREE_TEST_PERMISSION)) {
+                LOGGER.info("[Monetization] Player $playerName has '$FREE_TEST_PERMISSION' — overriding amount from $amount to 0.01")
+                "0.01"
+            } else {
+                amount
+            }
+        }
+
         // 检查待支付订单数量限制
         val pending = repository.findPendingByPlayer(playerId)
         val maxPending = MonetizationConfig.order.maxPendingPerPlayer
@@ -140,7 +157,7 @@ internal class PaymentServiceImpl(
         val request = CreateOrderRequest(
             outTradeNo = outTradeNo,
             name = productName,
-            money = amount,
+            money = actualAmount,
             type = paymentType,
             clientIp = "127.0.0.1", // 游戏服务器发起, 使用服务端 IP
             notifyUrl = notifyUrl,
@@ -164,7 +181,7 @@ internal class PaymentServiceImpl(
             playerId = playerId,
             playerName = playerName,
             productName = productName,
-            amount = amount,
+            amount = actualAmount,
             paymentType = paymentType,
             command = command,
             status = OrderStatus.PENDING,
@@ -176,7 +193,7 @@ internal class PaymentServiceImpl(
         )
 
         repository.save(order)
-        LOGGER.info("[Monetization] Order created: $outTradeNo for player $playerName, amount=$amount")
+        LOGGER.info("[Monetization] Order created: $outTradeNo for player $playerName, amount=$actualAmount")
 
         return order
     }
