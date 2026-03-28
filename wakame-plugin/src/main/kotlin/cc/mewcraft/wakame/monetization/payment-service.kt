@@ -227,10 +227,10 @@ internal class PaymentServiceImpl(
                 return@withLock true
             }
 
-            // 3. 只处理 PENDING 状态的订单
+            // 3. 接受所有非 PAID 状态的订单 (PENDING / EXPIRED / FAILED)
+            //    Z-PAY 回调意味着用户已真实付款, 即使本地订单已超时或被取消, 也必须认可并发放商品.
             if (order.status != OrderStatus.PENDING) {
-                LOGGER.warn("[Monetization] Callback for non-pending order: $outTradeNo (status=${order.status})")
-                return@withLock false
+                LOGGER.info("[Monetization] Recovering ${order.status} order via callback: $outTradeNo (player=${order.playerName})")
             }
 
             // 4. 金额校验 (使用 BigDecimal 比较, 避免 "1.0" != "1.00" 等字符串差异)
@@ -277,8 +277,8 @@ internal class PaymentServiceImpl(
         val result = mutex.withLock {
             val order = repository.findByOutTradeNo(outTradeNo) ?: return@withLock null
 
-            // 如果订单还在 PENDING, 主动向 Z-PAY 查询最新状态
-            if (order.status == OrderStatus.PENDING) {
+            // 如果订单尚未支付 (PENDING / EXPIRED / FAILED), 主动向 Z-PAY 查询最新状态
+            if (order.status != OrderStatus.PAID) {
                 try {
                     val response = client.queryOrder(outTradeNo)
                     if (response.isSuccess && response.isPaid) {
@@ -286,9 +286,13 @@ internal class PaymentServiceImpl(
 
                         // 再次从仓库读取当前订单状态, 避免与异步回调并发处理导致重复执行指令
                         val current = repository.findByOutTradeNo(outTradeNo)
-                        if (current == null || current.status != OrderStatus.PENDING) {
+                        if (current == null || current.status == OrderStatus.PAID) {
                             // 订单已经被其他流程处理, 直接返回最新状态
                             return@withLock current
+                        }
+
+                        if (current.status != OrderStatus.PENDING) {
+                            LOGGER.info("[Monetization] Recovering ${current.status} order via active query: $outTradeNo (player=${current.playerName})")
                         }
 
                         repository.updateStatus(outTradeNo, OrderStatus.PAID, now)
@@ -314,14 +318,17 @@ internal class PaymentServiceImpl(
     // ================================================================
 
     override suspend fun cancelPayment(outTradeNo: String): Boolean {
-        val order = repository.findByOutTradeNo(outTradeNo) ?: return false
-        if (order.status != OrderStatus.PENDING) {
-            return false
+        val mutex = lockFor(outTradeNo)
+        val result = mutex.withLock {
+            val order = repository.findByOutTradeNo(outTradeNo) ?: return@withLock false
+            // 在锁内二次确认状态, 避免将回调刚置为 PAID 的订单覆盖为 FAILED
+            if (order.status != OrderStatus.PENDING) return@withLock false
+            repository.updateStatus(outTradeNo, OrderStatus.FAILED)
+            orderLocks.remove(outTradeNo)
+            LOGGER.info("[Monetization] Order cancelled: $outTradeNo")
+            true
         }
-        repository.updateStatus(outTradeNo, OrderStatus.FAILED)
-        orderLocks.remove(outTradeNo)
-        LOGGER.info("[Monetization] Order cancelled: $outTradeNo")
-        return true
+        return result
     }
 
     // ================================================================
@@ -336,9 +343,15 @@ internal class PaymentServiceImpl(
         var count = 0
         for (order in pendingOrders) {
             if (order.createdAt.isBefore(cutoff)) {
-                repository.updateStatus(order.outTradeNo, OrderStatus.EXPIRED)
-                orderLocks.remove(order.outTradeNo)
-                count++
+                lockFor(order.outTradeNo).withLock {
+                    // 在锁内二次确认状态, 避免将回调刚置为 PAID 的订单覆盖为 EXPIRED
+                    val current = repository.findByOutTradeNo(order.outTradeNo)
+                    if (current != null && current.status == OrderStatus.PENDING) {
+                        repository.updateStatus(order.outTradeNo, OrderStatus.EXPIRED)
+                        orderLocks.remove(order.outTradeNo)
+                        count++
+                    }
+                }
             }
         }
 
