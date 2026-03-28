@@ -308,6 +308,6 @@ class TownyBoostListener : Listener {
 
     private fun formatMultiplier(product: Double): String {
         val percentChange = ((product - 1.0) * 100).roundToInt()
-        return if (percentChange >= 0) "+$percentChange%" else "$percentChange%"
+        return if (percentChange > 0) "+$percentChange%" else "-$percentChange%"
     }
 }
