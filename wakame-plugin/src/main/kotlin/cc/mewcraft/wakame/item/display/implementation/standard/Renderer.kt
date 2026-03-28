@@ -159,7 +159,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<MojangStack, Player>
         StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, item.get(DataComponents.ENCHANTMENTS))
         StandardRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, if (item.has(DataComponents.DAMAGE_RESISTANT)) Unit else null)
         StandardRenderingHandlerRegistry.FOOD.process(collector, item.get(DataComponents.FOOD))
-        StandardRenderingHandlerRegistry.ENCHANT_SLOTS.process(collector, item)
+        if (item.has(DataComponents.ENCHANTABLE)) StandardRenderingHandlerRegistry.ENCHANT_SLOTS.process(collector, item)
 
         // 生成 koish lore
         val koishLore = textAssembler.assemble(collector)
