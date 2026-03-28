@@ -37,6 +37,7 @@ val ItemStack.isKoish: Boolean get() = toNMS().isKoish
 val ItemStack.isExactKoish: Boolean get() = toNMS().isExactKoish
 val ItemStack.isProxyKoish: Boolean get() = toNMS().isProxyKoish
 val ItemStack.koishItem: KoishItem? get() = toNMS().koishItem
+val ItemStack.exactKoishItem: KoishItem? get() = toNMS().exactKoishItem
 fun ItemStack.dataContainer(includeProxy: Boolean): ItemDataContainer? = toNMS().dataContainer(includeProxy)
 fun ItemStack.metaContainer(): ItemMetaContainer? = toNMS().metaContainer()
 fun ItemStack.propContainer(): ItemPropContainer? = toNMS().propContainer()
