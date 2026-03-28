@@ -1,3 +1,29 @@
+# 城镇权益配置
+#
+# 每个权限组下可以配置不同的权益类型, 未配置的权益不会生效
+# 在配置文件中越靠后的权限组优先级越高
+# 当城镇有多个玩家激活了权益时:
+#   claim_block_bonus — 额外领地上限, 取所有数量求和
+#   claim_cost_multiplier — 圈地价格调整, 所有系数相乘
+#   town_upkeep_cost_multiplier — 城镇维护费调整, 所有系数相乘
+boost:
+  "group.vip1":
+    claim_block_bonus: 16
+    claim_cost_multiplier: 0.95
+    town_upkeep_cost_multiplier: 0.95
+  "group.vip2":
+    claim_block_bonus: 32
+    claim_cost_multiplier: 0.88
+    town_upkeep_cost_multiplier: 0.88
+  "group.vip3":
+    claim_block_bonus: 64
+    claim_cost_multiplier: 0.81
+    town_upkeep_cost_multiplier: 0.81
+  "group.vip4":
+    claim_block_bonus: 128
+    claim_cost_multiplier: 0.74
+    town_upkeep_cost_multiplier: 0.74
+
 # 城镇列表菜单设置
 town_list_menu:
   # 默认公告板

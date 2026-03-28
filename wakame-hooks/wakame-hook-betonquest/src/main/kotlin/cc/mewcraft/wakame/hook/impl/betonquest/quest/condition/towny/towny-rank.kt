@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.towny
 
-import cc.mewcraft.wakame.integration.towny.TownyLocal
+import cc.mewcraft.wakame.integration.townybridgelocal.TownyLocalBridge
 import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
@@ -20,8 +20,8 @@ class TownyRank(
 
     override fun check(profile: Profile): Boolean {
         return when (rankType.getValue(profile)) {
-            RankType.MAYOR -> TownyLocal.isMayor(profile.playerUUID)
-            RankType.KING -> TownyLocal.isKing(profile.playerUUID)
+            RankType.MAYOR -> TownyLocalBridge.isMayor(profile.playerUUID)
+            RankType.KING -> TownyLocalBridge.isKing(profile.playerUUID)
         }
     }
 }

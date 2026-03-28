@@ -50,8 +50,7 @@ internal object Initializer : Listener {
     }
 
     /**
-     * Performs pre-world-late initialization.
-     * This is called at the Mixin injection point, after bootstrap but before plugins are loaded.
+     * Performs pre-world initialization.
      */
     fun performPreWorld(): Unit {
         LifecycleUtils.runLifecycle(::initPreWorld)
@@ -211,8 +210,7 @@ internal object Initializer : Listener {
     }
 
     /**
-     * Starts the pre-world-late initialization process.
-     * This runs at the Mixin injection point, after bootstrap but before plugins are loaded.
+     * Starts the pre-world initialization process.
      */
     private fun initPreWorld(): Unit = runBlocking {
         LifecycleUtils.runLifecycle {

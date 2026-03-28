@@ -1,15 +1,22 @@
-adapter: sqlite
-database:
-  credentials:
-    host: localhost
-    port: 3306
-    database: bridge
-    username: minecraft
-    password: ''
-    parameters: '?autoReconnect=true&useSSL=false'
-  connection_pool:
-    maximum_pool_size: 10
-    minimum_idle: 10
-    maximum_lifetime: 1800000
-    keep_alive_time: 0
-    connection_timeout: 5000
+# 数据库类型: sqlite 或 mariadb
+type: sqlite
+
+# 连接凭证
+credentials:
+  # MariaDB 连接信息 (sqlite 模式下忽略)
+  host: localhost
+  port: 3306
+  database: koish
+  username: minecraft
+  password: ''
+  parameters: '?autoReconnect=true&useSSL=false'
+  # SQLite 数据库文件名 (相对于 data 目录, 留空则默认 sqlite.db)
+  file_path: ''
+
+# 连接池配置
+connection_pool:
+  maximum_pool_size: 10
+  minimum_idle: 10
+  maximum_lifetime: 1800000
+  keep_alive_interval: 0
+  connection_timeout: 5000

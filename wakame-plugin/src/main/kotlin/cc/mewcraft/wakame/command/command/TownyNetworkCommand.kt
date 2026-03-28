@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.command.command
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
-import cc.mewcraft.wakame.integration.townynetwork.TownyNetworkIntegration
+import cc.mewcraft.wakame.integration.townybridgenetwork.TownyNetworkBridge
 import cc.mewcraft.wakame.util.coroutine.async
 import kotlinx.coroutines.Dispatchers
 import org.incendo.cloud.context.CommandContext
@@ -42,12 +42,12 @@ internal object TownyNetworkCommand : KoishCommandFactory<Source> {
     private suspend fun handleTownSpawn(context: CommandContext<Source>) {
         val sender = (context.sender() as PlayerSource).source()
         val server = context.get<String>("server")
-        TownyNetworkIntegration.reqTownSpawn(sender, server)
+        TownyNetworkBridge.reqTownSpawn(sender, server)
     }
 
     private suspend fun handleNationSpawn(context: CommandContext<Source>) {
         val sender = (context.sender() as PlayerSource).source()
         val server = context.get<String>("server")
-        TownyNetworkIntegration.reqNationSpawn(sender, server)
+        TownyNetworkBridge.reqNationSpawn(sender, server)
     }
 }

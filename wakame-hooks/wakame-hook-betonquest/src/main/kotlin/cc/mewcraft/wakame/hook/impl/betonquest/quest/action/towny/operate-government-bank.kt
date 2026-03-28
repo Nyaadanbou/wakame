@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.quest.action.towny
 
-import cc.mewcraft.wakame.integration.towny.GovernmentType
-import cc.mewcraft.wakame.integration.towny.TownyLocal
+import cc.mewcraft.wakame.integration.townybridgelocal.GovernmentType
+import cc.mewcraft.wakame.integration.townybridgelocal.TownyLocalBridge
 import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
@@ -26,7 +26,7 @@ class OperateGovernmentBank(
         val playerId = profile.playerUUID
         when (govType.getValue(profile)) {
             GovernmentType.TOWN -> {
-                val town = TownyLocal.getTown(playerId) ?: return
+                val town = TownyLocalBridge.getTown(playerId) ?: return
                 when (operation.getValue(profile)) {
                     BankOperation.DEPOSIT -> town.deposit(amount.getValue(profile).toDouble())
                     BankOperation.WITHDRAW -> town.withdraw(amount.getValue(profile).toDouble())
@@ -34,7 +34,7 @@ class OperateGovernmentBank(
             }
 
             GovernmentType.NATION -> {
-                val nation = TownyLocal.getNation(playerId) ?: return
+                val nation = TownyLocalBridge.getNation(playerId) ?: return
                 when (operation.getValue(profile)) {
                     BankOperation.DEPOSIT -> nation.deposit(amount.getValue(profile).toDouble())
                     BankOperation.WITHDRAW -> nation.withdraw(amount.getValue(profile).toDouble())

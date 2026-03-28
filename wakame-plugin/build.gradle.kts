@@ -36,6 +36,7 @@ dependencies {
     runtimeOnly(project(":wakame-hooks:wakame-hook-huskhomes"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-litesignin"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-luckperms"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-malts"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-mythicdungeons"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-mythicmobs"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-nightcore"))
@@ -115,6 +116,12 @@ dependencies {
 
     // Git
     koishLoader(local.jgit)
+
+    // Ktor
+    koishLoader(local.ktor.server.core)
+    koishLoader(local.ktor.server.cio)
+    koishLoader(local.ktor.client.core)
+    koishLoader(local.ktor.client.java)
 
     /* test environment (just add whatever it needs to compile) */
 

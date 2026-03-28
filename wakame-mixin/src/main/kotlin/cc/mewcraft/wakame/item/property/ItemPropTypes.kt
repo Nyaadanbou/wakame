@@ -22,6 +22,7 @@ import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
 import cc.mewcraft.wakame.util.KoishKey
+import cc.mewcraft.wakame.util.ServerFilter
 import cc.mewcraft.wakame.util.typeTokenOf
 import cc.mewcraft.wakame.world.WeatherControl
 import net.kyori.adventure.key.Key
@@ -528,10 +529,47 @@ data object ItemPropTypes {
     val SETS_RETROACTIVE_CARD: ItemPropType<SetsRetroactiveCard> = typeOf("sets_retroactive_card")
 
     /**
+     * 修复石的数据, 用于修复物品耐久度.
+     *
+     * @see cc.mewcraft.wakame.item.property.impl.RepairStoneData
+     */
+    @JvmField
+    val REPAIR_STONE: ItemPropType<RepairStoneData> = typeOf("repair_stone") {
+        serializers {
+            registerExact<RepairStoneData>(RepairStoneData.SERIALIZER)
+        }
+    }
+
+    /**
+     * 用于标记一个物品可被修复石修复.
+     */
+    @JvmField
+    val REPAIRABLE_BY_REPAIR_STONE = typeOf<Unit>("repairable_by_repair_stone")
+
+    /**
+     * 兑换券的数据, 储存了消耗后执行的动作列表.
+     *
+     * @see cc.mewcraft.wakame.item.property.impl.VoucherData
+     */
+    @JvmField
+    val VOUCHER: ItemPropType<VoucherData> = typeOf("voucher") {
+        serializers {
+            registerExact<VoucherAction>(VoucherAction.SERIALIZER)
+            registerExact<ServerFilter>(ServerFilter.SERIALIZER)
+        }
+    }
+
+    /**
      * 储存了 [cc.mewcraft.wakame.item.behavior.impl.VirtualBook] 行为的全局配置项.
      */
     @JvmField
     val VIRTUAL_BOOK: ItemPropType<VirtualBook> = typeOf("virtual_book")
+
+    /**
+     * 标记一个物品具有 [cc.mewcraft.wakame.item.behavior.impl.TownyBoost] 行为.
+     */
+    @JvmField
+    val TOWNY_BOOST = typeOf<Unit>("towny_boost")
 
     // ------------
     // 方便函数
@@ -567,5 +605,4 @@ data object ItemPropTypes {
 
         return collection.build()
     }
-
 }

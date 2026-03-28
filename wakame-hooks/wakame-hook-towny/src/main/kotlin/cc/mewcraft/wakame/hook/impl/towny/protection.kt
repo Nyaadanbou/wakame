@@ -10,8 +10,6 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
-private val townyApi = TownyAPI.getInstance()
-
 object TownyProtectionIntegration : ProtectionIntegration {
     override fun getExecutionMode(): ProtectionIntegration.ExecutionMode {
         return ProtectionIntegration.ExecutionMode.SERVER
@@ -39,7 +37,7 @@ object TownyProtectionIntegration : ProtectionIntegration {
 
     override fun canHurtEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?): Boolean {
         if (player is Player && entity is Player) {
-            return townyApi.isPVP(entity.location)
+            return TownyAPI.getInstance().isPVP(entity.location)
         }
         return hasPermission(player, entity.location, TownyPermission.ActionType.DESTROY)
     }

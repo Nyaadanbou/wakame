@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.api
 
 import cc.mewcraft.wakame.api.item.KoishItem
 import cc.mewcraft.wakame.api.item.KoishItemRegistry
-import cc.mewcraft.wakame.item.koishItem
+import cc.mewcraft.wakame.item.exactKoishItem
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.util.KoishKeys
 import net.kyori.adventure.key.Key
@@ -32,7 +32,7 @@ object ApiItemRegistry : KoishItemRegistry {
     }
 
     override fun getOrNull(itemStack: ItemStack?): KoishItem? {
-        return itemStack?.koishItem?.let(::ApiItemWrapper)
+        return itemStack?.exactKoishItem?.let(::ApiItemWrapper)
     }
 
     override fun getNonNamespaced(name: String): List<KoishItem> {

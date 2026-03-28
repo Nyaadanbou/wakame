@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.quest.action.towny
 
-import cc.mewcraft.wakame.integration.towny.GovernmentType
-import cc.mewcraft.wakame.integration.towny.TownyLocal
+import cc.mewcraft.wakame.integration.townybridgelocal.GovernmentType
+import cc.mewcraft.wakame.integration.townybridgelocal.TownyLocalBridge
 import cc.mewcraft.wakame.util.dialog.DialogUtils
 import io.papermc.paper.registry.data.dialog.input.TextDialogInput
 import net.kyori.adventure.text.Component
@@ -24,8 +24,8 @@ class UpdateGovernmentBoard(
         val player = profile.player
         val playerId = profile.playerUUID
         val government = when (govType.getValue(profile)) {
-            GovernmentType.TOWN -> TownyLocal.getTown(playerId) ?: return
-            GovernmentType.NATION -> TownyLocal.getNation(playerId) ?: return
+            GovernmentType.TOWN -> TownyLocalBridge.getTown(playerId) ?: return
+            GovernmentType.NATION -> TownyLocalBridge.getNation(playerId) ?: return
         }
         DialogUtils.getPlayerTextInput(
             player = player,

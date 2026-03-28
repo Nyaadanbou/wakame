@@ -2,8 +2,9 @@ package cc.mewcraft.wakame.gui.towny
 
 import cc.mewcraft.lazyconfig.access.entryOrElse
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.integration.towny.Town
-import cc.mewcraft.wakame.integration.towny.TownyLocal
+import cc.mewcraft.wakame.integration.townybridgelocal.TOWNY_HOOK_CONFIG
+import cc.mewcraft.wakame.integration.townybridgelocal.Town
+import cc.mewcraft.wakame.integration.townybridgelocal.TownyLocalBridge
 import cc.mewcraft.wakame.util.KoishKeys
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
@@ -17,7 +18,7 @@ class TownListMenu(
     viewer = viewer,
 ) {
     companion object {
-        private val uiSettings by townyHookConfig.entryOrElse(
+        private val uiSettings by TOWNY_HOOK_CONFIG.entryOrElse(
             BasicMenuSettings(
                 title = Component.text("全部城镇 (当前位面)"),
                 structure = arrayOf(
@@ -43,6 +44,6 @@ class TownListMenu(
         get() = Companion.uiSettings
 
     override fun getGovernments(): List<Town> {
-        return TownyLocal.getTowns().toList()
+        return TownyLocalBridge.getTowns().toList()
     }
 }

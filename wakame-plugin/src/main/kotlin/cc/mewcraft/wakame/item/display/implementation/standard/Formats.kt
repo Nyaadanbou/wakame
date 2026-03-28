@@ -416,3 +416,30 @@ internal data class EffectivenessRendererFormat(
         BAD_LEVEL, BAD_DAMAGE
     }
 }
+
+/**
+ * 修复石的渲染格式.
+ *
+ * @property constant 修复石类型为固定值时的提示文本
+ * @property percentage 修复石类型为百分比时的提示文本
+ */
+@ConfigSerializable
+internal data class RepairStoneRendererFormat(
+    override val namespace: String,
+    private val constant: List<String> = listOf("<!i><green>使用可修复 <yellow><value></yellow> 点耐久度"),
+    private val percentage: List<String> = listOf("<!i><green>使用可修复 <yellow><value></yellow> 耐久度"),
+) : RendererFormat.Simple {
+    override val id: String = "repair_stone"
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory.fixed()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate.literal(namespace, id)
+
+    fun render(data: RepairStoneData): IndexedText {
+        val (template, resolver) = when (data) {
+            is RepairStoneData.Constant -> constant to Placeholder.component("value", Component.text(data.value))
+            is RepairStoneData.Percentage -> percentage to Placeholder.component("value", Component.text("${(data.value * 100).toInt()}%"))
+        }
+        val lines = template.map { MiniMessage.miniMessage().deserialize(it, resolver) }
+        return SimpleIndexedText(index, lines)
+    }
+}

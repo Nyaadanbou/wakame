@@ -28,13 +28,14 @@ internal object ItemCommand : KoishCommandFactory<Source> {
             literal("item")
         }
 
-        // <root> item give <item> [amount] [player]
+        // <root> item give <item> [amount] [player] [--s]
         // Give the player(s) certain amount of specific item(s)
         buildAndAdd(commonBuilder) {
             literal("give")
             required("item", ItemParser.itemParser())
             optional("amount", IntegerParser.integerParser(1, 4 * 9 * 64))
             optional("player", MultiplePlayerSelectorParser.multiplePlayerSelectorParser())
+            flag("s")
             koishHandler(handler = ::handleGiveItem)
         }
 
@@ -51,12 +52,13 @@ internal object ItemCommand : KoishCommandFactory<Source> {
         val sender = context.sender().source()
         val item = context.get<KoishItem>("item")
         val amount = context.getOrNull("amount") ?: 1
+        val silent = context.flags().contains("s")
         val recipients = context.getOrNull<MultiplePlayerSelector>("player")?.values()
             ?: (sender as? Player)?.let(::listOf)
             ?: emptyList()
 
         // 创建这个 map 有点耗时, 异步执行
-        val itemstackMap: Map<Player, Array<ItemStack>> = recipients.associateWith { player ->
+        val itemstackMap: Map<Player, Array<ItemStack>> = recipients.associateWith { _ ->
             buildList(amount) {
                 repeat(amount) {
                     add(KoishStackGenerator.generate(item, ItemGenerationContext(item, 0f, 0)))
@@ -69,7 +71,9 @@ internal object ItemCommand : KoishCommandFactory<Source> {
         withContext(Dispatchers.minecraft) {
             for ((player, items) in itemstackMap) {
                 player.inventory.addItem(*items)
-                player.sendPlainMessage("You received $amount item(s): ${item.id}")
+                if (!silent) {
+                    player.sendPlainMessage("You received $amount item(s): ${item.id}")
+                }
             }
         }
     }
@@ -85,5 +89,4 @@ internal object ItemCommand : KoishCommandFactory<Source> {
             menus.forEach(ExplorerItemMenu::open)
         }
     }
-
 }

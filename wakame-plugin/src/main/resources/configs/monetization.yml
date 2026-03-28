@@ -1,0 +1,62 @@
+version: 1
+
+# 是否启用该模块
+enabled: false
+
+# 启用该模块的服务器
+enabled_server: xcity1
+
+# 订单存储方式
+# in_memory - 内存存储, 重启后数据丢失 (适合调试)
+# database  - 数据库持久化, 使用全局数据库连接 (sqlite/mariadb, 配置见 database.yml)
+storage: database
+
+# Z-PAY 接口配置
+z_pay_api:
+  # 接口地址
+  url: https://zpayz.cn/
+  # 商户 ID
+  pid: 0000000000000000
+  # 商户密钥
+  pkey: AAAAAAAAAAAAAAAA
+
+# 内嵌回调服务器配置
+callback_server:
+  # 监听地址
+  host: "0.0.0.0"
+  # 监听端口
+  port: 18080
+  # Z-PAY 异步回调的完整公网 URL (必须外网可达)
+  # 如果服务器在 NAT/反向代理后面, 这里填公网地址
+  notify_url: "http://your-server-ip:18080/zpay/notify"
+
+# 订单相关配置
+order:
+  # 订单超时时间 (秒), 超过此时间未支付的订单将被标记为过期
+  timeout_seconds: 300
+  # 同一玩家最多同时存在的待支付订单数
+  max_pending_per_player: 1
+
+# 二维码展示配置
+qrcode_display:
+  # 二维码在地图上的显示尺寸 (像素, 1~128, 默认 128)
+  # 地图总尺寸固定为 128x128, 此值控制二维码缩放后的大小
+  # 小于 128 时将居中显示, 周围留白 (避免被其他 UI 遮挡)
+  map_size: 128
+  # 二维码展示时长 (秒), 超时后自动结束展示并取消订单
+  display_duration: 120
+  # 聊天提示的周期间隔 (秒), 定期提醒玩家扫码支付或按潜行取消
+  reminder_interval: 3
+
+# LuckPerms 配置
+luckperms_integration:
+  # 是否启用 LuckPerms 集成
+  enabled: true
+  # 累积充值金额档位 (单位: 元), 支持任意数量
+  # 注册后可在 LuckPerms Context 中使用, 例如:
+  #   lp user <player> permission set <perm> true paid-above-60=true
+  paid_above_thresholds:
+    - 60
+    - 240
+    - 480
+    - 720

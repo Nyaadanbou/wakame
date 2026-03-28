@@ -85,3 +85,17 @@ equipment_slots_to_keep_on_death:
 # 兼容 Just Enough Items (Fabric/NeoForge), 基本没用, 留着仅供参考说不定以后会用到
 # 限制: 客户端只会识别配方里的原版物品类型(Item), 不会识别任何额外数据(DataComponentMap)
 jei_compatibility: false
+
+# 玩家潜行换手 (默认 Shift+F) 时执行的动作列表
+# 触发时会取消原版换手行为, 依次执行以下动作
+# 支持的动作类型:
+#   player_chat    - 以玩家身份发送聊天消息
+#   player_command - 以玩家身份执行指令 (不需要加 /)
+#   console_command - 以控制台身份执行指令
+sneak_swap_actions:
+  - type: player_chat
+    command: "Hello!"
+  - type: player_command
+    command: "quick_bar"
+  - type: console_command
+    command: "say 控制台指令已执行!"

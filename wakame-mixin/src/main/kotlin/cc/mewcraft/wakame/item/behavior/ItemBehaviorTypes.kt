@@ -246,6 +246,23 @@ object ItemBehaviorTypes {
     @JvmField
     val VIRTUAL_BOOK = typeOf("virtual_book", VirtualBook)
 
+    /**
+     * 物品具有该行为时, 右键使用将为当前位置上的城镇激活城镇权益.
+     */
+    @JvmField
+    val TOWNY_BOOST = typeOf("towny_boost", TownyBoost)
+
+    /**
+     * 物品具有该行为时, 消耗时进行兑换券兑换.
+     *
+     * 每张兑换券只能兑换一次, 通过数据库原子操作保证安全性.
+     *
+     * @see cc.mewcraft.wakame.item.property.ItemPropTypes.VOUCHER
+     * @see cc.mewcraft.wakame.item.data.ItemDataTypes.SINGLE_USE_TOKEN
+     */
+    @JvmField
+    val VOUCHER = typeOf("voucher", Voucher)
+
     // ------------
     // 方便函数
     // ------------

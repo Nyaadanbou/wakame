@@ -23,6 +23,9 @@ object CommandPermissions {
     // Loot
     val LOOT = Permission.of("wakame.command.loot")
 
+    // Monetization
+    val MONETIZATION = Permission.of("wakame.command.monetization")
+
     // Plugin
     val PLUGIN = Permission.of("wakame.command.plugin")
 

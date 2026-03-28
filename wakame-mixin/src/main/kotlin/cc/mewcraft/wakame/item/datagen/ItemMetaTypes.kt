@@ -133,6 +133,13 @@ data object ItemMetaTypes {
         }
     }
 
+    @JvmField
+    val SINGLE_USE_TOKEN = typeOf<MetaSingleUseToken, String>("single_use_token") {
+        serializers {
+            registerExact(MetaSingleUseToken.SERIALIZER)
+        }
+    }
+
     // ------------
     // 方便函数
     // ------------
@@ -167,5 +174,4 @@ data object ItemMetaTypes {
 
         return collection.build()
     }
-
 }

@@ -337,3 +337,15 @@ random_teleport:
   tooltip:
     - "<!i><gray>随机半径: <yellow><search_radius>"
     - "<!i><gray>随机高度: <yellow><search_height>"
+
+# id: `repair_stone`
+repair_stone:
+  namespace: special
+  # 可用标签
+  # <value> 修复数值
+  # constant 在修复石类型为固定值时渲染
+  constant:
+    - "<!i><green>使用可修复 <yellow><value></yellow> 点耐久度"
+  # percentage 在修复石类型为百分比时渲染
+  percentage:
+    - "<!i><green>使用可修复 <yellow><value></yellow> 耐久度"

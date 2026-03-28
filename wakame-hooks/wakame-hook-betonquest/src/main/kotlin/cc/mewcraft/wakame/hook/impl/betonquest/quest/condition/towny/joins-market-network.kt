@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.betonquest.quest.condition.towny
 
-import cc.mewcraft.wakame.integration.towny.GovernmentType
-import cc.mewcraft.wakame.integration.towny.TownyLocal
+import cc.mewcraft.wakame.integration.townybridgelocal.GovernmentType
+import cc.mewcraft.wakame.integration.townybridgelocal.TownyLocalBridge
 import org.betonquest.betonquest.api.instruction.Argument
 import org.betonquest.betonquest.api.instruction.Instruction
 import org.betonquest.betonquest.api.logger.BetonQuestLogger
@@ -18,8 +18,8 @@ class JoinedMarketNetwork(
     override fun check(profile: Profile): Boolean {
         val playerId = profile.playerUUID
         val government = when (govType.getValue(profile)) {
-            GovernmentType.TOWN -> TownyLocal.getTown(playerId)
-            GovernmentType.NATION -> TownyLocal.getNation(playerId)
+            GovernmentType.TOWN -> TownyLocalBridge.getTown(playerId)
+            GovernmentType.NATION -> TownyLocalBridge.getNation(playerId)
         } ?: return false
         return government.hasJoinedMarketNetwork()
     }
