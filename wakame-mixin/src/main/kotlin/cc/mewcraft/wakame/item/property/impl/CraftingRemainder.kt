@@ -18,7 +18,7 @@ import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 import net.minecraft.core.registries.BuiltInRegistries as MojangBuiltInRegistries
 
-sealed interface CraftingReminder {
+sealed interface CraftingRemainder {
     /**
      * 获取单个输入物品参与合成后返还的物品.
      */
@@ -31,7 +31,7 @@ sealed interface CraftingReminder {
         fun serializers(): TypeSerializerCollection {
             val serials = TypeSerializerCollection.builder()
             serials.register<CraftingReminderType>(BuiltInRegistries.CRAFTING_REMINDER_TYPE.valueByNameTypeSerializer())
-            serials.registerExact<CraftingReminder>(DispatchingSerializer.create(CraftingReminder::type, CraftingReminderType::kotlinType))
+            serials.registerExact<CraftingRemainder>(DispatchingSerializer.create(CraftingRemainder::type, CraftingReminderType::kotlinType))
             return serials.build()
         }
     }
@@ -42,12 +42,12 @@ class CraftingReminderType(internal val kotlinType: KType)
 object CraftingReminderTypes {
 
     @JvmField
-    val ITEM: CraftingReminderType = register<ItemReminder>("item")
+    val ITEM: CraftingReminderType = register<ItemRemainder>("item")
 
     @JvmField
-    val HURT_AND_BREAK: CraftingReminderType = register<HurtAndBreakReminder>("hurt_and_break")
+    val HURT_AND_BREAK: CraftingReminderType = register<HurtAndBreakRemainder>("hurt_and_break")
 
-    private inline fun <reified E : CraftingReminder> register(id: String): CraftingReminderType {
+    private inline fun <reified E : CraftingRemainder> register(id: String): CraftingReminderType {
         return Registry.register(BuiltInRegistries.CRAFTING_REMINDER_TYPE, id, CraftingReminderType(typeOf<E>()))
     }
 }
@@ -56,10 +56,10 @@ object CraftingReminderTypes {
  * 返还特定的物品.
  */
 @ConfigSerializable
-data class ItemReminder(
+data class ItemRemainder(
     val id: KoishKey,
     val amount: Int = 1,
-) : CraftingReminder {
+) : CraftingRemainder {
     override val type: CraftingReminderType = CraftingReminderTypes.ITEM
 
     override fun reminder(inputStack: MojangStack): MojangStack {
@@ -87,9 +87,9 @@ data class ItemReminder(
  * - 如扣除耐久失败, 则返还原物品的克隆.
  */
 @ConfigSerializable
-data class HurtAndBreakReminder(
+data class HurtAndBreakRemainder(
     val damage: Int,
-) : CraftingReminder {
+) : CraftingRemainder {
     override val type: CraftingReminderType = CraftingReminderTypes.HURT_AND_BREAK
 
     override fun reminder(inputStack: MojangStack): MojangStack {

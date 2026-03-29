@@ -281,9 +281,9 @@ data object ItemPropTypes {
      * 物品在工作台中合成后返还的物品.
      */
     @JvmField
-    val CRAFTING_REMINDER: ItemPropType<CraftingReminder> = typeOf("crafting_reminder") {
+    val CRAFTING_REMAINDER: ItemPropType<CraftingRemainder> = typeOf("crafting_remainder") {
         serializers {
-            registerAll(CraftingReminder.serializers())
+            registerAll(CraftingRemainder.serializers())
         }
     }
 

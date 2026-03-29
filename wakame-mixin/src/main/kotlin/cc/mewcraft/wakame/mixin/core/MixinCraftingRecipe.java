@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.mixin.core;
 
 import cc.mewcraft.wakame.item.KoishStackData;
 import cc.mewcraft.wakame.item.property.ItemPropTypes;
-import cc.mewcraft.wakame.item.property.impl.CraftingReminder;
+import cc.mewcraft.wakame.item.property.impl.CraftingRemainder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -30,9 +30,9 @@ public interface MixinCraftingRecipe {
             if (KoishStackData.isKoish(inputStack)) {
                 // 套皮物品如果有 ItemProp 也能拿到
                 // 即支持修改原版物品的合成返还物品
-                CraftingReminder craftingReminder = KoishStackData.getProp(inputStack, ItemPropTypes.CRAFTING_REMINDER);
-                if (craftingReminder != null) {
-                    list.set(i, craftingReminder.reminder(inputStack));
+                CraftingRemainder craftingRemainder = KoishStackData.getProp(inputStack, ItemPropTypes.CRAFTING_REMAINDER);
+                if (craftingRemainder != null) {
+                    list.set(i, craftingRemainder.reminder(inputStack));
                     continue;
                 }
             }
