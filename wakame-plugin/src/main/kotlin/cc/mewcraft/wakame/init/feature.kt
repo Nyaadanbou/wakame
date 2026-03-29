@@ -29,5 +29,8 @@ object FeatureInitializer {
 
         // sneak swap actions
         SneakSwapActionListener().registerEvents()
+
+        // force command lowercase
+        ForceCommandLowercase().registerEvents()
     }
 }

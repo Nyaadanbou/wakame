@@ -99,3 +99,11 @@ sneak_swap_actions:
     command: "quick_bar"
   - type: console_command
     command: "say 控制台指令已执行!"
+
+# 是否强制将玩家输入的指令转换为小写字母
+# 转换规则:
+# - /SPAWN -> /spawn
+# - /Spawn -> /spawn
+# - /HELP SPAWN -> /help SPAWN
+# - /Help SPawn -> /help SPawn
+force_command_lowercase: true
