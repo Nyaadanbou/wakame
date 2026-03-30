@@ -10,8 +10,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.monetization.zpay.ZPayCallbackServerImpl
 import cc.mewcraft.wakame.monetization.zpay.ZPayClientImpl
 import cc.mewcraft.wakame.monetization.zpay.ZPaySignatureImpl
-import java.util.concurrent.TimeUnit
-import kotlin.concurrent.thread
 
 /**
  * 支付模块的生命周期管理.
@@ -29,11 +27,8 @@ import kotlin.concurrent.thread
 @Init(InitStage.POST_WORLD)
 internal object MonetizationBootstrap {
 
-    /** Ktor stop/close 清理线程的最大等待时间 (秒). */
-    private const val SHUTDOWN_TIMEOUT_SECONDS = 5L
-
     private var client: ZPayClientImpl? = null
-    private var callbackServer: ZPayCallbackServerImpl? = null
+    private var server: ZPayCallbackServerImpl? = null
 
     @InitFun
     fun init() {
@@ -73,7 +68,7 @@ internal object MonetizationBootstrap {
             // 启动回调服务器
             val server = ZPayCallbackServerImpl(MonetizationConfig.callbackServer, signature, svc)
             server.start()
-            callbackServer = server
+            MonetizationBootstrap.server = server
 
             svc
         } else {
@@ -98,29 +93,23 @@ internal object MonetizationBootstrap {
         Monetization.clearImplementation()
         MonetizationCache.shutdown()
 
-        // 2. 在后台线程执行 Ktor 的 stop/close, 设置硬性超时以避免阻塞 Server 线程
-        //    Ktor CIO 的 stop() 依赖协程调度器, 如果调度器已在关服流程中被销毁, stop() 可能永远阻塞
-        val callbackServer = callbackServer
-        val httpClient = client
+        // 2. 清理 Ktor 资源
+        //    callbackServer.stop() 内部已改为虚拟线程 fire-and-forget, 不会阻塞
+        //    client.close() 内部仅取消协程 Job, 同样不会阻塞
+        runCatching {
+            server?.stop()
+        }.onFailure {
+            LOGGER.warn("[Monetization] Exception while stopping callback server: ${it.message}")
+        }
+        server = null
 
-        this.callbackServer = null
+        runCatching {
+            client?.close()
+        }.onFailure {
+            LOGGER.warn("[Monetization] Exception while closing HTTP client: ${it.message}")
+        }
         client = null
 
-        if (callbackServer != null || httpClient != null) {
-            val cleanupThread = thread(isDaemon = true, name = "Monetization-Shutdown") {
-                runCatching { callbackServer?.stop() }.onFailure { LOGGER.warn("[Monetization] Exception while stopping callback server: ${it.message}") }
-                runCatching { httpClient?.close() }.onFailure { LOGGER.warn("[Monetization] Exception while closing HTTP client: ${it.message}") }
-            }
-            try {
-                cleanupThread.join(TimeUnit.SECONDS.toMillis(SHUTDOWN_TIMEOUT_SECONDS))
-                if (cleanupThread.isAlive) {
-                    LOGGER.warn("[Monetization] Cleanup thread did not finish within ${SHUTDOWN_TIMEOUT_SECONDS}s, proceeding with shutdown.")
-                    cleanupThread.interrupt()
-                }
-            } catch (_: InterruptedException) {
-                Thread.currentThread().interrupt()
-            }
-        }
 
         LOGGER.info("[Monetization] Payment system shut down.")
     }

@@ -80,6 +80,14 @@ internal class ZPayCallbackServerImpl(
     private var server: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? = null
 
     override fun start() {
+        // Ktor 在 EmbeddedServer.start() 中注册一个 JVM shutdown hook ("KtorShutdownHook"),
+        // 该 hook 会在 JVM 退出时调用 EmbeddedServer.stop().
+        // 然而 CIO 引擎的 stop() 内部使用 runBlocking { cancelAndJoin() },
+        // 在 Minecraft 关服流程中 kotlinx.coroutines 的调度器已被销毁 (Dispatchers.shutdown()),
+        // 导致 runBlocking 永远阻塞, JVM 因等待 shutdown hook 完成而无法退出.
+        // 通过系统属性禁用此 hook, 改由插件自身管理关闭逻辑.
+        System.setProperty("io.ktor.server.engine.ShutdownHook", "false")
+
         server = embeddedServer(CIO, host = config.host, port = config.port) {
             routing {
                 get("/zpay/notify") {
@@ -95,9 +103,19 @@ internal class ZPayCallbackServerImpl(
     }
 
     override fun stop() {
-        server?.stop(gracePeriodMillis = 1000, timeoutMillis = 3000)
+        val server2 = server ?: return
         server = null
-        logger.info("Callback server stopped.")
+        // 在虚拟线程上尝试优雅关闭.
+        // 虚拟线程始终是守护线程 (Java 21+), 不会阻塞调用线程, 也不会阻止 JVM 退出.
+        // 如果 engine.stop() 内部的 runBlocking 挂起, JVM 退出时会自动终止该虚拟线程.
+        Thread.startVirtualThread {
+            runCatching {
+                server2.stop(gracePeriodMillis = 1000, timeoutMillis = 3000)
+            }.onFailure {
+                logger.warn("Exception while stopping embedded server: ${it.message}")
+            }
+        }
+        logger.info("Callback server stop requested.")
     }
 
     /**
