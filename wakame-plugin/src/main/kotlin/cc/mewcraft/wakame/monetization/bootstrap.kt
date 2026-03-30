@@ -110,7 +110,6 @@ internal object MonetizationBootstrap {
         }
         client = null
 
-
         LOGGER.info("[Monetization] Payment system shut down.")
     }
 }
