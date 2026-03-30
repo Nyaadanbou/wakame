@@ -40,6 +40,14 @@ class MessagingHandler(
                 TownyBridgeNetworkPacketHandler.handle(packet); return true
             }
 
+            is TownOutpostRequestPacket -> {
+                TownyBridgeNetworkPacketHandler.handle(packet); return true
+            }
+
+            is TownOutpostResponsePacket -> {
+                TownyBridgeNetworkPacketHandler.handle(packet); return true
+            }
+
             is NationSpawnRequestPacket -> {
                 TownyBridgeNetworkPacketHandler.handle(packet); return true
             }

@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.paper.util.sender.PlayerSource
 import org.incendo.cloud.paper.util.sender.Source
+import org.incendo.cloud.parser.standard.IntegerParser
 import org.incendo.cloud.parser.standard.StringParser
 
 internal object TownyNetworkCommand : KoishCommandFactory<Source> {
@@ -29,6 +30,16 @@ internal object TownyNetworkCommand : KoishCommandFactory<Source> {
             koishHandler(context = Dispatchers.async, handler = ::handleTownSpawn)
         }
 
+        // <root> town outpost <#> <server>
+        buildAndAdd(builder) {
+            senderType<PlayerSource>()
+            literal("town")
+            literal("outpost")
+            required("index", IntegerParser.integerParser(1, 99))
+            required("server", StringParser.stringParser())
+            koishHandler(context = Dispatchers.async, handler = ::handleTownOutpost)
+        }
+
         // <root> nation spawn <server>
         buildAndAdd(builder) {
             senderType<PlayerSource>()
@@ -43,6 +54,13 @@ internal object TownyNetworkCommand : KoishCommandFactory<Source> {
         val sender = (context.sender() as PlayerSource).source()
         val server = context.get<String>("server")
         TownyNetworkBridge.reqTownSpawn(sender, server)
+    }
+
+    private suspend fun handleTownOutpost(context: CommandContext<Source>) {
+        val sender = (context.sender() as PlayerSource).source()
+        val index = context.get<Int>("index")
+        val server = context.get<String>("server")
+        TownyNetworkBridge.reqTownOutpost(sender, index, server)
     }
 
     private suspend fun handleNationSpawn(context: CommandContext<Source>) {

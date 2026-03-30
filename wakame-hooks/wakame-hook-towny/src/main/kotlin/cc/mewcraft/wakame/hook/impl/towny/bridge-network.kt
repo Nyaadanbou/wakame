@@ -8,16 +8,14 @@ import cc.mewcraft.wakame.feature.ProxyServerSwitcher
 import cc.mewcraft.wakame.integration.townybridgenetwork.TownyNetworkBridge
 import cc.mewcraft.wakame.messaging.MessagingManager
 import cc.mewcraft.wakame.messaging.handler.TownyBridgeNetworkPacketHandler
-import cc.mewcraft.wakame.messaging.packet.NationSpawnRequestPacket
-import cc.mewcraft.wakame.messaging.packet.NationSpawnResponsePacket
-import cc.mewcraft.wakame.messaging.packet.TownSpawnRequestPacket
-import cc.mewcraft.wakame.messaging.packet.TownSpawnResponsePacket
+import cc.mewcraft.wakame.messaging.packet.*
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.RemovalCause
 import com.google.common.cache.RemovalNotification
 import com.palmergames.bukkit.towny.TownyAPI
 import com.palmergames.bukkit.towny.`object`.Resident
+import com.palmergames.bukkit.towny.`object`.Town
 import io.papermc.paper.event.player.AsyncPlayerSpawnLocationEvent
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -32,8 +30,6 @@ private val serverId: UUID
     get() = ServerInfoProvider.serverId
 private val serverKey: String
     get() = ServerInfoProvider.serverKey
-private val serverGroup: String
-    get() = ServerInfoProvider.serverGroup
 
 /**
  * 服务器上有安装 Towny 时的实现.
@@ -43,6 +39,9 @@ object TownyNetworkBridgeImpl : TownyNetworkBridge, TownyBridgeNetworkPacketHand
     override suspend fun reqTownSpawn(player: Player, targetServer: String) =
         TownyTeleportImpl.reqTownSpawn(player, targetServer)
 
+    override suspend fun reqTownOutpost(player: Player, index: Int, targetServer: String) =
+        TownyTeleportImpl.reqTownOutpost(player, index, targetServer)
+
     override suspend fun reqNationSpawn(player: Player, targetServer: String) =
         TownyTeleportImpl.reqNationSpawn(player, targetServer)
 
@@ -50,6 +49,12 @@ object TownyNetworkBridgeImpl : TownyNetworkBridge, TownyBridgeNetworkPacketHand
         TownyTeleportImpl.handle(packet)
 
     override fun handle(packet: TownSpawnResponsePacket) =
+        TownyTeleportImpl.handle(packet)
+
+    override fun handle(packet: TownOutpostRequestPacket) =
+        TownyTeleportImpl.handle(packet)
+
+    override fun handle(packet: TownOutpostResponsePacket) =
         TownyTeleportImpl.handle(packet)
 
     override fun handle(packet: NationSpawnRequestPacket) =
@@ -69,6 +74,10 @@ private object TownyTeleportImpl {
     private val townSessions: Cache<UUID, TownSession> = CacheBuilder.newBuilder()
         .expireAfterAccess(Duration.ofSeconds(5))
         .removalListener<UUID, TownSession>(::notifyRequestExpiration)
+        .build()
+    private val outpostSessions: Cache<UUID, OutpostSession> = CacheBuilder.newBuilder()
+        .expireAfterAccess(Duration.ofSeconds(5))
+        .removalListener<UUID, OutpostSession>(::notifyRequestExpiration)
         .build()
     private val nationSessions: Cache<UUID, NationSession> = CacheBuilder.newBuilder()
         .expireAfterAccess(Duration.ofSeconds(5))
@@ -95,6 +104,28 @@ private object TownyTeleportImpl {
 
         // 广播封包
         MessagingManager.queuePacket { TownSpawnRequestPacket(serverId, playerId, targetServer) }
+    }
+
+    fun reqTownOutpost(player: Player, index: Int, targetServer: String) {
+        // 如果目标服务器是本服务器, 则直接本地传送
+        if (targetServer == serverKey) {
+            handleLocalTownOutpost(player, index)
+            return
+        }
+
+        val playerId = player.uniqueId
+
+        // 如果有未完成的传送请求, 则 return
+        if (this.outpostSessions.getIfPresent(playerId) != null) {
+            player.sendMessage(TranslatableMessages.MSG_ERR_NETWORK_TELEPORT_REQUEST_ALREADY_PENDING)
+            return
+        }
+
+        // 创建会话
+        this.outpostSessions.put(playerId, OutpostSession(OutpostSession.Stage.AWAITING_RESPONSE, targetServer, index))
+
+        // 广播封包
+        MessagingManager.queuePacket { TownOutpostRequestPacket(serverId, playerId, targetServer, index) }
     }
 
     fun reqNationSpawn(player: Player, targetServer: String) {
@@ -149,6 +180,35 @@ private object TownyTeleportImpl {
         MessagingManager.queuePacket { TownSpawnResponsePacket(serverId, playerId, TownSpawnResponsePacket.ResponseType.ALLOW) }
     }
 
+    fun handle(packet: TownOutpostRequestPacket) {
+        val targetServer = packet.targetServer
+
+        // 如果请求不由本服务器负责, 则 return
+        if (targetServer != serverKey) return
+        val playerId = packet.playerId
+
+        when (resolveTownOutpostSpawn(TownyAPI.getInstance().getResident(playerId)?.townOrNull, packet.index)) {
+            TownOutpostResolution.NoTown -> {
+                MessagingManager.queuePacket {
+                    TownOutpostResponsePacket(serverId, playerId, TownOutpostResponsePacket.ResponseType.DENY_FOR_NO_TOWN)
+                }
+            }
+
+            TownOutpostResolution.NoSuchOutpost -> {
+                MessagingManager.queuePacket {
+                    TownOutpostResponsePacket(serverId, playerId, TownOutpostResponsePacket.ResponseType.DENY_FOR_NO_SUCH_OUTPOST)
+                }
+            }
+
+            is TownOutpostResolution.Success -> {
+                this.outpostSessions.put(playerId, OutpostSession(OutpostSession.Stage.READY_TO_TELEPORT, targetServer, packet.index))
+                MessagingManager.queuePacket {
+                    TownOutpostResponsePacket(serverId, playerId, TownOutpostResponsePacket.ResponseType.ALLOW)
+                }
+            }
+        }
+    }
+
     fun handle(packet: TownSpawnResponsePacket) {
         val playerId = packet.playerId
         val session = this.townSessions.asMap().remove(playerId) ?: return
@@ -156,6 +216,17 @@ private object TownyTeleportImpl {
         when (packet.response) {
             TownSpawnResponsePacket.ResponseType.ALLOW -> ProxyServerSwitcher.switch(player, session.targetServer)
             TownSpawnResponsePacket.ResponseType.DENY_FOR_NO_TOWN -> player.sendMessage(TranslatableMessages.MSG_ERR_NO_TOWN_AT_TARGET_SERVER)
+        }
+    }
+
+    fun handle(packet: TownOutpostResponsePacket) {
+        val playerId = packet.playerId
+        val session = this.outpostSessions.asMap().remove(playerId) ?: return
+        val player = Bukkit.getPlayer(playerId) ?: return
+        when (packet.response) {
+            TownOutpostResponsePacket.ResponseType.ALLOW -> ProxyServerSwitcher.switch(player, session.targetServer)
+            TownOutpostResponsePacket.ResponseType.DENY_FOR_NO_TOWN -> player.sendMessage(TranslatableMessages.MSG_ERR_NO_TOWN_AT_TARGET_SERVER)
+            TownOutpostResponsePacket.ResponseType.DENY_FOR_NO_SUCH_OUTPOST -> player.sendMessage(TranslatableMessages.MSG_ERR_TOWN_NOT_ENOUGH_OUTPOSTS)
         }
     }
 
@@ -171,7 +242,7 @@ private object TownyTeleportImpl {
         }
 
         this.nationSessions.put(playerId, NationSession(NationSession.Stage.READY_TO_TELEPORT, targetServer))
-        MessagingManager.queuePacket { TownSpawnResponsePacket(serverId, playerId, TownSpawnResponsePacket.ResponseType.ALLOW) }
+        MessagingManager.queuePacket { NationSpawnResponsePacket(serverId, playerId, NationSpawnResponsePacket.ResponseType.ALLOW) }
     }
 
     fun handle(packet: NationSpawnResponsePacket) {
@@ -191,6 +262,7 @@ private object TownyTeleportImpl {
         val playerId = event.connection.profile.id ?: return
         val resident = TownyAPI.getInstance().getResident(playerId) ?: return
         handleNetworkTownSpawn(playerId, resident, event::setSpawnLocation)
+        handleNetworkTownOutpost(playerId, resident, event::setSpawnLocation)
         handleNetworkNationSpawn(playerId, resident, event::setSpawnLocation)
     }
 
@@ -201,6 +273,20 @@ private object TownyTeleportImpl {
         val townSpawn = town.spawnOrNull ?: return
         locationConsumer(townSpawn)
         session.stage = TownSession.Stage.TELEPORTED
+    }
+
+    private fun handleNetworkTownOutpost(playerId: UUID, resident: Resident, locationConsumer: (Location) -> Unit) {
+        val session = this.outpostSessions.asMap().remove(playerId) ?: return
+        if (session.stage != OutpostSession.Stage.READY_TO_TELEPORT) return
+
+        val spawn = when (val resolution = resolveTownOutpostSpawn(resident.townOrNull, session.index)) {
+            is TownOutpostResolution.Success -> resolution.location
+            TownOutpostResolution.NoTown,
+            TownOutpostResolution.NoSuchOutpost -> return
+        }
+
+        locationConsumer(spawn)
+        session.stage = OutpostSession.Stage.TELEPORTED
     }
 
     private fun handleNetworkNationSpawn(playerId: UUID, resident: Resident, locationConsumer: (Location) -> Unit) {
@@ -221,6 +307,14 @@ private object TownyTeleportImpl {
         player.teleportAsync(spawn, PlayerTeleportEvent.TeleportCause.PLUGIN)
     }
 
+    private fun handleLocalTownOutpost(player: Player, index: Int) {
+        when (val resolution = resolveTownOutpostSpawn(TownyAPI.getInstance().getTown(player), index)) {
+            TownOutpostResolution.NoTown -> player.sendMessage(TranslatableMessages.MSG_ERR_NO_TOWN_AT_TARGET_SERVER)
+            TownOutpostResolution.NoSuchOutpost -> player.sendMessage(TranslatableMessages.MSG_ERR_TOWN_NOT_ENOUGH_OUTPOSTS)
+            is TownOutpostResolution.Success -> player.teleportAsync(resolution.location, PlayerTeleportEvent.TeleportCause.PLUGIN)
+        }
+    }
+
     private fun handleLocalNationSpawn(player: Player) {
         val spawn = TownyAPI.getInstance().getNation(player)?.spawnOrNull
         if (spawn == null) {
@@ -239,11 +333,41 @@ private object TownyTeleportImpl {
         }
     }
 
+    private fun resolveTownOutpostSpawn(town: Town?, index: Int): TownOutpostResolution {
+        if (town == null) {
+            return TownOutpostResolution.NoTown
+        }
+
+        if (index !in 1..town.maxOutpostSpawn) {
+            return TownOutpostResolution.NoSuchOutpost
+        }
+
+        val spawn = runCatching { town.getOutpostSpawn(index) }.getOrNull()
+            ?: return TownOutpostResolution.NoSuchOutpost
+
+        return TownOutpostResolution.Success(spawn)
+    }
+
     // 封装了一次跨服城镇传送请求所需要的所有信息
     // 每个服务器上都维护了自己的一份 session
     private class TownSession(
         var stage: Stage,
         val targetServer: String,
+    ) {
+
+        enum class Stage {
+            AWAITING_RESPONSE,
+            READY_TO_TELEPORT,
+            TELEPORTED,
+        }
+    }
+
+    // 封装了一次跨服城镇前哨战传送请求所需要的所有信息
+    // 每个服务器上都维护了自己的一份 session
+    private class OutpostSession(
+        var stage: Stage,
+        val targetServer: String,
+        val index: Int,
     ) {
 
         enum class Stage {
@@ -264,5 +388,11 @@ private object TownyTeleportImpl {
             READY_TO_TELEPORT,
             TELEPORTED,
         }
+    }
+
+    private sealed class TownOutpostResolution {
+        data object NoTown : TownOutpostResolution()
+        data object NoSuchOutpost : TownOutpostResolution()
+        data class Success(val location: Location) : TownOutpostResolution()
     }
 }

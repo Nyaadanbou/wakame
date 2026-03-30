@@ -93,6 +93,7 @@ object TranslatableMessages {
     val MSG_MANA_CONSUMED = create("msg_mana_consumed")
     val MSG_ERR_NO_TOWN_AT_TARGET_SERVER = create("msg_err_no_town_at_target_server")
     val MSG_ERR_NO_NATION_AT_TARGET_SERVER = create("msg_err_no_nation_at_target_server")
+    val MSG_ERR_TOWN_NOT_ENOUGH_OUTPOSTS = create("msg_err_town_not_enough_outposts")
     val MSG_ERR_NETWORK_TELEPORT_REQUEST_ALREADY_PENDING = create("msg_err_network_teleport_request_already_pending")
     val MSG_ERR_NETWORK_TELEPORT_REQUEST_EXPIRED = create("msg_err_network_teleport_request_expired")
     val MSG_ERR_CANNOT_USE_BOW_IN_OFFHAND = create("msg_err_cannot_use_bow_in_offhand")

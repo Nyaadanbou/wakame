@@ -28,6 +28,8 @@ class MessagingManager(
         /* TownyNetwork */
         registerPacket(::TownSpawnRequestPacket)
         registerPacket(::TownSpawnResponsePacket)
+        registerPacket(::TownOutpostRequestPacket)
+        registerPacket(::TownOutpostResponsePacket)
         registerPacket(::NationSpawnRequestPacket)
         registerPacket(::NationSpawnResponsePacket)
     }

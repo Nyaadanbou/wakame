@@ -1,8 +1,9 @@
 /**
  * TownyNetwork 协议概述.
  *
- * 目前协议有两个功能:
+ * 目前协议有三个功能:
  * - 将玩家直接传送到指定服务器里的城镇传送点.
+ * - 将玩家直接传送到指定服务器里的城镇前哨战.
  * - 将玩家直接传送到指定服务器里的国家传送点.
  * - 遵循 Towny 关于传送的权限/经济/冷却规则. (实现有点麻烦)
  *
@@ -15,22 +16,23 @@
  *   - 根据 [TownSpawnResponsePacket.response] 进行处理...
  *   - 如果是 [TownSpawnResponsePacket.ResponseType.ALLOW] 则让代理将玩家转移到目标服务器; 否则提示玩家并终止流程.
  *
+ * 请求跨服城镇前哨战时, 协议流程基本同城镇的, 但会额外带上前哨战索引.
+ *
  * 请求跨服国家传送时, 协议流程基本同城镇的.
  */
 package cc.mewcraft.wakame.messaging.handler
 
 import cc.mewcraft.messaging2.packet.SimplePacketHandler
 import cc.mewcraft.wakame.integration.townybridgenetwork.TownylessNetworkBridge
-import cc.mewcraft.wakame.messaging.packet.NationSpawnRequestPacket
-import cc.mewcraft.wakame.messaging.packet.NationSpawnResponsePacket
-import cc.mewcraft.wakame.messaging.packet.TownSpawnRequestPacket
-import cc.mewcraft.wakame.messaging.packet.TownSpawnResponsePacket
+import cc.mewcraft.wakame.messaging.packet.*
 
 /**
  * 该 [SimplePacketHandler] 负责处理以下封包:
  *
  * - [TownSpawnRequestPacket]
  * - [TownSpawnResponsePacket]
+ * - [TownOutpostRequestPacket]
+ * - [TownOutpostResponsePacket]
  * - [NationSpawnRequestPacket]
  * - [NationSpawnResponsePacket]
  */
@@ -38,6 +40,8 @@ interface TownyBridgeNetworkPacketHandler : SimplePacketHandler {
 
     fun handle(packet: TownSpawnRequestPacket)
     fun handle(packet: TownSpawnResponsePacket)
+    fun handle(packet: TownOutpostRequestPacket)
+    fun handle(packet: TownOutpostResponsePacket)
     fun handle(packet: NationSpawnRequestPacket)
     fun handle(packet: NationSpawnResponsePacket)
 
@@ -54,6 +58,14 @@ interface TownyBridgeNetworkPacketHandler : SimplePacketHandler {
         }
 
         override fun handle(packet: TownSpawnResponsePacket) {
+            implementation.handle(packet)
+        }
+
+        override fun handle(packet: TownOutpostRequestPacket) {
+            implementation.handle(packet)
+        }
+
+        override fun handle(packet: TownOutpostResponsePacket) {
             implementation.handle(packet)
         }
 

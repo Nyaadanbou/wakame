@@ -15,6 +15,13 @@ interface TownyNetworkBridge {
     suspend fun reqTownSpawn(player: Player, targetServer: String)
 
     /**
+     * 将玩家 [player] 传送到指定服务器 [targetServer] 里面的(玩家所属的)城镇前哨战 [index].
+     *
+     * [index] 采用 Towny 命令的 1-based 编号.
+     */
+    suspend fun reqTownOutpost(player: Player, index: Int, targetServer: String)
+
+    /**
      * 将玩家 [player] 传送到指定服务器 [targetServer] 里面的(玩家所属的)国家传送点.
      */
     suspend fun reqNationSpawn(player: Player, targetServer: String)
@@ -31,6 +38,10 @@ interface TownyNetworkBridge {
 
         override suspend fun reqTownSpawn(player: Player, targetServer: String) {
             implementation.reqTownSpawn(player, targetServer)
+        }
+
+        override suspend fun reqTownOutpost(player: Player, index: Int, targetServer: String) {
+            implementation.reqTownOutpost(player, index, targetServer)
         }
 
         override suspend fun reqNationSpawn(player: Player, targetServer: String) {
