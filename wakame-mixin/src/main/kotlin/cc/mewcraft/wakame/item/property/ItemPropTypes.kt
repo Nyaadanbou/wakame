@@ -27,6 +27,7 @@ import cc.mewcraft.wakame.util.typeTokenOf
 import cc.mewcraft.wakame.world.WeatherControl
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import org.bukkit.enchantments.Enchantment
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 
@@ -570,6 +571,18 @@ data object ItemPropTypes {
      */
     @JvmField
     val TOWNY_BOOST = typeOf<Unit>("towny_boost")
+
+    /**
+     * 物品的主要附魔. 对应数据包里的 `primary_item`.
+     */
+    @JvmField
+    val PRIMARY_ENCHANTMENTS = typeOf<Set<Enchantment>>("primary_enchantments")
+
+    /**
+     * 物品受支持的附魔. 对应数据包里的 `supported_item`.
+     */
+    @JvmField
+    val SUPPORTED_ENCHANTMENTS = typeOf<Set<Enchantment>>("supported_enchantments")
 
     // ------------
     // 方便函数
