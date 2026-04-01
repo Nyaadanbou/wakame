@@ -21,6 +21,8 @@ import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
+import io.papermc.paper.registry.RegistryKey
 import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.ServerFilter
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -235,7 +237,7 @@ data object ItemPropTypes {
      * 但这样的系统似乎有点复杂, 我们暂时不考虑.
      *
      * 因此, 最终的设计是, 对于不太适合收购的物品类型来说, 我们直接禁止玩家发起收购操作.
-     * 当然 “禁止发起收购”的逻辑需要在特定的代码路径中实现, 这个 property 只是标记而已.
+     * 当然 "禁止发起收购"的逻辑需要在特定的代码路径中实现, 这个 property 只是标记而已.
      */
     @JvmField
     val PLAYER_PURCHASABLE: ItemPropType<Unit> = typeOf("player_purchasable")
@@ -576,13 +578,21 @@ data object ItemPropTypes {
      * 物品的主要附魔. 对应数据包里的 `primary_item`.
      */
     @JvmField
-    val PRIMARY_ENCHANTMENTS = typeOf<Set<Enchantment>>("primary_enchantments")
+    val PRIMARY_ENCHANTMENTS = typeOf<Set<Enchantment>>("primary_enchantments") {
+        serializers {
+            register(RegistryKey.ENCHANTMENT.valueByNameTypeSerializer())
+        }
+    }
 
     /**
      * 物品受支持的附魔. 对应数据包里的 `supported_item`.
      */
     @JvmField
-    val SUPPORTED_ENCHANTMENTS = typeOf<Set<Enchantment>>("supported_enchantments")
+    val SUPPORTED_ENCHANTMENTS = typeOf<Set<Enchantment>>("supported_enchantments") {
+        serializers {
+            register(RegistryKey.ENCHANTMENT.valueByNameTypeSerializer())
+        }
+    }
 
     // ------------
     // 方便函数
