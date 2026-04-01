@@ -21,8 +21,6 @@ import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
-import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
-import io.papermc.paper.registry.RegistryKey
 import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.ServerFilter
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -578,21 +576,13 @@ data object ItemPropTypes {
      * 物品的主要附魔. 对应数据包里的 `primary_item`.
      */
     @JvmField
-    val PRIMARY_ENCHANTMENTS = typeOf<Set<Enchantment>>("primary_enchantments") {
-        serializers {
-            register(RegistryKey.ENCHANTMENT.valueByNameTypeSerializer())
-        }
-    }
+    val PRIMARY_ENCHANTMENTS = typeOf<Set<Enchantment>>("primary_enchantments")
 
     /**
      * 物品受支持的附魔. 对应数据包里的 `supported_item`.
      */
     @JvmField
-    val SUPPORTED_ENCHANTMENTS = typeOf<Set<Enchantment>>("supported_enchantments") {
-        serializers {
-            register(RegistryKey.ENCHANTMENT.valueByNameTypeSerializer())
-        }
-    }
+    val SUPPORTED_ENCHANTMENTS = typeOf<Set<Enchantment>>("supported_enchantments")
 
     // ------------
     // 方便函数
