@@ -19,6 +19,7 @@
     "MixinDataComponentPatch$3",
     "MixinDataComponentPatch$Builder",
     "MixinDataComponents",
+    "MixinEnchantment",
     "MixinEnchantmentEffectComponents",
     "MixinEnchantmentEntityEffect",
     "MixinEnchantmentLocationBasedEffect",
