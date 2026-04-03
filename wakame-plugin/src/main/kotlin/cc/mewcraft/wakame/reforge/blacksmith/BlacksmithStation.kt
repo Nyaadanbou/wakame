@@ -17,8 +17,16 @@ interface BlacksmithStation {
      */
     val recyclingInventorySize: Int
 
+    /**
+     * 获取修复台用于存放物品的容器的大小 (i.e. 容器的格子数量).
+     */
+    val repairingInventorySize: Int
+
     companion object Shared {
         fun calculateRecyclingInventorySize(settings: BasicMenuSettings): Int =
+            settings.structure.joinToString().count { it == 'i' }
+
+        fun calculateRepairingInventorySize(settings: BasicMenuSettings): Int =
             settings.structure.joinToString().count { it == 'i' }
     }
 }
