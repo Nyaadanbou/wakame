@@ -1,15 +1,17 @@
 package cc.mewcraft.wakame.entity.display
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.lazyconfig.configurate.require
+import cc.mewcraft.wakame.util.math.Transformation
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.entity.Display.Billboard
-import org.bukkit.entity.Display.Brightness
 import org.bukkit.entity.ItemDisplay
 import org.bukkit.entity.TextDisplay
 import org.bukkit.inventory.ItemStack
-import org.bukkit.util.Transformation
-import org.joml.Quaternionf
-import org.joml.Vector3f
+import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import java.lang.reflect.Type
 import net.minecraft.world.entity.Display as MojangDisplay
 
 /**
@@ -21,7 +23,7 @@ sealed class CommonDisplayData {
     var billboard: Billboard = Billboard.FIXED
 
     @JvmField
-    var brightness: Brightness? = null
+    var brightness: Brightness = DefaultBrightness
 
     @JvmField
     var glowColorOverride: Int = -1
@@ -48,21 +50,10 @@ sealed class CommonDisplayData {
     var teleportDuration: Int = 0
 
     @JvmField
-    var transformation: Transformation = DEFAULT_TRANSFORMATION
+    var transformation: Transformation = Transformation.identity()
 
     @JvmField
     var viewRange: Float = 1.0f
-
-    companion object {
-        @JvmField
-        // 单位变换, 即无变换
-        val DEFAULT_TRANSFORMATION: Transformation = Transformation(
-            Vector3f(0.0f, 0.0f, 0.0f),
-            Quaternionf(0.0f, 0.0f, 0.0f, 1.0f),
-            Vector3f(1.0f, 1.0f, 1.0f),
-            Quaternionf(0.0f, 0.0f, 0.0f, 1.0f)
-        )
-    }
 }
 
 /**
@@ -124,5 +115,54 @@ fun Billboard.toMojang(): MojangDisplay.BillboardConstraints {
         Billboard.VERTICAL -> MojangDisplay.BillboardConstraints.VERTICAL
         Billboard.HORIZONTAL -> MojangDisplay.BillboardConstraints.HORIZONTAL
         Billboard.CENTER -> MojangDisplay.BillboardConstraints.CENTER
+    }
+}
+
+/**
+ * 对展示实体 brightness 属性的封装.
+ * 不直接使用 [org.bukkit.entity.Display.Brightness] 的原因:
+ * Bukkit 使用 null 代表默认值, 即使用当前展示实体所在位置的亮度.
+ * null 可能导致序列化问题.
+ */
+sealed interface Brightness
+
+/**
+ * 对应配置文件:
+ * ```yaml
+ * brightness: default
+ * ```
+ */
+object DefaultBrightness : Brightness {
+    const val PLACEHOLDER: String = "default"
+}
+
+/**
+ * 对应配置文件:
+ * ```yaml
+ * brightness:
+ *   block_light: 7
+ *   sky_light: 9
+ * ```
+ */
+@ConfigSerializable
+data class SpecifiedBrightness(
+    val blockLight: Int,
+    val skyLight: Int
+) : Brightness
+
+object BrightnessSerializer : SimpleSerializer<Brightness> {
+    override fun deserialize(type: Type, node: ConfigurationNode): Brightness {
+        val str = node.rawScalar().toString()
+        if (str == DefaultBrightness.PLACEHOLDER) {
+            return DefaultBrightness
+        }
+
+        val blockLight = node.node("block_light").require<Int>().also {
+            require(it in 0..15) { "The block light must be between 0 and 15" }
+        }
+        val skyLight = node.node("block_light").require<Int>().also {
+            require(it in 0..15) { "The sky light must be between 0 and 15" }
+        }
+        return SpecifiedBrightness(blockLight, skyLight)
     }
 }

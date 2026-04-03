@@ -3,35 +3,25 @@ package cc.mewcraft.wakame.damage
 import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.lazyconfig.access.entry
 import cc.mewcraft.lazyconfig.access.node
-import cc.mewcraft.lazyconfig.access.registerSerializer
-import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
-import cc.mewcraft.lazyconfig.configurate.require
-import cc.mewcraft.wakame.entity.hologram.AnimationData
-import cc.mewcraft.wakame.entity.hologram.Hologram
-import cc.mewcraft.wakame.entity.hologram.TextHologramData
+import cc.mewcraft.wakame.animation.AnimationData
+import cc.mewcraft.wakame.animation.DamageHologramContext
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.registry.BuiltInRegistries
-import cc.mewcraft.wakame.util.*
-import net.kyori.adventure.extra.kotlin.join
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.JoinConfiguration
-import net.kyori.adventure.text.format.StyleBuilderApplicable
-import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
-import org.bukkit.Color
+import cc.mewcraft.wakame.util.cross
+import cc.mewcraft.wakame.util.math.Vec3f
+import cc.mewcraft.wakame.util.minus
+import cc.mewcraft.wakame.util.mul
+import cc.mewcraft.wakame.util.plus
+import cc.mewcraft.wakame.util.registerEvents
+import cc.mewcraft.wakame.util.toLocation
+import cc.mewcraft.wakame.util.toVector3f
 import org.bukkit.Location
-import org.bukkit.entity.*
+import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.joml.Vector3f
-import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
-import xyz.xenondevs.commons.provider.Provider
-import java.lang.reflect.Type
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.cos
@@ -40,9 +30,7 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 private val DAMAGE_CONFIG = ConfigAccess["damage/config"]
-private val DISPLAY_CONFIG = DAMAGE_CONFIG.node("display")
-private val MERGED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("merged")
-private val SEPARATED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("separated")
+private val DISPLAY_CONFIG = DAMAGE_CONFIG.node("display2")
 
 /**
  * 该 object 实现了元素伤害显示的功能.
@@ -50,22 +38,10 @@ private val SEPARATED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("separated")
 @Init(InitStage.POST_WORLD)
 internal object DamageDisplay : Listener {
 
-    // 这些 Vector3f 实例都是可变的, 请注意副作用 !!!
-    private val ZERO = Vector3f(0f, 0f, 0f)
-    private val UNIT_X = Vector3f(1f, 0f, 0f)
-    private val UNIT_Y = Vector3f(0f, 1f, 0f)
-    private val UNIT_Z = Vector3f(0f, 0f, 1f)
-    private val ONE = Vector3f(1f, 1f, 1f)
-
-    // 用于辅助生成*伪随机*的伤害悬浮文字的坐标位置
-    private val RADIAL_POINT_CYCLE = RadialPointCycle(8, 1f)
-
-    // 用于构建 Display 的常量
-    private val BACKGROUND = Color.fromARGB(0)
-    private val BRIGHTNESS = Display.Brightness(15, 0)
-
-    // 当前使用的伤害显示配置
-    private val settings by DISPLAY_CONFIG.entry<DamageDisplaySettings>("mode")
+    // 当前使用的伤害显示动画
+    private val normalAnimation by DISPLAY_CONFIG.entry<AnimationData<*>>("normal")
+    private val positiveAnimation by DISPLAY_CONFIG.entry<AnimationData<*>>("positive_critical_strike")
+    private val negativeAnimation by DISPLAY_CONFIG.entry<AnimationData<*>>("negative_critical_strike")
 
     @InitFun
     fun init() {
@@ -75,62 +51,26 @@ internal object DamageDisplay : Listener {
     @EventHandler(ignoreCancelled = true)
     fun on(event: PostprocessDamageEvent) {
         val damagee = event.damagee as? LivingEntity ?: return
-        val damageeLoc = damagee.location
-        val css = event.damageMetadata.criticalStrikeMetadata.state
-        val hologramLoc = calculateHologramLocation1(damagee = damagee)
-        val hologramText = settings.finalText(event)
+        val animLocation = calculateHologramLocation1(damagee)
 
-        for (viewer in damagee.trackedBy) {
-            showHologram(viewer, css, damageeLoc, hologramLoc, hologramText)
-        }
-    }
-
-    private fun showHologram(
-        viewer: Player,
-        css: CriticalStrikeState,
-        damageeLoc: Location,
-        hologramLoc: Location,
-        hologramText: Component,
-    ) {
-        val hologram = Hologram(
-            data = TextHologramData(
-                location = hologramLoc,
-                text = hologramText,
-                background = BACKGROUND,
-                hasTextShadow = true,
-                textAlignment = TextDisplay.TextAlignment.CENTER,
-                isSeeThrough = viewer.location.distanceSquared(damageeLoc) < 512.0
-            ).apply {
-                this.brightness = BRIGHTNESS
-            }
-        )
-
-        for (animation in settings.animations) {
-            runTaskLater(animation.delay) { ->
-                val hologramData = hologram.data<TextHologramData>()
-
-                // 根据 animation 更新 hologram
-                when (css) {
-                    CriticalStrikeState.NONE -> animation.normalData
-                    CriticalStrikeState.POSITIVE -> animation.positiveData
-                    CriticalStrikeState.NEGATIVE -> animation.negativeData
-                }.applyTo(hologramData)
-
-                if (animation.delay == 0L) {
-                    // delay = 0 表示需要发送 [创建] hologram 的封包
-                    hologram.show(viewer)
-                } else {
-                    // 否则只需要更新
-                    hologram.update()
-                    hologram.refresh(viewer)
+        val context = DamageHologramContext(event)
+        when (event.damageMetadata.criticalStrikeMetadata.state) {
+            CriticalStrikeState.NONE -> {
+                damagee.trackedBy.forEach { player ->
+                    normalAnimation.play(player, animLocation, context)
                 }
             }
-        }
+            CriticalStrikeState.POSITIVE -> {
+                damagee.trackedBy.forEach { player ->
+                    positiveAnimation.play(player, animLocation, context)
+                }
+            }
 
-        // 发送 [隐藏] hologram 的封包
-        // 配置文件需要手动确保在“动画”播放完毕后再隐藏
-        runTaskLater(settings.animationDuration) { ->
-            hologram.hide(viewer)
+            CriticalStrikeState.NEGATIVE -> {
+                damagee.trackedBy.forEach { player ->
+                    negativeAnimation.play(player, animLocation, context)
+                }
+            }
         }
     }
 
@@ -179,7 +119,7 @@ internal object DamageDisplay : Listener {
         val c0 = a + (ab mul distance)
 
         // 生成不平行于 AB 的任意向量
-        val vx = if (ab.x != 0f || ab.z != 0f) UNIT_Y else UNIT_X
+        val vx = if (ab.x != 0f || ab.z != 0f) Vec3f.unitY() else Vec3f.unitX()
 
         // 生成平面 P 的基向量
         val v1 = (ab cross vx).normalize()
@@ -263,169 +203,4 @@ internal class RadialPointCycle {
             return ret
         }
     }
-}
-
-
-// ------------
-// 配置文件的实现
-// ------------
-
-
-internal interface DamageDisplaySettings : DamageDisplaySettingsFields {
-
-    fun finalText(context: PostprocessDamageEvent): Component {
-        val criticalStrikeMetadata = context.damageMetadata.criticalStrikeMetadata
-        val criticalStrikeStyle = criticalStrikeStyle(criticalStrikeMetadata)
-        val criticalStrikeText = criticalStrikeText(criticalStrikeMetadata)
-
-        val finalText = MiniMessage.miniMessage().deserialize(
-            MergedDamageDisplaySettings.finalText,
-            Placeholder.styling("critical_strike_style", *criticalStrikeStyle),
-            Placeholder.component("critical_strike_text", criticalStrikeText),
-            Placeholder.component("damage_value_text", damageValueText(context)),
-        )
-
-        return finalText
-    }
-
-    fun damageValueText(context: PostprocessDamageEvent): Component
-
-    fun criticalStrikeStyle(context: CriticalStrikeMetadata): Array<StyleBuilderApplicable> = when (context.state) {
-        CriticalStrikeState.NONE -> criticalStrikeStyleNone
-        CriticalStrikeState.POSITIVE -> criticalStrikeStylePositive
-        CriticalStrikeState.NEGATIVE -> criticalStrikeStyleNegative
-    }
-
-    fun criticalStrikeText(context: CriticalStrikeMetadata): Component = when (context.state) {
-        CriticalStrikeState.NONE -> criticalStrikeTextNone
-        CriticalStrikeState.POSITIVE -> criticalStrikeTextPositive
-        CriticalStrikeState.NEGATIVE -> criticalStrikeTextNegative
-    }
-
-}
-
-internal interface DamageDisplaySettingsFields {
-
-    val animations: List<DamageDisplayAnimation>
-    val animationDuration: Long
-    val finalText: String
-    val criticalStrikeStylePositive: Array<StyleBuilderApplicable>
-    val criticalStrikeStyleNegative: Array<StyleBuilderApplicable>
-    val criticalStrikeStyleNone: Array<StyleBuilderApplicable>
-    val criticalStrikeTextPositive: Component
-    val criticalStrikeTextNegative: Component
-    val criticalStrikeTextNone: Component
-
-}
-
-internal class DamageDisplaySettingsCommonFields(
-    config: Provider<ConfigurationNode>,
-) : DamageDisplaySettingsFields {
-    override val animations: List<DamageDisplayAnimation> by config.entry("animations")
-    override val animationDuration: Long by config.entry("animation_duration")
-    override val finalText: String by config.entry("final_text")
-    override val criticalStrikeStylePositive: Array<StyleBuilderApplicable> by config.entry("critical_strike_style", "positive")
-    override val criticalStrikeStyleNegative: Array<StyleBuilderApplicable> by config.entry("critical_strike_style", "negative")
-    override val criticalStrikeStyleNone: Array<StyleBuilderApplicable> by config.entry("critical_strike_style", "none")
-    override val criticalStrikeTextPositive: Component by config.entry("critical_strike_text", "positive")
-    override val criticalStrikeTextNegative: Component by config.entry("critical_strike_text", "negative")
-    override val criticalStrikeTextNone: Component by config.entry("critical_strike_text", "none")
-}
-
-internal object MergedDamageDisplaySettings : DamageDisplaySettings, DamageDisplaySettingsFields by DamageDisplaySettingsCommonFields(MERGED_DISPLAY_CONFIG) {
-
-    val damageValueText: String by MERGED_DISPLAY_CONFIG.entry("damage_value_text")
-
-    override fun damageValueText(context: PostprocessDamageEvent): Component {
-        val damageMap = context.finalDamageMap
-        val elementType = damageMap.maxWithOrNull(
-            compareBy { it.value }
-        )?.key ?: BuiltInRegistries.ELEMENT.getDefaultEntry()
-        val damageValueText = MiniMessage.miniMessage().deserialize(
-            damageValueText,
-            Placeholder.component("element_name", elementType.unwrap().displayName),
-            Placeholder.styling("element_style", *elementType.unwrap().displayStyles),
-            Formatter.number("damage_value", context.finalDamage)
-        )
-        return damageValueText
-    }
-
-}
-
-internal object SeparatedDamageDisplaySettings : DamageDisplaySettings, DamageDisplaySettingsFields by DamageDisplaySettingsCommonFields(SEPARATED_DISPLAY_CONFIG) {
-
-    val damageValueText: String by SEPARATED_DISPLAY_CONFIG.entry("damage_value_text")
-    val separator: Component by SEPARATED_DISPLAY_CONFIG.entry("separator")
-
-    override fun damageValueText(context: PostprocessDamageEvent): Component {
-        val damageMap = context.finalDamageMap
-        val damageValueText = damageMap.map { (elementType, damageValue) ->
-            MiniMessage.miniMessage().deserialize(
-                damageValueText,
-                Placeholder.component("element_name", elementType.unwrap().displayName),
-                Placeholder.styling("element_style", *elementType.unwrap().displayStyles),
-                Formatter.number("damage_value", damageValue)
-            )
-        }.join(JoinConfiguration.separator(separator))
-        return damageValueText
-    }
-
-}
-
-/**
- * 伤害显示中文本展示实体的单次动画.
- */
-internal data class DamageDisplayAnimation(
-    val delay: Long,
-    val normalData: AnimationData,
-    val positiveData: AnimationData,
-    val negativeData: AnimationData,
-)
-
-@Init(InitStage.BOOTSTRAP)
-internal object DamageDisplayAnimationSerializer : SimpleSerializer<DamageDisplayAnimation> {
-    override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplayAnimation {
-        val delay = node.node("delay").require<Long>()
-
-        val normalData = buildData(AnimationData.DEFAULT, node.node("normal"))
-        val positiveData = buildData(normalData, node.node("positive_critical_strike"))
-        val negativeData = buildData(normalData, node.node("negative_critical_strike"))
-
-        return DamageDisplayAnimation(delay, normalData, positiveData, negativeData)
-    }
-
-    /**
-     * 方便函数.
-     */
-    private fun buildData(parentData: AnimationData, node: ConfigurationNode): AnimationData {
-        val startInterpolation = node.node("start_interpolation").get<Int>()
-        val interpolationDuration = node.node("interpolation_duration").get<Int>()
-        val translation = node.node("translation").get<Vector3f>()
-        val scale = node.node("scale").get<Vector3f>()
-        return AnimationData(parentData, startInterpolation, interpolationDuration, translation, scale)
-    }
-
-    @InitFun
-    fun init() {
-        ConfigAccess.registerSerializer(KOISH_NAMESPACE, this)
-    }
-}
-
-internal enum class DamageDisplayMode {
-    MERGED, SEPARATED
-}
-
-@Init(InitStage.BOOTSTRAP)
-internal object DamageDisplaySettingsSerializer : SimpleSerializer<DamageDisplaySettings> {
-
-    override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplaySettings = when (node.require<DamageDisplayMode>()) {
-        DamageDisplayMode.MERGED -> MergedDamageDisplaySettings
-        DamageDisplayMode.SEPARATED -> SeparatedDamageDisplaySettings
-    }
-
-    @InitFun
-    fun init() {
-        ConfigAccess.registerSerializer(KOISH_NAMESPACE, this)
-    }
-
 }

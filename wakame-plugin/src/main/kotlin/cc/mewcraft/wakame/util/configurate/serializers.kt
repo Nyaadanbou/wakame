@@ -3,13 +3,35 @@
 package cc.mewcraft.wakame.util.configurate
 
 import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.wakame.animation.AnimationData
+import cc.mewcraft.wakame.animation.TextBuilder
+import cc.mewcraft.wakame.entity.display.BrightnessSerializer
 import cc.mewcraft.wakame.loot.LootPool
 import cc.mewcraft.wakame.loot.LootTable
 import cc.mewcraft.wakame.loot.entry.ComposableEntryContainer
 import cc.mewcraft.wakame.molang.ExpressionSerializer
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.DynamicRegistries
-import cc.mewcraft.wakame.serialization.configurate.serializer.*
+import cc.mewcraft.wakame.serialization.configurate.serializer.AttributeModifierSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.BlockTypeListSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.EntityTypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.IdentifierSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.IntRangeGuavaSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.IntRangeKotlinSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.ItemTypeListSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.KoishKeySerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.LocationSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.MaterialSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.MiniMessageComponentSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.MiniMessageStyleBuilderApplicableSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.MiniMessageStyleSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.NamespacedKeySerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.PotionEffectSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.QuaternionfSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.TransformationSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.Vector3fSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
 import cc.mewcraft.wakame.util.RandomizedValueSerializer
 import io.papermc.paper.registry.RegistryKey
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -24,12 +46,15 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     .register(AttributeModifierSerializer)
     .register(RandomizedValueSerializer)
     .register(ExpressionSerializer)
+    .register(BrightnessSerializer)
+    .register(AnimationData.Serializer)
     // Kotlin
     .register(IntRangeKotlinSerializer)
     // Text
     .register(MiniMessageComponentSerializer)
     .register(MiniMessageStyleSerializer)
     .register(MiniMessageStyleBuilderApplicableSerializer)
+    .register(TextBuilder.Serializer)
     // Guava
     .register(IntRangeGuavaSerializer)
     // Namespaced
@@ -38,6 +63,8 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     .register(IdentifierSerializer)
     // Math
     .register(Vector3fSerializer)
+    .register(QuaternionfSerializer)
+    .register(TransformationSerializer)
     // Bukkit Object
     .register(LocationSerializer)
     .register(PotionEffectSerializer)
