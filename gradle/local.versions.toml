@@ -25,14 +25,20 @@ caffeine = "3.2.3"
 cloud = "2.0.0"
 cloud-minecraft = "2.0.0-beta.11"
 cloud-processors = "1.0.0-rc.1"
-commons = "1.24"
+commons-collections = "1.35"
+commons-gson = "1.35"
+commons-guava = "1.35"
+commons-provider = "2.0.0-alpha.9"
+commons-reflection = "1.35"
+commons-tuple = "1.35"
+commons-version = "1.35"
 configurate = "4.2.0-SNAPSHOT"
 creative = "1.9.1"
 exposed = "1.0.0-rc-3"
 fleks = "2.11"
 h2 = "2.2.224"
 hikaricp = "5.1.0"
-invui = "1.49"
+invui = "2.0.0-beta.7"
 jarrelocator = "1.7"
 jgit = "6.9.0.202403050737-r"
 koin = "4.0.0"
@@ -130,12 +136,12 @@ cloud-minecraft-extras = { group = "org.incendo", name = "cloud-minecraft-extras
 cloud-paper = { group = "org.incendo", name = "cloud-paper", version.ref = "cloud-minecraft" }
 cloud-processors-confirmation = { group = "org.incendo", name = "cloud-processors-confirmation", version.ref = "cloud-processors" }
 cloud-velocity = { group = "org.incendo", name = "cloud-velocity", version.ref = "cloud-minecraft" }
-commons-collections = { group = "xyz.xenondevs.commons", name = "commons-collections", version.ref = "commons" }
-commons-gson = { group = "xyz.xenondevs.commons", name = "commons-gson", version.ref = "commons" }
-commons-guava = { group = "xyz.xenondevs.commons", name = "commons-guava", version.ref = "commons" }
-commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version.ref = "commons" }
-commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "commons" }
-commons-tuple = { group = "xyz.xenondevs.commons", name = "commons-tuple", version.ref = "commons" }
+commons-collections = { group = "xyz.xenondevs.commons", name = "commons-collections", version.ref = "commons-collections" }
+commons-gson = { group = "xyz.xenondevs.commons", name = "commons-gson", version.ref = "commons-gson" }
+commons-guava = { group = "xyz.xenondevs.commons", name = "commons-guava", version.ref = "commons-guava" }
+commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version.ref = "commons-provider" }
+commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "commons-reflection" }
+commons-tuple = { group = "xyz.xenondevs.commons", name = "commons-tuple", version.ref = "commons-tuple" }
 configurate-extra-dfu4 = { group = "cc.mewcraft.configurate", name = "configurate-extra-dfu4", version.ref = "configurate" }
 configurate-extra-dfu8 = { group = "cc.mewcraft.configurate", name = "configurate-extra-dfu8", version.ref = "configurate" }
 configurate-extra-dfu9 = { group = "cc.mewcraft.configurate", name = "configurate-extra-dfu9", version.ref = "configurate" }
@@ -152,11 +158,7 @@ fleks = { group = "io.github.quillraven.fleks", name = "Fleks", version.ref = "f
 gremlin-runtime = { group = "xyz.jpenilla", name = "gremlin-runtime", version.ref = "gremlin" }
 h2 = { module = "com.h2database:h2", version.ref = "h2" }
 hikaricp = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikaricp" }
-invui-core = { group = "xyz.xenondevs.invui", name = "invui-core", version.ref = "invui" }
-invui-inventoryaccess = { group = "xyz.xenondevs.invui", name = "inventory-access", version.ref = "invui" }
-invui-inventoryaccess-r24 = { group = "xyz.xenondevs.invui", name = "inventory-access-r24", version.ref = "invui" }
-invui-inventoryaccess-r25 = { group = "xyz.xenondevs.invui", name = "inventory-access-r25", version.ref = "invui" }
-invui-inventoryaccess-r26 = { group = "xyz.xenondevs.invui", name = "inventory-access-r26", version.ref = "invui" }
+invui = { group = "xyz.xenondevs.invui", name = "invui", version.ref = "invui" }
 invui-kotlin = { group = "xyz.xenondevs.invui", name = "invui-kotlin", version.ref = "invui" }
 jarrelocator = { group = "me.lucko", name = "jar-relocator", version.ref = "jarrelocator" }
 jedis = { group = "redis.clients", name = "jedis", version.ref = "jedis" }

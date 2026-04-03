@@ -102,11 +102,7 @@ dependencies {
     koishLoader(local.adventure.extra.kotlin)
 
     // 箱子UI
-    koishLoader(local.invui.core)
-    koishLoader(local.invui.inventoryaccess)
-    koishLoader(local.invui.inventoryaccess.r24)
-    koishLoader(local.invui.inventoryaccess.r25)
-    koishLoader(local.invui.inventoryaccess.r26)
+    koishLoader(local.invui)
     koishLoader(local.invui.kotlin)
 
     // 资源包

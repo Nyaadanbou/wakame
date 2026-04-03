@@ -47,6 +47,28 @@ sourceSets {
     }
 }
 
+// InvUI v2 的 Gradle Module Metadata 声明了 org.gradle.jvm.version=25,
+// 但实际上它的字节码兼容 Java 21 (参见 https://docs.xenondevs.xyz/invui2/).
+// 这里覆盖 JVM 版本属性, 让 Gradle 能正确解析依赖.
+dependencies {
+    components {
+        withModule("xyz.xenondevs.invui:invui") {
+            allVariants {
+                attributes {
+                    attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
+                }
+            }
+        }
+        withModule("xyz.xenondevs.invui:invui-kotlin") {
+            allVariants {
+                attributes {
+                    attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
+                }
+            }
+        }
+    }
+}
+
 indra {
     checkstyle().set(local.versions.checkstyle)
     javaVersions().target(21)
