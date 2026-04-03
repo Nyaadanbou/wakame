@@ -15,7 +15,6 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
 import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializer
-import xyz.xenondevs.commons.provider.map
 import java.lang.reflect.Type
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf

@@ -62,7 +62,7 @@ class RecipeMatcherResult(
         val itemStack = recipe.output.displayItemStack(settings)
 
         // 解析展示用的所有占位符
-        val slotDisplayResolved = settings.getSlotDisplay("listing").resolve {
+        val slotDisplayResolved = settings.getIcon("listing").resolve {
 
             // 适用于整个物品堆叠的占位符
             standard {

@@ -8,7 +8,6 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.EquipmentSlotGroup
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mapEachNotNull
 
 class EquipmentSlotsToKeepOnDeath : Listener {

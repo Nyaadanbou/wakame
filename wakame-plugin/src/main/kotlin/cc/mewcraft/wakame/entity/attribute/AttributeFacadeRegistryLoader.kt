@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.lazyconfig.access.entry
+import cc.mewcraft.lazyconfig.access.entryOrElse
 import cc.mewcraft.lazyconfig.access.node
 import cc.mewcraft.lazyconfig.access.optionalEntry
 import cc.mewcraft.lazyconfig.configurate.require
@@ -312,7 +313,7 @@ private class NumericScaling(
 private class QualityText(
     config: Provider<ConfigurationNode>,
 ) {
-    private val quality: Map<Quality, Component> by config.optionalEntry<Map<Quality, Component>>("quality").orElse(AttributeConfigFallback.quality)
+    private val quality: Map<Quality, Component> by config.entryOrElse<Map<Quality, Component>>(AttributeConfigFallback.quality, "quality")
 
     fun translate(quality: Quality?): Component {
         return this.quality[quality] ?: Component.empty()

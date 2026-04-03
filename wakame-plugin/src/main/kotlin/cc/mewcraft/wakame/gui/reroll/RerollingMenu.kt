@@ -17,14 +17,13 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.gui.Markers
 import xyz.xenondevs.invui.gui.ScrollGui
-import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
-import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.impl.controlitem.ScrollItem
+import xyz.xenondevs.invui.inventory.event.UpdateReason
+import xyz.xenondevs.invui.item.BoundItem
 import xyz.xenondevs.invui.window.Window
-import xyz.xenondevs.invui.window.type.context.setTitle
 import kotlin.properties.Delegates
 
 /**
@@ -53,28 +52,53 @@ internal class RerollingMenu(
      */
     // val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
 
-    private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
-        setPreUpdateHandler(::onInputInventoryPreUpdate)
+    private val inputSlot: VirtualInventory = VirtualInventory(1).apply {
+        addPreUpdateHandler(::onInputInventoryPreUpdate)
+        addPostUpdateHandler { e ->
+            // v2: newItem 不可变, 在 post-update handler 中统一处理渲染和 UI 更新
+            if (e.isAdd) {
+                val rendered = renderInputItem() ?: return@addPostUpdateHandler
+                setItem(UpdateReason.SUPPRESSED, e.slot, rendered)
+                updateSelectionGuis()
+                updateOutputSlot()
+            }
+        }
     }
-    private val outputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
-        setPreUpdateHandler(::onOutputInventoryPreUpdate)
+    private val outputSlot: VirtualInventory = VirtualInventory(1).apply {
+        addPreUpdateHandler(::onOutputInventoryPreUpdate)
     }
-    private val primaryGui: ScrollGui<Gui> = ScrollGui.guis { builder ->
-        builder.setStructure(*table.primaryMenuSettings.structure)
-        builder.addIngredient('.', table.primaryMenuSettings.getSlotDisplay("background").resolveToItemWrapper())
-        builder.addIngredient('i', inputSlot)
-        builder.addIngredient('o', outputSlot, table.primaryMenuSettings.getSlotDisplay("output_empty").resolveToItemWrapper())
-        builder.addIngredient('<', PrevItem())
-        builder.addIngredient('>', NextItem())
-        builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_VERTICAL)
-    }
-    private val primaryWindow: Window = Window.single { builder ->
-        builder.setGui(primaryGui)
-        builder.setTitle(table.primaryMenuSettings.title)
-        builder.setViewer(viewer)
-        builder.addOpenHandler(::onWindowOpen)
-        builder.addCloseHandler(::onWindowClose)
-    }
+    private val primaryGui: ScrollGui<Gui> = ScrollGui.guisBuilder()
+        .setStructure(*table.primaryMenuSettings.structure)
+        .addIngredient('.', table.primaryMenuSettings.getIcon("background").resolveToItemWrapper())
+        .addIngredient('i', inputSlot)
+        .addIngredient('o', outputSlot, table.primaryMenuSettings.getIcon("output_empty").resolveToItemWrapper())
+        .addIngredient(
+            '<', BoundItem.scrollBuilder()
+                .setItemProvider { _, _ ->
+                    table.primaryMenuSettings.getIcon("prev_page").resolveToItemWrapper()
+                }
+                .addClickHandler { _, gui, _ ->
+                    gui.line -= 1
+                }
+        )
+        .addIngredient(
+            '>', BoundItem.scrollBuilder()
+                .setItemProvider { _, _ ->
+                    table.primaryMenuSettings.getIcon("next_page").resolveToItemWrapper()
+                }
+                .addClickHandler { _, gui, _ ->
+                    gui.line += 1
+                }
+        )
+        .addIngredient('x', Markers.CONTENT_LIST_SLOT_VERTICAL)
+        .build()
+    private val primaryWindow: Window = Window.builder()
+        .setUpperGui(primaryGui)
+        .setTitle(table.primaryMenuSettings.title)
+        .setViewer(viewer)
+        .addOpenHandler(::onWindowOpen)
+        .addCloseHandler { onWindowClose() }
+        .build()
 
     /**
      * 玩家是否已经确认取出重造后的物品.
@@ -110,11 +134,7 @@ internal class RerollingMenu(
                 // 赋值完毕之后, session 内部的其他状态应该也要更新
                 session.originalInput = newItem
 
-                // 重新渲染放入的物品
-                event.newItem = renderInputItem()
-
-                updateSelectionGuis()
-                updateOutputSlot()
+                // v2: newItem 不可变, 渲染和 UI 更新统一由 post-update handler 处理
             }
 
             // 玩家尝试从 inputSlot 拿出物品:
@@ -175,7 +195,7 @@ internal class RerollingMenu(
 
                 // 判断玩家是否有足够的资源
                 if (!result.reforgeCost.test(viewer)) {
-                    setOutputSlot(table.primaryMenuSettings.getSlotDisplay("output_insufficient_resource").resolveToItemStack())
+                    setOutputSlot(table.primaryMenuSettings.getIcon("output_insufficient_resource").resolveToItemStack())
                     return
                 }
 
@@ -243,7 +263,7 @@ internal class RerollingMenu(
             ItemRenderers.REROLLING_TABLE.render(previewItem, RerollingTableContext(session, RerollingTableContext.Slot.OUTPUT))
 
             val slotDisplayId = if (confirmed) "output_ok_confirmed" else "output_ok_unconfirmed"
-            val slotDisplayResolved = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolve {
+            val slotDisplayResolved = table.primaryMenuSettings.getIcon(slotDisplayId).resolve {
                 standard { component("item_name", previewItem.itemNameOrType) }
                 folded("item_lore", previewItem.fastLoreOrEmpty)
                 folded("cost_description", reforgeResult.reforgeCost.description)
@@ -255,7 +275,7 @@ internal class RerollingMenu(
 
             // 由于根本无法重造, 所以也不存在重造后的物品.
             // 这里直接使用一个新的物品堆叠来展示失败的结果.
-            table.primaryMenuSettings.getSlotDisplay("output_failure").resolveToItemStack {
+            table.primaryMenuSettings.getIcon("output_failure").resolveToItemStack {
                 folded("failure_reason", reforgeResult.description)
             }
         }
@@ -308,26 +328,14 @@ internal class RerollingMenu(
     }
 
     private fun setInputSlot(stack: ItemStack?) {
-        inputSlot.setItemSilently(0, stack)
+        inputSlot.setItem(UpdateReason.SUPPRESSED, 0, stack)
     }
 
     private fun setOutputSlot(stack: ItemStack?) {
-        outputSlot.setItemSilently(0, stack)
+        outputSlot.setItem(UpdateReason.SUPPRESSED, 0, stack)
     }
 
-    private fun setSelectionGuis(guis: List<Gui>?) {
+    private fun setSelectionGuis(guis: List<Gui>) {
         primaryGui.setContent(guis)
-    }
-
-    private inner class PrevItem : ScrollItem(-1) {
-        override fun getItemProvider(gui: ScrollGui<*>): ItemProvider {
-            return table.primaryMenuSettings.getSlotDisplay("prev_page").resolveToItemWrapper()
-        }
-    }
-
-    private inner class NextItem : ScrollItem(1) {
-        override fun getItemProvider(gui: ScrollGui<*>): ItemProvider {
-            return table.primaryMenuSettings.getSlotDisplay("next_page").resolveToItemWrapper()
-        }
     }
 }

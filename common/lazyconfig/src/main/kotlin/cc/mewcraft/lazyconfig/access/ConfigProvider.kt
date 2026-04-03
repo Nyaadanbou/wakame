@@ -7,7 +7,8 @@ import org.spongepowered.configurate.ScopedConfigurationNode
 import xyz.xenondevs.commons.provider.*
 import java.lang.reflect.Type
 import java.nio.file.Path
-import java.util.concurrent.locks.ReentrantLock
+import java.util.Collections
+import java.util.WeakHashMap
 import kotlin.io.path.exists
 import kotlin.reflect.KType
 import kotlin.reflect.jvm.javaType
@@ -344,46 +345,46 @@ inline fun <reified T : Any> Provider<ConfigurationNode>.entryOrElse(default: T?
     if (default != null) optionalEntry<T>(*paths).orElse(default) else entry<T>(*paths)
 
 /**
- * Gets an entry [Provider] for a value of type [T] under [path], using [default] as fallback, or requiring config presence if null.
+ * Gets an entry [Provider] for a value of type [T] under [path], using [defaultProvider] as fallback, or requiring config presence if null.
  *
- * @throws NoSuchElementException if the entry does not exist and [default] is null
+ * @throws NoSuchElementException if the entry does not exist and [defaultProvider] is null
  * @throws IllegalStateException if the entry could not be deserialized to [T]
  */
-inline fun <reified T : Any> Provider<ConfigurationNode>.strongEntryOrElse(default: Provider<T>?, vararg path: String): Provider<T> =
-    if (default != null) strongOptionalEntry<T>(*path).strongOrElse(default) else strongEntry<T>(*path)
+inline fun <reified T : Any> Provider<ConfigurationNode>.strongEntryOrElse(defaultProvider: Provider<T>?, vararg path: String): Provider<T> =
+    if (defaultProvider != null) strongOptionalEntry<T>(*path).strongOrElseBy(defaultProvider) else strongEntry<T>(*path)
 
 /**
- * Gets an entry [Provider] for a value of type [T] under [path], using [default] as fallback, or requiring config presence if null.
+ * Gets an entry [Provider] for a value of type [T] under [path], using [defaultProvider] as fallback, or requiring config presence if null.
  *
  * The returned provider will only be stored in a [java.lang.ref.WeakReference] in the parent provider.
  *
- * @throws NoSuchElementException if the entry does not exist and [default] is null
+ * @throws NoSuchElementException if the entry does not exist and [defaultProvider] is null
  * @throws IllegalStateException if the entry could not be deserialized to [T]
  */
-inline fun <reified T : Any> Provider<ConfigurationNode>.entryOrElse(default: Provider<T>?, vararg path: String): Provider<T> =
-    if (default != null) optionalEntry<T>(*path).orElse(default) else entry<T>(*path)
+inline fun <reified T : Any> Provider<ConfigurationNode>.entryOrElse(defaultProvider: Provider<T>?, vararg path: String): Provider<T> =
+    if (defaultProvider != null) optionalEntry<T>(*path).orElseBy(defaultProvider) else entry<T>(*path)
 
 /**
  * Gets an entry [Provider] for a value of type [T] under the first existing path from [paths],
- * using [default] as fallback, or requiring config presence if null.
+ * using [defaultProvider] as fallback, or requiring config presence if null.
  *
- * @throws NoSuchElementException if no entry exists and [default] is null
+ * @throws NoSuchElementException if no entry exists and [defaultProvider] is null
  * @throws IllegalStateException if the entry could not be deserialized to [T]
  */
-inline fun <reified T : Any> Provider<ConfigurationNode>.strongEntryOrElse(default: Provider<T>?, vararg paths: Array<String>): Provider<T> =
-    if (default != null) strongOptionalEntry<T>(*paths).strongOrElse(default) else strongEntry<T>(*paths)
+inline fun <reified T : Any> Provider<ConfigurationNode>.strongEntryOrElse(defaultProvider: Provider<T>?, vararg paths: Array<String>): Provider<T> =
+    if (defaultProvider != null) strongOptionalEntry<T>(*paths).strongOrElseBy(defaultProvider) else strongEntry<T>(*paths)
 
 /**
  * Gets an entry [Provider] for a value of type [T] under the first existing path from [paths],
- * using [default] as fallback, or requiring config presence if null.
+ * using [defaultProvider] as fallback, or requiring config presence if null.
  *
  * The returned provider will only be stored in a [java.lang.ref.WeakReference] in the parent provider.
  *
- * @throws NoSuchElementException if no entry exists and [default] is null
+ * @throws NoSuchElementException if no entry exists and [defaultProvider] is null
  * @throws IllegalStateException if the entry could not be deserialized to [T]
  */
-inline fun <reified T : Any> Provider<ConfigurationNode>.entryOrElse(default: Provider<T>?, vararg paths: Array<String>): Provider<T> =
-    if (default != null) optionalEntry<T>(*paths).orElse(default) else entry<T>(*paths)
+inline fun <reified T : Any> Provider<ConfigurationNode>.entryOrElse(defaultProvider: Provider<T>?, vararg paths: Array<String>): Provider<T> =
+    if (defaultProvider != null) optionalEntry<T>(*paths).orElseBy(defaultProvider) else entry<T>(*paths)
 
 private fun Provider<ConfigurationNode>.fullPath(): String {
     val filePath = findFilePath()
@@ -403,17 +404,14 @@ private fun Provider<ConfigurationNode>.fullPath(): String {
     return builder.toString()
 }
 
-@OptIn(UnstableProviderApi::class)
 private fun Provider<ConfigurationNode>.findFilePath(): String? {
-    this as AbstractProvider<ConfigurationNode>
-
-    val queue = ArrayDeque<AbstractProvider<*>>()
+    val queue = ArrayDeque<Provider<*>>()
     queue.add(this)
-
     while (queue.isNotEmpty()) {
         val current = queue.removeFirst()
-        if (current is RootConfigProvider) {
-            return current.configId.toString()
+        val configId = RootConfigProvider.registry[current]
+        if (configId != null) {
+            return configId.toString()
         }
         queue.addAll(current.parents)
     }
@@ -421,11 +419,15 @@ private fun Provider<ConfigurationNode>.findFilePath(): String? {
     return null
 }
 
-@OptIn(UnstableProviderApi::class)
 class RootConfigProvider(
     val path: Path,
     val configId: Key,
-) : AbstractProvider<CommentedConfigurationNode>(ReentrantLock()) {
+) {
+
+    val backing: MutableProvider<CommentedConfigurationNode> = mutableProvider {
+        // 返回空的占位节点, 当配置实际加载时会被替换
+        ConfigAccess.createBuilder(configId.namespace()).build().createNode()
+    }
 
     @Volatile
     var loaded: Boolean = false
@@ -436,22 +438,24 @@ class RootConfigProvider(
         private set
 
     init {
-        subscribe {
+        registry[backing] = configId
+        backing.subscribe {
             loaded = true
             fileExisted = path.exists()
         }
     }
 
-    fun reload() {
-        set(loadNode())
-    }
+    fun get(): CommentedConfigurationNode = backing.get()
 
-    override fun pull(): CommentedConfigurationNode {
-        // 返回空的占位节点, 当配置实际加载时会被替换
-        return ConfigAccess.createBuilder(configId.namespace()).build().createNode()
+    fun reload() {
+        backing.set(loadNode())
     }
 
     private fun loadNode(): CommentedConfigurationNode {
         return ConfigAccess.createLoader(configId.namespace(), path).load()
+    }
+
+    companion object {
+        internal val registry: MutableMap<Provider<*>, Key> = Collections.synchronizedMap(WeakHashMap())
     }
 }

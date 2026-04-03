@@ -56,6 +56,7 @@ internal data object WtfBlacksmithStation : BlacksmithStation {
     override val recyclingStation: RecyclingStation = WtfRecyclingStation
     override val repairingTable: RepairingTable = WtfRepairingTable
     override val recyclingInventorySize: Int = BlacksmithStation.calculateRecyclingInventorySize(recyclingMenuSettings)
+    override val repairingInventorySize: Int = BlacksmithStation.calculateRepairingInventorySize(repairingMenuSettings)
 }
 
 internal class SimpleBlacksmithStation(
@@ -68,6 +69,7 @@ internal class SimpleBlacksmithStation(
     override val repairingTable: RepairingTable,
 ) : BlacksmithStation, Examinable {
     override val recyclingInventorySize: Int = BlacksmithStation.calculateRecyclingInventorySize(recyclingMenuSettings)
+    override val repairingInventorySize: Int = BlacksmithStation.calculateRepairingInventorySize(repairingMenuSettings)
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(

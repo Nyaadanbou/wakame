@@ -12,8 +12,8 @@ import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
-import xyz.xenondevs.invui.gui.structure.Marker
-import xyz.xenondevs.invui.gui.structure.Markers
+import xyz.xenondevs.invui.gui.Marker
+import xyz.xenondevs.invui.gui.Markers
 
 /**
  * 物品图鉴中展示的一个物品类别.

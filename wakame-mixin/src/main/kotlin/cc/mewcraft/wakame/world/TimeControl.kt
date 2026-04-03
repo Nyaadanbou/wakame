@@ -8,7 +8,6 @@ import cc.mewcraft.wakame.world.TimeControl.addTime
 import cc.mewcraft.wakame.world.TimeControl.setTime
 import net.kyori.adventure.util.Ticks
 import org.bukkit.Bukkit
-import xyz.xenondevs.commons.provider.map
 
 /**
  * 控制所有维度的时间.

@@ -56,7 +56,6 @@ import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.commons.collections.enumSetOf
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.orElse
 import java.time.Duration
 import java.util.*

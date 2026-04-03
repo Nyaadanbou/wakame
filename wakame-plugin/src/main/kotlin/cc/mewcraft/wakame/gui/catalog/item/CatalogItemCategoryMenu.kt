@@ -2,69 +2,112 @@ package cc.mewcraft.wakame.gui.catalog.item
 
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.item.resolveToItemWrapper
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.gui.PagedGui
+import xyz.xenondevs.invui.item.BoundItem
 import xyz.xenondevs.invui.item.Item
-import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
-import xyz.xenondevs.invui.item.impl.AbstractItem
-import xyz.xenondevs.invui.item.impl.controlitem.PageItem
 import xyz.xenondevs.invui.window.Window
-import xyz.xenondevs.invui.window.type.context.setTitle
 
 /**
- * 类别菜单.
- * 展示某类别的所有物品.
+ * 类别菜单. 展示某类别的所有物品.
  */
 internal class CatalogItemCategoryMenu(
-    /**
-     * 该菜单展示的 [CatalogItemCategory].
-     */
+    /** 该菜单展示的类别. */
     val category: CatalogItemCategory,
-    /**
-     * 该菜单的用户, 也就是正在查看该菜单的玩家.
-     */
+    /** 正在查看该菜单的玩家. */
     val viewer: Player,
 ) : CatalogItemMenu {
 
-    /**
-     * 菜单的 [BasicMenuSettings].
-     */
     private val settings: BasicMenuSettings = category.menuSettings
 
-    /**
-     * 菜单的 [PagedGui].
-     *
-     * - `.`: background
-     * - `<`: prev_page
-     * - `>`: next_page
-     * - `b`: back
-     * - `x`: display
-     */
-    private val primaryGui: PagedGui<Item> = PagedGui.items { builder ->
-        builder.setStructure(*settings.structure)
-        builder.addIngredient('.', BackgroundItem())
-        builder.addIngredient('<', PrevItem())
-        builder.addIngredient('>', NextItem())
-        builder.addIngredient('b', BackItem())
-        builder.addIngredient('x', category.contentMarker)
-        // 类别菜单所展示的物品
-        builder.setContent(category.items.map { itemRef -> DisplayItem(itemRef) })
-    }
+    private val primaryGui: PagedGui<Item> = PagedGui.itemsBuilder()
+        .setStructure(*settings.structure)
+        .addIngredient(
+            '.', Item.builder()
+                .setItemProvider { _ ->
+                    settings.getIcon("background").resolveToItemWrapper()
+                }
+        )
+        .addIngredient(
+            '<', BoundItem.pagedBuilder()
+                .setItemProvider { _, gui ->
+                    if (gui.page <= 0)
+                        settings.getIcon("background").resolveToItemWrapper()
+                    else
+                        settings.getIcon("prev_page").resolveToItemWrapper {
+                            standard {
+                                component("current_page", Component.text(gui.page + 1))
+                                component("total_page", Component.text(gui.pageCount))
+                            }
+                        }
+                }
+                .addClickHandler { _, gui, _ ->
+                    gui.page -= 1
+                }
+        )
+        .addIngredient(
+            '>', BoundItem.pagedBuilder()
+                .setItemProvider { _, gui ->
+                    if (gui.page >= gui.pageCount - 1) settings.getIcon("background").resolveToItemWrapper()
+                    else settings.getIcon("next_page").resolveToItemWrapper {
+                        standard {
+                            component("current_page", Component.text(gui.page + 1))
+                            component("total_page", Component.text(gui.pageCount))
+                        }
+                    }
+                }
+                .addClickHandler { _, gui, _ ->
+                    gui.page += 1
+                }
+        )
+        .addIngredient(
+            'b', Item.builder()
+                .setItemProvider { _ ->
+                    settings.getIcon("back").resolveToItemWrapper()
+                }
+                .addClickHandler { _, click ->
+                    CatalogItemMenuStacks.pop(click.player)
+                }
+                .build()
+        )
+        .addIngredient('x', category.contentMarker)
+        .setContent(category.items.map { itemRef ->
+            Item.builder()
+                .setItemProvider { _ ->
+                    ItemWrapper(itemRef.createItemStack())
+                }
+                .addClickHandler { _, click ->
+                    val clickType = click.clickType
+                    val player = click.player
+                    val preferredState = when (clickType) {
+                        ClickType.LEFT, ClickType.RIGHT -> LookupState.SOURCE
+                        ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> LookupState.USAGE
+                        else -> return@addClickHandler
+                    }
+                    // 兜底查询另一个方向: 允许 loot table / single source 类输入图标直接点开
+                    val fallbackState = if (preferredState == LookupState.SOURCE) LookupState.USAGE else LookupState.SOURCE
+                    val preferredGuis = CatalogItemNodeGuiManager.getGui(itemRef, preferredState)
+                    val (state, guis) = if (preferredGuis.isNotEmpty()) {
+                        preferredState to preferredGuis
+                    } else {
+                        fallbackState to CatalogItemNodeGuiManager.getGui(itemRef, fallbackState)
+                    }
+                    if (guis.isEmpty()) return@addClickHandler
+                    CatalogItemMenuStacks.push(viewer, CatalogItemFocusMenu(itemRef, state, viewer, guis))
+                }
+                .build()
+        })
+        .build()
 
-    /**
-     * 菜单的 [Window].
-     */
-    private val primaryWindow: Window = Window.single().apply {
-        setGui(primaryGui)
-        setViewer(viewer)
-        setTitle(settings.title)
-    }.build()
+    private val primaryWindow: Window = Window.builder()
+        .setUpperGui(primaryGui)
+        .setViewer(viewer)
+        .setTitle(settings.title)
+        .build()
 
     override fun open() {
         primaryWindow.open()
@@ -72,102 +115,5 @@ internal class CatalogItemCategoryMenu(
 
     override fun close() {
         primaryWindow.close()
-    }
-
-    /**
-     * 背景占位的图标.
-     */
-    inner class BackgroundItem : AbstractItem() {
-
-        override fun getItemProvider(): ItemProvider {
-            return settings.getSlotDisplay("background").resolveToItemWrapper()
-        }
-
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-
-        }
-    }
-
-    /**
-     * 上一页的图标.
-     */
-    inner class PrevItem : PageItem(false) {
-
-        override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            if (!getGui().hasPreviousPage()) {
-                return settings.getSlotDisplay("background").resolveToItemWrapper()
-            }
-            return settings.getSlotDisplay("prev_page").resolveToItemWrapper {
-                standard {
-                    component("current_page", Component.text(primaryGui.currentPage + 1))
-                    component("total_page", Component.text(primaryGui.pageAmount))
-                }
-            }
-        }
-    }
-
-    /**
-     * 下一页的图标.
-     */
-    inner class NextItem : PageItem(true) {
-
-        override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            if (!getGui().hasNextPage()) {
-                return settings.getSlotDisplay("background").resolveToItemWrapper()
-            }
-            return settings.getSlotDisplay("next_page").resolveToItemWrapper {
-                standard {
-                    component("current_page", Component.text(primaryGui.currentPage + 1))
-                    component("total_page", Component.text(primaryGui.pageAmount))
-                }
-            }
-        }
-    }
-
-    /**
-     * **返回** 的图标.
-     */
-    inner class BackItem : AbstractItem() {
-
-        override fun getItemProvider(): ItemProvider {
-            return settings.getSlotDisplay("back").resolveToItemWrapper()
-        }
-
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            CatalogItemMenuStacks.pop(player)
-        }
-    }
-
-    /**
-     * **展示物品** 的图标.
-     */
-    inner class DisplayItem(
-        val item: ItemRef,
-    ) : AbstractItem() {
-
-        override fun getItemProvider(): ItemProvider {
-            return ItemWrapper(item.createItemStack())
-        }
-
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            val preferredState = when (clickType) {
-                ClickType.LEFT, ClickType.RIGHT -> LookupState.SOURCE
-                ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> LookupState.USAGE
-                else -> return
-            }
-
-            // 兜底查询另一个方向: 允许像 loot table / single source 这类输入图标直接点开对应节点输出
-            val fallbackState = if (preferredState == LookupState.SOURCE) LookupState.USAGE else LookupState.SOURCE
-            val preferredGuis = CatalogItemNodeGuiManager.getGui(item, preferredState)
-            val (state, guis) = if (preferredGuis.isNotEmpty()) {
-                preferredState to preferredGuis
-            } else {
-                fallbackState to CatalogItemNodeGuiManager.getGui(item, fallbackState)
-            }
-
-            if (guis.isEmpty()) return
-
-            CatalogItemMenuStacks.push(viewer, CatalogItemFocusMenu(item, state, viewer, guis))
-        }
     }
 }

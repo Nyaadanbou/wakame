@@ -9,15 +9,13 @@ import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
 import cc.mewcraft.wakame.util.item.removeNBT
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
-import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.inventory.event.UpdateReason
+import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemWrapper
-import xyz.xenondevs.invui.item.impl.AbstractItem
 
 /**
  * 用于定制*单个*核孔核心的菜单, 需要被嵌入到 [ModdingMenu] 中.
@@ -30,20 +28,39 @@ internal class ReplaceMenu(
 ) {
 
     private val viewer: Player = parent.viewer
-    private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
-        setPreUpdateHandler(::onInputInventoryPreUpdate)
-        guiPriority = 10
+    private val inputSlot: VirtualInventory = VirtualInventory(1).apply {
+        addPreUpdateHandler(::onInputInventoryPreUpdate)
+        addPostUpdateHandler { e ->
+            // v2: newItem 不可变, 在 post-update handler 中重新渲染放入的物品
+            if (e.isAdd) {
+                val rendered = renderInputItem()
+                setItem(UpdateReason.SUPPRESSED, e.slot, rendered)
+            }
+        }
     }
 
-    val primaryGui: Gui = Gui.normal { builder ->
+    val primaryGui: Gui = Gui.builder()
         // a: 被定制对象的预览物品
         // b: 接收玩家输入的虚拟容器
         // *: 起视觉引导作用的物品
-        builder.setStructure("a * b")
-        builder.addIngredient('a', ViewItem(replace))
-        builder.addIngredient('b', inputSlot)
-        builder.addIngredient('*', parent.table.replaceMenuSettings.getSlotDisplay("compatibility_view").resolveToItemWrapper())
-    }
+        .setStructure("a * b")
+        .addIngredient(
+            'a', Item.builder()
+                .setItemProvider { _ ->
+                    val core = replace.core
+                    val coreId = replace.coreId
+                    val icon = CoreIcons.getItemStack(coreId, core)
+                    val resolved = parent.table.replaceMenuSettings.getIcon("core_view").resolve {
+                        standard { component("core_name", core.displayName) }
+                        folded("core_description", core.description)
+                    }
+                    resolved.applyInPlace(icon)
+                    ItemWrapper(icon)
+                }
+        )
+        .addIngredient('b', inputSlot)
+        .addIngredient('*', parent.table.replaceMenuSettings.getIcon("compatibility_view").resolveToItemWrapper())
+        .build()
 
     /**
      * 当输入容器中的物品发生*变化前*调用.
@@ -69,10 +86,7 @@ internal class ReplaceMenu(
             // 玩家尝试向 inputSlot 中添加物品:
             event.isAdd -> {
                 // 执行一次替换流程
-                replace.originalInput = newItem
-
-                // 重新渲染放入的物品
-                event.newItem = renderInputItem()
+                replace.originalInput = event.newItem
 
                 parent.refreshReplaceGuis(this)
                 parent.executeReforge()
@@ -128,7 +142,7 @@ internal class ReplaceMenu(
         if (usableInput == null) {
             // 耗材不可用于定制:
 
-            val resolved = parent.table.replaceMenuSettings.getSlotDisplay("core_unusable").resolve {
+            val resolved = parent.table.replaceMenuSettings.getIcon("core_unusable").resolve {
                 folded("result_description", replaceResult.description)
             }
 
@@ -149,7 +163,7 @@ internal class ReplaceMenu(
             ItemRenderers.MODDING_TABLE.render(usableInput, context)
 
             // 使用 SlotDisplay 再处理一遍
-            val resolved = parent.table.replaceMenuSettings.getSlotDisplay("core_usable").resolve {
+            val resolved = parent.table.replaceMenuSettings.getIcon("core_usable").resolve {
                 folded("item_lore", usableInput.fastLoreOrEmpty)
                 folded("result_description", replaceResult.description)
             }
@@ -159,26 +173,6 @@ internal class ReplaceMenu(
     }
 
     private fun setInputSlot(item: ItemStack?) {
-        inputSlot.setItemSilently(0, item)
-    }
-
-    private inner class ViewItem(
-        val replace: ModdingSession.Replace,
-    ) : AbstractItem() {
-        override fun getItemProvider(): ItemProvider {
-            val core = replace.core
-            val coreId = replace.coreId
-            val icon = CoreIcons.getItemStack(coreId, core)
-            val resolved = parent.table.replaceMenuSettings.getSlotDisplay("core_view").resolve {
-                standard { component("core_name", core.displayName) }
-                folded("core_description", core.description)
-            }
-            resolved.applyInPlace(icon)
-            return ItemWrapper(icon)
-        }
-
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            // NOP
-        }
+        inputSlot.setItem(UpdateReason.SUPPRESSED, 0, item)
     }
 }

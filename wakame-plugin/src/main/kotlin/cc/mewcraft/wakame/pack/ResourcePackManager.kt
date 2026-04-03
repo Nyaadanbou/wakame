@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.pack.generate.*
 import cc.mewcraft.wakame.util.formatSize
 import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mapEach
 import xyz.xenondevs.commons.provider.orElse
 import java.io.File

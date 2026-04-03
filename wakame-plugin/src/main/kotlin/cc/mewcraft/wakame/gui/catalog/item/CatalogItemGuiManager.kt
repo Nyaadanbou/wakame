@@ -12,23 +12,18 @@ import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.item.SlotDisplay
 import cc.mewcraft.wakame.item.resolveToItemWrapper
 import cc.mewcraft.wakame.util.ReloadableProperty
-import cc.mewcraft.wakame.util.runTaskTimer
 import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.*
-import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.gui.Markers
 import xyz.xenondevs.invui.gui.PagedGui
-import xyz.xenondevs.invui.gui.structure.Markers
-import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.BoundItem
+import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemWrapper
-import xyz.xenondevs.invui.item.impl.AbstractItem
-import xyz.xenondevs.invui.item.impl.SimpleItem
-import xyz.xenondevs.invui.item.impl.controlitem.PageItem
-import xyz.xenondevs.invui.window.AbstractWindow
 import java.text.DecimalFormat
 
 /**
@@ -38,14 +33,9 @@ import java.text.DecimalFormat
  */
 internal object CatalogItemNodeGuiManager {
 
-    /**
-     * [CatalogItemNodeGui] 的构造函数.
-     */
+    /** [CatalogItemNodeGui] 的构造函数. */
     private val GUI_CONSTRUCTORS: HashMap<Class<out CatalogItemNode>, (CatalogItemNode) -> CatalogItemNodeGui> = HashMap()
-
-    /**
-     * [CatalogItemNodeGui] 在图鉴展示时的优先级, 数字小的类型将被排在前面.
-     */
+    /** [CatalogItemNodeGui] 在图鉴展示时的优先级, 数字小的类型排在前面. */
     private val GUI_PRIORITIES: HashMap<Class<out CatalogItemNode>, Int> = HashMap()
 
     private val cachedGuis: HashMap<LookupKey, List<CatalogItemNodeGui>> by ReloadableProperty { HashMap(1024) }
@@ -117,22 +107,21 @@ internal object CatalogItemNodeGuiManager {
         }
     }
 
-
     /**
      * 创建烧制配方 [CatalogItemNodeGui] 的方法.
      * 烧制配方包括: 熔炉, 高炉, 烟熏炉, 营火配方.
      */
     private fun createCookingRecipeGui(node: CatalogItemCookingNode): CatalogItemNodeGui {
         val settings = node.menuCfg
-        val gui = Gui.normal { builder ->
-            builder.setStructure(*settings.structure)
-            builder.addIngredient('?', HintItem(settings))
-            builder.addIngredient('.', BackgroundItem(settings))
-            builder.addIngredient('!', CookingInfoItem(settings, node.cookingTime, node.experience))
-            builder.addIngredient('f', FuelItem(settings))
-            builder.addIngredient('i', DisplayItem(node.inputItems))
-            builder.addIngredient('o', DisplayItem(node.outputItems, node.recipe<CookingRecipe<*>>().result.amount))
-        }
+        val gui = Gui.builder()
+            .setStructure(*settings.structure)
+            .addIngredient('?', HintItem(settings))
+            .addIngredient('.', BackgroundItem(settings))
+            .addIngredient('!', CookingInfoItem(settings, node.cookingTime, node.experience))
+            .addIngredient('f', FuelItem(settings))
+            .addIngredient('i', DisplayItem(node.inputItems))
+            .addIngredient('o', DisplayItem(node.outputItems, node.recipe<CookingRecipe<*>>().result.amount))
+            .build()
         return CatalogItemNodeGui(settings.title, gui)
     }
 
@@ -141,25 +130,26 @@ internal object CatalogItemNodeGuiManager {
      */
     private fun createShapedRecipeGui(node: CatalogItemShapedNode): CatalogItemNodeGui {
         val settings = node.menuCfg
-        val gui = PagedGui.items { builder ->
-            builder.setStructure(*settings.structure)
-            builder.addIngredient('?', HintItem(settings))
-            builder.addIngredient('.', BackgroundItem(settings))
-            builder.addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-            builder.addIngredient('o', DisplayItem(node.outputItem, node.recipe<ShapedRecipe>().result.amount))
-
-            // 凑出9个格子里的字符, 排成一个字符串后打散
-            val chars = node.shape.map { it.padEnd(3, ' ') }
-                .let { it + List(3 - it.size) { "   " } }
-                .joinToString("")
-                .toCharArray()
-            // 转化为图标物品并放入gui
-            builder.setContent(chars.map {
-                if (it == ' ') return@map SimpleItem(ItemStack.empty())
-                val itemRefs = node.inputItems[it] as List<ItemRef>
-                return@map DisplayItem(itemRefs)
+        val gui = PagedGui.itemsBuilder()
+            .setStructure(*settings.structure)
+            .addIngredient('?', HintItem(settings))
+            .addIngredient('.', BackgroundItem(settings))
+            .addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+            .addIngredient('o', DisplayItem(node.outputItem, node.recipe<ShapedRecipe>().result.amount))
+            .setContent(run {
+                // 凑出9个格子里的字符, 排成一个字符串后打散
+                val chars = node.shape.map { it.padEnd(3, ' ') }
+                    .let { it + List(3 - it.size) { "   " } }
+                    .joinToString("")
+                    .toCharArray()
+                // 转化为图标物品并放入gui
+                chars.map {
+                    if (it == ' ') return@map Item.simple(ItemStack.empty())
+                    val itemRefs = node.inputItems[it] as List<ItemRef>
+                    return@map DisplayItem(itemRefs)
+                }
             })
-        }
+            .build()
         return CatalogItemNodeGui(settings.title, gui)
     }
 
@@ -169,14 +159,16 @@ internal object CatalogItemNodeGuiManager {
      */
     private fun createShapelessRecipeGui(node: CatalogItemShapelessNode): CatalogItemNodeGui {
         val settings = node.menuCfg
-        val gui = PagedGui.items { builder ->
-            builder.setStructure(*settings.structure)
-            builder.addIngredient('?', HintItem(settings))
-            builder.addIngredient('.', BackgroundItem(settings))
-            builder.addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-            builder.addIngredient('o', DisplayItem(node.outputItems, node.recipe<ShapelessRecipe>().result.amount))
-            builder.setContent(node.inputItems.map { DisplayItem(it) })
-        }
+        val gui = PagedGui.itemsBuilder()
+            .setStructure(*settings.structure)
+            .addIngredient('?', HintItem(settings))
+            .addIngredient('.', BackgroundItem(settings))
+            .addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+            .addIngredient('o', DisplayItem(node.outputItems, node.recipe<ShapelessRecipe>().result.amount))
+            .setContent(node.inputItems.map {
+                DisplayItem(it)
+            })
+            .build()
         return CatalogItemNodeGui(settings.title, gui)
     }
 
@@ -185,15 +177,15 @@ internal object CatalogItemNodeGuiManager {
      */
     private fun createSmithingTransformRecipeGui(node: CatalogItemSmithingTransformNode): CatalogItemNodeGui {
         val settings = node.menuCfg
-        val gui = PagedGui.items { builder ->
-            builder.setStructure(*settings.structure)
-            builder.addIngredient('?', HintItem(settings))
-            builder.addIngredient('.', BackgroundItem(settings))
-            builder.addIngredient('b', DisplayItem(node.baseItems))
-            builder.addIngredient('t', DisplayItem(node.templateItems))
-            builder.addIngredient('a', DisplayItem(node.additionItems))
-            builder.addIngredient('o', DisplayItem(node.outputItemRef, node.recipe<SmithingRecipe>().result.amount))
-        }
+        val gui = PagedGui.itemsBuilder()
+            .setStructure(*settings.structure)
+            .addIngredient('?', HintItem(settings))
+            .addIngredient('.', BackgroundItem(settings))
+            .addIngredient('b', DisplayItem(node.baseItems))
+            .addIngredient('t', DisplayItem(node.templateItems))
+            .addIngredient('a', DisplayItem(node.additionItems))
+            .addIngredient('o', DisplayItem(node.outputItemRef, node.recipe<SmithingRecipe>().result.amount))
+            .build()
         return CatalogItemNodeGui(settings.title, gui)
     }
 
@@ -202,16 +194,20 @@ internal object CatalogItemNodeGuiManager {
      */
     private fun createSmithingTrimRecipeGui(node: CatalogItemSmithingTrimNode): CatalogItemNodeGui {
         val settings = node.menuCfg
-        val gui = PagedGui.items { builder ->
-            builder.setStructure(*settings.structure)
-            builder.addIngredient('?', HintItem(settings))
-            builder.addIngredient('.', BackgroundItem(settings))
-            builder.addIngredient('b', DisplayItem(node.baseItems))
-            builder.addIngredient('t', DisplayItem(node.templateItems))
-            builder.addIngredient('a', DisplayItem(node.additionItems))
-            // 锻造台纹饰配方的输出槽显示一个固定物品
-            builder.addIngredient('r', TrimResultItem(settings))
-        }
+        val gui = PagedGui.itemsBuilder()
+            .setStructure(*settings.structure)
+            .addIngredient('?', HintItem(settings))
+            .addIngredient('.', BackgroundItem(settings))
+            .addIngredient('b', DisplayItem(node.baseItems))
+            .addIngredient('t', DisplayItem(node.templateItems))
+            .addIngredient('a', DisplayItem(node.additionItems))
+            .addIngredient(
+                'r', Item.builder()
+                    .setItemProvider { _ ->
+                        settings.getIcon("trim_result").resolveToItemWrapper()
+                    }
+            )
+            .build()
         return CatalogItemNodeGui(settings.title, gui)
     }
 
@@ -220,13 +216,13 @@ internal object CatalogItemNodeGuiManager {
      */
     private fun createStonecuttingRecipeGui(node: CatalogItemStonecuttingNode): CatalogItemNodeGui {
         val settings = node.menuCfg
-        val gui = PagedGui.items { builder ->
-            builder.setStructure(*settings.structure)
-            builder.addIngredient('?', HintItem(settings))
-            builder.addIngredient('.', BackgroundItem(settings))
-            builder.addIngredient('i', DisplayItem(node.inputItems))
-            builder.addIngredient('o', DisplayItem(node.outputItem, node.recipe<StonecuttingRecipe>().result.amount))
-        }
+        val gui = PagedGui.itemsBuilder()
+            .setStructure(*settings.structure)
+            .addIngredient('?', HintItem(settings))
+            .addIngredient('.', BackgroundItem(settings))
+            .addIngredient('i', DisplayItem(node.inputItems))
+            .addIngredient('o', DisplayItem(node.outputItem, node.recipe<StonecuttingRecipe>().result.amount))
+            .build()
         return CatalogItemNodeGui(settings.title, gui)
     }
 
@@ -235,16 +231,16 @@ internal object CatalogItemNodeGuiManager {
      */
     private fun createLootTableGui(node: CatalogItemLootTableNode): CatalogItemNodeGui {
         val settings = node.menuCfg
-        val gui = PagedGui.items { builder ->
-            builder.setStructure(*settings.structure)
-            builder.addIngredient('?', HintItem(settings))
-            builder.addIngredient('.', BackgroundItem(settings))
-            builder.addIngredient('<', PrevItem(settings))
-            builder.addIngredient('>', NextItem(settings))
-            builder.addIngredient('i', LootItem(node))
-            builder.addIngredient('o', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-            builder.setContent(node.lootItems.map(::DisplayItem))
-        }
+        val gui = PagedGui.itemsBuilder()
+            .setStructure(*settings.structure)
+            .addIngredient('?', HintItem(settings))
+            .addIngredient('.', BackgroundItem(settings))
+            .addIngredient('<', PrevPageItem(settings))
+            .addIngredient('>', NextPageItem(settings))
+            .addIngredient('i', Item.simple(SlotDisplay.get(node.inputIcon).resolveToItemWrapper()))
+            .addIngredient('o', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+            .setContent(node.lootItems.map(::DisplayItem))
+            .build()
         return CatalogItemNodeGui(settings.title, gui)
     }
 
@@ -256,26 +252,28 @@ internal object CatalogItemNodeGuiManager {
      */
     private fun createCraftingStationGui(node: CatalogItemCraftingStationNode): CatalogItemNodeGui {
         val settings = node.menuCfg
-        val gui = PagedGui.items { builder ->
-            builder.setStructure(*settings.structure)
-            builder.addIngredient('?', HintItem(settings))
-            builder.addIngredient('.', BackgroundItem(settings))
-            builder.addIngredient('<', PrevItem(settings))
-            builder.addIngredient('>', NextItem(settings))
-            builder.addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-            builder.setContent(node.inputChoices.map { choice ->
+        val gui = PagedGui.itemsBuilder()
+            .setStructure(*settings.structure)
+            .addIngredient('?', HintItem(settings))
+            .addIngredient('.', BackgroundItem(settings))
+            .addIngredient('<', PrevPageItem(settings))
+            .addIngredient('>', NextPageItem(settings))
+            .addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+            .setContent(node.inputChoices.map { choice ->
                 when (choice) {
                     is ItemChoice -> DisplayItem(choice.item, choice.amount)
-                    is ExpChoice -> SimpleItem(ItemStack(Material.EXPERIENCE_BOTTLE, choice.amount.coerceIn(1, 64)))
+                    is ExpChoice -> Item.simple(ItemStack(Material.EXPERIENCE_BOTTLE, choice.amount.coerceIn(1, 64)))
                 }
             })
-            val output = node.outputResult
-            if (output is ItemResult) {
-                builder.addIngredient('o', DisplayItem(output.item, output.amount))
-            } else {
-                builder.addIngredient('o', SimpleItem(ItemStack.empty()))
+            .apply {
+                val output = node.outputResult
+                if (output is ItemResult) {
+                    addIngredient('o', DisplayItem(output.item, output.amount))
+                } else {
+                    addIngredient('o', Item.simple(ItemStack.empty()))
+                }
             }
-        }
+            .build()
         return CatalogItemNodeGui(settings.title, gui)
     }
 
@@ -286,207 +284,87 @@ internal object CatalogItemNodeGuiManager {
      */
     private fun createSingleSourceGui(node: CatalogItemSingleSourceNode): CatalogItemNodeGui {
         val settings = node.menuCfg
-        val gui = PagedGui.items { builder ->
-            builder.setStructure(*settings.structure)
-            builder.addIngredient('?', HintItem(settings))
-            builder.addIngredient('.', BackgroundItem(settings))
-            builder.addIngredient('<', PrevItem(settings))
-            builder.addIngredient('>', NextItem(settings))
-            builder.addIngredient('i', SingleSourceItem(node))
-            builder.addIngredient('o', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-            builder.setContent(node.outputItems.map(::DisplayItem))
-        }
+        val gui = PagedGui.itemsBuilder()
+            .setStructure(*settings.structure)
+            .addIngredient('?', HintItem(settings))
+            .addIngredient('.', BackgroundItem(settings))
+            .addIngredient('<', PrevPageItem(settings))
+            .addIngredient('>', NextPageItem(settings))
+            .addIngredient('i', Item.simple(SlotDisplay.get(node.inputIcon).resolveToItemWrapper()))
+            .addIngredient('o', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+            .setContent(node.outputItems.map(::DisplayItem))
+            .build()
         return CatalogItemNodeGui(settings.title, gui)
     }
 }
 
-/**
- * `提示` 占位的图标.
- */
-private class HintItem(
-    val settings: BasicMenuSettings,
-) : AbstractItem() {
+// --- Helper Item factories ---
 
-    override fun getItemProvider(): ItemProvider {
-        return settings.getSlotDisplay("hint").resolveToItemWrapper()
-    }
+private fun HintItem(settings: BasicMenuSettings): Item =
+    Item.builder()
+        .setItemProvider { _ ->
+            settings.getIcon("hint").resolveToItemWrapper()
+        }
+        .build()
 
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+private fun BackgroundItem(settings: BasicMenuSettings): Item =
+    Item.builder()
+        .setItemProvider { _ ->
+            settings.getIcon("background").resolveToItemWrapper()
+        }.build()
 
-    }
-}
-
-/**
- * `背景` 占位的图标.
- */
-private class BackgroundItem(
-    val settings: BasicMenuSettings,
-) : AbstractItem() {
-
-    override fun getItemProvider(): ItemProvider {
-        return settings.getSlotDisplay("background").resolveToItemWrapper()
-    }
-
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-
-    }
-}
-
-/**
- * `烧制信息` 的图标. 烧制配方使用.
- */
-private class CookingInfoItem(
-    val settings: BasicMenuSettings,
-    val cookingTime: Int,
-    val exp: Float,
-) : AbstractItem() {
-
-    override fun getItemProvider(): ItemProvider {
-        return settings.getSlotDisplay("cooking_info").resolveToItemWrapper {
-            standard {
-                component("cooking_time", Component.text(DecimalFormat("#.#").format(cookingTime / 20.0)))
-                component("exp", Component.text(DecimalFormat("#.##").format(exp)))
+private fun CookingInfoItem(settings: BasicMenuSettings, cookingTime: Int, exp: Float): Item =
+    Item.builder()
+        .setItemProvider { _ ->
+            settings.getIcon("cooking_info").resolveToItemWrapper {
+                standard {
+                    component("cooking_time", Component.text(DecimalFormat("#.#").format(cookingTime / 20.0)))
+                    component("exp", Component.text(DecimalFormat("#.##").format(exp)))
+                }
             }
         }
-    }
+        .build()
 
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-
-    }
-}
-
-/**
- * `燃料` 的图标. 烧制配方使用.
- */
-private class FuelItem(
-    val settings: BasicMenuSettings,
-) : AbstractItem() {
-
-    override fun getItemProvider(): ItemProvider {
-        return settings.getSlotDisplay("fuel").resolveToItemWrapper()
-    }
-
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-
-    }
-}
-
-/**
- * `带纹饰的盔甲` 的图标.
- * 锻造台纹饰配方使用.
- */
-private class TrimResultItem(
-    val settings: BasicMenuSettings,
-) : AbstractItem() {
-    override fun getItemProvider(): ItemProvider {
-        return settings.getSlotDisplay("trim_result").resolveToItemWrapper()
-    }
-
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-
-    }
-}
-
-/**
- * **战利品表占位输入** 的图标.
- */
-class LootItem(
-    private val node: CatalogItemLootTableNode,
-) : AbstractItem() {
-
-    private val itemProvider = SlotDisplay.get(node.inputIcon).resolveToItemWrapper()
-
-    override fun getItemProvider(): ItemProvider {
-        return itemProvider
-    }
-
-    override fun handleClick(p0: ClickType, p1: Player, p2: InventoryClickEvent) {
-
-    }
-}
-
-/**
- * **单源节点占位输入** 的图标.
- */
-private class SingleSourceItem(
-    private val node: CatalogItemSingleSourceNode,
-) : AbstractItem() {
-
-    private val itemProvider = SlotDisplay.get(node.inputIcon).resolveToItemWrapper()
-
-    override fun getItemProvider(): ItemProvider {
-        return itemProvider
-    }
-
-    override fun handleClick(p0: ClickType, p1: Player, p2: InventoryClickEvent) {
-
-    }
-}
-
-/**
- * `上一页` 的图标.
- */
-private class PrevItem(
-    val settings: BasicMenuSettings,
-) : PageItem(false) {
-
-    override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-        if (!getGui().hasPreviousPage()) {
-            return settings.getSlotDisplay("background").resolveToItemWrapper()
+private fun FuelItem(settings: BasicMenuSettings): Item =
+    Item.builder()
+        .setItemProvider { _ ->
+            settings.getIcon("fuel").resolveToItemWrapper()
         }
-        return settings.getSlotDisplay("prev_page").resolveToItemWrapper {
-            standard {
-                component("current_page", Component.text(gui.currentPage + 1))
-                component("total_page", Component.text(gui.pageAmount))
+        .build()
+
+private fun PrevPageItem(settings: BasicMenuSettings): BoundItem.Builder<PagedGui<*>> =
+    BoundItem.pagedBuilder()
+        .setItemProvider { _, gui ->
+            if (gui.page <= 0)
+                settings.getIcon("background").resolveToItemWrapper()
+            else
+                settings.getIcon("prev_page").resolveToItemWrapper {
+                    standard {
+                        component("current_page", Component.text(gui.page + 1))
+                        component("total_page", Component.text(gui.pageCount))
+                    }
+                }
+        }
+        .addClickHandler { _, gui, _ ->
+            gui.page -= 1
+        }
+
+private fun NextPageItem(settings: BasicMenuSettings): BoundItem.Builder<PagedGui<*>> =
+    BoundItem.pagedBuilder()
+        .setItemProvider { _, gui ->
+            if (gui.page >= gui.pageCount - 1) settings.getIcon("background").resolveToItemWrapper()
+            else settings.getIcon("next_page").resolveToItemWrapper {
+                standard {
+                    component("current_page", Component.text(gui.page + 1))
+                    component("total_page", Component.text(gui.pageCount))
+                }
             }
         }
-    }
-}
-
-/**
- * `下一页` 的图标.
- */
-private class NextItem(
-    val settings: BasicMenuSettings,
-) : PageItem(true) {
-
-    override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-        if (!getGui().hasNextPage()) {
-            return settings.getSlotDisplay("background").resolveToItemWrapper()
+        .addClickHandler { _, gui, _ ->
+            gui.page += 1
         }
-        return settings.getSlotDisplay("next_page").resolveToItemWrapper {
-            standard {
-                component("current_page", Component.text(gui.currentPage + 1))
-                component("total_page", Component.text(gui.pageAmount))
-            }
-        }
-    }
-}
 
-/**
- * `配方展示物品` 的图标.
- *
- * 输入物品: 单个物品和多个物品循环.
- * 输出物品: 单个物品.
- *
- * 直接点击 = 查找该物品的获取方式.
- * Shift 点击 = 查找该物品的用途.
- */
-@Suppress("FunctionName")
-private fun DisplayItem(items: List<ItemRef>, amount: Int = 1): AbstractItem {
-    if (items.isEmpty())
-        return SimpleItem(ItemStack.empty())
-    return if (items.size == 1) {
-        DisplayItem(items.first(), amount)
-    } else {
-        MultiDisplayItem(items, amount)
-    }
-}
-
-@Suppress("FunctionName")
-private fun DisplayItem(items: ItemRef, amount: Int = 1): AbstractItem {
-    return SingleDisplayItem(items, amount)
-}
+// --- Display Item factories ---
 
 /**
  * 方便函数.
@@ -518,71 +396,47 @@ private fun handleClickCommons(clickType: ClickType, player: Player, item: ItemR
     CatalogItemMenuStacks.push(player, CatalogItemFocusMenu(item, lookupState, player, catalogNodeGuis))
 }
 
-private class SingleDisplayItem(
-    val item: ItemRef,
-    val amount: Int,
-) : AbstractItem() {
-
-    override fun getItemProvider(): ItemProvider {
-        return ItemWrapper(item.createItemStack(amount))
-    }
-
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        handleClickCommons(clickType, player, item)
+@Suppress("FunctionName")
+private fun DisplayItem(items: List<ItemRef>, amount: Int = 1): Item {
+    if (items.isEmpty())
+        return Item.simple(ItemStack.empty())
+    return if (items.size == 1) {
+        DisplayItem(items.first(), amount)
+    } else {
+        MultiDisplayItem(items, amount)
     }
 }
 
-private class MultiDisplayItem(
-    val items: List<ItemRef>,
-    /**
-     * 对于循环物品, 所有物品数量相同.
-     */
-    val amount: Int,
-) : AbstractItem() {
-
-    private var task: BukkitTask? = null
-    private var state = 0
-
-    fun start() {
-        task?.cancel()
-        // 物品循环周期固定为 20t
-        task = runTaskTimer(0L, 20L, ::cycle)
-    }
-
-    fun cancel() {
-        task?.cancel()
-        task = null
-    }
-
-    private fun cycle() {
-        ++state
-        if (state == items.size) {
-            state = 0
+@Suppress("FunctionName")
+private fun DisplayItem(item: ItemRef, amount: Int = 1): Item {
+    return Item.builder()
+        .setItemProvider { _ ->
+            ItemWrapper(item.createItemStack(amount))
         }
-        notifyWindows()
-    }
-
-    override fun getItemProvider(): ItemProvider {
-        return ItemWrapper(items[state].createItemStack(amount))
-    }
-
-    override fun addWindow(window: AbstractWindow) {
-        super.addWindow(window)
-        if (task == null) {
-            start()
+        .addClickHandler { _, click ->
+            handleClickCommons(click.clickType, click.player, item)
         }
-    }
+        .build()
+}
 
-    override fun removeWindow(window: AbstractWindow) {
-        super.removeWindow(window)
-        if (windows.isEmpty() && task != null) {
-            cancel()
+/**
+ * Multi-item cycling display. Uses InvUI's built-in [Item.Builder.updatePeriodically]
+ * to cycle through items. The periodic update is lifecycle-managed by InvUI and
+ * automatically stops when the item is removed from all windows.
+ */
+private fun MultiDisplayItem(items: List<ItemRef>, amount: Int): Item {
+    val period = 20
+    return Item.builder()
+        .setItemProvider { _ ->
+            val state = (Bukkit.getCurrentTick() / period) % items.size
+            ItemWrapper(items[state].createItemStack(amount))
         }
-    }
-
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        handleClickCommons(clickType, player, items[state])
-    }
+        .addClickHandler { _, click ->
+            val state = (Bukkit.getCurrentTick() / period) % items.size
+            handleClickCommons(click.clickType, click.player, items[state])
+        }
+        .updatePeriodically(period)
+        .build()
 }
 
 internal enum class LookupState {
