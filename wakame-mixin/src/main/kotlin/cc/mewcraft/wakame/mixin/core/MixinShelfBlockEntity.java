@@ -22,7 +22,7 @@ public class MixinShelfBlockEntity {
     ///
     /// 但由于没有直接的方式获取 [ClientboundLevelChunkWithLightPacket#chunkData] 中的
     /// [ClientboundLevelChunkPacketData#blockEntitiesData], 发包修改这一块有点麻烦.
-    /// 其次, [ClientboundLevelChunkPacketData.BlockEntityInfo] 中的数据是原始 NBT,
+    /// 其次, {@code ClientboundLevelChunkPacketData.BlockEntityInfo} 中的数据是原始 NBT,
     /// 如果要修改还得 decode 成 [ItemStack], 修改, 再 encode 回去, 性能上损失较大.
     @ModifyArg(
             method = "getUpdateTag",
