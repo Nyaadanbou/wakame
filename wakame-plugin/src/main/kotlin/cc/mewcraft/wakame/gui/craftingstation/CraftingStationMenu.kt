@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
 import cc.mewcraft.wakame.item.resolveToItemWrapper
 import net.kyori.adventure.extra.kotlin.text
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -56,8 +57,13 @@ internal class CraftingStationMenu(
         )
         .addIngredient(
             '<', BoundItem.pagedBuilder()
-                .setItemProvider { _, _ ->
-                    settings.getIcon("prev_page").resolveToItemWrapper()
+                .setItemProvider { _, gui ->
+                    settings.getIcon("prev_page").resolveToItemWrapper {
+                        standard {
+                            component("current_page", Component.text(gui.page + 1))
+                            component("total_page", Component.text(gui.pageCount))
+                        }
+                    }
                 }
                 .addClickHandler { _, gui, _ ->
                     gui.page -= 1
@@ -65,8 +71,13 @@ internal class CraftingStationMenu(
         )
         .addIngredient(
             '>', BoundItem.pagedBuilder()
-                .setItemProvider { _, _ ->
-                    settings.getIcon("next_page").resolveToItemWrapper()
+                .setItemProvider { _, gui ->
+                    settings.getIcon("next_page").resolveToItemWrapper {
+                        standard {
+                            component("current_page", Component.text(gui.page + 1))
+                            component("total_page", Component.text(gui.pageCount))
+                        }
+                    }
                 }
                 .addClickHandler { _, gui, _ ->
                     gui.page += 1

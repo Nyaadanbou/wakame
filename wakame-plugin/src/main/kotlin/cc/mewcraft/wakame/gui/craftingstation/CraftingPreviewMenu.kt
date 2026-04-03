@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.gui.craftingstation
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.resolveToItemWrapper
+import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import xyz.xenondevs.invui.gui.Markers
@@ -39,7 +40,12 @@ internal class CraftingPreviewMenu(
                     if (gui.page <= 0)
                         settings.getIcon("background").resolveToItemWrapper()
                     else
-                        settings.getIcon("prev_page").resolveToItemWrapper()
+                        settings.getIcon("prev_page").resolveToItemWrapper {
+                            standard {
+                                component("current_page", Component.text(gui.page + 1))
+                                component("total_page", Component.text(gui.pageCount))
+                            }
+                        }
                 }
                 .addClickHandler { _, gui, _ ->
                     gui.page -= 1
@@ -48,8 +54,15 @@ internal class CraftingPreviewMenu(
         .addIngredient(
             '>', BoundItem.pagedBuilder()
                 .setItemProvider { _, gui ->
-                    if (gui.page >= gui.pageCount - 1) settings.getIcon("background").resolveToItemWrapper()
-                    else settings.getIcon("next_page").resolveToItemWrapper()
+                    if (gui.page >= gui.pageCount - 1)
+                        settings.getIcon("background").resolveToItemWrapper()
+                    else
+                        settings.getIcon("next_page").resolveToItemWrapper {
+                            standard {
+                                component("current_page", Component.text(gui.page + 1))
+                                component("total_page", Component.text(gui.pageCount))
+                            }
+                        }
                 }
                 .addClickHandler { _, gui, _ ->
                     gui.page += 1
