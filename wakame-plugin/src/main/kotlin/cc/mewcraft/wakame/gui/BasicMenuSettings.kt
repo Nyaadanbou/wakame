@@ -51,7 +51,7 @@ data class BasicMenuSettings(
         return SlotDisplay.get(itemId)
     }
 
-    @Deprecated("Use getIcon")
+    @Deprecated("Use getIcon", replaceWith = ReplaceWith("getIcon(id)"))
     fun getSlotDisplay(id: String): SlotDisplay {
         return getIcon(id)
     }

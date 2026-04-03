@@ -129,7 +129,7 @@ internal data class ItemChoice(
         itemStack.render()
 
         // 解析展示用的物品堆叠信息
-        val slotDisplayResolved = settings.getSlotDisplay("choice").resolve {
+        val slotDisplayResolved = settings.getIcon("choice").resolve {
             standard { component("item_name", itemStack.itemNameOrType) }
             folded("item_lore", itemStack.fastLoreOrEmpty)
         }

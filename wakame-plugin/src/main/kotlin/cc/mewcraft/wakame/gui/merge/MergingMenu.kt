@@ -19,8 +19,8 @@ import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
+import xyz.xenondevs.invui.inventory.event.UpdateReason
 import xyz.xenondevs.invui.window.Window
-import xyz.xenondevs.invui.window.type.context.setTitle
 import kotlin.properties.Delegates
 
 internal class MergingMenu(
@@ -48,34 +48,49 @@ internal class MergingMenu(
 
     private val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.MERING_LOG_PREFIX)
 
-    private val inputSlot1: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
-        guiPriority = 3
-        setPreUpdateHandler { e -> onInputSlotPreUpdate(e, InputSlot.INPUT1) }
+    private val inputSlot1: VirtualInventory = VirtualInventory(1).apply {
+        addPreUpdateHandler { e ->
+            onInputSlotPreUpdate(e, InputSlot.INPUT1)
+        }
+        addPostUpdateHandler { e ->
+            if (e.isAdd) {
+                val added = e.newItem ?: return@addPostUpdateHandler
+                val rendered = renderInputSlot(added)
+                setItem(UpdateReason.SUPPRESSED, e.slot, rendered)
+            }
+        }
     }
-    private val inputSlot2: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
-        guiPriority = 2
-        setPreUpdateHandler { e -> onInputSlotPreUpdate(e, InputSlot.INPUT2) }
+    private val inputSlot2: VirtualInventory = VirtualInventory(1).apply {
+        addPreUpdateHandler { e ->
+            onInputSlotPreUpdate(e, InputSlot.INPUT2)
+        }
+        addPostUpdateHandler { e ->
+            if (e.isAdd) {
+                val added = e.newItem ?: return@addPostUpdateHandler
+                val rendered = renderInputSlot(added)
+                setItem(UpdateReason.SUPPRESSED, e.slot, rendered)
+            }
+        }
     }
-    private val outputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
-        guiPriority = 1
-        setPreUpdateHandler(::onOutputSlotPreUpdate)
+    private val outputSlot: VirtualInventory = VirtualInventory(1).apply {
+        addPreUpdateHandler(::onOutputSlotPreUpdate)
     }
 
-    private val primaryGui: Gui = Gui.normal { builder ->
-        builder.setStructure(*table.primaryMenuSettings.structure)
-        builder.addIngredient('.', table.primaryMenuSettings.getSlotDisplay("background").resolveToItemWrapper())
-        builder.addIngredient('a', inputSlot1)
-        builder.addIngredient('b', inputSlot2)
-        builder.addIngredient('c', outputSlot, table.primaryMenuSettings.getSlotDisplay("output_empty").resolveToItemWrapper())
-    }
+    private val primaryGui: Gui = Gui.builder()
+        .setStructure(*table.primaryMenuSettings.structure)
+        .addIngredient('.', table.primaryMenuSettings.getIcon("background").resolveToItemWrapper())
+        .addIngredient('a', inputSlot1)
+        .addIngredient('b', inputSlot2)
+        .addIngredient('c', outputSlot, table.primaryMenuSettings.getIcon("output_empty").resolveToItemWrapper())
+        .build()
 
-    private val primaryWindow: Window = Window.single { builder ->
-        builder.setGui(primaryGui)
-        builder.setTitle(table.primaryMenuSettings.title)
-        builder.setViewer(viewer)
-        builder.addOpenHandler(::onWindowOpen)
-        builder.addCloseHandler(::onWindowClose)
-    }
+    private val primaryWindow: Window = Window.builder()
+        .setUpperGui(primaryGui)
+        .setTitle(table.primaryMenuSettings.title)
+        .setViewer(viewer)
+        .addOpenHandler(::onWindowOpen)
+        .addCloseHandler { onWindowClose() }
+        .build()
 
     private val playerInventorySuppressor = PlayerInventorySuppressor(viewer)
 
@@ -109,7 +124,7 @@ internal class MergingMenu(
             }
 
             e.isAdd -> {
-                val added = newItem?.takeIf { it.isKoish } ?: run {
+                val added = e.newItem?.takeIf { it.isKoish } ?: run {
                     e.isCancelled = true
                     viewer.sendMessage(TranslatableMessages.MSG_ERR_NOT_AUGMENT_CORE)
                     return
@@ -125,8 +140,7 @@ internal class MergingMenu(
                     }
                 }
 
-                // 重新渲染放入容器的物品
-                e.newItem = renderInputSlot(added)
+                // v2: newItem 不可变, 渲染由 post-update handler 处理
 
                 confirmed = false
                 executeReforge()
@@ -179,7 +193,7 @@ internal class MergingMenu(
 
                     // 玩家必须有足够的资源
                     if (!reforgeResult.reforgeCost.test(viewer)) {
-                        setOutputSlot(table.primaryMenuSettings.getSlotDisplay("output_insufficient_resource").resolveToItemStack())
+                        setOutputSlot(table.primaryMenuSettings.getIcon("output_insufficient_resource").resolveToItemStack())
                         return
                     }
 
@@ -244,7 +258,7 @@ internal class MergingMenu(
             ItemRenderers.MERGING_TABLE.render(output, MergingTableContext.MergeOutputSlot(session))
 
             val slotDisplayId = if (confirmed) "output_ok_confirmed" else "output_ok_unconfirmed"
-            val slotDisplayResolved = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolve {
+            val slotDisplayResolved = table.primaryMenuSettings.getIcon(slotDisplayId).resolve {
                 folded("item_lore", output.fastLoreOrEmpty)
                 folded("type_description", result.reforgeType.description)
                 folded("cost_description", result.reforgeCost.description)
@@ -253,7 +267,7 @@ internal class MergingMenu(
 
             return slotDisplayResolved.applyInPlace(output)
         } else {
-            return table.primaryMenuSettings.getSlotDisplay("output_failure").resolveToItemStack {
+            return table.primaryMenuSettings.getIcon("output_failure").resolveToItemStack {
                 // 这里仅仅解析 result_description 告诉玩家为什么合并失败.
                 // 其他的信息, 比如[合并类型]没有必要在合并失败的时候显示出来.
                 folded("result_description", result.description)
@@ -283,15 +297,15 @@ internal class MergingMenu(
 
     @Suppress("SameParameterValue")
     private fun setInputSlot1(item: ItemStack?) {
-        inputSlot1.setItemSilently(0, item)
+        inputSlot1.setItem(UpdateReason.SUPPRESSED, 0, item)
     }
 
     @Suppress("SameParameterValue")
     private fun setInputSlot2(item: ItemStack?) {
-        inputSlot2.setItemSilently(0, item)
+        inputSlot2.setItem(UpdateReason.SUPPRESSED, 0, item)
     }
 
     private fun setOutputSlot(item: ItemStack?) {
-        outputSlot.setItemSilently(0, item)
+        outputSlot.setItem(UpdateReason.SUPPRESSED, 0, item)
     }
 }

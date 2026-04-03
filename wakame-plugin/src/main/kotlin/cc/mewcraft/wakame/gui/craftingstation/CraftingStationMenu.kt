@@ -11,17 +11,13 @@ import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.gui.Markers
 import xyz.xenondevs.invui.gui.PagedGui
-import xyz.xenondevs.invui.gui.structure.Markers
+import xyz.xenondevs.invui.item.BoundItem
 import xyz.xenondevs.invui.item.Item
-import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
-import xyz.xenondevs.invui.item.impl.AbstractItem
-import xyz.xenondevs.invui.item.impl.controlitem.PageItem
 import xyz.xenondevs.invui.window.Window
-import xyz.xenondevs.invui.window.type.context.setTitle
 
 internal class CraftingStationMenu(
     /**
@@ -49,27 +45,43 @@ internal class CraftingStationMenu(
 
     /**
      * 合成站菜单的 [Gui].
-     *
-     * - `.`: background
-     * - `x`: recipe
-     * - `<`: prev_page
-     * - `>`: next_page
      */
-    private val primaryGui: PagedGui<Item> = PagedGui.items { builder ->
-        builder.setStructure(*settings.structure)
-        builder.addIngredient('.', BackgroundItem())
-        builder.addIngredient('<', PrevItem())
-        builder.addIngredient('>', NextItem())
-        builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-    }
+    private val primaryGui: PagedGui<Item> = PagedGui.itemsBuilder()
+        .setStructure(*settings.structure)
+        .addIngredient(
+            '.', Item.builder()
+                .setItemProvider { _ ->
+                    settings.getIcon("background").resolveToItemWrapper()
+                }
+        )
+        .addIngredient(
+            '<', BoundItem.pagedBuilder()
+                .setItemProvider { _, _ ->
+                    settings.getIcon("prev_page").resolveToItemWrapper()
+                }
+                .addClickHandler { _, gui, _ ->
+                    gui.page -= 1
+                }
+        )
+        .addIngredient(
+            '>', BoundItem.pagedBuilder()
+                .setItemProvider { _, _ ->
+                    settings.getIcon("next_page").resolveToItemWrapper()
+                }
+                .addClickHandler { _, gui, _ ->
+                    gui.page += 1
+                }
+        )
+        .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+        .build()
 
     /**
      * 合成站菜单的 [Window].
      */
-    private val primaryWindow: Window.Builder.Normal.Single = Window.single().apply {
-        setGui(primaryGui)
+    private val primaryWindowBuilder: Window.Builder.Normal.Split = Window.builder().apply {
+        setUpperGui(primaryGui)
         addOpenHandler(::onWindowOpen)
-        addCloseHandler(::onWindowClose)
+        addCloseHandler { onWindowClose() }
     }
 
     private val playerInventorySuppressor = PlayerInventorySuppressor(viewer)
@@ -80,8 +92,8 @@ internal class CraftingStationMenu(
      */
     fun update() {
         // 排序已在 StationSession 的迭代器中实现
-        primaryGui.setContent(stationSession.getRecipeMatcherResults().map(::RecipeItem))
-        primaryWindow.setTitle(settings.title) // TODO slot 背景颜色红绿显示
+        primaryGui.setContent(stationSession.getRecipeMatcherResults().map(::createRecipeItem))
+        primaryWindowBuilder.setTitle(settings.title)
     }
 
     /**
@@ -95,7 +107,7 @@ internal class CraftingStationMenu(
      * 向指定玩家打开合成站的主界面.
      */
     fun open() {
-        primaryWindow.open(viewer)
+        primaryWindowBuilder.open(viewer)
     }
 
     private fun onWindowOpen() {
@@ -107,132 +119,93 @@ internal class CraftingStationMenu(
     }
 
     /**
-     * 背景占位的图标.
-     */
-    inner class BackgroundItem : AbstractItem() {
-        override fun getItemProvider(): ItemProvider {
-            return settings.getSlotDisplay("background").resolveToItemWrapper()
-        }
-
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            // do nothing
-        }
-    }
-
-    /**
-     * 上一页的图标.
-     */
-    inner class PrevItem : PageItem(false) {
-        override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            return settings.getSlotDisplay("prev_page").resolveToItemWrapper()
-        }
-    }
-
-    /**
-     * 下一页的图标.
-     */
-    inner class NextItem : PageItem(true) {
-        override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            return settings.getSlotDisplay("next_page").resolveToItemWrapper()
-        }
-    }
-
-    /**
      * 展示一个配方的图标.
      */
-    inner class RecipeItem(
-        private val recipeMatcherResult: RecipeMatcherResult,
-    ) : AbstractCraftItem() {
-        override fun getItemProvider(): ItemProvider {
-            return ItemWrapper(recipeMatcherResult.getListingDisplay(settings))
-        }
-
-        private fun updateMenu() {
-            // 刷新会话中的配方匹配结果
-            stationSession.updateRecipeMatcherResults()
-            // 刷新菜单Gui
-            update()
-        }
-
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            when (clickType) {
-                // 左键预览
-                ClickType.LEFT -> {
-                    CraftingPreviewMenu(this@CraftingStationMenu, recipeMatcherResult.recipe, player).open()
-                }
-
-                // 右键合成
-                ClickType.RIGHT -> {
-                    val stationRecipe = recipeMatcherResult.recipe
-                    if (stationRecipe.match(player).isAllowed) {
-                        tryCraft(stationRecipe, player)
-                    } else {
-                        notifyFail(player)
+    private fun createRecipeItem(recipeMatcherResult: RecipeMatcherResult): Item {
+        return Item.builder()
+            .setItemProvider { _ ->
+                ItemWrapper(recipeMatcherResult.getListingDisplay(settings))
+            }
+            .addClickHandler { _, click ->
+                val clickType = click.clickType
+                val player = click.player
+                when (clickType) {
+                    // 左键预览
+                    ClickType.LEFT -> {
+                        val menu = CraftingPreviewMenu(this, recipeMatcherResult.recipe, player)
+                        menu.open()
                     }
-
-                    updateMenu()
-                }
-
-                // 潜行合成8次
-                ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> {
-                    val stationRecipe = recipeMatcherResult.recipe
-                    var count = 0
-                    if (stationRecipe.match(player).isAllowed) {
-                        do {
+                    // 右键合成
+                    ClickType.RIGHT -> {
+                        val stationRecipe = recipeMatcherResult.recipe
+                        if (stationRecipe.match(player).isAllowed) {
                             tryCraft(stationRecipe, player)
-                            count++
-                        } while (stationRecipe.match(player).isAllowed && count < 8)
-                    } else {
-                        notifyFail(player)
+                        } else {
+                            notifyFail(player)
+                        }
+                        updateMenu()
+                    }
+                    // 潜行合成8次
+                    ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> {
+                        val stationRecipe = recipeMatcherResult.recipe
+                        var count = 0
+                        if (stationRecipe.match(player).isAllowed) {
+                            do {
+                                tryCraft(stationRecipe, player)
+                                count++
+                            } while (stationRecipe.match(player).isAllowed && count < 8)
+                        } else {
+                            notifyFail(player)
+                        }
+                        updateMenu()
+                    }
+                    // 丢弃一键合成全部
+                    ClickType.DROP, ClickType.CONTROL_DROP -> {
+                        val stationRecipe = recipeMatcherResult.recipe
+                        if (stationRecipe.match(player).isAllowed) {
+                            do {
+                                tryCraft(stationRecipe, player)
+                            } while (stationRecipe.match(player).isAllowed)
+                        } else {
+                            notifyFail(player)
+                        }
+                        updateMenu()
                     }
 
-                    updateMenu()
-                }
-
-                // 丢弃一键合成全部
-                ClickType.DROP, ClickType.CONTROL_DROP -> {
-                    val stationRecipe = recipeMatcherResult.recipe
-                    if (stationRecipe.match(player).isAllowed) {
-                        do {
-                            tryCraft(stationRecipe, player)
-                        } while (stationRecipe.match(player).isAllowed)
-                    } else {
-                        notifyFail(player)
+                    else -> {
+                        /* do nothing */
                     }
-
-                    updateMenu()
-                }
-
-                else -> {
-                    // do nothing
                 }
             }
-        }
+            .build()
+    }
+
+    private fun updateMenu() {
+        stationSession.updateRecipeMatcherResults()
+        update()
     }
 }
 
 /**
- * 封装了合成逻辑的一个抽象 [Item].
+ * 封装了合成逻辑的工具函数.
  */
-internal abstract class AbstractCraftItem : AbstractItem() {
-    fun tryCraft(recipe: Recipe, player: Player) {
-        // 无法正常执行消耗就抛出异常中断代码执行, 不给予玩家任何东西.
-        try {
-            recipe.consume(player)
-            recipe.output.apply(player)
-        } catch (e: RuntimeException) {
-            e.printStackTrace()
-            player.sendMessage(text {
-                content("发生了一个内部错误, 请汇报给管理员!")
-                color(NamedTextColor.RED)
-            })
-        }
-    }
-
-    fun notifyFail(player: Player) {
+internal fun tryCraft(recipe: Recipe, player: Player) {
+    // 无法正常消耗则抛异常中断, 不给予玩家任何东西
+    try {
+        recipe.consume(player)
+        recipe.output.apply(player)
+    } catch (e: RuntimeException) {
+        e.printStackTrace()
         player.sendMessage(text {
-            content("你没有足够的材料来合成这个物品!")
+            content("发生了一个内部错误, 请汇报给管理员!")
             color(NamedTextColor.RED)
         })
     }
+}
+
+internal fun notifyFail(player: Player) {
+    player.sendMessage(text {
+        content("你没有足够的材料来合成这个物品!")
+        color(NamedTextColor.RED)
+    })
 }
