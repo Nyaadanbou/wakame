@@ -142,11 +142,14 @@ abstract class ConfigsBase : ConfigAccess {
     }
 
     override operator fun get(id: Key): Provider<CommentedConfigurationNode> {
-        return this.configProviders.getOrPut(id) {
+        val rootProvider = this.configProviders.getOrPut(id) {
             RootConfigProvider(resolvePath(id), id).also { provider ->
-                if (this.lastReloadTimestamp > UNINITIALIZED_LAST_RELOAD) provider.reload()
+                if (this.lastReloadTimestamp > UNINITIALIZED_LAST_RELOAD) {
+                    provider.reload()
+                }
             }
         }
+        return rootProvider.backing
     }
 
     override fun getOrNull(id: String): CommentedConfigurationNode? {
