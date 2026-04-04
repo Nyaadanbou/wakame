@@ -13,6 +13,7 @@ import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
+import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -222,10 +223,12 @@ internal data class EntityBucketInfoRendererFormat(
 @ConfigSerializable
 internal data class CastableRendererFormat(
     override val namespace: String,
-    @Setting("content")
-    private val content: List<String>,
-    @Setting("trigger")
-    private val trigger: Trigger,
+    private val content: List<String> = listOf(
+        "<!i><#C8A8E8>该物品具有一个或多个特殊效果",
+        "<!i><#C8A8E8>特殊效果触发方式(<trigger_type>): <trigger_value>",
+    ),
+    private val triggerTypes: TriggerTypes = TriggerTypes(),
+    private val triggerValues: TriggerValues = TriggerValues(),
 ) : RendererFormat.Simple {
     override val id: String = "castable"
     override val index: DerivedIndex = createIndex()
@@ -238,109 +241,105 @@ internal data class CastableRendererFormat(
     }
 
     private fun render(data: Castable): List<Component> {
-        val skillTrigger = data.trigger.unwrap()
-        val triggerConfig = this.trigger
-        val lines = when (skillTrigger) {
-            is SpecialCastableTrigger -> {
-                val line = triggerConfig.special.generate(skillTrigger)
-                content.map { MiniMessage.miniMessage().deserialize(it, Placeholder.component("trigger", line)) }
-            }
-
-            is GenericCastableTrigger -> {
-                val line = triggerConfig.generic.generate(skillTrigger)
-                content.map { MiniMessage.miniMessage().deserialize(it, Placeholder.component("trigger", line)) }
-            }
-
-            is SequenceCastableTrigger -> {
-                val line = triggerConfig.sequence.generate(skillTrigger)
-                content.map { MiniMessage.miniMessage().deserialize(it, Placeholder.component("trigger", line)) }
-            }
-
-            is InputCastableTrigger -> {
-                val line = triggerConfig.input.generate(skillTrigger)
-                content.map { MiniMessage.miniMessage().deserialize(it, Placeholder.component("trigger", line)) }
-            }
+        val trigger = data.trigger.unwrap()
+        val type: Component
+        val value: Component
+        when (trigger) {
+            is SpecialCastableTrigger -> { type = triggerTypes.special; value = triggerValues.special.generate(trigger) }
+            is GenericCastableTrigger -> { type = triggerTypes.generic; value = triggerValues.generic.generate(trigger) }
+            is SequenceCastableTrigger -> { type = triggerTypes.sequence; value = triggerValues.sequence.generate(trigger) }
+            is InputCastableTrigger -> { type = triggerTypes.input; value = triggerValues.input.generate(trigger) }
         }
-        return lines
-    }
-
-    @ConfigSerializable
-    data class Trigger(
-        @Setting("special")
-        val special: Special,
-        @Setting("generic")
-        val generic: Generic,
-        @Setting("sequence")
-        val sequence: Sequence,
-        @Setting("input")
-        val input: Input,
-    )
-
-    @ConfigSerializable
-    data class Special(
-        val onEquip: Component,
-        val onUnequip: Component,
-        val onConsume: Component,
-    ) {
-        fun generate(trigger: SpecialCastableTrigger): Component {
-            return when (trigger) {
-                SpecialCastableTrigger.ON_EQUIP -> onEquip
-                SpecialCastableTrigger.ON_UNEQUIP -> onUnequip
-                SpecialCastableTrigger.ON_CONSUME -> onConsume
-            }
-        }
-    }
-
-    @ConfigSerializable
-    data class Generic(
-        val leftClick: Component,
-        val rightClick: Component,
-    ) {
-        fun generate(trigger: GenericCastableTrigger): Component {
-            return when (trigger) {
-                GenericCastableTrigger.LEFT_CLICK -> leftClick
-                GenericCastableTrigger.RIGHT_CLICK -> rightClick
-            }
-        }
-    }
-
-    @ConfigSerializable
-    data class Sequence(
-        val left: Component,
-        val right: Component,
-        val separator: Component,
-    ) {
-        fun generate(trigger: SequenceCastableTrigger): Component {
-            return trigger.sequence.map {
-                when (it) {
-                    GenericCastableTrigger.LEFT_CLICK -> left
-                    GenericCastableTrigger.RIGHT_CLICK -> right
-                }
-            }.join(
-                JoinConfiguration.separator(separator)
+        return content.map {
+            MiniMessage.miniMessage().deserialize(
+                it,
+                Placeholder.component("trigger_type", type),
+                Placeholder.component("trigger_value", value),
             )
         }
     }
 
     @ConfigSerializable
-    data class Input(
-        val forward: Component,
-        val backward: Component,
-        val left: Component,
-        val right: Component,
-        val jump: Component,
-        val sneak: Component,
-        val sprint: Component,
+    data class TriggerTypes(
+        val special: Component = Component.text("特别").color(TextColor.color(0xC0A0E0)),
+        val generic: Component = Component.text("交互").color(TextColor.color(0xA0C8E0)),
+        val sequence: Component = Component.text("组合").color(TextColor.color(0xE0C0A0)),
+        val input: Component = Component.text("输入").color(TextColor.color(0xA0E0C0)),
+    )
+
+    @ConfigSerializable
+    data class TriggerValues(
+        val special: Special = Special(),
+        val generic: Generic = Generic(),
+        val sequence: Sequence = Sequence(),
+        val input: Input = Input(),
     ) {
-        fun generate(trigger: InputCastableTrigger): Component {
-            return when (trigger) {
-                InputCastableTrigger.FORWARD -> forward
-                InputCastableTrigger.BACKWARD -> backward
-                InputCastableTrigger.LEFT -> left
-                InputCastableTrigger.RIGHT -> right
-                InputCastableTrigger.JUMP -> jump
-                InputCastableTrigger.SNEAK -> sneak
-                InputCastableTrigger.SPRINT -> sprint
+        @ConfigSerializable
+        data class Special(
+            val equip: Component = Component.text("穿戴时").color(TextColor.color(0x7FDFB0)),
+            val unequip: Component = Component.text("脱下时").color(TextColor.color(0xDF9F7F)),
+            val consume: Component = Component.text("消耗时").color(TextColor.color(0xBF9FDF)),
+        ) {
+            fun generate(trigger: SpecialCastableTrigger): Component {
+                return when (trigger) {
+                    SpecialCastableTrigger.ON_EQUIP -> equip
+                    SpecialCastableTrigger.ON_UNEQUIP -> unequip
+                    SpecialCastableTrigger.ON_CONSUME -> consume
+                }
+            }
+        }
+
+        @ConfigSerializable
+        data class Generic(
+            val leftClick: Component = Component.text("左键").color(TextColor.color(0xEFCF6F)),
+            val rightClick: Component = Component.text("右键").color(TextColor.color(0x6FBFEF)),
+        ) {
+            fun generate(trigger: GenericCastableTrigger): Component {
+                return when (trigger) {
+                    GenericCastableTrigger.LEFT_CLICK -> leftClick
+                    GenericCastableTrigger.RIGHT_CLICK -> rightClick
+                }
+            }
+        }
+
+        @ConfigSerializable
+        data class Sequence(
+            val left: Component = Component.text("左").color(TextColor.color(0xEFCF6F)),
+            val right: Component = Component.text("右").color(TextColor.color(0x6FBFEF)),
+            val separator: Component = Component.text("·").color(TextColor.color(0x8F8F9F)),
+        ) {
+            fun generate(trigger: SequenceCastableTrigger): Component {
+                return trigger.sequence.map {
+                    when (it) {
+                        GenericCastableTrigger.LEFT_CLICK -> left
+                        GenericCastableTrigger.RIGHT_CLICK -> right
+                    }
+                }.join(
+                    JoinConfiguration.separator(separator)
+                )
+            }
+        }
+
+        @ConfigSerializable
+        data class Input(
+            val forward: Component = Component.text("前进").color(TextColor.color(0x7FDFB0)),
+            val backward: Component = Component.text("后退").color(TextColor.color(0xDF8F7F)),
+            val left: Component = Component.text("左移").color(TextColor.color(0x7FBFDF)),
+            val right: Component = Component.text("右移").color(TextColor.color(0xDFBF7F)),
+            val jump: Component = Component.text("跳跃").color(TextColor.color(0xBF9FDF)),
+            val sneak: Component = Component.text("潜行").color(TextColor.color(0x9FAFBF)),
+            val sprint: Component = Component.text("冲刺").color(TextColor.color(0xEFCF6F)),
+        ) {
+            fun generate(trigger: InputCastableTrigger): Component {
+                return when (trigger) {
+                    InputCastableTrigger.FORWARD -> forward
+                    InputCastableTrigger.BACKWARD -> backward
+                    InputCastableTrigger.LEFT -> left
+                    InputCastableTrigger.RIGHT -> right
+                    InputCastableTrigger.JUMP -> jump
+                    InputCastableTrigger.SNEAK -> sneak
+                    InputCastableTrigger.SPRINT -> sprint
+                }
             }
         }
     }

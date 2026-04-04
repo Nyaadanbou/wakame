@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.ItemBehaviorListener
 import cc.mewcraft.wakame.item.ScanItemSlotChanges
 import cc.mewcraft.wakame.item.behavior.impl.weapon.KatanaSwitchSystem
 import cc.mewcraft.wakame.item.behavior.impl.weapon.KatanaTickSystem
+import cc.mewcraft.wakame.item.feature.SequenceComboFeature
 import cc.mewcraft.wakame.kizami.system.ItemInscriptionSystem
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import org.bukkit.Bukkit
@@ -28,6 +29,7 @@ object ServerOnlineUserTicker : Listener {
             EnchantmentAttributeSystem.onTickUser(user, player)
             KatanaTickSystem.onTickUser(user, player)
             KatanaSwitchSystem.onTickUser(user, player)
+            SequenceComboFeature.onTickUser(user, player)
         }
     }
 }

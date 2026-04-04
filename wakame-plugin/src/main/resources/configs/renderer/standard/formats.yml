@@ -256,30 +256,38 @@ fuel:
 castable:
   namespace: special
   # 可用标签
-  # <trigger> 触发器描述
+  # <trigger_type> 触发器类型
+  # <trigger_value> 触发器描述
   content:
-    - "<!i><gray><trigger>释放特殊效果"
+    - "<!i><#C8A8E8>该物品具有一个或多个特殊效果"
+    - "<!i><#C8A8E8>特殊效果触发方式(<trigger_type>): <trigger_value>"
+  # 触发器类型
+  trigger_types:
+    special: "<#C0A0E0>特别</#C0A0E0>"
+    generic: "<#A0C8E0>交互</#A0C8E0>"
+    sequence: "<#E0C0A0>组合</#E0C0A0>"
+    input: "<#A0E0C0>输入</#A0E0C0>"
   # 触发器描述
-  trigger:
+  trigger_values:
     special:
-      on_equip: "<!i><light_purple>穿戴时</light_purple>"
-      on_unequip: "<!i><light_purple>脱下时</light_purple>"
-      on_consume: "<!i><light_purple>消耗时</light_purple>"
+      equip: "<#7FDFB0>穿戴时</#7FDFB0>"
+      unequip: "<#DF9F7F>脱下时</#DF9F7F>"
+      consume: "<#BF9FDF>消耗时</#BF9FDF>"
     generic:
-      left_click: "<!i><light_purple>左键</light_purple>"
-      right_click: "<!i><light_purple>右键</light_purple>"
+      left_click: "<#EFCF6F>左键</#EFCF6F>"
+      right_click: "<#6FBFEF>右键</#6FBFEF>"
     sequence:
-      left: "<!i><light_purple>左</light_purple>"
-      right: "<!i><light_purple>右</light_purple>"
-      separator: ""
+      left: "<#EFCF6F>左</#EFCF6F>"
+      right: "<#6FBFEF>右</#6FBFEF>"
+      separator: "<#8F8F9F>·</#8F8F9F>"
     input:
-      forward: "<!i><light_purple>前进</light_purple>"
-      backward: "<!i><light_purple>后退</light_purple>"
-      left: "<!i><light_purple>左移</light_purple>"
-      right: "<!i><light_purple>右移</light_purple>"
-      jump: "<!i><light_purple>跳跃</light_purple>"
-      sneak: "<!i><light_purple>潜行</light_purple>"
-      sprint: "<!i><light_purple>冲刺</light_purple>"
+      forward: "<#7FDFB0>前进</#7FDFB0>"
+      backward: "<#DF8F7F>后退</#DF8F7F>"
+      left: "<#7FBFDF>左移</#7FBFDF>"
+      right: "<#DFBF7F>右移</#DFBF7F>"
+      jump: "<#BF9FDF>跳跃</#BF9FDF>"
+      sneak: "<#9FAFBF>潜行</#9FAFBF>"
+      sprint: "<#EFCF6F>冲刺</#EFCF6F>"
 
 # id: `network_position`
 network_position:

@@ -79,6 +79,37 @@ remove_attributes_on_clientbound_update_attributes_packet:
 # 在发送 ClientboundSetEntityDataPacket 封包时移除掉 ABSORPTION 数据
 remove_absorption_on_clientbound_set_entity_data_packet: true
 
+# 物品触发器的显示设置
+sequence_castable_trigger_display:
+  # 组合键超时 (ticks), 超过该时间未输入下一个键则重置组合
+  combo_timeout_ticks: 20
+  # 左键点击的显示配置
+  left_click:
+    # 在 action bar 上显示的符号
+    literal_symbol: "L"
+    # 组合键匹配成功时该符号的样式
+    success_style: "<green>"
+    # 组合键匹配失败时该符号的样式
+    failure_style: "<red>"
+    # 组合键输入中 (尚未完成) 时该符号的样式
+    progress_style: "<yellow>"
+  # 右键点击的显示配置
+  right_click:
+    literal_symbol: "R"
+    success_style: "<green>"
+    failure_style: "<red>"
+    progress_style: "<yellow>"
+  # 组合键序列结果的显示配置
+  sequence:
+    # 各输入符号之间的连接符
+    connector: "<gray> ➔ </gray>"
+    # 序列完成且匹配成功时追加显示的文本
+    success: "<green>OK"
+    # 序列完成但匹配失败时追加显示的文本
+    failure: "<red>BAD"
+    # 组合键超时未完成时追加显示的文本
+    timeout: "<gray>TIMEOUT"
+
 # 关于调试模式
 debug:
   # 显示攻击碰撞箱
