@@ -73,7 +73,18 @@ val propValue = itemStack.getProp(ItemPropTypes.MY_PROP) ?: return
 ### 定义新的 ItemBehavior
 
 - 在 `wakame-mixin/.../item/behavior/impl/` 下创建 `object`，实现 `SimpleInteract`（或 `ItemBehavior`）。
-- `SimpleInteract` 提供 `handleSimpleUse` (右键) / `handleSimpleAttack` (左键) / `handleConsume` (消耗) 的统一入口。
+  - 子目录按类别组织: `weapon/` (武器行为), `external/` (依赖外部插件的行为), `test/` (测试用)
+  - 对应的 property impl 也使用相同子目录: `item/property/impl/weapon/`
+- `SimpleInteract` 将 6 种交互统一为 `handleSimpleUse` (右键) 和 `handleSimpleAttack` (左键) 两个入口。
+  - 当方块/实体本身有交互时，`SimpleInteract` 会自动让出 (`FAIL`)，不执行物品交互。
+  - 若物品交互优先级需高于方块/实体交互，应直接实现 `ItemBehavior` 而非 `SimpleInteract`。
+- `ItemBehavior` 顶级接口提供的所有 handler:
+  - `handleUse` / `handleUseOn` / `handleUseEntity` — 右键 (空气/方块/实体)
+  - `handleAttack` / `handleAttackOn` / `handleAttackEntity` — 左键 (空气/方块/实体)
+  - `handleCauseDamage` / `handleReceiveDamage` — 物品处于激活状态时造成/受到伤害
+  - `handleDurabilityDecrease` — 物品失去耐久度
+  - `handleStopUse` — 停止使用 (不可取消)
+  - `handleConsume` — 消耗物品 (`minecraft:consumable` 组件)
 - 在 `ItemBehaviorTypes` 中注册:
   ```kotlin
   @JvmField
@@ -118,6 +129,12 @@ private val config: MyConfig by MAIN_CONFIG.entryOrElse(MyConfig(), "yaml_node_p
 
 // 读取一个可选配置项:
 private val optConfig: MyConfig? by MAIN_CONFIG.optionalEntry("yaml_node_path")
+```
+
+嵌套 YAML 路径使用 varargs (每级路径一个参数):
+```kotlin
+// 对应 YAML: debug.logging.damage
+private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "damage").orElse(false)
 ```
 
 ### 示例: 嵌套 @ConfigSerializable 配置
@@ -166,6 +183,31 @@ object MyFeature : Listener {
 }
 ```
 
+### 排序与依赖
+
+`@Init` 和 `@InitFun` 均支持 `runAfter` / `runBefore` 参数，用于声明初始化顺序依赖:
+```kotlin
+@Init(InitStage.POST_WORLD, runAfter = [SomeDependency::class])
+object MyFeature {
+    @InitFun
+    fun init() { /* 在 SomeDependency 初始化完成后执行 */ }
+}
+```
+
+### 关闭逻辑
+
+使用 `@DisableFun` 标注需要在插件禁用时执行的清理方法:
+```kotlin
+@Init(InitStage.POST_WORLD)
+object MyFeature {
+    @InitFun
+    fun init() { /* 启动逻辑 */ }
+
+    @DisableFun
+    fun disable() { /* 清理逻辑 */ }
+}
+```
+
 > `object` 标注 `@Init` 后会被反射自动初始化，无需手动调用。IDE 可能报 "Object is never used" 警告，可忽略。
 
 ---
@@ -190,13 +232,13 @@ MyTickSystem.onTickUser(user, player)
 
 ## MetadataMap 范式
 
-用于存储与玩家关联的临时运行时状态:
+用于存储与游戏对象关联的临时运行时状态 (支持 `Player`/`Entity`/`Block`/`World`):
 
 ```kotlin
 // 定义 key
 val MY_KEY: MetadataKey<MyState> = metadataKey("my_feature:state")
 
-// 读写
+// 读写 (Player/Entity/Block/World 均可调用 .metadata())
 val metadata = player.metadata()
 val state = metadata.getOrPut(MY_KEY) { MyState() }
 metadata.getOrNull(MY_KEY)
@@ -222,6 +264,7 @@ metadata.remove(MY_KEY)
 
 - 注释语言: **中文**
 - KDoc: 公共 API 必须有 KDoc (中文)
+- 文件末尾: 必须以恰好一个换行符 (`\n`) 结尾，不留多余空行
 - 代码折叠: 使用 `//<editor-fold desc="...">` ... `//</editor-fold>` 组织长文件
 - 导入别名: 当类名冲突时使用 `import ... as`，例如:
   ```kotlin
