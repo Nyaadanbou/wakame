@@ -260,12 +260,32 @@ metadata.remove(MY_KEY)
 
 ---
 
+## MCP 工具使用偏好
+
+执行特定任务时，优先使用以下 MCP 工具:
+
+|任务|首选工具|说明|
+|---|---|---|
+|检索项目代码 (符号、引用、结构)|Serena (`find_symbol`, `find_referencing_symbols`, `get_symbols_overview`, `search_for_pattern`)|语言感知的代码分析，优于纯文本搜索|
+|查询第三方库/API 文档|Context7 (`resolve-library-id` + `get-library-docs`)|获取最新的库文档、代码示例和配置步骤，无需用户显式要求|
+|爬取/读取网页|Firecrawl (`firecrawl_scrape`, `firecrawl_search`) 或 `fetch`|Firecrawl 功能更强（支持 JS 渲染、结构化提取），`fetch` 适合轻量级单页抓取|
+
+> 如果某个 MCP 工具不可用，退而求其次使用备选工具（`grep_search`、`read_file` 等），核心目标不变。
+
+---
+
 ## 编码风格
 
 - 注释语言: **中文**
 - KDoc: 公共 API 必须有 KDoc (中文)
 - 文件末尾: 必须以恰好一个换行符 (`\n`) 结尾，不留多余空行
 - 代码折叠: 使用 `//<editor-fold desc="...">` ... `//</editor-fold>` 组织长文件
+- Markdown 表格: 使用最小格式，不要加多余的空格或 `-` 来对齐列。IDE 用户有 Markdown 可视化，源代码的人类可读性不重要。例如:
+  ```markdown
+  |列A|列B|
+  |---|---|
+  |值1|值2|
+  ```
 - 导入别名: 当类名冲突时使用 `import ... as`，例如:
   ```kotlin
   import cc.mewcraft.wakame.item.behavior.impl.Castable as CastableBehavior
