@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.animation
 
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
-import cc.mewcraft.lazyconfig.configurate.require
+import cc.mewcraft.lazyconfig.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.entity.display.Brightness
 import cc.mewcraft.wakame.entity.display.CommonDisplayData
 import cc.mewcraft.wakame.entity.display.DefaultBrightness
@@ -13,9 +13,9 @@ import org.bukkit.Location
 import org.bukkit.entity.Display.Billboard
 import org.bukkit.entity.Player
 import org.bukkit.entity.TextDisplay.TextAlignment
-import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import java.lang.reflect.Type
+import org.spongepowered.configurate.objectmapping.meta.PostProcess
+import org.spongepowered.configurate.serialize.SerializationException
 import kotlin.math.max
 
 /**
@@ -27,22 +27,18 @@ interface AnimationData<T : CommonDisplayData> {
     val frames: Map<Long, AnimationFrame<T>>
     val settings: AnimationSettings<T>
 
+    /**
+     * 播放动画.
+     */
     fun play(viewer: Player, animLocation: Location, context: AnimationContext)
 
-    companion object Serializer : SimpleSerializer<AnimationData<*>> {
-        override fun deserialize(type: Type, node: ConfigurationNode): AnimationData<*> {
-            val type = node.node("type").require<String>()
-
-            val animationData = when (type) {
-                TextDisplayAnimationData.TYPE -> node.require<TextDisplayAnimationData>()
-
-                else -> throw IllegalArgumentException("Unknown animation type: '$type'")
-            }
-
-            require(animationData.frames.all { it.key >= 0 }) { "The delay of a frame must be non-negative" }
-            require(animationData.frames.keys.contains(0)) { "Missing start frame (delay = 0)" }
-
-            return animationData
+    companion object {
+        fun serializer(): SimpleSerializer<AnimationData<*>> {
+            return DispatchingSerializer.createPartial(
+                mapOf(
+                    "text_display" to TextDisplayAnimationData::class
+                )
+            )
         }
     }
 }
@@ -55,9 +51,6 @@ data class TextDisplayAnimationData(
     override val frames: Map<Long, TextDisplayAnimationFrame>,
     override val settings: TextDisplayAnimationSettings
 ) : AnimationData<TextDisplayData> {
-    companion object {
-        const val TYPE = "text_display"
-    }
 
     override fun play(viewer: Player, animLocation: Location, context: AnimationContext) {
         val data = settings.applyTo(TextDisplayData(), context)
@@ -65,9 +58,7 @@ data class TextDisplayAnimationData(
         display.create()
 
         for ((delay, frame) in frames) {
-            // 保险起见还是判断一下非负, 实际上反序列化时已保证
-            if (delay < 0) continue
-
+            // 反序列化时保证 delay 必定大于等于 0
             if (delay == 0L) {
                 frame.applyTo(data, context)
                 display.update()
@@ -81,15 +72,19 @@ data class TextDisplayAnimationData(
             }
         }
 
-        val maxEntry = frames.maxByOrNull { it.key }
-        // 实际上不可能为空
-        // 反序列化时已保证至少会有 delay = 0 这一帧
-        if (maxEntry != null) {
-            val animDuration = maxEntry.key + max(maxEntry.value.interpolationDuration, maxEntry.value.teleportDuration)
-            runTaskLater(animDuration) { ->
-                display.hide(viewer)
-            }
+        // 反序列化时保证至少会有 delay = 0 这一帧
+        val entry = frames.maxByOrNull { it.key }!!
+        val lastFrame = entry.value
+        val animDuration = entry.key + lastFrame.startInterpolation + max(lastFrame.interpolationDuration, lastFrame.teleportDuration)
+        runTaskLater(animDuration) { ->
+            display.hide(viewer)
         }
+    }
+
+    @PostProcess
+    private fun callback() {
+        if (frames.any { it.key < 0 }) throw SerializationException("The delay of a frame must be non-negative")
+        if (!frames.keys.contains(0)) throw SerializationException("Missing start frame (delay = 0)")
     }
 
 }
@@ -135,15 +130,15 @@ data class TextDisplayAnimationFrame(
     /**
      * 可以发现, 此处和 [TextDisplayAnimationSettings] 均有 [text] 属性.
      * 这样设计的目的是:
-     * 1.如果动画中的文本每帧不变化, 只需要在 Settings 中全局设置一次即可, 各帧直接 Empty 节约性能.
+     * 1.如果动画中的文本每帧不变化, 只需要在 Settings 中全局设置一次即可, 各帧直接 null 节约性能.
      * 2.如果动画中的文本每帧变化, 则各帧各自设置.
      * 3.实现了简单的继承关系, 各帧可以继承 Settings 中的文本, 也可以自行覆写.
      */
-    val text: TextBuilder = EmptyTextBuilder
+    val text: TextBuilder? = null
 ) : AnimationFrame<TextDisplayData> {
     override fun applyTo(data: TextDisplayData, context: AnimationContext): TextDisplayData {
         applyToCommon(data)
-        if (text == EmptyTextBuilder) {
+        if (text != null) {
             data.text = text.build(context)
         }
         return data
@@ -209,7 +204,7 @@ data class TextDisplayAnimationSettings(
     /**
      * 参见 [TextDisplayAnimationFrame.text].
      */
-    val text: TextBuilder = EmptyTextBuilder,
+    val text: TextBuilder = FixedTextBuilder(),
     val textOpacity: Byte = -1,
 ) : AnimationSettings<TextDisplayData> {
     override fun applyTo(data: TextDisplayData, context: AnimationContext): TextDisplayData {

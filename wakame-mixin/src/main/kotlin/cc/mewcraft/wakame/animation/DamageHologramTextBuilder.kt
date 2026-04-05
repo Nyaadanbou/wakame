@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.animation
 
-import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.wakame.damage.CriticalStrikeMetadata
 import cc.mewcraft.wakame.damage.CriticalStrikeState
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
@@ -11,9 +10,7 @@ import net.kyori.adventure.text.format.StyleBuilderApplicable
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
-import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
-import java.lang.reflect.Type
+import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 data class DamageHologramContext(
     val event: PostprocessDamageEvent
@@ -72,15 +69,16 @@ abstract class DamageHologramTextBuilder : TextBuilder {
  * 一种伤害显示文本构建器的实现.
  * 该实现下各元素伤害合并显示.
  */
-class MergedDamageHologramTextBuilder(
-    override val finalText: String,
-    override val criticalStrikeStylePositive: Array<StyleBuilderApplicable>,
-    override val criticalStrikeStyleNegative: Array<StyleBuilderApplicable>,
-    override val criticalStrikeStyleNone: Array<StyleBuilderApplicable>,
-    override val criticalStrikeTextPositive: Component,
-    override val criticalStrikeTextNegative: Component,
-    override val criticalStrikeTextNone: Component,
-    val damageValueText: String
+@ConfigSerializable
+data class MergedDamageHologramTextBuilder(
+    override val finalText: String = "未配置: [final_text]",
+    override val criticalStrikeStylePositive: Array<StyleBuilderApplicable> = emptyArray(),
+    override val criticalStrikeStyleNegative: Array<StyleBuilderApplicable> = emptyArray(),
+    override val criticalStrikeStyleNone: Array<StyleBuilderApplicable> = emptyArray(),
+    override val criticalStrikeTextPositive: Component = Component.text("未配置: [critical_strike_text.positive]"),
+    override val criticalStrikeTextNegative: Component = Component.text("未配置: [critical_strike_text.negative]"),
+    override val criticalStrikeTextNone: Component = Component.text("未配置: [critical_strike_text.none]"),
+    val damageValueText: String = "未配置: [damage_value_text]",
 ) : DamageHologramTextBuilder() {
 
     override fun damageValueText(event: PostprocessDamageEvent): Component {
@@ -97,30 +95,34 @@ class MergedDamageHologramTextBuilder(
         return damageValueText
     }
 
-    companion object Serializer : SimpleSerializer<MergedDamageHologramTextBuilder> {
-        const val TYPE = "merged_damage_display"
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-        override fun deserialize(type: Type, node: ConfigurationNode): MergedDamageHologramTextBuilder {
-            val finalText = node.node("final_text").get<String>("请输入文本: [final_text]")
-            val criticalStrikeStylePositive = node.node("critical_strike_style", "positive").get<Array<StyleBuilderApplicable>>(emptyArray())
-            val criticalStrikeStyleNegative = node.node("critical_strike_style", "negative").get<Array<StyleBuilderApplicable>>(emptyArray())
-            val criticalStrikeStyleNone = node.node("critical_strike_style", "none").get<Array<StyleBuilderApplicable>>(emptyArray())
-            val criticalStrikeTextPositive = node.node("critical_strike_text", "positive").get<Component>(Component.text("请输入文本: [critical_strike_text.positive]"))
-            val criticalStrikeTextNegative = node.node("critical_strike_text", "negative").get<Component>(Component.text("请输入文本: [critical_strike_text.negative]"))
-            val criticalStrikeTextNone = node.node("critical_strike_text", "none").get<Component>(Component.text("请输入文本: [critical_strike_text.none]"))
-            val damageValueText = node.node("damage_value_text").get<String>("请输入文本: [damage_value_text]")
+        other as MergedDamageHologramTextBuilder
 
-            return MergedDamageHologramTextBuilder(
-                finalText,
-                criticalStrikeStylePositive,
-                criticalStrikeStyleNegative,
-                criticalStrikeStyleNone,
-                criticalStrikeTextPositive,
-                criticalStrikeTextNegative,
-                criticalStrikeTextNone,
-                damageValueText
-            )
-        }
+        if (finalText != other.finalText) return false
+        if (!criticalStrikeStylePositive.contentEquals(other.criticalStrikeStylePositive)) return false
+        if (!criticalStrikeStyleNegative.contentEquals(other.criticalStrikeStyleNegative)) return false
+        if (!criticalStrikeStyleNone.contentEquals(other.criticalStrikeStyleNone)) return false
+        if (criticalStrikeTextPositive != other.criticalStrikeTextPositive) return false
+        if (criticalStrikeTextNegative != other.criticalStrikeTextNegative) return false
+        if (criticalStrikeTextNone != other.criticalStrikeTextNone) return false
+        if (damageValueText != other.damageValueText) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = finalText.hashCode()
+        result = 31 * result + criticalStrikeStylePositive.contentHashCode()
+        result = 31 * result + criticalStrikeStyleNegative.contentHashCode()
+        result = 31 * result + criticalStrikeStyleNone.contentHashCode()
+        result = 31 * result + criticalStrikeTextPositive.hashCode()
+        result = 31 * result + criticalStrikeTextNegative.hashCode()
+        result = 31 * result + criticalStrikeTextNone.hashCode()
+        result = 31 * result + damageValueText.hashCode()
+        return result
     }
 
 }
@@ -129,16 +131,17 @@ class MergedDamageHologramTextBuilder(
  * 一种伤害显示文本构建器的实现.
  * 该实现下各元素伤害分别显示.
  */
-class SeparatedDamageHologramTextBuilder(
-    override val finalText: String,
-    override val criticalStrikeStylePositive: Array<StyleBuilderApplicable>,
-    override val criticalStrikeStyleNegative: Array<StyleBuilderApplicable>,
-    override val criticalStrikeStyleNone: Array<StyleBuilderApplicable>,
-    override val criticalStrikeTextPositive: Component,
-    override val criticalStrikeTextNegative: Component,
-    override val criticalStrikeTextNone: Component,
-    val damageValueText: String,
-    val separator: Component
+@ConfigSerializable
+data class SeparatedDamageHologramTextBuilder(
+    override val finalText: String = "未配置: [final_text]",
+    override val criticalStrikeStylePositive: Array<StyleBuilderApplicable> = emptyArray(),
+    override val criticalStrikeStyleNegative: Array<StyleBuilderApplicable> = emptyArray(),
+    override val criticalStrikeStyleNone: Array<StyleBuilderApplicable> = emptyArray(),
+    override val criticalStrikeTextPositive: Component = Component.text("未配置: [critical_strike_text.positive]"),
+    override val criticalStrikeTextNegative: Component = Component.text("未配置: [critical_strike_text.negative]"),
+    override val criticalStrikeTextNone: Component = Component.text("未配置: [critical_strike_text.none]"),
+    val damageValueText: String = "未配置: [damage_value_text]",
+    val separator: Component = Component.text("未配置: [separator]")
 ) : DamageHologramTextBuilder() {
 
     override fun damageValueText(event: PostprocessDamageEvent): Component {
@@ -154,32 +157,36 @@ class SeparatedDamageHologramTextBuilder(
         return Component.join(JoinConfiguration.separator(separator), damageValueTexts)
     }
 
-    companion object Serializer : SimpleSerializer<SeparatedDamageHologramTextBuilder> {
-        const val TYPE = "separated_damage_display"
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-        override fun deserialize(type: Type, node: ConfigurationNode): SeparatedDamageHologramTextBuilder {
-            val finalText = node.node("final_text").get<String>("请输入文本: [final_text]")
-            val criticalStrikeStylePositive = node.node("critical_strike_style", "positive").get<Array<StyleBuilderApplicable>>(emptyArray())
-            val criticalStrikeStyleNegative = node.node("critical_strike_style", "negative").get<Array<StyleBuilderApplicable>>(emptyArray())
-            val criticalStrikeStyleNone = node.node("critical_strike_style", "none").get<Array<StyleBuilderApplicable>>(emptyArray())
-            val criticalStrikeTextPositive = node.node("critical_strike_text", "positive").get<Component>(Component.text("请输入文本: [critical_strike_text.positive]"))
-            val criticalStrikeTextNegative = node.node("critical_strike_text", "negative").get<Component>(Component.text("请输入文本: [critical_strike_text.negative]"))
-            val criticalStrikeTextNone = node.node("critical_strike_text", "none").get<Component>(Component.text("请输入文本: [critical_strike_text.none]"))
-            val damageValueText = node.node("damage_value_text").get<String>("请输入文本: [damage_value_text]")
-            val separator = node.node("separator").get<Component>(Component.text("请输入文本: [separator]"))
+        other as SeparatedDamageHologramTextBuilder
 
-            return SeparatedDamageHologramTextBuilder(
-                finalText,
-                criticalStrikeStylePositive,
-                criticalStrikeStyleNegative,
-                criticalStrikeStyleNone,
-                criticalStrikeTextPositive,
-                criticalStrikeTextNegative,
-                criticalStrikeTextNone,
-                damageValueText,
-                separator
-            )
-        }
+        if (finalText != other.finalText) return false
+        if (!criticalStrikeStylePositive.contentEquals(other.criticalStrikeStylePositive)) return false
+        if (!criticalStrikeStyleNegative.contentEquals(other.criticalStrikeStyleNegative)) return false
+        if (!criticalStrikeStyleNone.contentEquals(other.criticalStrikeStyleNone)) return false
+        if (criticalStrikeTextPositive != other.criticalStrikeTextPositive) return false
+        if (criticalStrikeTextNegative != other.criticalStrikeTextNegative) return false
+        if (criticalStrikeTextNone != other.criticalStrikeTextNone) return false
+        if (damageValueText != other.damageValueText) return false
+        if (separator != other.separator) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = finalText.hashCode()
+        result = 31 * result + criticalStrikeStylePositive.contentHashCode()
+        result = 31 * result + criticalStrikeStyleNegative.contentHashCode()
+        result = 31 * result + criticalStrikeStyleNone.contentHashCode()
+        result = 31 * result + criticalStrikeTextPositive.hashCode()
+        result = 31 * result + criticalStrikeTextNegative.hashCode()
+        result = 31 * result + criticalStrikeTextNone.hashCode()
+        result = 31 * result + damageValueText.hashCode()
+        result = 31 * result + separator.hashCode()
+        return result
     }
 
 }

@@ -47,14 +47,14 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     .register(RandomizedValueSerializer)
     .register(ExpressionSerializer)
     .register(BrightnessSerializer)
-    .register(AnimationData.Serializer)
+    .register(AnimationData.serializer())
     // Kotlin
     .register(IntRangeKotlinSerializer)
     // Text
     .register(MiniMessageComponentSerializer)
     .register(MiniMessageStyleSerializer)
     .register(MiniMessageStyleBuilderApplicableSerializer)
-    .register(TextBuilder.Serializer)
+    .register(TextBuilder.serializer())
     // Guava
     .register(IntRangeGuavaSerializer)
     // Namespaced
