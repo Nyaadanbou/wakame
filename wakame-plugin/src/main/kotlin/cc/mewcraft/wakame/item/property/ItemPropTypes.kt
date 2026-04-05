@@ -14,8 +14,43 @@ import cc.mewcraft.wakame.item.data.impl.CoreContainer
 import cc.mewcraft.wakame.item.data.impl.ItemLevel
 import cc.mewcraft.wakame.item.property.ItemPropTypes.ICON
 import cc.mewcraft.wakame.item.property.ItemPropTypes.SLOT_DISPLAY
-import cc.mewcraft.wakame.item.property.impl.*
-import cc.mewcraft.wakame.item.property.impl.weapon.*
+import cc.mewcraft.wakame.item.property.impl.Arrow
+import cc.mewcraft.wakame.item.property.impl.BlockExtraLootEntry
+import cc.mewcraft.wakame.item.property.impl.Castable
+import cc.mewcraft.wakame.item.property.impl.CraftingRemainder
+import cc.mewcraft.wakame.item.property.impl.DungeonEntry
+import cc.mewcraft.wakame.item.property.impl.EnchantSlotCapacity
+import cc.mewcraft.wakame.item.property.impl.EntityBucket
+import cc.mewcraft.wakame.item.property.impl.EntityExtraLootEntry
+import cc.mewcraft.wakame.item.property.impl.ExtraLoot
+import cc.mewcraft.wakame.item.property.impl.ExtraLore
+import cc.mewcraft.wakame.item.property.impl.Fuel
+import cc.mewcraft.wakame.item.property.impl.GlidingExtras
+import cc.mewcraft.wakame.item.property.impl.HoldLastDamage
+import cc.mewcraft.wakame.item.property.impl.ItemBase
+import cc.mewcraft.wakame.item.property.impl.ItemSlot
+import cc.mewcraft.wakame.item.property.impl.ItemSlotGroup
+import cc.mewcraft.wakame.item.property.impl.LiquidCollisionBlockSettings
+import cc.mewcraft.wakame.item.property.impl.OpenCatalog
+import cc.mewcraft.wakame.item.property.impl.OpenExternalMenu
+import cc.mewcraft.wakame.item.property.impl.RandomTeleport
+import cc.mewcraft.wakame.item.property.impl.RepairStoneData
+import cc.mewcraft.wakame.item.property.impl.SetsRetroactiveCard
+import cc.mewcraft.wakame.item.property.impl.TeleportAnchor
+import cc.mewcraft.wakame.item.property.impl.TownyFlight
+import cc.mewcraft.wakame.item.property.impl.Transfer
+import cc.mewcraft.wakame.item.property.impl.VirtualBook
+import cc.mewcraft.wakame.item.property.impl.VoucherAction
+import cc.mewcraft.wakame.item.property.impl.VoucherData
+import cc.mewcraft.wakame.item.property.impl.WorldTimeControl
+import cc.mewcraft.wakame.item.property.impl.WorldWeatherControl
+import cc.mewcraft.wakame.item.property.impl.weapon.DualSword
+import cc.mewcraft.wakame.item.property.impl.weapon.Katana
+import cc.mewcraft.wakame.item.property.impl.weapon.Mace
+import cc.mewcraft.wakame.item.property.impl.weapon.Melee
+import cc.mewcraft.wakame.item.property.impl.weapon.Sweep
+import cc.mewcraft.wakame.item.property.impl.weapon.Sword
+import cc.mewcraft.wakame.item.property.impl.weapon.Trident
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.BuiltInRegistries
@@ -173,16 +208,22 @@ data object ItemPropTypes {
     }
 
     /**
+     * 使物品具有双剑行为.
+     */
+    @JvmField
+    val DUAL_SWORD: ItemPropType<DualSword> = typeOf("dual_sword")
+
+    /**
      * 使物品具有太刀行为.
      */
     @JvmField
     val KATANA: ItemPropType<Katana> = typeOf("katana")
 
     /**
-     * 使物品具有双剑行为.
+     * 使物品具有剑行为.
      */
     @JvmField
-    val DUAL_SWORD: ItemPropType<DualSword> = typeOf("dual_sword")
+    val SWORD: ItemPropType<Sword> = typeOf("sword")
 
     /**
      * **原版弓**武器行为所需配置.
@@ -215,6 +256,14 @@ data object ItemPropTypes {
      */
     @JvmField
     val MINECRAFT_MELEE: ItemPropType<Melee> = typeOf("minecraft_melee")
+
+    /**
+     * **原版剑**武器行为所需配置.
+     *
+     * @see cc.mewcraft.wakame.item.behavior.impl.weapon.Sweep
+     */
+    @JvmField
+    val MINECRAFT_SWEEP: ItemPropType<Sweep> = typeOf("minecraft_sword")
 
     /**
      * **原版三叉戟**武器行为所需配置.

@@ -9,14 +9,11 @@ import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.util.cross
 import cc.mewcraft.wakame.util.math.Vec3f
-import cc.mewcraft.wakame.util.minus
-import cc.mewcraft.wakame.util.mul
-import cc.mewcraft.wakame.util.plus
+import cc.mewcraft.wakame.util.math.Vec3f.toLocation
+import cc.mewcraft.wakame.util.math.Vec3f.toVector3f
+import cc.mewcraft.wakame.util.math.copy
 import cc.mewcraft.wakame.util.registerEvents
-import cc.mewcraft.wakame.util.toLocation
-import cc.mewcraft.wakame.util.toVector3f
 import org.bukkit.Location
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -60,6 +57,7 @@ internal object DamageDisplay : Listener {
                     normalAnimation.play(player, animLocation, context)
                 }
             }
+
             CriticalStrikeState.POSITIVE -> {
                 damagee.trackedBy.forEach { player ->
                     positiveAnimation.play(player, animLocation, context)
@@ -115,22 +113,22 @@ internal object DamageDisplay : Listener {
     ): Location {
         val a = start.toVector3f()
         val b = end.toVector3f()
-        val ab = (b - a).normalize()
-        val c0 = a + (ab mul distance)
+        val ab = b.sub(a).normalize()
+        val c0 = ab.copy().mul(distance).add(a)
 
         // 生成不平行于 AB 的任意向量
         val vx = if (ab.x != 0f || ab.z != 0f) Vec3f.unitY() else Vec3f.unitX()
 
         // 生成平面 P 的基向量
-        val v1 = (ab cross vx).normalize()
-        val v2 = (ab cross v1).normalize()
+        val v1 = ab.copy().cross(vx).normalize()
+        val v2 = ab.cross(v1).normalize()
 
         // 生成垂直平面的随机因子
         val r1 = (Random.nextFloat() - .5f) * 1f // *1 就是 -0.5 ~ +0.5, *2 就是 -1.0 ~ +1.0
         val r2 = (Random.nextFloat() - .5f) * 1f
 
         // 计算 C
-        val c = c0 + (v1 mul r1) + (v2 mul r2)
+        val c = c0.add(v1.mul(r1)).add(v2.mul(r2))
 
         return c.toLocation(end.world)
     }

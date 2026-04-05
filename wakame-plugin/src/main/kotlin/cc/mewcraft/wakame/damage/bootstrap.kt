@@ -11,7 +11,6 @@ import cc.mewcraft.wakame.registry.entry.RegistryEntry
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.keys.tags.DamageTypeTagKeys
-import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys
 import io.papermc.paper.tag.TagEntry
 import net.kyori.adventure.key.Key
 
@@ -36,16 +35,6 @@ internal object DamageApiBootstrap {
      * 以实现伤害系统的特定功能.
      */
     private fun modifyTags() {
-        KoishBootstrapContexts.LIFECYCLE_MANAGER_OWNED_BY_BOOTSTRAP.registerEventHandler(
-            LifecycleEvents.TAGS.postFlatten(RegistryKey.ITEM)
-        ) { event ->
-            val registrar = event.registrar()
-
-            // 清空 minecraft:swords 标签的内容
-            // 目的是移除原版的横扫机制
-            registrar.setTag(ItemTypeTagKeys.SWORDS, emptySet())
-        }
-
         KoishBootstrapContexts.LIFECYCLE_MANAGER_OWNED_BY_BOOTSTRAP.registerEventHandler(
             LifecycleEvents.TAGS.preFlatten(RegistryKey.DAMAGE_TYPE)
         ) { event ->

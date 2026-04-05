@@ -31,6 +31,16 @@ data class Melee(
 ) : AttackCooldownLike
 
 /**
+ * **原版横扫**武器的配置.
+ *
+ * @property attackCooldown 攻击后物品冷却.
+ */
+@ConfigSerializable
+data class Sweep(
+    override val attackCooldown: Int = 12,
+) : AttackCooldownLike
+
+/**
  * **原版三叉戟**武器的配置.
  *
  * @property attackCooldown 攻击后物品冷却.

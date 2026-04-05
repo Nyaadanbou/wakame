@@ -16,6 +16,10 @@ sealed interface Weapon : SimpleInteract {
      *
      * 警告: 不要在该方法中的实现中写攻击的附带效果!
      * 会导致伤害事件取消时附带效果没有被取消!
+     *
+     * 进一步优化:
+     * 不使用源生伤害事件的武器物品行为覆写 [handleSimpleAttack] 方法时,
+     * 建议使用会取消事件的返回值, 直接不触发源生伤害事件, 节约性能.
      */
     fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
         return null

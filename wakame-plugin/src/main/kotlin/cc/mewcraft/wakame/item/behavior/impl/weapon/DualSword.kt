@@ -20,7 +20,7 @@ import cc.mewcraft.wakame.item.property.impl.MinecraftItemSlot
 import org.bukkit.inventory.EquipmentSlot
 
 /**
- * 剑的物品行为.
+ * 双剑的物品行为.
  */
 object DualSword : Weapon {
 

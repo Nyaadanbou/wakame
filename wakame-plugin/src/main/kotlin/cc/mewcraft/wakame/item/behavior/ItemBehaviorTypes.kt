@@ -4,8 +4,6 @@ import cc.mewcraft.wakame.item.behavior.impl.*
 import cc.mewcraft.wakame.item.behavior.impl.external.*
 import cc.mewcraft.wakame.item.behavior.impl.test.TestInteract
 import cc.mewcraft.wakame.item.behavior.impl.weapon.*
-import cc.mewcraft.wakame.lifecycle.initializer.Init
-import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 
 /**
@@ -98,6 +96,14 @@ object ItemBehaviorTypes {
      */
     @JvmField
     val KATANA = typeOf("katana", Katana)
+
+    /**
+     * 物品具有该行为时, 可以作为剑武器.
+     *
+     * @see cc.mewcraft.wakame.item.property.ItemPropTypes.SWORD
+     */
+    @JvmField
+    val SWORD = typeOf("sword", Sword)
 
     /**
      * 物品具有该行为时, 可以捕捉和释放生物.

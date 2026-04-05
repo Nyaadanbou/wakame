@@ -105,6 +105,28 @@ object Melee : Weapon {
 }
 
 /**
+ * **原版横扫**武器行为.
+ *
+ * 相较于原版的改动:
+ * - 只有造成伤害才会进入冷却.
+ * - 所有命中的生物都会受到面板伤害.
+ */
+object Sweep : Weapon {
+
+    override fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
+        if (itemstack.isOnCooldown(player)) return null
+        val minecraftSweep = itemstack.getProp(ItemPropTypes.MINECRAFT_SWEEP) ?: return null
+        itemstack.addCooldown(player, minecraftSweep.attackCooldown)
+
+        return PlayerDamageMetadata(player.attributeContainer) {
+            every {
+                standard()
+            }
+        }
+    }
+}
+
+/**
  * **原版三叉戟**武器行为.
  *
  * 投掷出的三叉戟伤害计算见 DamageManager 弹射物部分.
