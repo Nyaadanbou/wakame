@@ -24,7 +24,6 @@ import org.bukkit.inventory.ItemStack
  * - 直接攻击(左键)实体不会有伤害.
  */
 object Bow : Weapon {
-
     override fun handleSimpleUse(context: UseContext): InteractionResult {
         // 禁止副手交互弓
         if (context.hand == InteractionHand.OFF_HAND) {
@@ -45,7 +44,6 @@ object Bow : Weapon {
  * - 直接攻击(左键)实体不会有伤害.
  */
 object Crossbow : Weapon {
-
     override fun handleSimpleUse(context: UseContext): InteractionResult {
         // 禁止副手交互弩
         if (context.hand == InteractionHand.OFF_HAND) {
@@ -90,7 +88,6 @@ object Mace : Weapon {
  * - 只有造成伤害才会进入冷却.
  */
 object Melee : Weapon {
-
     override fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
         if (itemstack.isOnCooldown(player)) return null
         val minecraftMelee = itemstack.getProp(ItemPropTypes.MINECRAFT_MELEE) ?: return null
@@ -112,7 +109,6 @@ object Melee : Weapon {
  * - 所有命中的生物都会受到面板伤害.
  */
 object Sweep : Weapon {
-
     override fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
         if (itemstack.isOnCooldown(player)) return null
         val minecraftSweep = itemstack.getProp(ItemPropTypes.MINECRAFT_SWEEP) ?: return null

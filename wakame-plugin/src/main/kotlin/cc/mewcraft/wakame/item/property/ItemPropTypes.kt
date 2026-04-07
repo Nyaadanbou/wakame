@@ -51,6 +51,7 @@ import cc.mewcraft.wakame.item.property.impl.weapon.Melee
 import cc.mewcraft.wakame.item.property.impl.weapon.Sweep
 import cc.mewcraft.wakame.item.property.impl.weapon.Sword
 import cc.mewcraft.wakame.item.property.impl.weapon.Trident
+import cc.mewcraft.wakame.item.property.impl.weapon.Wand
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.BuiltInRegistries
@@ -226,6 +227,12 @@ data object ItemPropTypes {
     val SWORD: ItemPropType<Sword> = typeOf("sword")
 
     /**
+     * 使物品具有法杖行为.
+     */
+    @JvmField
+    val WAND: ItemPropType<Wand> = typeOf("wand")
+
+    /**
      * **原版弓**武器行为所需配置.
      *
      * @see cc.mewcraft.wakame.item.behavior.impl.weapon.Bow
@@ -258,12 +265,12 @@ data object ItemPropTypes {
     val MINECRAFT_MELEE: ItemPropType<Melee> = typeOf("minecraft_melee")
 
     /**
-     * **原版剑**武器行为所需配置.
+     * **原版横扫(剑)**武器行为所需配置.
      *
      * @see cc.mewcraft.wakame.item.behavior.impl.weapon.Sweep
      */
     @JvmField
-    val MINECRAFT_SWEEP: ItemPropType<Sweep> = typeOf("minecraft_sword")
+    val MINECRAFT_SWEEP: ItemPropType<Sweep> = typeOf("minecraft_sweep")
 
     /**
      * **原版三叉戟**武器行为所需配置.

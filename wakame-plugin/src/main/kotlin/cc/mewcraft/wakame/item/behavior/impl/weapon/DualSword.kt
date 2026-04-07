@@ -19,7 +19,7 @@ import cc.mewcraft.wakame.item.property.impl.ItemSlotGroup
 import cc.mewcraft.wakame.item.property.impl.MinecraftItemSlot
 import org.bukkit.inventory.EquipmentSlot
 
-/**
+/** FIXME 重构
  * 双剑的物品行为.
  */
 object DualSword : Weapon {

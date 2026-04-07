@@ -1,6 +1,10 @@
 package cc.mewcraft.wakame.item.behavior.impl
 
-import cc.mewcraft.wakame.item.behavior.*
+import cc.mewcraft.wakame.item.behavior.AttackContext
+import cc.mewcraft.wakame.item.behavior.BehaviorResult
+import cc.mewcraft.wakame.item.behavior.ConsumeContext
+import cc.mewcraft.wakame.item.behavior.InteractionResult
+import cc.mewcraft.wakame.item.behavior.UseContext
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.CastableTrigger
@@ -45,7 +49,7 @@ object Castable : SimpleInteract {
         // 处理组合键序列输入
         sequenceComboHandler?.handleInput(player, castable, GenericCastableTrigger.RIGHT_CLICK)
 
-        return InteractionResult.PASS
+        return InteractionResult.SUCCESS
     }
 
     // Implements the following triggers in castable:
@@ -62,7 +66,7 @@ object Castable : SimpleInteract {
         // 处理组合键序列输入
         sequenceComboHandler?.handleInput(player, castable, GenericCastableTrigger.LEFT_CLICK)
 
-        return InteractionResult.PASS
+        return InteractionResult.SUCCESS
     }
 
     // Implements the following triggers in castable:
@@ -75,7 +79,7 @@ object Castable : SimpleInteract {
             handleTrigger(player, entry, SpecialCastableTrigger.ON_CONSUME)
         }
 
-        return BehaviorResult.PASS
+        return BehaviorResult.FINISH
     }
 
     /**

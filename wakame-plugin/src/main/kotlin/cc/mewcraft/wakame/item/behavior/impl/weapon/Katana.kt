@@ -10,7 +10,12 @@ import cc.mewcraft.wakame.entity.player.OnlineUserTicker
 import cc.mewcraft.wakame.entity.player.User
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.item.ItemStackEffectiveness
-import cc.mewcraft.wakame.item.behavior.*
+import cc.mewcraft.wakame.item.behavior.AttackContext
+import cc.mewcraft.wakame.item.behavior.BehaviorResult
+import cc.mewcraft.wakame.item.behavior.InteractionHand
+import cc.mewcraft.wakame.item.behavior.InteractionResult
+import cc.mewcraft.wakame.item.behavior.ReceiveDamageContext
+import cc.mewcraft.wakame.item.behavior.UseContext
 import cc.mewcraft.wakame.item.behavior.impl.weapon.WeaponUtils.getInputDirection
 import cc.mewcraft.wakame.item.extension.addCooldown
 import cc.mewcraft.wakame.item.extension.damageItem
@@ -37,7 +42,7 @@ import kotlin.random.Random
 
 private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "damage").orElse(false)
 
-/**
+/** FIXME 重构
  * 太刀的物品行为.
  *
  * 该 `object` 里的所有逻辑都是与事件相关的, 不包含 tick 逻辑.
