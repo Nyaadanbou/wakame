@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.lazyconfig.MAIN_CONFIG
 import cc.mewcraft.lazyconfig.access.entryOrElse
+import cc.mewcraft.wakame.bridge.NMSUtils
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -13,7 +14,6 @@ import cc.mewcraft.wakame.network.event.clientbound.ClientboundUpdateAttributesP
 import cc.mewcraft.wakame.network.event.registerPacketListener
 import cc.mewcraft.wakame.network.event.unregisterPacketListener
 import cc.mewcraft.wakame.shadow.world.entity.ShadowPlayer
-import cc.mewcraft.wakame.util.NMSUtils
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.staticShadow
 import net.minecraft.network.syncher.SynchedEntityData

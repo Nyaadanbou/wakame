@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.database
 import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.lazyconfig.access.entryOrElse
 import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.KoishSharedConstants
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.database.DatabaseManager.database
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -69,7 +69,7 @@ object DatabaseManager {
             datasource = ds,
             setupConnection = { it.autoCommit = false },
             databaseConfig = DatabaseConfig {
-                sqlLogger = if (SharedConstants.isRunningInIde) StdOutSqlLogger else null
+                sqlLogger = if (KoishSharedConstants.isRunningInIde) StdOutSqlLogger else null
             },
             connectionAutoRegistration = ExposedConnectionImpl(),
         )

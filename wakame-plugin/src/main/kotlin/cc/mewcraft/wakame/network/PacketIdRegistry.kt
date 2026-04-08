@@ -2,7 +2,7 @@
 
 package cc.mewcraft.wakame.network
 
-import cc.mewcraft.wakame.util.REGISTRY_ACCESS
+import cc.mewcraft.wakame.bridge.REGISTRY_ACCESS
 import it.unimi.dsi.fastutil.objects.Object2IntMap
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.IdDispatchCodec

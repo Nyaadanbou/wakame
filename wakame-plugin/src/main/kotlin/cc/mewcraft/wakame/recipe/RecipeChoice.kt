@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
+import cc.mewcraft.wakame.bridge.KoishIngredient
+import cc.mewcraft.wakame.bridge.MojangIngredient
 import cc.mewcraft.wakame.item.ItemRef
 import cc.mewcraft.wakame.item.KoishTagManager
-import cc.mewcraft.wakame.mixin.support.KoishIngredient
 import cc.mewcraft.wakame.util.KoishKey
-import cc.mewcraft.wakame.util.MojangIngredient
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty

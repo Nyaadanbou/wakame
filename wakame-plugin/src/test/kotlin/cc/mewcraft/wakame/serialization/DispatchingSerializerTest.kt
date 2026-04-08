@@ -5,9 +5,9 @@ import cc.mewcraft.lazyconfig.configurate.register
 import cc.mewcraft.lazyconfig.configurate.registerExact
 import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.lazyconfig.configurate.serializer.DispatchingSerializer
-import cc.mewcraft.lazyconfig.configurate.serializer.valueByNameTypeSerializer
 import cc.mewcraft.wakame.registry.Registry
 import cc.mewcraft.wakame.registry.SimpleRegistry
+import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

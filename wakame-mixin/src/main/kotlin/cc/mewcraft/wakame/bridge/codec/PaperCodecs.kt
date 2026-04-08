@@ -1,0 +1,24 @@
+package cc.mewcraft.wakame.bridge.codec
+
+import com.mojang.serialization.Codec
+import net.minecraft.core.registries.BuiltInRegistries
+import org.bukkit.Material
+import org.bukkit.craftbukkit.block.CraftBlockType
+import org.bukkit.craftbukkit.inventory.CraftItemType
+
+/**
+ * Paper API 数据类型的 Codec.
+ */
+object PaperCodecs {
+    @JvmField
+    val MATERIAL_ITEM: Codec<Material> = BuiltInRegistries.ITEM.byNameCodec().xmap(
+        CraftItemType<*>::minecraftToBukkit,
+        CraftItemType<*>::bukkitToMinecraft
+    )
+
+    @JvmField
+    val MATERIAL_BLOCK: Codec<Material> = BuiltInRegistries.BLOCK.byNameCodec().xmap(
+        CraftBlockType<*>::minecraftToBukkit,
+        CraftBlockType<*>::bukkitToMinecraft
+    )
+}

@@ -17,7 +17,6 @@ dependencies {
     paperweight.paperDevBundle(local.versions.paper)
 
     api(project(":wakame-api"))
-    compileOnlyApi(project(":wakame-mixin-libraries"))
 }
 
 horizon {

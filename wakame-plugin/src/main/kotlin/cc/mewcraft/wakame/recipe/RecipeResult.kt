@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.lazyconfig.configurate.require
+import cc.mewcraft.wakame.bridge.MojangStack
 import cc.mewcraft.wakame.item.ItemRef
-import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.item.toNMS
 import net.kyori.examination.Examinable

@@ -118,7 +118,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         consumeData(BuiltInRegistries.ITEM_PROXY::update)
     }
 
-    private fun consumeData(consumer: (KoishKey, KoishItemProxy) -> Unit) {
+    private fun consumeData(consumer: (KoishKey, ProxyKoishItem) -> Unit) {
         val loader = yamlLoader {
             withDefaults()
             serializers { registerAll(SERIALIZERS) }
@@ -140,7 +140,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         }
     }
 
-    private fun loadValue(id: KoishKey, node: ConfigurationNode): KoishItemProxy {
+    private fun loadValue(id: KoishKey, node: ConfigurationNode): ProxyKoishItem {
         val dataConfig = node.require<ItemMetaContainer>()
         val properties = node.require<ItemPropContainer>()
         val behaviors = node.require<ItemBehaviorContainer>()
@@ -150,7 +150,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         val tempItemstack = KoishStackGenerator.generate(koishItem, ItemGenerationContext(koishItem, 0f, 0))
         val dataContainer = tempItemstack.dataContainer(false) ?: error("The generated ItemStack has no ItemDataContainer. This is a bug!")
 
-        return KoishItemProxy(id, dataConfig, properties, behaviors, dataContainer)
+        return ProxyKoishItem(id, dataConfig, properties, behaviors, dataContainer)
     }
 
     private fun validateItemProxies() {

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.util.bossbar.operation
 
-import cc.mewcraft.wakame.util.RegistryFriendlyByteBuf
+import cc.mewcraft.wakame.bridge.RegistryFriendlyByteBuf
 import cc.mewcraft.wakame.util.adventure.toAdventureComponent
 import cc.mewcraft.wakame.util.adventure.toNMSComponent
 import net.kyori.adventure.text.Component

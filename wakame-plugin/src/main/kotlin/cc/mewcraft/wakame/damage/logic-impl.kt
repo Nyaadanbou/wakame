@@ -7,6 +7,9 @@ import cc.mewcraft.lazyconfig.access.ConfigAccess
 import cc.mewcraft.lazyconfig.access.node
 import cc.mewcraft.lazyconfig.access.optionalEntry
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.bridge.DamageManagerBridge
+import cc.mewcraft.wakame.bridge.handle
+import cc.mewcraft.wakame.bridge.serverLevel
 import cc.mewcraft.wakame.damage.DamageManagerImpl.registerExactArrow
 import cc.mewcraft.wakame.damage.DamageManagerImpl.registerTrident
 import cc.mewcraft.wakame.damage.DamageManagerImpl.registeredCustomDamageMap
@@ -28,11 +31,9 @@ import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.util.handle
 import cc.mewcraft.wakame.util.isResistantTo
 import cc.mewcraft.wakame.util.item.isDamageable
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
-import cc.mewcraft.wakame.util.serverLevel
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import io.papermc.paper.datacomponent.DataComponentTypes
@@ -79,7 +80,7 @@ private val EQUIPMENT_MAX_AMOUNT by EQUIPMENT_CONFIG.optionalEntry<Int>("max_amo
 /**
  * 包含伤害系统的计算逻辑和状态.
  */
-internal object DamageManagerImpl : DamageManagerApi {
+internal object DamageManagerImpl : DamageManagerApi, DamageManagerBridge {
 
     // 特殊值, 方便识别. 仅用于触发事件, 以被事件系统监听&修改.
     private const val PLACEHOLDER_DAMAGE_VALUE: Float = 4.95f
@@ -992,5 +993,4 @@ internal object DamageManagerImpl : DamageManagerApi {
     private fun Player.canIntrinsicAttack(): Boolean {
         return System.currentTimeMillis() - playerIntrinsicAttackTimestampMap.getOrDefault(uniqueId, 0L) >= PLAYER_INTRINSIC_ATTACK_COOLDOWN
     }
-
 }

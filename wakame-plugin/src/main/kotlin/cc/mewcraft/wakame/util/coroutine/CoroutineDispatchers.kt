@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.util.coroutine
 
-import cc.mewcraft.wakame.BootstrapContexts
-import cc.mewcraft.wakame.SharedConstants
+import cc.mewcraft.wakame.KoishBootstrapContexts
+import cc.mewcraft.wakame.KoishSharedConstants
 import cc.mewcraft.wakame.util.runAsyncTask
 import cc.mewcraft.wakame.util.runTask
 import kotlinx.coroutines.CoroutineDispatcher
@@ -45,7 +45,7 @@ private object MinecraftCoroutineDispatcher : CoroutineDispatcher() {
         // - 代码运行在 IDE 中, 如单元测试
         // - 代码已经运行在服务端的主线程
         // - 插件还未启动完毕
-        return !SharedConstants.isRunningInIde && !Bukkit.isPrimaryThread() && BootstrapContexts.PLUGIN_READY
+        return !KoishSharedConstants.isRunningInIde && !Bukkit.isPrimaryThread() && KoishBootstrapContexts.PLUGIN_READY
     }
 
     /**

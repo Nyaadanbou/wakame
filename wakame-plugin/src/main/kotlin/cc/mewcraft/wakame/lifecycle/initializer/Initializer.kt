@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.lifecycle.initializer
 
-import cc.mewcraft.wakame.BootstrapContexts
+import cc.mewcraft.wakame.KoishBootstrapContexts
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.BuiltInMessages
 import cc.mewcraft.wakame.api.event.KoishLoadDataEvent
@@ -39,7 +39,7 @@ internal object Initializer : Listener {
      * Finds all initializable tasks and registers them all.
      */
     fun initialize(): Unit = LifecycleUtils.runLifecycle {
-        findAndRegisterTasks(BootstrapContexts.PLUGIN_JAR, javaClass.classLoader)
+        findAndRegisterTasks(KoishBootstrapContexts.PLUGIN_JAR, javaClass.classLoader)
     }
 
     /**
@@ -171,7 +171,7 @@ internal object Initializer : Listener {
             disableable.loadDependencies(Initializer.disableables, disableDependencyGraph)
         }
 
-        if (BootstrapContexts.IS_DEV_SERVER) {
+        if (KoishBootstrapContexts.IS_DEV_SERVER) {
             dumpGraphs()
         }
     }
@@ -234,7 +234,7 @@ internal object Initializer : Listener {
 
         isDone = true
         KoishLoadDataEvent().callEvent()
-        PermanentStorage.store("last_version", BootstrapContexts.PLUGIN_VERSION.toString())
+        PermanentStorage.store("last_version", KoishBootstrapContexts.PLUGIN_VERSION.toString())
         BuiltInMessages.STARTUP_BANNER.send(Bukkit.getServer().consoleSender)
         LOGGER.info(Component.text("Done loading").color(NamedTextColor.AQUA))
     }

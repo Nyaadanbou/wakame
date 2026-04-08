@@ -77,5 +77,4 @@ internal object LegacyDataMigrator {
             throw RuntimeException("Migration failed: ${e.message}", e)
         }
     }
-
 }

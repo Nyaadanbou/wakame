@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.display.implementation.standard
 
+import cc.mewcraft.wakame.bridge.MojangStack
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item.ItemStackEffectiveness
 import cc.mewcraft.wakame.item.data.impl.*
@@ -8,7 +9,6 @@ import cc.mewcraft.wakame.item.display.implementation.common.*
 import cc.mewcraft.wakame.item.property.impl.*
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.util.MojangStack
 import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component

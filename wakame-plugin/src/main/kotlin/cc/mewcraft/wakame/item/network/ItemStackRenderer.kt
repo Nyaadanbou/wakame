@@ -3,6 +3,9 @@ package cc.mewcraft.wakame.item.network
 import cc.mewcraft.lazyconfig.MAIN_CONFIG
 import cc.mewcraft.lazyconfig.access.optionalEntry
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.bridge.KoishDataSanitizer
+import cc.mewcraft.wakame.bridge.MojangStack
+import cc.mewcraft.wakame.bridge.getOrThrow
 import cc.mewcraft.wakame.item.HotfixItemName
 import cc.mewcraft.wakame.item.display.ItemRenderers
 import cc.mewcraft.wakame.item.isNetworkRewrite
@@ -11,15 +14,12 @@ import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.mixin.support.KoishDataSanitizer
 import cc.mewcraft.wakame.network.event.PacketHandler
 import cc.mewcraft.wakame.network.event.PacketListener
 import cc.mewcraft.wakame.network.event.clientbound.*
 import cc.mewcraft.wakame.network.event.registerPacketListener
 import cc.mewcraft.wakame.network.event.serverbound.ServerboundContainerClickPacketEvent
 import cc.mewcraft.wakame.network.event.unregisterPacketListener
-import cc.mewcraft.wakame.util.MojangStack
-import cc.mewcraft.wakame.util.getOrThrow
 import com.mojang.datafixers.util.Pair
 import io.papermc.paper.adventure.PaperAdventure
 import net.kyori.adventure.text.Component

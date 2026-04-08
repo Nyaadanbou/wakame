@@ -3,6 +3,8 @@ package cc.mewcraft.wakame.catalog.item
 import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.bridge.MINECRAFT_SERVER
+import cc.mewcraft.wakame.bridge.MojangLootTable
 import cc.mewcraft.wakame.catalog.item.node.CatalogItemLootTableNode
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -13,8 +15,6 @@ import cc.mewcraft.wakame.registry.DynamicRegistries
 import cc.mewcraft.wakame.registry.RegistryLoader
 import cc.mewcraft.wakame.util.IdePauser
 import cc.mewcraft.wakame.util.KoishKey
-import cc.mewcraft.wakame.util.MINECRAFT_SERVER
-import cc.mewcraft.wakame.util.MojangLootTable
 import cc.mewcraft.wakame.util.configurate.yamlLoader
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component

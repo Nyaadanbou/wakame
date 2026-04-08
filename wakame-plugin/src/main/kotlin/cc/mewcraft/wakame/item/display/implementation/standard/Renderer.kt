@@ -2,6 +2,9 @@ package cc.mewcraft.wakame.item.display.implementation.standard
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.bridge.MojangStack
+import cc.mewcraft.wakame.bridge.copyItems
+import cc.mewcraft.wakame.bridge.isNotEmpty
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item.*
@@ -25,14 +28,11 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.entry.RegistryEntry
-import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.configurate.yamlLoader
 import cc.mewcraft.wakame.util.decorate
 import cc.mewcraft.wakame.util.item.lore
 import cc.mewcraft.wakame.util.item.loreOrEmpty
 import cc.mewcraft.wakame.util.item.toBukkit
-import cc.mewcraft.wakame.util.nms.copyItems
-import cc.mewcraft.wakame.util.nms.isNotEmpty
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet

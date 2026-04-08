@@ -22,7 +22,7 @@ import cc.mewcraft.wakame.api.Koish as IKoish
 internal object KoishPlugin : JavaPlugin(), IKoish {
 
     override fun onLoad() {
-        PluginProvider.set(this)
+        KoishPluginProvider.set(this)
         KoishProvider.register(this)
 
         // 执行所有 InitFun (PRE_WORLD)
@@ -31,7 +31,7 @@ internal object KoishPlugin : JavaPlugin(), IKoish {
     }
 
     override fun onEnable() {
-        BootstrapContexts.registerLifecycleManagerOwnedByPlugin(lifecycleManager) // LifecycleManager 此时已发生变化, 重新注册
+        KoishBootstrapContexts.registerLifecycleManagerOwnedByPlugin(lifecycleManager) // LifecycleManager 此时已发生变化, 重新注册
 
         // 在 onEnable() 调用 Initializer.performPostWorld() 可以让我们利用 paper-plugin.yml
         // 中的插件依赖的配置项来控制 KoishPlugin#onEnable 的调用时机是先于其他插件还是晚于其他插件.
@@ -39,11 +39,11 @@ internal object KoishPlugin : JavaPlugin(), IKoish {
         Initializer.performPostWorld()
         Initializer.registerEvents()
 
-        BootstrapContexts.setPluginReady(true)
+        KoishBootstrapContexts.setPluginReady(true)
     }
 
     override fun onDisable() {
-        BootstrapContexts.setPluginReady(false)
+        KoishBootstrapContexts.setPluginReady(false)
         KoishProvider.unregister()
         Initializer.performDisable()
         PLUGIN_SCOPE.cancel("Koish Plugin has been disabled")

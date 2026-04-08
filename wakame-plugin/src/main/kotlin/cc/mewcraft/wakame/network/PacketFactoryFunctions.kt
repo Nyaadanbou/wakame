@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.network
 
+import cc.mewcraft.wakame.bridge.RegistryFriendlyByteBuf
 import cc.mewcraft.wakame.network.event.serverbound.ServerboundInteractPacketEvent
-import cc.mewcraft.wakame.util.RegistryFriendlyByteBuf
 import cc.mewcraft.wakame.util.bossbar.operation.BossBarOperation
 import com.mojang.datafixers.util.Pair
 import io.netty.buffer.Unpooled

@@ -8,15 +8,14 @@ Koish (codename: wakame) is a large-scale Minecraft Paper plugin written in **Ko
 
 | Module | Description |
 |---|---|
-| `wakame-mixin` | Core abstractions & interfaces (ItemBehavior, ItemProp, CastableTrigger, etc.). Compiled as a Mixin library loaded at server boot. **No plugin logic here.** |
-| `wakame-plugin` | Plugin implementation. Feature logic, config reading, event listeners, tick systems, and all runtime behavior live here. |
-| `wakame-api` | Public API surface exposed to other plugins. |
-| `wakame-mixin-libraries` | Bundled libraries for the mixin layer. |
-| `wakame-hooks/*` | Third-party plugin integrations (one sub-module per hook). |
+| `buildSrc` | Gradle build conventions. |
 | `common/lazyconfig` | Configuration framework (`MAIN_CONFIG`, `entryOrElse`, `optionalEntry`). |
 | `common/messaging` | Cross-server messaging utilities. |
 | `standalone/*` | Standalone sub-plugins (economy, cron-scheduler, etc.). |
-| `buildSrc` | Gradle build conventions. |
+| `wakame-api` | Public API surface exposed to other plugins. |
+| `wakame-mixin` | Core abstractions & interfaces (ItemBehavior, ItemProp, CastableTrigger, etc.). Compiled as a Mixin library loaded at server boot. **No plugin logic here.** |
+| `wakame-plugin` | Plugin implementation. Feature logic, config reading, event listeners, tick systems, and all runtime behavior live here. |
+| `wakame-hooks/*` | Third-party plugin integrations (one sub-module per hook). |
 
 ## Build System
 
