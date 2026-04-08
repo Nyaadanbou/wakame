@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.bridge;
 
-import cc.mewcraft.wakame.bridge.serialization.codec.AdventureCodecs;
+import cc.mewcraft.wakame.bridge.codec.AdventureCodecs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.kyori.adventure.key.Key;

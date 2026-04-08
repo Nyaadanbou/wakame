@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.enchantment.effect
 
-import cc.mewcraft.wakame.bridge.serialization.codec.PaperCodecs
+import cc.mewcraft.wakame.bridge.codec.PaperCodecs
 import cc.mewcraft.wakame.enchantment.component.AutoReplant
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import cc.mewcraft.wakame.util.metadata.MetadataKey

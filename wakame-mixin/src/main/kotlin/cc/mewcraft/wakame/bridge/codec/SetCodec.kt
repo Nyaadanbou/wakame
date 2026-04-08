@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.bridge.serialization.codec
+package cc.mewcraft.wakame.bridge.codec
 
 import com.mojang.datafixers.util.Pair
 import com.mojang.datafixers.util.Unit

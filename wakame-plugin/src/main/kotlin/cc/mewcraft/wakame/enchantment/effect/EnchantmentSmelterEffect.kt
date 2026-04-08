@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.enchantment.effect
 
-import cc.mewcraft.wakame.bridge.serialization.codec.AdventureCodecs
-import cc.mewcraft.wakame.bridge.serialization.codec.PaperCodecs
-import cc.mewcraft.wakame.bridge.serialization.codec.setOf
+import cc.mewcraft.wakame.bridge.codec.AdventureCodecs
+import cc.mewcraft.wakame.bridge.codec.PaperCodecs
+import cc.mewcraft.wakame.bridge.codec.setOf
 import cc.mewcraft.wakame.enchantment.component.Smelter
 import cc.mewcraft.wakame.item.property.impl.ItemSlot
 import cc.mewcraft.wakame.util.KoishKey

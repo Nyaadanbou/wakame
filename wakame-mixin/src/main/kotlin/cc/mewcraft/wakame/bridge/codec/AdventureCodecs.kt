@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.bridge.serialization.codec
+package cc.mewcraft.wakame.bridge.codec
 
 import cc.mewcraft.wakame.KoishSharedConstants
 import com.mojang.serialization.Codec

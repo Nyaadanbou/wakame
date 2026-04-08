@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.enchantment.effect
 
-import cc.mewcraft.wakame.bridge.serialization.codec.AdventureCodecs
+import cc.mewcraft.wakame.bridge.codec.AdventureCodecs
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier

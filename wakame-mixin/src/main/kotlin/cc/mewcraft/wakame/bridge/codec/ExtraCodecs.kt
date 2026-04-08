@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.bridge.serialization.codec
+package cc.mewcraft.wakame.bridge.codec
 
 import com.mojang.serialization.Codec
 import org.joml.Vector2f
