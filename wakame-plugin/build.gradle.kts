@@ -56,18 +56,37 @@ dependencies {
     implementation(local.gremlin.runtime)
     implementation(local.jarrelocator)
 
+    // 表达式解析
+    api(local.mocha)
+
+    // 简单反射
+    api(local.shadow.bukkit)
+
     // 通用
-    //koishLoader(local.commons.collections)
-    //koishLoader(local.commons.gson)
-    //koishLoader(local.commons.provider)
-    //koishLoader(local.commons.reflection)
-    //koishLoader(local.commons.tuple)
+    koishLoader(local.commons.collections)
+    koishLoader(local.commons.gson)
+    koishLoader(local.commons.provider)
+    koishLoader(local.commons.reflection)
+    koishLoader(local.commons.tuple)
 
     // 配置
-    //koishLoader(local.configurate.yaml)
-    //koishLoader(local.configurate.gson)
-    //koishLoader(local.configurate.extra.dfu8)
-    //koishLoader(local.configurate.extra.kotlin)
+    api(project(":common:lazyconfig"))
+    koishLoader(local.configurate.yaml)
+    koishLoader(local.configurate.gson)
+    koishLoader(local.configurate.extra.dfu9)
+    koishLoader(local.configurate.extra.kotlin)
+
+    // 跨进程通讯
+    api(project(":common:messaging"))
+    koishLoader(local.messenger)
+    koishLoader(local.messenger.nats)
+    koishLoader(local.messenger.rabbitmq)
+    koishLoader(local.messenger.redis)
+    koishLoader(local.zstdjni)
+    koishLoader(local.jedis)
+    koishLoader(local.rabbitmq)
+    koishLoader(local.nats)
+    koishLoader(local.caffeine)
 
     // 数据库
     koishLoader(local.exposed.core)
@@ -78,17 +97,6 @@ dependencies {
     koishLoader(local.mysql.jdbc)
     koishLoader(local.postgresql.jdbc)
     koishLoader(local.hikaricp)
-
-    // 跨进程通讯
-    //koishLoader(local.messenger)
-    //koishLoader(local.messenger.nats)
-    //koishLoader(local.messenger.rabbitmq)
-    //koishLoader(local.messenger.redis)
-    //koishLoader(local.zstdjni)
-    //koishLoader(local.jedis)
-    //koishLoader(local.rabbitmq)
-    //koishLoader(local.nats)
-    //koishLoader(local.caffeine)
 
     // 指令框架
     koishLoader(local.cloud.core)

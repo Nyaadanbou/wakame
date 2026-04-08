@@ -20,36 +20,6 @@ dependencies {
 
     // Paper API + NMS
     paperweight.paperDevBundle(local.versions.paper)
-
-    // 表达式解析
-    api(local.mocha)
-
-    // 反射
-    api(local.shadow.bukkit)
-
-    // 配置
-    api(project(":common:lazyconfig"))
-    runtimeOnly(local.commons.collections)
-    runtimeOnly(local.commons.gson)
-    runtimeOnly(local.commons.provider)
-    runtimeOnly(local.commons.reflection)
-    runtimeOnly(local.commons.tuple)
-    runtimeOnly(local.configurate.yaml)
-    runtimeOnly(local.configurate.gson)
-    runtimeOnly(local.configurate.extra.dfu9)
-    runtimeOnly(local.configurate.extra.kotlin)
-
-    // 跨进程通讯
-    api(project(":common:messaging"))
-    runtimeOnly(local.messenger)
-    runtimeOnly(local.messenger.nats)
-    runtimeOnly(local.messenger.rabbitmq)
-    runtimeOnly(local.messenger.redis)
-    runtimeOnly(local.zstdjni)
-    runtimeOnly(local.jedis)
-    runtimeOnly(local.rabbitmq)
-    runtimeOnly(local.nats)
-    runtimeOnly(local.caffeine)
 }
 
 horizon {
