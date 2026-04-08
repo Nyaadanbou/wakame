@@ -173,13 +173,14 @@ private fun createItemDataContainerCodec(): Codec<ServerItemDataContainer> {
     // 优先使用带压缩的枚举类序列化实现
     serials.register(CompressedEnumValueSerializer)
     // 添加 Configurate 内置的 TypeSerializer.
-    // 注意: 按照 Configurate 的实现, 查询 TypeSerializer 的顺序 是按照 注册 TypeSerializer 的顺序 进行的.
+    // 注意: 按照 Configurate 的实现, 查询 TypeSerializer 的顺序 是按照注册 TypeSerializer 的顺序进行的.
     // 因此内置的 TypeSerializeCollection 必须在我们自定义的 ObjectMapper 之后注册, 否则在反序列化时,
     // 内置的 ObjectMapper 将被优先使用, 导致无法反序列化 Kotlin 的 data class.
     serials.registerAll(STANDARD_SERIALIZERS)
 
-    val codec = DfuSerializers.codec(typeTokenOf<ServerItemDataContainer>(), serials.build())
-    requireNotNull(codec) { "Cannot find an appropriate TypeSerializer for ${ItemDataContainer::class}" }
+    val typeToken = typeTokenOf<ServerItemDataContainer>()
+    val codec = DfuSerializers.codec(typeToken, serials.build())
+    requireNotNull(codec) { "Cannot find an appropriate TypeSerializer for ${typeToken.type}" }
 
     return codec
 }
@@ -188,7 +189,7 @@ private fun createDirectSerializers(): TypeSerializerCollection {
     val serials = TypeSerializerCollection.builder()
 
     // 添加 ItemDataContainer 的 TypeSerializer
-    serials.register(typeTokenOf<ItemDataContainer>(), SimpleItemDataContainer.Serializer)
+    serials.register(typeTokenOf<ServerItemDataContainer>(), SimpleItemDataContainer.serializer())
     // 添加每一个 “Item Data” 的 TypeSerializer
     serials.registerAll(ItemDataTypes.directSerializers())
 
@@ -211,6 +212,61 @@ private open class SimpleItemDataContainer(
     private var dataMap: Reference2ObjectOpenHashMap<ItemDataType<*>, Any> = Reference2ObjectOpenHashMap(),
     private var copyOnWrite: Boolean, // 用于优化 copy() 的性能
 ) : ItemDataContainer, ItemDataContainer.Builder {
+    companion object {
+        fun serializer(): SimpleSerializer<ServerItemDataContainer> {
+            return object : SimpleSerializer<ServerItemDataContainer> {
+                override fun deserialize(type: Type, node: ConfigurationNode): ItemDataContainer {
+                    // 修复过期的数据格式
+                    if (ItemDataFixer.needFix(node)) {
+                        ItemDataFixer.createFix().apply(node)
+                        ItemDataFixer.validate(node)
+                    }
+
+                    // 反序列化每一个数据项
+                    val builder = ItemDataContainer.builder()
+                    for ((rawNodeKey, itemDataNode) in node.childrenMap()) {
+                        val nodeKey = rawNodeKey.toString()
+                        // 注意: 该 node key 所对应的 type 必须存在
+                        val dataType = BuiltInRegistries.ITEM_DATA_TYPE[nodeKey] ?: continue
+                        // 该 loader 必须加载了能够 deserialize 该类型的 TypeSerializer
+                        val dataValue = try {
+                            itemDataNode.get(dataType.typeToken) ?: run {
+                                LOGGER.error("Decoded item data value to null for $dataType. Skipped.")
+                                continue
+                            }
+                        } catch (ex: Throwable) {
+                            LOGGER.error("An exception occurred while deserializing $dataType. Skipped. Reason: ${ex.message}")
+                            continue
+                        }
+                        builder.setUnsafe(dataType, dataValue)
+                    }
+                    return builder.build()
+                }
+
+                override fun serialize(type: Type, obj: ServerItemDataContainer?, node: ConfigurationNode) {
+                    if (obj == null) return
+                    if (obj !is SimpleItemDataContainer) {
+                        LOGGER.error("Only expects ${SimpleItemDataContainer::class.qualifiedName}, but got ${obj::class.qualifiedName}")
+                        return
+                    }
+
+                    val iter = obj.fastIterator()
+                    while (iter.hasNext()) {
+                        val (dataType, dataValue) = iter.next()
+                        if (!dataType.persistent) continue
+                        val dataTypeId = BuiltInRegistries.ITEM_DATA_TYPE.getId(dataType) ?: continue
+                        val mapKey = dataTypeId.value() // 这里写入的 map key 省略了命名空间 "koish"
+                        val entryNode = node.node(mapKey)
+                        entryNode.set(
+                            dataType.typeToken.type, // 不能用 ConfigurationNode.set(Object). 必须传入该数据的 TypeToken, 否则不支持带参数的数据类型
+                            dataValue
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     override val types: Set<ItemDataType<*>>
         get() = dataMap.keys
 
@@ -299,56 +355,5 @@ private open class SimpleItemDataContainer(
                 "${BuiltInRegistries.ITEM_DATA_TYPE.getId(key)?.value() ?: "$key(unregistered)"}=$value"
             }
         }}"
-    }
-
-    object Serializer : SimpleSerializer<ItemDataContainer> {
-        override fun deserialize(type: Type, node: ConfigurationNode): ItemDataContainer {
-            // 修复过期的数据格式
-            if (ItemDataFixer.needFix(node)) {
-                ItemDataFixer.createFix().apply(node)
-                ItemDataFixer.validate(node)
-            }
-
-            // 反序列化每一个数据项
-            val builder = ItemDataContainer.builder()
-            for ((rawNodeKey, itemDataNode) in node.childrenMap()) {
-                val nodeKey = rawNodeKey.toString()
-                // 注意: 该 node key 所对应的 type 必须存在
-                val dataType = BuiltInRegistries.ITEM_DATA_TYPE[nodeKey] ?: continue
-                // 该 loader 必须加载了能够 deserialize 该类型的 TypeSerializer
-                val dataValue = try {
-                    itemDataNode.get(dataType.typeToken) ?: run {
-                        LOGGER.error("Decoded item data value to null for $dataType. Skipped.")
-                        continue
-                    }
-                } catch (ex: Throwable) {
-                    LOGGER.error("An exception occurred while deserializing $dataType. Skipped. Reason: ${ex.message}")
-                    continue
-                }
-                builder.setUnsafe(dataType, dataValue)
-            }
-            return builder.build()
-        }
-
-        override fun serialize(type: Type, obj: ItemDataContainer?, node: ConfigurationNode) {
-            if (obj == null) return
-            if (obj !is SimpleItemDataContainer) {
-                LOGGER.error("Only expects ${SimpleItemDataContainer::class.qualifiedName}, but got ${obj::class.qualifiedName}")
-                return
-            }
-
-            val iter = obj.fastIterator()
-            while (iter.hasNext()) {
-                val (dataType, dataValue) = iter.next()
-                if (!dataType.persistent) continue
-                val dataTypeId = BuiltInRegistries.ITEM_DATA_TYPE.getId(dataType) ?: continue
-                val mapKey = dataTypeId.value() // 这里写入的 map key 省略了命名空间 "koish"
-                val entryNode = node.node(mapKey)
-                entryNode.set(
-                    dataType.typeToken.type, // 不能用 ConfigurationNode.set(Object). 必须传入该数据的 TypeToken, 否则不支持带参数的数据类型
-                    dataValue
-                )
-            }
-        }
     }
 }

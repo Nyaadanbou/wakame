@@ -10,20 +10,20 @@ import net.kyori.adventure.key.Key
  */
 object AdventureCodecs {
     @JvmField
-    val KEY_WITH_MINECRAFT_NAMESPACE: Codec<Key> = Codec.STRING.comapFlatMap({ key ->
-        try {
-            DataResult.success(Key.key(Key.MINECRAFT_NAMESPACE, key))
-        } catch (e: IllegalArgumentException) {
-            DataResult.error { "Invalid key: '$key' (${e.message})" }
-        }
-    }, Any::toString).stable()
+    val KEY_WITH_MINECRAFT_NAMESPACE: Codec<Key> = Codec.STRING.comapFlatMap(::validateMinecraftKey, Any::toString).stable()
 
     @JvmField
-    val KEY_WITH_KOISH_NAMESPACE: Codec<Key> = Codec.STRING.comapFlatMap({ key ->
-        try {
-            DataResult.success(Key.key(KoishSharedConstants.KOISH_NAMESPACE, key))
-        } catch (e: IllegalArgumentException) {
-            DataResult.error { "Invalid key: '$key' (${e.message})" }
-        }
-    }, Any::toString).stable()
+    val KEY_WITH_KOISH_NAMESPACE: Codec<Key> = Codec.STRING.comapFlatMap(::validateKoishKey, Any::toString).stable()
+
+    private fun validateMinecraftKey(key: String): DataResult<Key> = try {
+        DataResult.success(Key.key(key))
+    } catch (e: IllegalArgumentException) {
+        DataResult.error { "Invalid key: '$key' (${e.message})" }
+    }
+
+    private fun validateKoishKey(key: String): DataResult<Key> = try {
+        DataResult.success(Key.key(KoishSharedConstants.KOISH_NAMESPACE, key))
+    } catch (e: IllegalArgumentException) {
+        DataResult.error { "Invalid key: '$key' (${e.message})" }
+    }
 }
