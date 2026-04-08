@@ -11,7 +11,6 @@ import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
  * 负责注册新的 {@link LootPoolEntryType}.
  */
 public class ExtraLootPoolEntries {
-
     public static final LootPoolEntryType KOISH_ITEM = register(
             "koish:item", KoishLootItem.CODEC
     );

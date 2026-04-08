@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.bridge
 import org.bukkit.event.entity.EntityDamageEvent
 
 interface DamageManagerBridge {
-
     companion object Impl : DamageManagerBridge {
         private var implementation: DamageManagerBridge = object : DamageManagerBridge {
             override fun injectDamageLogic(event: EntityDamageEvent, originalLastHurt: Float, isDuringInvulnerable: Boolean): Float = Float.NaN

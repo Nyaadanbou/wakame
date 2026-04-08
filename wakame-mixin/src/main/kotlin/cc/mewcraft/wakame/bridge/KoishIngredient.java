@@ -19,7 +19,6 @@ import java.util.Set;
 
 /// 桥接接口, 让其他代码可以调用通过 Mixin 新增的方法.
 public interface KoishIngredient {
-
     boolean koish$hasKeys();
 
     @Nullable Set<Key> koish$getKeys();

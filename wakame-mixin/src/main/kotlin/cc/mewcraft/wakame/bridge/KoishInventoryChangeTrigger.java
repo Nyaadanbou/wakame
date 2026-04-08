@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class KoishInventoryChangeTrigger extends SimpleCriterionTrigger<KoishInventoryChangeTrigger.TriggerInstance> {
-
     @Override
     public Codec<KoishInventoryChangeTrigger.TriggerInstance> codec() {
         return KoishInventoryChangeTrigger.TriggerInstance.CODEC;

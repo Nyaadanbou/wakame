@@ -11,7 +11,6 @@ import java.util.*
 import java.util.function.Function
 
 object KoishDataSanitizer {
-
     @JvmStatic
     fun isExtra(type: DataComponentType<*>): Boolean {
         return type == ExtraDataComponents.ITEM_KEY || type == ExtraDataComponents.DATA_CONTAINER
