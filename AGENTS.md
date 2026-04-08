@@ -266,9 +266,9 @@ metadata.remove(MY_KEY)
 
 |任务|首选工具|说明|
 |---|---|---|
-|检索项目代码 (符号、引用、结构)|Serena (`find_symbol`, `find_referencing_symbols`, `get_symbols_overview`, `search_for_pattern`)|语言感知的代码分析，优于纯文本搜索|
-|查询第三方库/API 文档|Context7 (`resolve-library-id` + `get-library-docs`)|获取最新的库文档、代码示例和配置步骤，无需用户显式要求|
-|爬取/读取网页|Firecrawl (`firecrawl_scrape`, `firecrawl_search`) 或 `fetch`|Firecrawl 功能更强（支持 JS 渲染、结构化提取），`fetch` 适合轻量级单页抓取|
+|检索项目代码 (符号、引用、结构)|Serena |语言感知的代码分析，优于纯文本搜索|
+|查询第三方库/API 文档|Context7 |获取最新的库文档、代码示例和配置步骤，无需用户显式要求|
+|爬取/读取网页|Firecrawl 或 `fetch`|Firecrawl 功能更强（支持 JS 渲染、结构化提取），`fetch` 适合轻量级单页抓取|
 
 > 如果某个 MCP 工具不可用，退而求其次使用备选工具（`grep_search`、`read_file` 等），核心目标不变。
 

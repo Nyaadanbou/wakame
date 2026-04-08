@@ -41,6 +41,7 @@ Skill 与 Custom Instructions (如 `copilot-instructions.md`) 的区别:
 | `.github/skills/configurate-config/` | 配置文件读取与编写 (Configurate + lazyconfig) |
 | `.github/skills/create-skill/` | 创建新的 Agent Skill (本技能) |
 | `.github/skills/create-module-skill/` | 创建模块/框架文档型 Skill (元技能) |
+| `.github/skills/mixin-to-plugin-migration/` | 从 wakame-mixin 迁移代码到 wakame-plugin |
 
 ---
 
@@ -260,4 +261,3 @@ allowed-tools: shell
 3. **description 是触发器**: Copilot 完全依赖 `description` 判断是否加载 Skill，写不好会导致 Skill 永远不被触发。
 4. **避免过大的 Skill**: Skill 加载后会占用上下文窗口。如果内容过多，考虑拆分为多个 Skill。
 5. **Skill 目录下的所有文件都可被 Copilot 访问**: 当 Skill 被触发时，Copilot 可以读取目录下的所有文件，因此可以放置示例代码、模板等辅助资源。
-
