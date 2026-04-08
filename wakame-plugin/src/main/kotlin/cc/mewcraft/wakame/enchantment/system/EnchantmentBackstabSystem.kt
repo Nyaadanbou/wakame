@@ -1,0 +1,4 @@
+package cc.mewcraft.wakame.enchantment.system
+
+// 背刺: 增加从后面造成的伤害
+object EnchantmentBackstabSystem

@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.craftingstation.station
 
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.lazyconfig.configurate.require
+import cc.mewcraft.wakame.KoishSharedConstants
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -81,7 +81,7 @@ internal object StationSerializer : SimpleSerializer<CraftingStation> {
                 // 向合成站添加配方
                 val recipeKeys = node.node("recipes").getList<Key>(emptyList())
                 for (key in recipeKeys) {
-                    val stationRecipe = if (SharedConstants.isRunningInIde) {
+                    val stationRecipe = if (KoishSharedConstants.isRunningInIde) {
                         CraftingStationRegistry.getRawRecipe(key)
                     } else {
                         CraftingStationRegistry.getRecipe(key)

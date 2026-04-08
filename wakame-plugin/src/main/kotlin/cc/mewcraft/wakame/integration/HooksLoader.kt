@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.integration
 
-import cc.mewcraft.wakame.BootstrapContexts
+import cc.mewcraft.wakame.KoishBootstrapContexts
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.integration.permission.PermissionIntegration
@@ -38,7 +38,7 @@ private object HooksLoader {
 
     @Suppress("UNCHECKED_CAST")
     fun loadHooks(targetStage: HookStage) {
-        val pluginJar = BootstrapContexts.PLUGIN_JAR.toFile()
+        val pluginJar = KoishBootstrapContexts.PLUGIN_JAR.toFile()
         JarUtils.findAnnotatedClasses(
             pluginJar,
             listOf(Hook::class), listOf(),

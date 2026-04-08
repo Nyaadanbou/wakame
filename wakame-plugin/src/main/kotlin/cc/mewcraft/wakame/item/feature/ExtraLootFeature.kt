@@ -1,11 +1,12 @@
 package cc.mewcraft.wakame.item.feature
 
+import cc.mewcraft.wakame.bridge.*
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.util.*
 import cc.mewcraft.wakame.util.item.toNMS
+import cc.mewcraft.wakame.util.registerEvents
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams

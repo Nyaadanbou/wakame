@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.network
 
+import cc.mewcraft.wakame.bridge.MINECRAFT_SERVER
+import cc.mewcraft.wakame.bridge.serverPlayer
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInitStage
-import cc.mewcraft.wakame.util.MINECRAFT_SERVER
 import cc.mewcraft.wakame.util.registerEvents
-import cc.mewcraft.wakame.util.serverPlayer
 import io.netty.channel.Channel
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelHandler.Sharable

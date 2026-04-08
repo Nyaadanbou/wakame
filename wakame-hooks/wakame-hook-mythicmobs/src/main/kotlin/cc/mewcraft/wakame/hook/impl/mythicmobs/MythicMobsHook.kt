@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs
 
+import cc.mewcraft.wakame.bridge.MythicPluginBridge
 import cc.mewcraft.wakame.hook.impl.mythicmobs.listener.ConfigListener
 import cc.mewcraft.wakame.hook.impl.mythicmobs.listener.DamageListener
 import cc.mewcraft.wakame.hook.impl.mythicmobs.listener.ReloadListener
 import cc.mewcraft.wakame.hook.impl.mythicmobs.placeholder.KoishPlaceholders
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.integration.skill.SkillIntegration
-import cc.mewcraft.wakame.mixin.support.MythicPluginBridge
 import cc.mewcraft.wakame.util.registerEvents
 import io.lumine.mythic.bukkit.MythicBukkit
 import io.lumine.mythic.core.constants.MobKeys

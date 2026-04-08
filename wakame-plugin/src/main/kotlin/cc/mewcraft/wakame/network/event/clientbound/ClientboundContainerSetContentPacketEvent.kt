@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.network.event.clientbound
 
+import cc.mewcraft.wakame.bridge.NonNullList
 import cc.mewcraft.wakame.network.event.PlayerPacketEvent
-import cc.mewcraft.wakame.util.NonNullList
 import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket
 import org.bukkit.entity.Player
 import net.minecraft.world.item.ItemStack as MojangStack

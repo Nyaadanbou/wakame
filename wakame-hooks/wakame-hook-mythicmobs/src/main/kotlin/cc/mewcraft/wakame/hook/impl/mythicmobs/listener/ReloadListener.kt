@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.listener
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.bridge.EntityTypeWrapperObjects
 import cc.mewcraft.wakame.hook.impl.mythicmobs.placeholder.KoishPlaceholders
-import cc.mewcraft.wakame.mixin.support.EntityTypeWrapperObjects
 import io.lumine.mythic.bukkit.events.MythicReloadCompleteEvent
 import io.lumine.mythic.bukkit.events.MythicReloadEvent
 import io.lumine.mythic.bukkit.events.MythicReloadedEvent

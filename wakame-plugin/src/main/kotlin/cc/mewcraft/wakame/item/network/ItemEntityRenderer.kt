@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.network
 
+import cc.mewcraft.wakame.bridge.NMSUtils
+import cc.mewcraft.wakame.bridge.send
 import cc.mewcraft.wakame.item.extension.rarity2
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.hasProp
@@ -16,9 +18,7 @@ import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEntityDataPack
 import cc.mewcraft.wakame.network.event.registerPacketListener
 import cc.mewcraft.wakame.network.event.unregisterPacketListener
 import cc.mewcraft.wakame.shadow.world.entity.ShadowEntity
-import cc.mewcraft.wakame.util.NMSUtils
 import cc.mewcraft.wakame.util.adventure.toNMSComponent
-import cc.mewcraft.wakame.util.send
 import io.papermc.paper.adventure.PaperAdventure
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.staticShadow

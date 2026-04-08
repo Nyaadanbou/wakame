@@ -1,11 +1,15 @@
 package cc.mewcraft.wakame.catalog.item.node
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.bridge.KoishLootItem
+import cc.mewcraft.wakame.bridge.MINECRAFT_SERVER
+import cc.mewcraft.wakame.bridge.MojangLootTable
+import cc.mewcraft.wakame.bridge.namespacedKey
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.ItemRef
-import cc.mewcraft.wakame.mixin.support.KoishLootItem
 import cc.mewcraft.wakame.shadow.loot.*
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.decorate
+import cc.mewcraft.wakame.util.shadow
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.shadow
 import net.kyori.adventure.key.Key

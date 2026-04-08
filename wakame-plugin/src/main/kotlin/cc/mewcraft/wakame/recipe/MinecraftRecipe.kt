@@ -3,9 +3,13 @@ package cc.mewcraft.wakame.recipe
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.adventure.key.KoishKeyed
+import cc.mewcraft.wakame.bridge.MojangResourceKey
+import cc.mewcraft.wakame.bridge.RECIPE_MANAGER
+import cc.mewcraft.wakame.bridge.toIdentifier
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.adventure.toSimpleString
+import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey

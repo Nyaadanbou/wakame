@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.papi
 
 import cc.mewcraft.lazyconfig.access.entryOrElse
-import cc.mewcraft.wakame.BootstrapContexts
+import cc.mewcraft.wakame.KoishBootstrapContexts
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.feature.FEATURE_CONFIG
@@ -23,8 +23,8 @@ object PlaceholderAPIHook : PlaceholderExpansion() {
     }
 
     override fun getIdentifier(): String = "Koish"
-    override fun getAuthor(): String = BootstrapContexts.PLUGIN_AUTHORS.joinToString()
-    override fun getVersion(): String = BootstrapContexts.PLUGIN_VERSION.toString()
+    override fun getAuthor(): String = KoishBootstrapContexts.PLUGIN_AUTHORS.joinToString()
+    override fun getVersion(): String = KoishBootstrapContexts.PLUGIN_VERSION.toString()
     override fun getRequiredPlugin(): String? = null
     override fun persist(): Boolean = true
 

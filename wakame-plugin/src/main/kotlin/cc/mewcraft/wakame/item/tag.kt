@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.util.KoishKey
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import org.bukkit.inventory.ItemStack
+import org.jetbrains.annotations.ApiStatus
 
 /**
  * 负责初始化 Koish 标签系统的一些内部状态, 如 API 实例.
@@ -20,6 +21,33 @@ internal object KoishTagApiBootstrap {
     fun init() {
         // 注册 KoishTagManagerApi
         KoishTagManagerApi.setImplementation(KoishTagManager)
+    }
+}
+
+interface KoishTagManagerApi {
+    fun isTagged(itemStack: ItemStack, tagId: KoishKey): Boolean
+
+    fun getValues(tagId: KoishKey): Set<ItemRef>
+
+    companion object Impl : KoishTagManagerApi {
+
+        private var implementation: KoishTagManagerApi = object : KoishTagManagerApi {
+            override fun isTagged(itemStack: ItemStack, tagId: KoishKey): Boolean = false
+            override fun getValues(tagId: KoishKey): Set<ItemRef> = emptySet()
+        }
+
+        @ApiStatus.Internal
+        fun setImplementation(instance: KoishTagManagerApi) {
+            this.implementation = instance
+        }
+
+        override fun isTagged(itemStack: ItemStack, tagId: KoishKey): Boolean {
+            return implementation.isTagged(itemStack, tagId)
+        }
+
+        override fun getValues(tagId: KoishKey): Set<ItemRef> {
+            return implementation.getValues(tagId)
+        }
     }
 }
 

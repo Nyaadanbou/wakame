@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.item.ScanItemSlotChanges
 import cc.mewcraft.wakame.item.behavior.impl.weapon.KatanaSwitchSystem
 import cc.mewcraft.wakame.item.behavior.impl.weapon.KatanaTickSystem
 import cc.mewcraft.wakame.item.feature.SequenceComboFeature
-import cc.mewcraft.wakame.kizami.system.ItemInscriptionSystem
+import cc.mewcraft.wakame.kizami.ItemInscriptionSystem
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler

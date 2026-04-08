@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.BootstrapContexts
+import cc.mewcraft.wakame.KoishBootstrapContexts
+import cc.mewcraft.wakame.bridge.DamageManagerBridge
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -22,11 +23,9 @@ internal object DamageApiBootstrap {
 
     @InitFun
     fun init() {
-        // 注册 DamageBundleFactory
         DamageBundleFactory.register(DefaultDamageBundleFactory)
-
-        // 注册 DamageManagerApi
         DamageManagerApi.setImplementation(DamageManagerImpl)
+        DamageManagerBridge.setImplementation(DamageManagerImpl)
 
         // 修改原版和伤害有关的部分标签
         modifyTags()
@@ -37,7 +36,7 @@ internal object DamageApiBootstrap {
      * 以实现伤害系统的特定功能.
      */
     private fun modifyTags() {
-        BootstrapContexts.LIFECYCLE_MANAGER_OWNED_BY_BOOTSTRAP.registerEventHandler(
+        KoishBootstrapContexts.LIFECYCLE_MANAGER_OWNED_BY_BOOTSTRAP.registerEventHandler(
             LifecycleEvents.TAGS.postFlatten(RegistryKey.ITEM)
         ) { event ->
             val registrar = event.registrar()
@@ -47,7 +46,7 @@ internal object DamageApiBootstrap {
             registrar.setTag(ItemTypeTagKeys.SWORDS, emptySet())
         }
 
-        BootstrapContexts.LIFECYCLE_MANAGER_OWNED_BY_BOOTSTRAP.registerEventHandler(
+        KoishBootstrapContexts.LIFECYCLE_MANAGER_OWNED_BY_BOOTSTRAP.registerEventHandler(
             LifecycleEvents.TAGS.preFlatten(RegistryKey.DAMAGE_TYPE)
         ) { event ->
             val registrar = event.registrar()
