@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.util
 import cc.mewcraft.wakame.KoishSharedConstants
 import com.google.common.collect.HashBiMap
 import io.papermc.paper.ServerBuildInfo
-import xyz.xenondevs.commons.collections.mapToIntArray
 import kotlin.math.max
 
 private val RELEASE_STAGES = HashBiMap.create<String, Int>().apply {
@@ -36,7 +35,11 @@ class Version : Comparable<Version> {
         val stage = result.groupValues[2].takeUnless(String::isBlank)
         val stageVer = result.groupValues[3].takeUnless(String::isBlank)
 
-        this.version = ver.split('.').mapToIntArray { it.toIntOrNull() ?: 0 }
+        this.version = ver.split('.').let { list ->
+            IntArray(list.size) {
+                list[it].toIntOrNull() ?: 0
+            }
+        }
 
         if (stage != null) {
             this.stageVersion = buildList<Int> {
