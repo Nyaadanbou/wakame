@@ -8,6 +8,9 @@ import cc.mewcraft.wakame.hook.impl.mythicmobs.listener.ReloadListener
 import cc.mewcraft.wakame.hook.impl.mythicmobs.placeholder.KoishPlaceholders
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.integration.skill.SkillIntegration
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.registerEvents
 import io.lumine.mythic.bukkit.MythicBukkit
 import io.lumine.mythic.core.constants.MobKeys
@@ -34,11 +37,19 @@ object MythicMobsHook {
         // 注册 Placeholders
         KoishPlaceholders.register(MythicBukkit.inst())
 
-        MythicMobsBridge.setImplementation(MythicMobsBridgeImpl)
+        // 注册 SkillIntegration
         SkillIntegration.setImplementation(MythicSkillIntegration)
 
         // 目前的所有实现暂时不需要获取 MythicMobs 的怪物的 id, 等之后需要的时候再把这个注释给去掉.
         // BuiltInRegistries.ENTITY_REF_LOOKUP_DIR.add("mythicmobs", MythicMobsEntityRefLookupDictionary())
+    }
+}
+
+@Init(InitStage.BOOTSTRAP)
+object MythicMobsBootstrap {
+    @InitFun
+    fun init() {
+        MythicMobsBridge.setImplementation(MythicMobsBridgeImpl)
     }
 }
 
