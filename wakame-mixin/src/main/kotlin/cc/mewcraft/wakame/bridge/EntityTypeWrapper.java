@@ -37,7 +37,6 @@ import java.util.function.Consumer;
  */
 @NullMarked
 public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
-
     public static final Codec<EntityType<?>> CODEC = Identifier.CODEC.comapFlatMap(EntityTypeWrapper::encode, EntityTypeWrapper::decode);
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String NAMESPACE = "mythicmobs";
@@ -105,7 +104,7 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
         if (this.delegate == null) {
             // 直接从 MythicBootstrapBridge 获取 NMS EntityType, 避免在 Bootstrap 阶段调用 CraftBukkit 还未初始化的代码
             // 如果 MythicMobs 生物配置文件写错了 EntityType, 这里会抛出 RuntimeException 来终止服务端启动, 这是符合预期的
-            EntityType<T> entityType = (EntityType<T>) MythicBootstrapBridge.INSTANCE.getEntityType(id);
+            EntityType<T> entityType = (EntityType<T>) MythicMobsBridge.Impl.getRealEntityType(id);
             if (entityType != null) {
                 this.delegate = entityType;
             } else {
@@ -166,7 +165,7 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
         // MythicMobs 5.8.2:
         // 在实体被创建时, MythicMobs 会识别这里写入的数据, 将实体变成对应的 MythicMobs 实体
-        MythicPluginBridge.Impl.writeIdMark(bukkitEntity, PaperAdventure.asAdventure(id));
+        MythicMobsBridge.Impl.writeIdMark(bukkitEntity, PaperAdventure.asAdventure(id));
 
         return entity;
     }
@@ -288,7 +287,7 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
     @Override
     public @Nullable T tryCast(Entity obj) {
-        return  getDelegate().tryCast(obj);
+        return getDelegate().tryCast(obj);
     }
 
     @Override
