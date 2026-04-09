@@ -2,11 +2,7 @@ package cc.mewcraft.wakame.animation
 
 import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.lazyconfig.configurate.serializer.DispatchingSerializer
-import cc.mewcraft.wakame.entity.display.Brightness
-import cc.mewcraft.wakame.entity.display.CommonDisplayData
-import cc.mewcraft.wakame.entity.display.DefaultBrightness
-import cc.mewcraft.wakame.entity.display.TextDisplay
-import cc.mewcraft.wakame.entity.display.TextDisplayData
+import cc.mewcraft.wakame.entity.display.*
 import cc.mewcraft.wakame.util.math.Transformation
 import cc.mewcraft.wakame.util.runTaskLater
 import org.bukkit.Location
@@ -49,7 +45,7 @@ interface AnimationData<T : CommonDisplayData> {
 @ConfigSerializable
 data class TextDisplayAnimationData(
     override val frames: Map<Long, TextDisplayAnimationFrame>,
-    override val settings: TextDisplayAnimationSettings
+    override val settings: TextDisplayAnimationSettings,
 ) : AnimationData<TextDisplayData> {
 
     override fun play(viewer: Player, animLocation: Location, context: AnimationContext) {
@@ -134,7 +130,7 @@ data class TextDisplayAnimationFrame(
      * 2.如果动画中的文本每帧变化, 则各帧各自设置.
      * 3.实现了简单的继承关系, 各帧可以继承 Settings 中的文本, 也可以自行覆写.
      */
-    val text: TextBuilder? = null
+    val text: TextBuilder? = null,
 ) : AnimationFrame<TextDisplayData> {
     override fun applyTo(data: TextDisplayData, context: AnimationContext): TextDisplayData {
         applyToCommon(data)

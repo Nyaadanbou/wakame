@@ -1,7 +1,6 @@
-package cc.mewcraft.wakame.mixin.core;
+package cc.mewcraft.wakame.mixin;
 
-import cc.mewcraft.wakame.item.KoishStackData;
-import cc.mewcraft.wakame.item.property.ItemPropTypes;
+import cc.mewcraft.wakame.bridge.KoishItemBridge;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -23,6 +22,6 @@ abstract class MixinPlayer {
             )
     )
     private boolean redirectIsSword(ItemStack instance, TagKey<Item> tag) {
-        return KoishStackData.hasProp(instance, ItemPropTypes.MINECRAFT_SWEEP);
+        return KoishItemBridge.Impl.allowSweepAttack(instance);
     }
 }

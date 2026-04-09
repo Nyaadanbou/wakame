@@ -89,7 +89,7 @@ data class OBB constructor(
         axisX: Vector3f,
         axisY: Vector3f,
         axisZ: Vector3f,
-        halfExtents: Vector3f
+        halfExtents: Vector3f,
     ) : this(
         center.x, center.y, center.z,
         axisX.x, axisX.y, axisX.z,
@@ -99,7 +99,7 @@ data class OBB constructor(
     )
 
     constructor(
-        center: Vector3f, axes: Triple<Vector3f, Vector3f, Vector3f>, halfExtents: Vector3f
+        center: Vector3f, axes: Triple<Vector3f, Vector3f, Vector3f>, halfExtents: Vector3f,
     ) : this(
         center, axes.first, axes.second, axes.third, halfExtents
     )

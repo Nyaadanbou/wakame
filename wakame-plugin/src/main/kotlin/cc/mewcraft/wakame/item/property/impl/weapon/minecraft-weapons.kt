@@ -2,8 +2,6 @@ package cc.mewcraft.wakame.item.property.impl.weapon
 
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
-
-
 /**
  * **原版重锤**武器的配置.
  *

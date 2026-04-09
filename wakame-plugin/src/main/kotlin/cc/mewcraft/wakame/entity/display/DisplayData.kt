@@ -16,6 +16,7 @@ import net.minecraft.world.entity.Display as MojangDisplay
 
 /**
  * 展示实体共通数据.
+ *
  * 默认值与 wiki 一致.
  */
 sealed class CommonDisplayData {
@@ -120,9 +121,9 @@ fun Billboard.toMojang(): MojangDisplay.BillboardConstraints {
 
 /**
  * 对展示实体 brightness 属性的封装.
+ *
  * 不直接使用 [org.bukkit.entity.Display.Brightness] 的原因:
- * Bukkit 使用 null 代表默认值, 即使用当前展示实体所在位置的亮度.
- * null 可能导致序列化问题.
+ * Bukkit 使用 null 代表默认值, 即使用当前展示实体所在位置的亮度. 而 null 可能导致序列化问题.
  */
 sealed interface Brightness
 
@@ -147,7 +148,7 @@ object DefaultBrightness : Brightness {
 @ConfigSerializable
 data class SpecifiedBrightness(
     val blockLight: Int,
-    val skyLight: Int
+    val skyLight: Int,
 ) : Brightness
 
 object BrightnessSerializer : SimpleSerializer<Brightness> {

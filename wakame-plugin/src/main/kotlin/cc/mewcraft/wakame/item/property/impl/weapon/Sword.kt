@@ -21,4 +21,4 @@ data class Sword(
     override val isTwoHanded: Boolean = false,
     val damageDistributed: Boolean = false,
     val minDamageDistributedRatio: Double = .0,
-): ConfigurableTwoHanded, ConfigurableAttackCooldown
+) : ConfigurableTwoHanded, ConfigurableAttackCooldown

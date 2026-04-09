@@ -9,5 +9,5 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
  */
 @ConfigSerializable
 data class Wand(
-    override val isTwoHanded: Boolean
+    override val isTwoHanded: Boolean,
 ) : ConfigurableTwoHanded

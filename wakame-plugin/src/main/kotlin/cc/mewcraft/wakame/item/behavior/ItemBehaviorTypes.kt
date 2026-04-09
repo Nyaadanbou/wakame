@@ -4,6 +4,8 @@ import cc.mewcraft.wakame.item.behavior.impl.*
 import cc.mewcraft.wakame.item.behavior.impl.external.*
 import cc.mewcraft.wakame.item.behavior.impl.test.TestInteract
 import cc.mewcraft.wakame.item.behavior.impl.weapon.*
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 
 /**

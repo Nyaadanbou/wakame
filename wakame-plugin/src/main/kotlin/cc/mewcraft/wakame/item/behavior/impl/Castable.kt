@@ -1,10 +1,6 @@
 package cc.mewcraft.wakame.item.behavior.impl
 
-import cc.mewcraft.wakame.item.behavior.AttackContext
-import cc.mewcraft.wakame.item.behavior.BehaviorResult
-import cc.mewcraft.wakame.item.behavior.ConsumeContext
-import cc.mewcraft.wakame.item.behavior.InteractionResult
-import cc.mewcraft.wakame.item.behavior.UseContext
+import cc.mewcraft.wakame.item.behavior.*
 import cc.mewcraft.wakame.item.getProp
 import cc.mewcraft.wakame.item.property.ItemPropTypes
 import cc.mewcraft.wakame.item.property.impl.CastableTrigger

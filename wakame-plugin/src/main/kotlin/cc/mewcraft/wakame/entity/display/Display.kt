@@ -1,21 +1,16 @@
 package cc.mewcraft.wakame.entity.display
 
+import cc.mewcraft.wakame.bridge.MojangStack
+import cc.mewcraft.wakame.bridge.serverLevel
+import cc.mewcraft.wakame.bridge.serverPlayer
 import cc.mewcraft.wakame.shadow.network.syncher.ShadowSynchedEntityData
-import cc.mewcraft.wakame.util.MojangStack
-import cc.mewcraft.wakame.util.serverLevel
-import cc.mewcraft.wakame.util.serverPlayer
 import io.papermc.paper.adventure.PaperAdventure
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.shadow
 import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.protocol.Packet
-import net.minecraft.network.protocol.game.ClientGamePacketListener
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
-import net.minecraft.network.protocol.game.ClientboundBundlePacket
-import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
-import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
-import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
+import net.minecraft.network.protocol.game.*
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
 import net.minecraft.resources.Identifier
 import net.minecraft.util.Brightness
@@ -33,7 +28,7 @@ import net.minecraft.world.entity.Display as MojangDisplay
 import org.bukkit.entity.TextDisplay as BukkitTextDisplay
 
 abstract class CommonDisplay<T : MojangDisplay>(
-    protected var location: Location
+    protected var location: Location,
 ) {
     protected var mojangDisplay: T? = null
 
@@ -51,6 +46,7 @@ abstract class CommonDisplay<T : MojangDisplay>(
 
     /**
      * 创建对应的 [mojangDisplay].
+     *
      * 仅创建, 不会更新各属性.
      * 由具体的展示实体子类实现.
      */
@@ -58,6 +54,7 @@ abstract class CommonDisplay<T : MojangDisplay>(
 
     /**
      * 更新对应的 [mojangDisplay] 中的各属性.
+     *
      * 即将 [data] 中的属性同步至 [mojangDisplay] 中.
      * 由具体的展示实体子类实现.
      */
@@ -65,6 +62,7 @@ abstract class CommonDisplay<T : MojangDisplay>(
 
     /**
      * 向 [player] 显示展示实体.
+     *
      * 本质上是向玩家发送添加实体的网络包(该包不会设置实体属性).
      * 会调用一次 [refresh].
      */
@@ -121,6 +119,7 @@ abstract class CommonDisplay<T : MojangDisplay>(
 
     /**
      * 向 [player] 隐藏展示实体.
+     *
      * 本质上是向玩家发送移除实体的网络包.
      */
     fun hide(player: Player): Boolean {
@@ -139,7 +138,7 @@ abstract class CommonDisplay<T : MojangDisplay>(
 
         // brightness
         val brightness = data.brightness
-        mojangDisplay.brightnessOverride = when(brightness) {
+        mojangDisplay.brightnessOverride = when (brightness) {
             is DefaultBrightness -> null
             is SpecifiedBrightness -> Brightness(brightness.blockLight, brightness.skyLight)
         }
@@ -185,7 +184,7 @@ abstract class CommonDisplay<T : MojangDisplay>(
 
 class TextDisplay(
     override val data: TextDisplayData,
-    location: Location
+    location: Location,
 ) : CommonDisplay<MojangDisplay.TextDisplay>(location) {
 
     override fun create() {
@@ -256,7 +255,7 @@ class TextDisplay(
 
 class ItemDisplay(
     override val data: ItemDisplayData,
-    location: Location
+    location: Location,
 ) : CommonDisplay<MojangDisplay.ItemDisplay>(location) {
 
     override fun create() {
@@ -286,7 +285,7 @@ class ItemDisplay(
 
 class BlockDisplay(
     override val data: BlockDisplayData,
-    location: Location
+    location: Location,
 ) : CommonDisplay<MojangDisplay.BlockDisplay>(location) {
 
     override fun create() {
@@ -308,7 +307,7 @@ class BlockDisplay(
 
         // block state
         val block = BuiltInRegistries.BLOCK.get(Identifier.bySeparator(data.material.key.toString(), ':')).get().value()
-        mojangDisplay.blockState =  block.defaultBlockState()
+        mojangDisplay.blockState = block.defaultBlockState()
 
         // TODO 还有其他属性, 由于方块展示实体使用较少, 暂时搁置
     }

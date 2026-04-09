@@ -59,7 +59,7 @@ object Vec3f {
         x1: Float, y1: Float, z1: Float,
         x2: Float, y2: Float, z2: Float,
         x3: Float, y3: Float, z3: Float,
-        epsilon: Float = 1e-6f
+        epsilon: Float = 1e-6f,
     ): Boolean {
         // 单位向量判定
         val aLengthSquared = x1 * x1 + y1 * y1 + z1 * z1

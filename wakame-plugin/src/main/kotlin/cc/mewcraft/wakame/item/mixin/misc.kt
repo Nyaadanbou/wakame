@@ -93,6 +93,10 @@ private object KoishItemBridgeImpl : KoishItemBridge {
         stack.onlyCompareIdInRecipeBook = bool
     }
 
+    override fun allowSweepAttack(stack: MojangStack): Boolean {
+        return stack.hasProp(ItemPropTypes.MINECRAFT_SWEEP)
+    }
+
     private fun minecraftEnchantmentToBukkit(enchantment: net.minecraft.world.item.enchantment.Enchantment): Enchantment? {
         val id = MinecraftServer.getServer().registryAccess()
             .lookupOrThrow(Registries.ENCHANTMENT)

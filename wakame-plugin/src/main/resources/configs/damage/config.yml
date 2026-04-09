@@ -268,9 +268,9 @@ display:
           scale: [ 1.5, 1.5, 1.5 ]
         # 正暴击时该次动画的参数.
         # 暴击动画的参数未指定时, 将继承常规动画参数.
-        positive_critical_strike: {}
+        positive_critical_strike: { }
         # 负暴击时该次动画的参数.
-        negative_critical_strike: {}
+        negative_critical_strike: { }
 
       - delay: 2
         normal:

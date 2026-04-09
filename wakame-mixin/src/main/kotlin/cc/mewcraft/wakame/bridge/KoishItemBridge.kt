@@ -23,6 +23,7 @@ interface KoishItemBridge {
             override fun createShowItemComponent(component: Component): Component = throw NotImplementedError()
             override fun onlyCompareTypeIdForRecipeBook(stack: MojangStack): Boolean = throw NotImplementedError()
             override fun onlyCompareTypeIdForRecipeBook(stack: MojangStack, bool: Boolean): Unit = throw NotImplementedError()
+            override fun allowSweepAttack(stack: MojangStack): Boolean = throw NotImplementedError()
         }
 
         fun setImplementation(impl: KoishItemBridge) {
@@ -71,6 +72,9 @@ interface KoishItemBridge {
         override fun onlyCompareTypeIdForRecipeBook(stack: MojangStack, bool: Boolean) {
             implementation.onlyCompareTypeIdForRecipeBook(stack, bool)
         }
+
+        override fun allowSweepAttack(stack: MojangStack): Boolean =
+            implementation.allowSweepAttack(stack)
     }
 
     fun getTypeId(stack: MojangStack): Key //KoishStackData.getTypeId(stack);
@@ -87,4 +91,5 @@ interface KoishItemBridge {
     fun createShowItemComponent(component: Component): Component
     fun onlyCompareTypeIdForRecipeBook(stack: MojangStack): Boolean
     fun onlyCompareTypeIdForRecipeBook(stack: MojangStack, bool: Boolean)
+    fun allowSweepAttack(stack: MojangStack): Boolean
 }

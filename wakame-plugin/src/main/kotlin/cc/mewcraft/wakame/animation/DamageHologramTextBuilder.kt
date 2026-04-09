@@ -13,7 +13,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 data class DamageHologramContext(
-    val event: PostprocessDamageEvent
+    val event: PostprocessDamageEvent,
 ) : AnimationContext
 
 /**
@@ -141,7 +141,7 @@ data class SeparatedDamageHologramTextBuilder(
     override val criticalStrikeTextNegative: Component = Component.text("未配置: [critical_strike_text.negative]"),
     override val criticalStrikeTextNone: Component = Component.text("未配置: [critical_strike_text.none]"),
     val damageValueText: String = "未配置: [damage_value_text]",
-    val separator: Component = Component.text("未配置: [separator]")
+    val separator: Component = Component.text("未配置: [separator]"),
 ) : DamageHologramTextBuilder() {
 
     override fun damageValueText(event: PostprocessDamageEvent): Component {

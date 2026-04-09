@@ -8,7 +8,7 @@ class Transformation(
     val translation: Vector3f,
     val leftRotation: Quaternionf,
     val scale: Vector3f,
-    val rightRotation: Quaternionf
+    val rightRotation: Quaternionf,
 ) {
     /**
      * 构造一个单位变换.
@@ -27,7 +27,7 @@ class Transformation(
         translation: Vector3f,
         leftRotation: AxisAngle4f,
         scale: Vector3f,
-        rightRotation: AxisAngle4f
+        rightRotation: AxisAngle4f,
     ) : this(
         translation,
         Quaternionf(leftRotation),

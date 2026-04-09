@@ -10,12 +10,7 @@ import cc.mewcraft.wakame.entity.player.OnlineUserTicker
 import cc.mewcraft.wakame.entity.player.User
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.item.ItemStackEffectiveness
-import cc.mewcraft.wakame.item.behavior.AttackContext
-import cc.mewcraft.wakame.item.behavior.BehaviorResult
-import cc.mewcraft.wakame.item.behavior.InteractionHand
-import cc.mewcraft.wakame.item.behavior.InteractionResult
-import cc.mewcraft.wakame.item.behavior.ReceiveDamageContext
-import cc.mewcraft.wakame.item.behavior.UseContext
+import cc.mewcraft.wakame.item.behavior.*
 import cc.mewcraft.wakame.item.behavior.impl.weapon.WeaponUtils.getInputDirection
 import cc.mewcraft.wakame.item.extension.addCooldown
 import cc.mewcraft.wakame.item.extension.damageItem
