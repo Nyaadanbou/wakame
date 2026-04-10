@@ -86,11 +86,11 @@ private object KoishItemBridgeImpl : KoishItemBridge {
     }
 
     override fun onlyCompareTypeIdForRecipeBook(stack: MojangStack): Boolean {
-        return stack.onlyCompareIdInRecipeBook
+        return stack.onlyCompareTypeIdInRecipeBook
     }
 
     override fun onlyCompareTypeIdForRecipeBook(stack: MojangStack, bool: Boolean) {
-        stack.onlyCompareIdInRecipeBook = bool
+        stack.onlyCompareTypeIdInRecipeBook = bool
     }
 
     override fun allowSweepAttack(stack: MojangStack): Boolean {
