@@ -4,8 +4,6 @@ import dev.aurelium.auraskills.api.registry.NamespacedId
 import dev.aurelium.auraskills.api.trait.CustomTrait
 
 object KoishTraits {
-
-
     private val KOISH_ATTRIBUTE_TRAITS = ArrayList<CustomTrait>()
 
     // 使用懒加载. 按照目前的实现, 读取这个 property 时, KOISH_ATTRIBUTE_TRAITS 应该已经初始化完了.
@@ -197,6 +195,42 @@ object KoishTraits {
         CustomTrait
             .builder(NamespacedId.of("koish", "attribute_lifesteal"))
             //.displayName("Lifesteal")
+            .build()
+    )
+
+    @JvmField
+    val MANASTEAL: CustomTrait = register(
+        TraitType.ATTRIBUTE,
+        CustomTrait
+            .builder(NamespacedId.of("koish", "attribute_manasteal"))
+            //.displayName("Manasteal")
+            .build()
+    )
+
+    @JvmField
+    val MANA_CONSUMPTION_RATE: CustomTrait = register(
+        TraitType.ATTRIBUTE,
+        CustomTrait
+            .builder(NamespacedId.of("koish", "attribute_mana_consumption_rate"))
+            //.displayName("Mana Consumption Rate")
+            .build()
+    )
+
+    @JvmField
+    val MANA_REGENERATION: CustomTrait = register(
+        TraitType.ATTRIBUTE,
+        CustomTrait
+            .builder(NamespacedId.of("koish", "attribute_mana_regeneration"))
+            //.displayName("Mana Regeneration")
+            .build()
+    )
+
+    @JvmField
+    val MAX_MANA: CustomTrait = register(
+        TraitType.ATTRIBUTE,
+        CustomTrait
+            .builder(NamespacedId.of("koish", "attribute_max_mana"))
+            //.displayName("Max Mana")
             .build()
     )
 

@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.entity.player
 import cc.mewcraft.wakame.enchantment.system.EnchantmentAttributeSystem
 import cc.mewcraft.wakame.enchantment.system.EnchantmentEffectSystem
 import cc.mewcraft.wakame.entity.attribute.system.ItemAttributeSystem
+import cc.mewcraft.wakame.integration.auraskills.ManaTraitBridge
 import cc.mewcraft.wakame.item.ItemBehaviorListener
 import cc.mewcraft.wakame.item.ScanItemSlotChanges
 import cc.mewcraft.wakame.item.behavior.impl.weapon.KatanaSwitchSystem
@@ -30,6 +31,7 @@ object ServerOnlineUserTicker : Listener {
             KatanaTickSystem.onTickUser(user, player)
             KatanaSwitchSystem.onTickUser(user, player)
             SequenceComboFeature.onTickUser(user, player)
+            ManaTraitBridge.onTickUser(user, player)
         }
     }
 }
