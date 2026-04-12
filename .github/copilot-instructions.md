@@ -6,16 +6,16 @@ Koish (codename: wakame) is a large-scale Minecraft Paper plugin written in **Ko
 
 ## Module Structure
 
-| Module | Description |
+|Module|Description|
 |---|---|
-| `buildSrc` | Gradle build conventions. |
-| `common/lazyconfig` | Configuration framework (`MAIN_CONFIG`, `entryOrElse`, `optionalEntry`). |
-| `common/messaging` | Cross-server messaging utilities. |
-| `standalone/*` | Standalone sub-plugins (economy, cron-scheduler, etc.). |
-| `wakame-api` | Public API surface exposed to other plugins. |
-| `wakame-mixin` | Core abstractions & interfaces (ItemBehavior, ItemProp, CastableTrigger, etc.). Compiled as a Mixin library loaded at server boot. **No plugin logic here.** |
-| `wakame-plugin` | Plugin implementation. Feature logic, config reading, event listeners, tick systems, and all runtime behavior live here. |
-| `wakame-hooks/*` | Third-party plugin integrations (one sub-module per hook). |
+|`buildSrc`|Gradle build conventions.|
+|`common/lazyconfig`|Configuration framework (`MAIN_CONFIG`, `entryOrElse`, `optionalEntry`).|
+|`common/messaging`|Cross-server messaging utilities.|
+|`standalone/*`|Standalone sub-plugins (economy, cron-scheduler, etc.).|
+|`wakame-api`|Public API surface exposed to other plugins.|
+|`wakame-mixin`|NMS Mixin patches (Java) + Bridge interfaces (Kotlin). Built with Horizon + Weaver. **No game logic here.**|
+|`wakame-plugin`|Plugin implementation. All game logic lives here: item system (ItemBehavior, ItemProp, CastableTrigger), config reading, event listeners, tick systems, and runtime behavior.|
+|`wakame-hooks/*`|Third-party plugin integrations (one sub-module per hook).|
 
 ## Build System
 
@@ -31,3 +31,4 @@ Koish (codename: wakame) is a large-scale Minecraft Paper plugin written in **Ko
 - **Comments**: Code comments and config comments are written in **Chinese (中文)**.
 - **KDoc**: Public APIs should have KDoc. Comments use Chinese.
 - **Trailing whitespace**: Files must end with exactly one newline (`\n`). Do NOT leave extra blank lines at the end of a file.
+- **Git commits**: Follow Conventional Commits format. See `.github/git-commit-instructions.md`.
