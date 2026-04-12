@@ -193,7 +193,7 @@ class TextDisplay(
 
         // 创建文本展示实体
         val world = location.world.serverLevel
-        mojangDisplay = MojangDisplay.TextDisplay(EntityType.BLOCK_DISPLAY, world)
+        mojangDisplay = MojangDisplay.TextDisplay(EntityType.TEXT_DISPLAY, world)
     }
 
     override fun update() {
