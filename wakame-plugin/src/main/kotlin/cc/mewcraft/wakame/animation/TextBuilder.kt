@@ -12,7 +12,7 @@ interface TextBuilder {
     fun build(context: AnimationContext): Component
 
     companion object {
-        fun serializer(): SimpleSerializer<TextBuilder> {
+        internal fun serializer(): SimpleSerializer<TextBuilder> {
             return DispatchingSerializer.createPartial(
                 mapOf(
                     "fixed" to FixedTextBuilder::class,
@@ -29,7 +29,7 @@ interface TextBuilder {
  */
 @ConfigSerializable
 data class FixedTextBuilder(
-    val text: Component = Component.text("未配置: [text]"),
+    val text: Component = Component.text("未配置"),
 ) : TextBuilder {
 
     override fun build(context: AnimationContext): Component {

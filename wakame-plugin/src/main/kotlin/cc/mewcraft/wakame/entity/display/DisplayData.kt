@@ -9,9 +9,7 @@ import org.bukkit.entity.Display.Billboard
 import org.bukkit.entity.ItemDisplay
 import org.bukkit.entity.TextDisplay
 import org.bukkit.inventory.ItemStack
-import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import java.lang.reflect.Type
 import net.minecraft.world.entity.Display as MojangDisplay
 
 /**
@@ -125,7 +123,26 @@ fun Billboard.toMojang(): MojangDisplay.BillboardConstraints {
  * 不直接使用 [org.bukkit.entity.Display.Brightness] 的原因:
  * Bukkit 使用 null 代表默认值, 即使用当前展示实体所在位置的亮度. 而 null 可能导致序列化问题.
  */
-sealed interface Brightness
+sealed interface Brightness {
+    companion object {
+        internal  fun serializer(): SimpleSerializer<Brightness> {
+            return SimpleSerializer { type, node ->
+                val str = node.rawScalar().toString()
+                if (str == DefaultBrightness.PLACEHOLDER) {
+                    return@SimpleSerializer DefaultBrightness
+                }
+
+                val blockLight = node.node("block_light").require<Int>().also {
+                    require(it in 0..15) { "The block light must be between 0 and 15" }
+                }
+                val skyLight = node.node("block_light").require<Int>().also {
+                    require(it in 0..15) { "The sky light must be between 0 and 15" }
+                }
+                SpecifiedBrightness(blockLight, skyLight)
+            }
+        }
+    }
+}
 
 /**
  * 对应配置文件:
@@ -150,20 +167,3 @@ data class SpecifiedBrightness(
     val blockLight: Int,
     val skyLight: Int,
 ) : Brightness
-
-object BrightnessSerializer : SimpleSerializer<Brightness> {
-    override fun deserialize(type: Type, node: ConfigurationNode): Brightness {
-        val str = node.rawScalar().toString()
-        if (str == DefaultBrightness.PLACEHOLDER) {
-            return DefaultBrightness
-        }
-
-        val blockLight = node.node("block_light").require<Int>().also {
-            require(it in 0..15) { "The block light must be between 0 and 15" }
-        }
-        val skyLight = node.node("block_light").require<Int>().also {
-            require(it in 0..15) { "The sky light must be between 0 and 15" }
-        }
-        return SpecifiedBrightness(blockLight, skyLight)
-    }
-}

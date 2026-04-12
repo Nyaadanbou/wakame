@@ -16,19 +16,45 @@ fun <S> LootPool(
     rolls: Int,
     conditions: List<LootPredicate>,
     entries: List<ComposableEntryContainer<S>>,
-): LootPool<S> = SimpleLootPool(
-    rolls = rolls,
-    conditions = conditions,
-    entries = entries
-)
+): LootPool<S> {
+    return SimpleLootPool(
+        rolls = rolls,
+        conditions = conditions,
+        entries = entries
+    )
+}
 
 /**
  * [LootPool] 是一个包含了若干 [cc.mewcraft.wakame.loot.entry.ComposableEntryContainer] 的集合.
  */
 interface LootPool<S> {
-
     companion object {
-        val SERIALIZER: SimpleSerializer<LootPool<*>> = Serializer
+        internal fun serializer(): SimpleSerializer<LootPool<*>> {
+            return object : SimpleSerializer<LootPool<*>> {
+                override fun deserialize(type: Type, node: ConfigurationNode): LootPool<*> {
+                    val type = type as ParameterizedType
+                    val rolls = node.node("rolls").require<Int>()
+                    val conditions = node.node("conditions").require<List<LootPredicate>>()
+                    val entries = getEntries(node.node("entries"), type)
+                    return SimpleLootPool(
+                        rolls = rolls,
+                        conditions = conditions,
+                        entries = entries
+                    )
+                }
+
+                private fun getEntries(
+                    node: ConfigurationNode,
+                    entryType: ParameterizedType,
+                ): List<ComposableEntryContainer<Any>> {
+                    val sType = entryType.actualTypeArguments[0]
+                    val entryContainerType: Type = TypeFactory.parameterizedClass(ComposableEntryContainer::class.java, sType) // ComposableEntryContainer<S>
+                    val entriesType = TypeFactory.parameterizedClass(List::class.java, entryContainerType) // List<ComposableEntryContainer<S>>
+                    val typeToken = TypeToken.get(entriesType) as TypeToken<List<ComposableEntryContainer<Any>>>
+                    return node.require(typeToken) // 获取 entries 的类型为 List<ComposableEntryContainer<S>>
+                }
+            }
+        }
     }
 
     /**
@@ -53,31 +79,6 @@ interface LootPool<S> {
      * 选择 [LootPool] 中的样本.
      */
     fun select(context: LootContext): List<S>
-
-    private object Serializer : SimpleSerializer<LootPool<*>> {
-        override fun deserialize(type: Type, node: ConfigurationNode): LootPool<*> {
-            val type = type as ParameterizedType
-            val rolls = node.node("rolls").require<Int>()
-            val conditions = node.node("conditions").require<List<LootPredicate>>()
-            val entries = getEntries(node.node("entries"), type)
-            return SimpleLootPool(
-                rolls = rolls,
-                conditions = conditions,
-                entries = entries
-            )
-        }
-
-        private fun getEntries(
-            node: ConfigurationNode,
-            entryType: ParameterizedType,
-        ): List<ComposableEntryContainer<Any>> {
-            val sType = entryType.actualTypeArguments[0]
-            val entryContainerType: Type = TypeFactory.parameterizedClass(ComposableEntryContainer::class.java, sType) // ComposableEntryContainer<S>
-            val entriesType = TypeFactory.parameterizedClass(List::class.java, entryContainerType) // List<ComposableEntryContainer<S>>
-            val typeToken = TypeToken.get(entriesType) as TypeToken<List<ComposableEntryContainer<Any>>>
-            return node.require(typeToken) // 获取 entries 的类型为 List<ComposableEntryContainer<S>>
-        }
-    }
 
     /**
      * 从这个 [LootPool] 中随机添加一个条目到 [dataConsumer] 中.

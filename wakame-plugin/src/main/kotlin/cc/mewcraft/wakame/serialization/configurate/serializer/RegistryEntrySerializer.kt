@@ -18,11 +18,11 @@ import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
 //<editor-fold desc="Koish Registry">
-/*internal*/ fun <T : Any> Registry<T>.valueByNameTypeSerializer(): SimpleSerializer<T> {
+internal fun <T : Any> Registry<T>.valueByNameTypeSerializer(): SimpleSerializer<T> {
     return RegistryValueEntrySerializer(this)
 }
 
-/*internal*/ fun <T : Any> Registry<T>.holderByNameTypeSerializer(): SimpleSerializer<RegistryEntry<T>> {
+internal fun <T : Any> Registry<T>.holderByNameTypeSerializer(): SimpleSerializer<RegistryEntry<T>> {
     return RegistryHolderEntrySerializer(this)
 }
 
@@ -58,7 +58,7 @@ internal class RegistryHolderEntrySerializer<T : Any>(
 //</editor-fold>
 
 //<editor-fold desc="Paper Registry">
-/*internal*/ fun <T : Keyed> RegistryKey<T>.valueByNameTypeSerializer(): SimpleSerializer<T> {
+internal fun <T : Keyed> RegistryKey<T>.valueByNameTypeSerializer(): SimpleSerializer<T> {
     return BukkitRegistryEntryValueSerializer(this)
 }
 
@@ -87,7 +87,7 @@ internal class BukkitRegistryEntryValueSerializer<T : Keyed>(
 //</editor-fold>
 
 //<editor-fold desc="Vanilla Registry">
-/*internal*/ fun <T : Any> MojangRegistry<T>.valueByNameTypeSerializer(): SimpleSerializer<T> {
+internal fun <T : Any> MojangRegistry<T>.valueByNameTypeSerializer(): SimpleSerializer<T> {
     return MojangRegistryValueEntrySerializer(this)
 }
 

@@ -6,34 +6,39 @@ import cc.mewcraft.lazyconfig.configurate.register
 import cc.mewcraft.lazyconfig.configurate.registerExact
 import cc.mewcraft.wakame.animation.AnimationData
 import cc.mewcraft.wakame.animation.TextBuilder
-import cc.mewcraft.wakame.entity.display.BrightnessSerializer
+import cc.mewcraft.wakame.bridge.MojangBuiltInRegistries
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier
+import cc.mewcraft.wakame.entity.display.Brightness
 import cc.mewcraft.wakame.loot.LootPool
 import cc.mewcraft.wakame.loot.LootTable
 import cc.mewcraft.wakame.loot.entry.ComposableEntryContainer
-import cc.mewcraft.wakame.molang.ExpressionSerializer
+import cc.mewcraft.wakame.loot.predicate.LootPredicate
+import cc.mewcraft.wakame.molang.Expression
 import cc.mewcraft.wakame.registry.BuiltInRegistries
 import cc.mewcraft.wakame.registry.DynamicRegistries
 import cc.mewcraft.wakame.serialization.configurate.serializer.*
-import cc.mewcraft.wakame.util.RandomizedValueSerializer
+import cc.mewcraft.wakame.util.RandomizedValue
 import io.papermc.paper.registry.RegistryKey
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
-
-// FIXME #350: 迁移到 wakame-mixin
 /**
  * 这些序列化器可以处理 Koish 内部的数据类型.
  */
-val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
+internal val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
     // Koish
-    .register(AttributeModifierSerializer)
-    .register(RandomizedValueSerializer)
-    .register(ExpressionSerializer)
-    .register(BrightnessSerializer)
     .registerExact(AnimationData.serializer())
+    .register(AttributeModifier.serializer())
+    .register(Brightness.serializer())
+    .register(ComposableEntryContainer.serializer())
+    .register(Expression.serializer())
+    .register(LootTable.serializer())
+    .register(LootPool.serializer())
+    .register(LootPredicate.serializer())
+    .register(RandomizedValue.serializer())
     .registerExact(TextBuilder.serializer())
     // Kotlin
     .register(IntRangeKotlinSerializer)
-    // Text
+    // Text Component
     .register(MiniMessageComponentSerializer)
     .register(MiniMessageStyleSerializer)
     .register(MiniMessageStyleBuilderApplicableSerializer)
@@ -55,12 +60,8 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     .register(MaterialSerializer)
     .register(BlockTypeListSerializer)
     .register(ItemTypeListSerializer)
-    // Loot Table
-    .register(LootTable.SERIALIZER)
-    .register(LootPool.SERIALIZER)
-    .register(ComposableEntryContainer.SERIALIZER)
     // NMS Registry
-    .register(net.minecraft.core.registries.BuiltInRegistries.DATA_COMPONENT_TYPE.valueByNameTypeSerializer())
+    .register(MojangBuiltInRegistries.DATA_COMPONENT_TYPE.valueByNameTypeSerializer())
     // Paper Registry
     .register(RegistryKey.DAMAGE_TYPE.valueByNameTypeSerializer())
     .register(RegistryKey.DATA_COMPONENT_TYPE.valueByNameTypeSerializer())
@@ -69,12 +70,13 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     .register(RegistryKey.ITEM.valueByNameTypeSerializer())
     .register(RegistryKey.MOB_EFFECT.valueByNameTypeSerializer())
     .register(RegistryKey.SOUND_EVENT.valueByNameTypeSerializer())
-    // Koish Registry
+    // Koish Builtin Registry
     .register(BuiltInRegistries.ATTRIBUTE.holderByNameTypeSerializer())
     .register(BuiltInRegistries.ELEMENT.holderByNameTypeSerializer())
     .register(BuiltInRegistries.ENTITY_REF.holderByNameTypeSerializer())
-    .register(DynamicRegistries.CATALOG_ITEM_CATEGORY.holderByNameTypeSerializer())
     .register(BuiltInRegistries.KIZAMI.holderByNameTypeSerializer())
     .register(BuiltInRegistries.LEVEL_TO_RARITY_MAPPING.holderByNameTypeSerializer())
     .register(BuiltInRegistries.RARITY.holderByNameTypeSerializer())
+    // Koish Dynamic Registry
+    .register(DynamicRegistries.CATALOG_ITEM_CATEGORY.holderByNameTypeSerializer())
     .build()

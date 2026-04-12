@@ -29,7 +29,7 @@ interface AnimationData<T : CommonDisplayData> {
     fun play(viewer: Player, animLocation: Location, context: AnimationContext)
 
     companion object {
-        fun serializer(): SimpleSerializer<AnimationData<*>> {
+        internal fun serializer(): SimpleSerializer<AnimationData<*>> {
             return DispatchingSerializer.createPartial(
                 mapOf(
                     "text_display" to TextDisplayAnimationData::class
@@ -47,7 +47,6 @@ data class TextDisplayAnimationData(
     override val frames: Map<Long, TextDisplayAnimationFrame>,
     override val settings: TextDisplayAnimationSettings,
 ) : AnimationData<TextDisplayData> {
-
     override fun play(viewer: Player, animLocation: Location, context: AnimationContext) {
         val data = settings.applyTo(TextDisplayData(), context)
         val display = TextDisplay(data, animLocation)
@@ -82,7 +81,6 @@ data class TextDisplayAnimationData(
         if (frames.any { it.key < 0 }) throw SerializationException("The delay of a frame must be non-negative")
         if (!frames.keys.contains(0)) throw SerializationException("Missing start frame (delay = 0)")
     }
-
 }
 
 
@@ -140,7 +138,6 @@ data class TextDisplayAnimationFrame(
         return data
     }
 }
-
 
 /**
  * 动画设置项.

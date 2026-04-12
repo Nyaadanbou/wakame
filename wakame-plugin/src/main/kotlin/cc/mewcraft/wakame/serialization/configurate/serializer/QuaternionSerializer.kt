@@ -8,7 +8,7 @@ import org.spongepowered.configurate.kotlin.extensions.typedSet
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
-/*internal*/ object QuaternionfSerializer : SimpleSerializer<Quaternionf> {
+internal object QuaternionfSerializer : SimpleSerializer<Quaternionf> {
     override fun deserialize(type: Type, node: ConfigurationNode): Quaternionf {
         val floats = node.get<FloatArray>() ?: throw SerializationException(node, type, "Quaternionf must be an array of 4 floats")
         require(floats.size == 4) { "Quaternionf must exactly have 4 floats" }

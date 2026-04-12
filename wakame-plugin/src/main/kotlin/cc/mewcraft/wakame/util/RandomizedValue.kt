@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.util
 
+import cc.mewcraft.lazyconfig.configurate.SimpleSerializer
 import cc.mewcraft.lazyconfig.configurate.require
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
-import org.spongepowered.configurate.serialize.TypeSerializer
 import java.lang.reflect.Type
 import java.util.concurrent.ThreadLocalRandom
 
@@ -114,7 +114,62 @@ data class RandomizedValue(
         val score: Double,
     )
 
-    companion object Factory {
+    companion object {
+        internal fun serializer(): SimpleSerializer<RandomizedValue> {
+            return object : SimpleSerializer<RandomizedValue> {
+                override fun deserialize(type: Type, node: ConfigurationNode): RandomizedValue {
+                    val scalar = node.rawScalar()
+                    if (scalar != null) {
+                        // if it's just a simple plain value like "value: 32"
+                        return RandomizedValue(node.double, .0, .0, lowerBound = null, upperBound = null)
+                    }
+
+                    val base = node.node("base").require<Double>()
+                    val scale = node.node("scale").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
+                    val sigma = node.node("spread").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
+                    val lowerBound = node.node("min").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
+                    val upperBound = node.node("max").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
+
+                    return RandomizedValue(
+                        base = base, scale = scale ?: .0, sigma = sigma ?: .0, lowerBound = lowerBound, upperBound = upperBound
+                    )
+                }
+
+                override fun serialize(type: Type, obj: RandomizedValue?, node: ConfigurationNode) {
+                    // throws if no value is provided
+                    obj ?: throw SerializationException()
+
+                    with(obj) {
+                        if (!isScaled && !isRandom) {
+                            // case 1
+                            node.set(base)
+                        } else {
+                            // case 2/3/4
+                            with(node) {
+                                node("base").set(base)
+                                if (isScaled) {
+                                    // if scale is set
+                                    node("scale").set(scale)
+                                }
+                                if (isRandom) {
+                                    // if spread is set
+                                    node("spread").set(sigma)
+                                    if (isLowerBounded) {
+                                        // if lower bound is set
+                                        node("min").set(lowerBound)
+                                    }
+                                    if (isUpperBounded) {
+                                        // if upper bound is set
+                                        node("max").set(upperBound)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         /**
          * Creates an instance from a string.
          *
@@ -153,7 +208,7 @@ data class RandomizedValue(
          * @return an instance
          */
         fun create(node: ConfigurationNode): RandomizedValue {
-            return RandomizedValueSerializer.deserialize(javaTypeOf<RandomizedValue>(), node)
+            return serializer().deserialize(javaTypeOf<RandomizedValue>(), node) ?: error("Cannot create a randomized value")
         }
     }
 
@@ -236,58 +291,5 @@ data class RandomizedValue(
      */
     fun calculate(): Result {
         return calculate(.0)
-    }
-}
-
-object RandomizedValueSerializer : TypeSerializer<RandomizedValue> {
-    override fun deserialize(type: Type, node: ConfigurationNode): RandomizedValue {
-        val scalar = node.rawScalar()
-        if (scalar != null) {
-            // if it's just a simple plain value like "value: 32"
-            return RandomizedValue(node.double, .0, .0, lowerBound = null, upperBound = null)
-        }
-
-        val base = node.node("base").require<Double>()
-        val scale = node.node("scale").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
-        val sigma = node.node("spread").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
-        val lowerBound = node.node("min").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
-        val upperBound = node.node("max").takeIf { !it.virtual() }?.apply { require(Double::class.java) }?.double
-
-        return RandomizedValue(
-            base = base, scale = scale ?: .0, sigma = sigma ?: .0, lowerBound = lowerBound, upperBound = upperBound
-        )
-    }
-
-    override fun serialize(type: Type, obj: RandomizedValue?, node: ConfigurationNode) {
-        // throws if no value is provided
-        obj ?: throw SerializationException()
-
-        with(obj) {
-            if (!isScaled && !isRandom) {
-                // case 1
-                node.set(base)
-            } else {
-                // case 2/3/4
-                with(node) {
-                    node("base").set(base)
-                    if (isScaled) {
-                        // if scale is set
-                        node("scale").set(scale)
-                    }
-                    if (isRandom) {
-                        // if spread is set
-                        node("spread").set(sigma)
-                        if (isLowerBounded) {
-                            // if lower bound is set
-                            node("min").set(lowerBound)
-                        }
-                        if (isUpperBounded) {
-                            // if upper bound is set
-                            node("max").set(upperBound)
-                        }
-                    }
-                }
-            }
-        }
     }
 }
