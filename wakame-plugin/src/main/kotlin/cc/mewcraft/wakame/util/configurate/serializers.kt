@@ -3,6 +3,7 @@
 package cc.mewcraft.wakame.util.configurate
 
 import cc.mewcraft.lazyconfig.configurate.register
+import cc.mewcraft.lazyconfig.configurate.registerExact
 import cc.mewcraft.wakame.animation.AnimationData
 import cc.mewcraft.wakame.animation.TextBuilder
 import cc.mewcraft.wakame.entity.display.BrightnessSerializer
