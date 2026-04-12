@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.entity.player.PlayerDataLoadingCoordinator
 import cc.mewcraft.wakame.entity.player.ResourceLoadingFixHandler
 import cc.mewcraft.wakame.integration.Hook
+import cc.mewcraft.wakame.integration.auraskills.ManaTraitBridge
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.integration.playermana.PlayerManaIntegration
@@ -42,6 +43,8 @@ object AuraSkillsHook : PlayerManaIntegration by AuraPlayerManaIntegration {
         registerTraitHandlers()
 
         AuraSkillsListener().registerEvents()
+
+        ManaTraitBridge.setImplementation(AuraSkillsManaTraitBridge)
     }
 
     private fun registerTraits() {
@@ -69,6 +72,10 @@ object AuraSkillsHook : PlayerManaIntegration by AuraPlayerManaIntegration {
         koishRegistry.registerTrait(KoishTraits.HAMMER_DAMAGE_RATIO)
         koishRegistry.registerTrait(KoishTraits.HEALTH_REGENERATION)
         koishRegistry.registerTrait(KoishTraits.LIFESTEAL)
+        koishRegistry.registerTrait(KoishTraits.MANASTEAL)
+        koishRegistry.registerTrait(KoishTraits.MANA_CONSUMPTION_RATE)
+        koishRegistry.registerTrait(KoishTraits.MANA_REGENERATION)
+        koishRegistry.registerTrait(KoishTraits.MAX_MANA)
         koishRegistry.registerTrait(KoishTraits.NEGATIVE_CRITICAL_STRIKE_POWER)
         koishRegistry.registerTrait(KoishTraits.NONE_CRITICAL_STRIKE_POWER)
         koishRegistry.registerTrait(KoishTraits.UNIVERSAL_DEFENSE)

@@ -20,9 +20,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent
  * 用于处理 Koish 的所有 Attribute Trait.
  */
 class KoishAttributeTrait : Listener, BukkitTraitHandler {
-
     companion object {
-
         private val TRAIT_TO_ATTRIBUTE: Map<Trait, Attribute> = hashMapOf(
             KoishTraits.ATTACK_KNOCKBACK to Attributes.ATTACK_KNOCKBACK,
             KoishTraits.BLOCK_INTERACTION_RANGE to Attributes.BLOCK_INTERACTION_RANGE,
@@ -45,6 +43,12 @@ class KoishAttributeTrait : Listener, BukkitTraitHandler {
             KoishTraits.HAMMER_DAMAGE_RATIO to Attributes.HAMMER_DAMAGE_RATIO,
             KoishTraits.HEALTH_REGENERATION to Attributes.HEALTH_REGENERATION,
             KoishTraits.LIFESTEAL to Attributes.LIFESTEAL,
+            KoishTraits.MANASTEAL to Attributes.MANASTEAL,
+            //region 特殊处理魔法值
+            KoishTraits.MANA_CONSUMPTION_RATE to Attributes.MANA_CONSUMPTION_RATE,
+            KoishTraits.MANA_REGENERATION to Attributes.MANA_REGENERATION,
+            KoishTraits.MAX_MANA to Attributes.MAX_MANA,
+            //endregion
             KoishTraits.NEGATIVE_CRITICAL_STRIKE_POWER to Attributes.NEGATIVE_CRITICAL_STRIKE_POWER,
             KoishTraits.NONE_CRITICAL_STRIKE_POWER to Attributes.NONE_CRITICAL_STRIKE_POWER,
             KoishTraits.UNIVERSAL_DEFENSE to Attributes.UNIVERSAL_DEFENSE,
@@ -54,7 +58,12 @@ class KoishAttributeTrait : Listener, BukkitTraitHandler {
             KoishTraits.UNIVERSAL_MIN_ATTACK_DAMAGE to Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE,
         )
 
-        private val ATTRIBUTE_TO_MODIFIER_KEY: HashMap<Attribute, Key> = HashMap<Attribute, Key>()
+        private val ATTRIBUTE_TO_MODIFIER_KEY: HashMap<Attribute, Key> = HashMap()
+        private fun getModifierKeyBy(attribute: Attribute): Key {
+            return ATTRIBUTE_TO_MODIFIER_KEY.computeIfAbsent(attribute) { attribute ->
+                Key.key("koish", "auraskills/trait/${attribute.id}")
+            }
+        }
     }
 
     override fun getBaseLevel(player: Player, trait: Trait): Double {
@@ -96,12 +105,6 @@ class KoishAttributeTrait : Listener, BukkitTraitHandler {
             val player = event.player
             val user = AuraSkillsApi.get().getUser(player.uniqueId)
             set(player, user, trait)
-        }
-    }
-
-    private fun getModifierKeyBy(attribute: Attribute): Key {
-        return ATTRIBUTE_TO_MODIFIER_KEY.computeIfAbsent(attribute) { attribute ->
-            Key.key("koish", "auraskills/trait/${attribute.id}")
         }
     }
 

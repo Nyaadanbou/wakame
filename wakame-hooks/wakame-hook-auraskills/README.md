@@ -53,6 +53,14 @@ traits:
     name: 生命值再生
   koish/attribute_lifesteal:
     name: 生命偷取
+  koish/attribute_manasteal:
+    name: 魔法偷取
+  koish/attribute_mana_consumption_rate:
+    name: 魔法消耗率
+  koish/attribute_mana_regeneration:
+    name: 魔法再生
+  koish/attribute_max_mana:
+    name: 最大魔法值
   koish/attribute_negative_critical_strike_power:
     name: 负暴击伤害
   koish/attribute_none_critical_strike_power:
@@ -121,6 +129,14 @@ templates:
       koish/attribute_health_regeneration:
         material: gray_dye
       koish/attribute_lifesteal:
+        material: gray_dye
+      koish/attribute_manasteal:
+        material: gray_dye
+      koish/attribute_mana_consumption_rate:
+        material: gray_dye
+      koish/attribute_mana_regeneration:
+        material: gray_dye
+      koish/attribute_max_mana:
         material: gray_dye
       koish/attribute_negative_critical_strike_power:
         material: gray_dye
