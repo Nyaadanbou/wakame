@@ -15,28 +15,11 @@ object AuraSkillsManaTraitBridge : ManaTraitBridge {
 
     override fun onTickUser(user: KoishUser, player: Player) {
         val auraUser = AuraSkillsApi.get().getUser(player.uniqueId)
-        //val itemSlotChanges = user.itemSlotChanges
         val attributeContainer = user.attributeContainer
         if (Bukkit.getCurrentTick() % 20 != 0) {
             return
         }
-        auraUser.removeTraitModifier(MODIFIER_MANA_REGEN)
-        auraUser.removeTraitModifier(MODIFIER_MAX_MANA)
         auraUser.addTraitModifier(TraitModifier(MODIFIER_MANA_REGEN, Traits.MANA_REGEN, attributeContainer.getValue(Attributes.MANA_REGENERATION)))
         auraUser.addTraitModifier(TraitModifier(MODIFIER_MAX_MANA, Traits.MAX_MANA, attributeContainer.getValue(Attributes.MAX_MANA)))
-        //itemSlotChanges.forEachChangingEntry { slot, curr, prev ->
-        //    if (prev != null && ItemStackEffectiveness.testSlot(slot, prev)) {
-        //        auraUser.removeTraitModifier(MODIFIER_MANA_REGEN)
-        //        auraUser.removeTraitModifier(MODIFIER_MAX_MANA)
-        //    }
-        //    if (curr != null &&
-        //        ItemStackEffectiveness.testSlot(slot, curr) &&
-        //        ItemStackEffectiveness.testLevel(player, curr) &&
-        //        ItemStackEffectiveness.testDamaged(curr)
-        //    ) {
-        //        auraUser.addTraitModifier(TraitModifier(MODIFIER_MANA_REGEN, Traits.MANA_REGEN, attributeContainer.getValue(Attributes.MANA_REGENERATION)))
-        //        auraUser.addTraitModifier(TraitModifier(MODIFIER_MAX_MANA, Traits.MAX_MANA, attributeContainer.getValue(Attributes.MAX_MANA)))
-        //    }
-        //}
     }
 }
