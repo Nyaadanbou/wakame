@@ -2,6 +2,16 @@
 
 本文档总结了 Koish 项目中关键的编码范式，供 AI Agent 在后续对话中直接参考，避免重复分析项目结构。
 
+## GitHub 仓库信息
+
+|字段|值|
+|---|---|
+|owner|`Nyaadanbou`|
+|repo|`wakame`|
+|SSH|`git@github.com:Nyaadanbou/wakame.git`|
+
+> 使用 GitHub MCP 工具时，`owner` 和 `repo` 参数分别填写以上值。
+
 ---
 
 ## 模块职责划分: wakame-mixin vs wakame-plugin
@@ -307,7 +317,7 @@ metadata.remove(MY_KEY)
   |---|---|
   |值1|值2|
   ```
-- 导入别名: 当类名冲突时使用 `import ... as`，例如:
+- 导入别名: 当类名冲突时使用 `import ... as`，例如
   ```kotlin
   import cc.mewcraft.wakame.item.behavior.impl.Castable as CastableBehavior
   import cc.mewcraft.wakame.item.property.impl.Castable as CastableProp
