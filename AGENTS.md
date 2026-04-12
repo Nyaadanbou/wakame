@@ -6,28 +6,49 @@
 
 ## 模块职责划分: wakame-mixin vs wakame-plugin
 
-`wakame-mixin` 定义**接口和数据结构**，`wakame-plugin` 提供**实现和运行时逻辑**。
+`wakame-mixin` 是 **NMS Mixin 模块**，包含 Java Mixin 类 (NMS 补丁) 和 Kotlin bridge 接口 (NMS 级别的抽象)。使用 Horizon (`io.canvasmc.horizon`) + Weaver (`io.canvasmc.weaver.userdev`) 构建。**不包含任何游戏逻辑或物品系统代码。**
 
-当 wakame-plugin 需要向 wakame-mixin 中的代码注入行为时，使用 **接口委托模式**：
-- 在 `wakame-mixin` 中定义 `fun interface` 或普通 `interface`
-- 在 `wakame-mixin` 的调用方持有一个 `var handler: MyHandler? = null`
-- 在 `wakame-plugin` 中实现该接口，并在 `init {}` 块中注入: `CallerObject.handler = this`
+`wakame-plugin` 包含**所有游戏逻辑**：接口、数据结构、实现、配置读取、事件监听、tick 系统等。ItemBehavior、ItemProp、CastableTrigger、OnlineUserTicker、@Init 等核心抽象全部在此模块中。
 
-**示例** (组合键序列):
+### wakame-mixin Bridge 模式 (跨模块)
+
+当 Mixin 类 (NMS 层) 需要调用插件逻辑时，使用 **Bridge 委托模式**：
+- 在 `wakame-mixin/bridge/` 中定义 `interface`，带有 `companion object Impl` 委托到 `var implementation`
+- Mixin 类直接调用 companion object
+- `wakame-plugin` 通过 `setImplementation()` 注入实现
+
 ```kotlin
-// wakame-mixin: 定义接口
+// wakame-mixin/bridge/DamageManagerBridge.kt
+interface DamageManagerBridge {
+    companion object Impl : DamageManagerBridge {
+        private var implementation: DamageManagerBridge = object : DamageManagerBridge { /* 默认抛异常 */ }
+        fun setImplementation(impl: DamageManagerBridge) { implementation = impl }
+        override fun injectDamageLogic(...) = implementation.injectDamageLogic(...)
+    }
+    fun injectDamageLogic(event: EntityDamageEvent, originalLastHurt: Float, isDuringInvulnerable: Boolean): Float
+}
+```
+
+关键 Bridge 接口: `KoishItemBridge` (物品系统)、`DamageManagerBridge` (伤害系统)、`MythicMobsBridge` 等。
+
+### 模块内解耦模式 (wakame-plugin 内部)
+
+当 `wakame-plugin` 内部需要解耦不同特性时，使用 **handler 注入模式**：
+- 在调用方持有 `var handler: MyHandler? = null`
+- 在实现方的 `init {}` 块中注入
+
+```kotlin
+// 定义接口 (wakame-plugin/item/behavior/impl/SequenceComboHandler.kt)
 fun interface SequenceComboHandler {
     fun handleInput(player: Player, castableMap: Map<String, CastableProp>, input: GenericCastableTrigger)
 }
 
-// wakame-mixin: 调用方
+// 调用方 (wakame-plugin/item/behavior/impl/Castable.kt)
 object Castable : SimpleInteract {
     var sequenceComboHandler: SequenceComboHandler? = null
-    // 在 handleSimpleUse/handleSimpleAttack 中调用:
-    // sequenceComboHandler?.handleInput(player, castable, trigger)
 }
 
-// wakame-plugin: 实现并注入
+// 实现并注入 (wakame-plugin/item/feature/SequenceComboFeature.kt)
 @Init(InitStage.POST_WORLD)
 object SequenceComboFeature : SequenceComboHandler {
     init { CastableBehavior.sequenceComboHandler = this }
@@ -39,15 +60,15 @@ object SequenceComboFeature : SequenceComboHandler {
 
 ## ItemProp 范式
 
-`ItemProp` 是附加在物品类型上的静态数据，定义在 `wakame-mixin` 中。
+`ItemProp` 是附加在物品类型上的静态数据，定义在 `wakame-plugin` 中。
 
 ### 定义新的 ItemProp 数据类型
 
-在 `wakame-mixin/src/main/kotlin/cc/mewcraft/wakame/item/property/impl/` 下创建 `data class`，标记 `@ConfigSerializable`。
+在 `wakame-plugin/src/main/kotlin/cc/mewcraft/wakame/item/property/impl/` 下创建 `data class`，标记 `@ConfigSerializable`。
 
 ### 注册到 ItemPropTypes
 
-在 `wakame-mixin/.../item/property/ItemPropTypes.kt` 中添加:
+在 `wakame-plugin/.../item/property/ItemPropTypes.kt` 中添加:
 ```kotlin
 @JvmField
 val MY_PROP: ItemPropType<MyPropData> = typeOf("my_prop") {
@@ -68,11 +89,11 @@ val propValue = itemStack.getProp(ItemPropTypes.MY_PROP) ?: return
 
 ## ItemBehavior 范式
 
-`ItemBehavior` 描述物品与世界交互的逻辑，不含数据，定义在 `wakame-mixin` 中。
+`ItemBehavior` 描述物品与世界交互的逻辑，不含数据，定义在 `wakame-plugin` 中。
 
 ### 定义新的 ItemBehavior
 
-- 在 `wakame-mixin/.../item/behavior/impl/` 下创建 `object`，实现 `SimpleInteract`（或 `ItemBehavior`）。
+- 在 `wakame-plugin/.../item/behavior/impl/` 下创建 `object`，实现 `SimpleInteract`（或 `ItemBehavior`）。
   - 子目录按类别组织: `weapon/` (武器行为), `external/` (依赖外部插件的行为), `test/` (测试用)
   - 对应的 property impl 也使用相同子目录: `item/property/impl/weapon/`
 - `SimpleInteract` 将 6 种交互统一为 `handleSimpleUse` (右键) 和 `handleSimpleAttack` (左键) 两个入口。
@@ -215,7 +236,7 @@ object MyFeature {
 ## OnlineUserTicker 范式
 
 需要每 tick 对每个在线玩家执行逻辑时:
-- 实现 `OnlineUserTicker` 接口 (`wakame-mixin/.../entity/player/ticker.kt`)
+- 实现 `OnlineUserTicker` 接口 (`wakame-plugin/.../entity/player/ticker.kt`)
 - 在 `ServerOnlineUserTicker` (`wakame-plugin`) 中注册调用
 
 ```kotlin
