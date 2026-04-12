@@ -61,7 +61,7 @@ object JsonStyleBuilderApplicableSerializer : ScalarSerializer<Array<StyleBuilde
 //endregion
 
 //region MiniMessage <-> Component
-object MiniMessageComponentSerializer : ScalarSerializer<Component>(typeTokenOf()) {
+internal object MiniMessageComponentSerializer : ScalarSerializer<Component>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Component {
         return MiniMessage.miniMessage().deserialize(obj.toString().replace("§", ""))
     }
@@ -71,7 +71,7 @@ object MiniMessageComponentSerializer : ScalarSerializer<Component>(typeTokenOf(
     }
 }
 
-object MiniMessageStyleSerializer : ScalarSerializer<Style>(typeTokenOf()) {
+internal object MiniMessageStyleSerializer : ScalarSerializer<Style>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Style {
         return MiniMessageComponentSerializer.deserialize(type, obj).style()
     }
@@ -82,7 +82,7 @@ object MiniMessageStyleSerializer : ScalarSerializer<Style>(typeTokenOf()) {
     }
 }
 
-object MiniMessageStyleBuilderApplicableSerializer : ScalarSerializer<Array<StyleBuilderApplicable>>(typeTokenOf()) {
+internal object MiniMessageStyleBuilderApplicableSerializer : ScalarSerializer<Array<StyleBuilderApplicable>>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Array<StyleBuilderApplicable> {
         val component = MiniMessageComponentSerializer.deserialize(type, obj)
         val styleList = ArrayList<StyleBuilderApplicable>()

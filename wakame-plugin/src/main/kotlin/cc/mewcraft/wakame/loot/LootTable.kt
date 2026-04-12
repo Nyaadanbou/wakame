@@ -15,16 +15,37 @@ import java.lang.reflect.Type
 import java.lang.reflect.WildcardType
 import java.util.stream.Stream
 
-inline fun <reified S> LootTable(
-    pools: List<LootPool<S>>,
-): LootTable<S> = SimpleLootTable(pools)
+inline fun <reified S> LootTable(pools: List<LootPool<S>>): LootTable<S> {
+    return SimpleLootTable(pools)
+}
 
 /**
  * [LootTable] 是一个包含了若干 [LootPool] 的集合
  */
 interface LootTable<S> {
     companion object {
-        val SERIALIZER: SimpleSerializer<LootTable<*>> = Serializer
+        internal fun serializer(): SimpleSerializer<LootTable<*>> {
+            return object : SimpleSerializer<LootTable<*>> {
+                override fun deserialize(type: Type, node: ConfigurationNode): LootTable<*> {
+                    val rawScalar = node.rawScalar()
+                    if (rawScalar is String) {
+                        // 如果 rawScalar 是字符串, 则是配置文件中指定了 LootTable 的名称, 需要从注册表中读取
+                        return BuiltInRegistries.LOOT_TABLE[rawScalar]
+                            ?: throw SerializationException(node, type, "无法从配置文件中读取名为 $rawScalar 的 LootTable")
+                    }
+                    // 如果 rawScalar 不是字符串, 则是配置文件中直接指定了一整个 LootTable 对象, 或是 LootTable 系统本身在序列化, 进行对应逻辑.
+                    val type = type as ParameterizedType
+                    val sType = type.actualTypeArguments[0]
+                    if (sType is WildcardType) {
+                        throw SerializationException(node, type, "LootTable 的样本类型不能是通配符类型, 这是一个代码 bug!")
+                    }
+                    val poolType = TypeFactory.parameterizedClass(LootPool::class.java, sType) // LootPool<S>
+                    val poolTypeToken = TypeToken.get(poolType) as TypeToken<LootPool<Any>>
+                    val pools = node.node("pools").getList(poolTypeToken) ?: throw SerializationException(node, type, "Failed to deserialize LootTable: pools is null or empty")
+                    return SimpleLootTable(pools)
+                }
+            }
+        }
 
         fun <T> empty(): LootTable<T> {
             return SimpleLootTable(emptyList())
@@ -40,27 +61,6 @@ interface LootTable<S> {
      * 选择 [LootTable] 中的样本.
      */
     fun select(context: LootContext): List<S>
-
-    private object Serializer : SimpleSerializer<LootTable<*>> {
-        override fun deserialize(type: Type, node: ConfigurationNode): LootTable<*> {
-            val rawScalar = node.rawScalar()
-            if (rawScalar is String) {
-                // 如果 rawScalar 是字符串, 则是配置文件中指定了 LootTable 的名称, 需要从注册表中读取
-                return BuiltInRegistries.LOOT_TABLE[rawScalar]
-                    ?: throw SerializationException(node, type, "无法从配置文件中读取名为 $rawScalar 的 LootTable")
-            }
-            // 如果 rawScalar 不是字符串, 则是配置文件中直接指定了一整个 LootTable 对象, 或是 LootTable 系统本身在序列化, 进行对应逻辑.
-            val type = type as ParameterizedType
-            val sType = type.actualTypeArguments[0]
-            if (sType is WildcardType) {
-                throw SerializationException(node, type, "LootTable 的样本类型不能是通配符类型, 这是一个代码 bug!")
-            }
-            val poolType = TypeFactory.parameterizedClass(LootPool::class.java, sType) // LootPool<S>
-            val poolTypeToken = TypeToken.get(poolType) as TypeToken<LootPool<Any>>
-            val pools = node.node("pools").getList(poolTypeToken) ?: throw SerializationException(node, type, "Failed to deserialize LootTable: pools is null or empty")
-            return SimpleLootTable(pools)
-        }
-    }
 }
 
 /* Implementations */

@@ -29,12 +29,6 @@ object ItemBehaviorTypes {
     val TEST_INTERACT = typeOf("test_interact", TestInteract)
 
     /**
-     * 物品具有该行为时, 可以触发指定的机制.
-     */
-    @JvmField
-    val CASTABLE = typeOf("castable", Castable)
-
-    /**
      * 物品具有该行为时, 会保留最后的耐久(维持在0).
      * 可实现物品耐久耗尽时变为不可用状态(“损坏”状态)而不是直接消失.
      *
@@ -76,6 +70,14 @@ object ItemBehaviorTypes {
     val MINECRAFT_MELEE = typeOf("minecraft_melee", Melee)
 
     /**
+     * 使物品具有**原版横扫(剑)**武器行为.
+     *
+     * @see cc.mewcraft.wakame.item.property.ItemPropTypes.MINECRAFT_SWEEP
+     */
+    @JvmField
+    val MINECRAFT_SWEEP = typeOf("minecraft_sweep", Sweep)
+
+    /**
      * 使物品具有**原版三叉戟**武器行为.
      *
      * @see cc.mewcraft.wakame.item.property.ItemPropTypes.MINECRAFT_TRIDENT
@@ -98,6 +100,28 @@ object ItemBehaviorTypes {
      */
     @JvmField
     val KATANA = typeOf("katana", Katana)
+
+    /**
+     * 物品具有该行为时, 可以作为剑武器.
+     *
+     * @see cc.mewcraft.wakame.item.property.ItemPropTypes.SWORD
+     */
+    @JvmField
+    val SWORD = typeOf("sword", Sword)
+
+    /**
+     * 物品具有该行为时, 可以作为法杖武器.
+     *
+     * @see cc.mewcraft.wakame.item.property.ItemPropTypes.WAND
+     */
+    @JvmField
+    val WAND = typeOf("wand", Wand)
+
+    /**
+     * 物品具有该行为时, 可以触发指定的机制.
+     */
+    @JvmField
+    val CASTABLE = typeOf("castable", Castable)
 
     /**
      * 物品具有该行为时, 可以捕捉和释放生物.

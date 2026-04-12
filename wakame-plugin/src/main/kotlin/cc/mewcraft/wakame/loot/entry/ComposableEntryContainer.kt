@@ -20,9 +20,29 @@ import java.lang.reflect.Type
  * @param S 战利品数据的类型.
  */
 fun interface ComposableEntryContainer<S> {
-
     companion object {
-        val SERIALIZER: SimpleSerializer<ComposableEntryContainer<*>> = Serializer
+        internal fun serializer(): SimpleSerializer<ComposableEntryContainer<*>> {
+            return object : SimpleSerializer<ComposableEntryContainer<*>> {
+                override fun deserialize(type: Type, node: ConfigurationNode): ComposableEntryContainer<*> {
+                    val id = node.node("type").require<String>()
+                    val dataType = BuiltInRegistries.LOOT_POOL_ENTRY_TYPE[id] ?: throw SerializationException(node, type, "Unknown loot pool entry type: $type")
+                    return getDataValue(dataType, type, node)
+                }
+
+                private fun getDataValue(
+                    dataType: LootPoolEntryType<*>,
+                    type: Type,
+                    node: ConfigurationNode,
+                ): ComposableEntryContainer<*> {
+                    val sType = (type as ParameterizedType).actualTypeArguments[0]
+                    val rawSubclass = GenericTypeReflector.erase(dataType.typeToken.type) // out ComposableEntryContainer.class
+                    val actualType = TypeFactory.parameterizedClass(rawSubclass, sType) // out ComposableEntryContainer<S>
+                    val serializer = dataType.serializer
+
+                    return serializer.deserialize(actualType, node) ?: throw SerializationException(node, type, "Failed to deserialize loot pool entry of type: $dataType with type: $actualType")
+                }
+            }
+        }
 
         /**
          * 返回一个始终返回 `true` 的 [ComposableEntryContainer] 实例。
@@ -85,27 +105,6 @@ fun interface ComposableEntryContainer<S> {
             } else {
                 this.expand(context, dataConsumer) || entry.expand(context, dataConsumer) // 如果不是迭代, 则只在满足条件时扩展条目
             }
-        }
-    }
-
-    private object Serializer : SimpleSerializer<ComposableEntryContainer<*>> {
-        override fun deserialize(type: Type, node: ConfigurationNode): ComposableEntryContainer<*> {
-            val id = node.node("type").require<String>()
-            val dataType = BuiltInRegistries.LOOT_POOL_ENTRY_TYPE[id] ?: throw SerializationException(node, type, "Unknown loot pool entry type: $type")
-            return getDataValue(dataType, type, node)
-        }
-
-        private fun getDataValue(
-            dataType: LootPoolEntryType<*>,
-            type: Type,
-            node: ConfigurationNode,
-        ): ComposableEntryContainer<*> {
-            val sType = (type as ParameterizedType).actualTypeArguments[0]
-            val rawSubclass = GenericTypeReflector.erase(dataType.typeToken.type) // out ComposableEntryContainer.class
-            val actualType = TypeFactory.parameterizedClass(rawSubclass, sType) // out ComposableEntryContainer<S>
-            val serializer = dataType.serializer
-
-            return serializer.deserialize(actualType, node) ?: throw SerializationException(node, type, "Failed to deserialize loot pool entry of type: $dataType with type: $actualType")
         }
     }
 }

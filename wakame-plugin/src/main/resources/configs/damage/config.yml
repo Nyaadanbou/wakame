@@ -80,6 +80,227 @@ equipment:
     - starve
     - wither
 
+# 属性修饰符来源
+attribute_modifier_source:
+  # 来源于状态效果
+  effect:
+    resistance:
+      - id: "incoming_damage_rate"
+        operation: add
+        value: 0
+        element: neutral
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: 0.2
+    strength:
+      - id: "attack_damage"
+        operation: add
+        lower: 0
+        upper: 0
+        element: neutral
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: 3
+      - id: "attack_damage"
+        operation: add
+        lower: 0
+        upper: 0
+        element: water
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: 5
+      - id: "attack_damage"
+        operation: add
+        lower: 0
+        upper: 0
+        element: fire
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: 1
+    weakness:
+      - id: "attack_damage"
+        operation: add
+        lower: 0
+        upper: 0
+        element: neutral
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: -4
+    haste:
+      - id: "attack_cooldown_rate"
+        operation: add
+        value: 0
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: -0.1
+    mining_fatigue:
+      - id: "attack_cooldown_rate"
+        operation: add
+        value: 0
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: 0.1
+
+# TODO 生物护甲、潜影贝盖壳
+
+display2:
+  normal:
+    type: text_display
+    settings:
+      billboard: center
+      brightness: default
+      glowColorOverride: -1
+      height: 0.0
+      width: 0.0
+      shadowRadius: 0.0
+      shadowStrength: 1.0
+      viewRange: 1.0
+      textAlignment: center
+      background: 0
+      defaultBackground: false
+      lineWidth: 200
+      isSeeThrough: true
+      hasTextShadow: true
+      text:
+        type: separated_damage_display
+        # 伤害显示总文本.
+        final_text: <critical_strike_style><critical_strike_text><damage_value_text>
+        # 暴击状态风格.
+        critical_strike_style:
+          positive: <bold>
+          negative: <bold>
+          none: ""
+        # 暴击状态文本.
+        critical_strike_text:
+          positive: <color:#FF9900>💥</color:#FF9900>
+          negative: <color:#02AFFF>💥</color:#02AFFF>
+          none: ""
+        # 元素文本.
+        # 支持占位符:
+        # - <element_name> 元素名
+        # - <element_style> 元素风格
+        # - <damage_value> 该元素类型具体伤害值
+        damage_value_text: "<element_style><damage_value:0>"
+        # 各元素类型的伤害文本之间的分隔字符串.
+        separator: " "
+    frames:
+      0:
+        start_interpolation: 0
+        interpolation_duration: 0
+        teleport_duration: 0
+        transformation:
+          translation: [ .0, -1.0, .0 ]
+          scale: [ 1.5, 1.5, 1.5 ]
+          left_rotation: [ .0, .0, .0, 1.0 ]
+          right_rotation: [ .0, .0, .0, 1.0 ]
+      2:
+        start_interpolation: 0
+        interpolation_duration: 5
+        teleport_duration: 0
+        transformation:
+          translation: [ .0, -0.5, .0 ]
+          scale: [ 2.5, 2.5, 2.5 ]
+          left_rotation: [ .0, .0, .0, 1.0 ]
+          right_rotation: [ .0, .0, .0, 1.0 ]
+      8:
+        start_interpolation: 0
+        interpolation_duration: 20
+        teleport_duration: 0
+        transformation:
+          translation: [ .0, 0.5, .0 ]
+          scale: [ 1.0, 1.0, 1.0 ]
+          left_rotation: [ .0, .0, .0, 1.0 ]
+          right_rotation: [ .0, .0, .0, 1.0 ]
+  positive_critical_strike:
+    type: text_display
+    settings:
+      billboard: center
+      background: 0
+      isSeeThrough: true
+      hasTextShadow: true
+      text:
+        type: separated_damage_display
+        # 伤害显示总文本.
+        final_text: <critical_strike_style><critical_strike_text><damage_value_text>
+        # 暴击状态风格.
+        critical_strike_style:
+          positive: <bold>
+          negative: <bold>
+          none: ""
+        # 暴击状态文本.
+        critical_strike_text:
+          positive: <color:#FF9900>💥</color:#FF9900>
+          negative: <color:#02AFFF>💥</color:#02AFFF>
+          none: ""
+        # 元素文本.
+        # 支持占位符:
+        # - <element_name> 元素名
+        # - <element_style> 元素风格
+        # - <damage_value> 该元素类型具体伤害值
+        damage_value_text: "<element_style><damage_value:0>"
+        # 各元素类型的伤害文本之间的分隔字符串.
+        separator: " "
+    frames:
+      0:
+        interpolation_duration: 0
+        transformation:
+          translation: [ .0, -1.0, .0 ]
+          scale: [ 1.5, 1.5, 1.5 ]
+      2:
+        interpolation_duration: 5
+        transformation:
+          translation: [ .0, -0.5, .0 ]
+          scale: [ 4.5, 4.5, 4.5 ]
+      8:
+        interpolation_duration: 20
+        transformation:
+          translation: [ .0, 0.5, .0 ]
+  negative_critical_strike:
+    type: text_display
+    settings:
+      billboard: center
+      background: 0
+      isSeeThrough: true
+      hasTextShadow: true
+      text:
+        type: separated_damage_display
+        # 伤害显示总文本.
+        final_text: <critical_strike_style><critical_strike_text><damage_value_text>
+        # 暴击状态风格.
+        critical_strike_style:
+          positive: <bold>
+          negative: <bold>
+          none: ""
+        # 暴击状态文本.
+        critical_strike_text:
+          positive: <color:#FF9900>💥</color:#FF9900>
+          negative: <color:#02AFFF>💥</color:#02AFFF>
+          none: ""
+        # 元素文本.
+        # 支持占位符:
+        # - <element_name> 元素名
+        # - <element_style> 元素风格
+        # - <damage_value> 该元素类型具体伤害值
+        damage_value_text: "<element_style><damage_value:0>"
+        # 各元素类型的伤害文本之间的分隔字符串.
+        separator: " "
+    frames:
+      0:
+        interpolation_duration: 0
+        transformation:
+          translation: [ .0, -1.0, .0 ]
+          scale: [ 1.5, 1.5, 1.5 ]
+      2:
+        interpolation_duration: 5
+        transformation:
+          translation: [ .0, -0.5, .0 ]
+          scale: [ 4.5, 4.5, 4.5 ]
+      8:
+        interpolation_duration: 20
+        transformation:
+          translation: [ .0, 0.5, .0 ]
+
+
 # 伤害显示相关.
 display:
 
@@ -110,9 +331,9 @@ display:
           scale: [ 1.5, 1.5, 1.5 ]
         # 正暴击时该次动画的参数.
         # 暴击动画的参数未指定时, 将继承常规动画参数.
-        positive_critical_strike: {}
+        positive_critical_strike: { }
         # 负暴击时该次动画的参数.
-        negative_critical_strike: {}
+        negative_critical_strike: { }
 
       - delay: 2
         normal:

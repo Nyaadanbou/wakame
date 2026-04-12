@@ -143,6 +143,7 @@ object TranslatableMessages {
     val MSG_VOUCHER_ALREADY_REDEEMED = create("msg_voucher_already_redeemed")
     val MSG_VOUCHER_NO_CODE = create("msg_voucher_no_code")
     val MSG_VOUCHER_SERVER_NOT_ALLOWED = create("msg_voucher_server_not_allowed")
+    val MSG_ERR_REQUIRE_TWO_HANDED = create("msg_err_require_two_handed")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)
