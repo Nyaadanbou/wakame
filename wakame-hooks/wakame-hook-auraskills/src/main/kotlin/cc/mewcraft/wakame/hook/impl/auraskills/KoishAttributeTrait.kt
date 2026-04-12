@@ -37,6 +37,7 @@ class KoishAttributeTrait : Listener, BukkitTraitHandler {
             KoishTraits.STEP_HEIGHT to Attributes.STEP_HEIGHT,
             KoishTraits.SWEEPING_DAMAGE_RATIO to Attributes.SWEEPING_DAMAGE_RATIO,
             KoishTraits.WATER_MOVEMENT_EFFICIENCY to Attributes.WATER_MOVEMENT_EFFICIENCY,
+            KoishTraits.ATTACK_COOLDOWN_RATE to Attributes.ATTACK_COOLDOWN_RATE,
             KoishTraits.ATTACK_EFFECT_CHANCE to Attributes.ATTACK_EFFECT_CHANCE,
             KoishTraits.CRITICAL_STRIKE_CHANCE to Attributes.CRITICAL_STRIKE_CHANCE,
             KoishTraits.CRITICAL_STRIKE_POWER to Attributes.CRITICAL_STRIKE_POWER,

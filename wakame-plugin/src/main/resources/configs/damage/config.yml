@@ -80,6 +80,69 @@ equipment:
     - starve
     - wither
 
+# 属性修饰符来源
+attribute_modifier_source:
+  # 来源于状态效果
+  effect:
+    resistance:
+      - id: "incoming_damage_rate"
+        operation: add
+        value: 0
+        element: neutral
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: 0.2
+    strength:
+      - id: "attack_damage"
+        operation: add
+        lower: 0
+        upper: 0
+        element: neutral
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: 3
+      - id: "attack_damage"
+        operation: add
+        lower: 0
+        upper: 0
+        element: water
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: 5
+      - id: "attack_damage"
+        operation: add
+        lower: 0
+        upper: 0
+        element: fire
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: 1
+    weakness:
+      - id: "attack_damage"
+        operation: add
+        lower: 0
+        upper: 0
+        element: neutral
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: -4
+    haste:
+      - id: "attack_cooldown_rate"
+        operation: add
+        value: 0
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: -0.1
+    mining_fatigue:
+      - id: "attack_cooldown_rate"
+        operation: add
+        value: 0
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: 0.1
+
+# TODO 生物护甲、潜影贝盖壳
+
 display2:
   normal:
     type: text_display

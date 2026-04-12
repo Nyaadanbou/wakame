@@ -7,8 +7,20 @@ import cc.mewcraft.lazyconfig.access.optionalEntry
 import cc.mewcraft.lazyconfig.configurate.require
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.entity.attribute.bundle.*
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundleTrait
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundleTraitSet
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeFacade
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle.Quality
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundleR
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundleRE
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundleS
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundleSE
+import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
+import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundleR
+import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundleRE
+import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundleS
+import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundleSE
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -73,6 +85,7 @@ internal object AttributeFacadeRegistryLoader : RegistryLoader {
      * Registers all [AttributeFacade].
      */
     private fun addAll() {
+        +build("attack_cooldown_rate").single().bind(Attributes.ATTACK_COOLDOWN_RATE)
         +build("attack_damage").ranged().element().bind(Attributes.MIN_ATTACK_DAMAGE, Attributes.MAX_ATTACK_DAMAGE)
         +build("attack_damage_rate").single().element().bind(Attributes.ATTACK_DAMAGE_RATE)
         +build("attack_effect_chance").single().bind(Attributes.ATTACK_EFFECT_CHANCE)
