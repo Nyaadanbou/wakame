@@ -12,6 +12,105 @@ Koish 附魔框架**完全复用 Minecraft 原版的附魔定义系统** ([Encha
 
 **核心思路**: 附魔的"是什么"由数据包定义 (JSON)；附魔的"怎么运行"由 Java/Kotlin 代码实现。
 
+## 魔咒是什么
+
+### 玩家视角
+
+在玩家眼中，一个**魔咒** (Enchantment) 就是一条可以附在物品上的属性/能力，例如"连锁采矿"、"爆破采矿"、"自动熔炼"。魔咒有名字、有等级上限、有适用的物品类型。
+
+### 数据包视角 (一个 JSON = 一个魔咒)
+
+每个魔咒对应数据包 `data/<namespace>/enchantment/` 目录下的**一个 JSON 文件**。文件名即为魔咒 ID (不含命名空间)，例如 `data/koish/enchantment/veinminer.json` 对应 `koish:veinminer`。
+
+JSON 遵循原版 [Enchantment definition](https://minecraft.wiki/w/Enchantment_definition#JSON_format) 格式，完整示例:
+
+```json
+{
+  "description": { "translate": "enchantment.koish.veinminer", "fallback": "连锁采矿" },
+  "supported_items": "#minecraft:enchantable/mining",
+  "slots": ["mainhand"],
+  "max_level": 5,
+  "min_cost": { "base": 1, "per_level_above_first": 10 },
+  "max_cost": { "base": 51, "per_level_above_first": 10 },
+  "anvil_cost": 1,
+  "weight": 10,
+  "effects": {
+    "koish:veinminer": {
+      "longest_chain_mining": {
+        "type": "minecraft:clamped",
+        "value": { "type": "minecraft:linear", "base": 4.0, "per_level_above_first": 4.0 },
+        "min": 1.0, "max": 64.0
+      },
+      "allowed_block_types": ["minecraft:iron_ore", "minecraft:gold_ore"],
+      "block_break_sound": "minecraft:block.stone.place",
+      "period": 3
+    }
+  }
+}
+```
+
+其中各字段的含义:
+
+|字段|说明|
+|---|---|
+|`description`|魔咒的显示名称 (支持翻译键)|
+|`supported_items`|可附魔的物品标签或列表 (对 Koish 物品会被 Mixin 拦截，见下文)|
+|`slots`|魔咒在哪些装备槽位生效 (`mainhand`, `offhand`, `any` 等)|
+|`max_level`|最大附魔等级|
+|`min_cost` / `max_cost`|附魔台花费范围 (原版附魔台机制)|
+|`anvil_cost`|铁砧花费|
+|`weight`|附魔权重 (影响附魔台随机出现概率)|
+|`effects`|**0 到 N 个 enchantment effect component**，键为效果 ID，值为该效果的配置数据|
+
+**要点: 一个魔咒可以拥有 0 到 N 个 effect。** 例如，`attack_damage_fire` 魔咒在 `effects` 中包含了一个 `koish:attributes` 列表 (提供自定义属性)；而理论上也可以在同一个魔咒中组合多种效果。
+
+### 代码视角 (Bukkit API)
+
+在代码中，一个魔咒对应 `org.bukkit.enchantments.Enchantment` 实例。所有已加载的魔咒 (包括原版 + 数据包定义的) 可以通过注册表获取:
+
+```kotlin
+// 获取所有已注册的魔咒
+val allEnchantments: List<Enchantment> =
+    RegistryAccess.registryAccess()
+        .getRegistry(RegistryKey.ENCHANTMENT)
+        .stream()
+        .toList()
+
+// 通过 NamespacedKey 获取特定魔咒
+val veinminer: Enchantment? =
+    RegistryAccess.registryAccess()
+        .getRegistry(RegistryKey.ENCHANTMENT)
+        .get(NamespacedKey.fromString("koish:veinminer")!!)
+```
+
+项目中提供了扩展函数来方便地操作魔咒 (定义在 `tools.kt`):
+
+```kotlin
+// 获取魔咒上的所有 effect component (DataComponentMap)
+val effects: DataComponentMap = enchantment.getEffectList()
+
+// 获取特定类型的 effect
+val smelter: EnchantmentSmelterEffect? = enchantment.getEffect(ExtraEnchantmentEffects.SMELTER)
+
+// 获取列表类型的 effect (如 attributes)
+val attributes: List<EnchantmentAttributeEffect> = enchantment.getEffectList(ExtraEnchantmentEffects.ATTRIBUTES)
+
+// 获取物品上所有 koish 命名空间的魔咒及其等级
+val enchants: Map<Enchantment, Int> = itemStack.koishEnchantments
+
+// 获取物品上所有非 minecraft 命名空间的魔咒及其等级
+val customs: Map<Enchantment, Int> = itemStack.customEnchantments
+```
+
+### 魔咒 vs 魔咒效果
+
+|概念|对应物|数量关系|
+|---|---|---|
+|魔咒 (Enchantment)|一个数据包 JSON 文件 / 一个 `org.bukkit.enchantments.Enchantment` 实例|—|
+|魔咒效果 (Enchantment Effect)|JSON `effects` 中的一个键值对 / 一个 `DataComponentType<T>` 实例|一个魔咒拥有 0-N 个效果|
+
+魔咒是面向玩家的实体 (有名字、有等级、可以附在物品上)；魔咒效果是面向开发者的实现单元 (一段可复用的效果逻辑)。同一个效果类型可以被多个不同的魔咒使用 (例如多个魔咒都可以使用 `koish:attributes` 来提供不同的属性加成)。
+
 ## 模块职责
 
 |模块|附魔相关职责|
