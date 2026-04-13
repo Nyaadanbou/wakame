@@ -16,12 +16,17 @@ import cc.mewcraft.wakame.damage.mapping.PlayerAdhocDamageMappings
 import cc.mewcraft.wakame.element.ElementRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.ImgAttributeMapRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.source.AttributeSourceRegistry
 import cc.mewcraft.wakame.entity.typeref.EntityRefRegistryLoader
 import cc.mewcraft.wakame.event.map.ConfigurationReloadEvent
 import cc.mewcraft.wakame.gui.BasicGuiInitializer
 import cc.mewcraft.wakame.gui.catalog.item.CatalogItemMenuStacks
 import cc.mewcraft.wakame.init.RecipeInitializer
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.CustomItemRegistryLoader
+import cc.mewcraft.wakame.item.ItemProxyRegistryLoader
+import cc.mewcraft.wakame.item.KoishStackGenerator
+import cc.mewcraft.wakame.item.KoishTagManager
+import cc.mewcraft.wakame.item.SlotDisplay
 import cc.mewcraft.wakame.item.display.implementation.crafting_station.CraftingStationItemRenderer
 import cc.mewcraft.wakame.item.display.implementation.merging_table.MergingTableItemRenderer
 import cc.mewcraft.wakame.item.display.implementation.repairing_table.RepairingTableItemRenderer
@@ -112,6 +117,7 @@ private object ReloadProcess {
 
         AttributeSupplierRegistryLoader.reload()
         ImgAttributeMapRegistryLoader.reload()
+        AttributeSourceRegistry.reload()
 
         LootTableRegistryLoader.reload()
 

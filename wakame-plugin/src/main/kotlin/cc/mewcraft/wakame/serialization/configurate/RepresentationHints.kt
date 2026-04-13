@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.serialization.configurate
 
 import cc.mewcraft.wakame.util.KoishKey
 import cc.mewcraft.wakame.util.typeTokenOf
+import org.bukkit.potion.PotionEffectType
 import org.spongepowered.configurate.RepresentationHint
 import kotlin.reflect.KClass
 
@@ -18,6 +19,9 @@ object RepresentationHints {
 
     @JvmField
     val MINECRAFT_RECIPE_ID = create<KoishKey>("minecraft_recipe_id")
+
+    @JvmField
+    val EFFECT_TYPE = create<PotionEffectType>("effect_type")
 
     private fun <T : Any> create(key: String, type: KClass<T>): RepresentationHint<T> {
         return RepresentationHint.of(key, type.java)

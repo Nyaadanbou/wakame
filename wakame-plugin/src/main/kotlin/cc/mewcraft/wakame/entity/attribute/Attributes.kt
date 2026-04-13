@@ -54,6 +54,8 @@ object Attributes : AttributeProvider {
     // 就是说, 我们需要通过自定义监听器或调度器等方式来实现它们.
 
     @JvmField
+    val ATTACK_COOLDOWN_RATE = RangedAttribute("attack_cooldown_rate", 1.0, .0, 16384.0).register()
+    @JvmField
     val ATTACK_EFFECT_CHANCE = RangedAttribute("attack_effect_chance", 0.01, .0, 1.0).register()
     @JvmField
     val CRITICAL_STRIKE_CHANCE = RangedAttribute("critical_strike_chance", .0, -1.0, 1.0).register()

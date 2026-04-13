@@ -4,7 +4,7 @@ import org.joml.Vector3f
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 /**
- * 剑的配置.
+ * 双剑的配置.
  *
  * @property itemDamagePerAttack 每次攻击命中消耗的耐久度.
  * @property attackHalfExtentsBase OBB攻击判定范围.

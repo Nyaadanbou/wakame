@@ -64,6 +64,7 @@ object AuraSkillsHook : PlayerManaIntegration by AuraPlayerManaIntegration {
         koishRegistry.registerTrait(KoishTraits.STEP_HEIGHT)
         koishRegistry.registerTrait(KoishTraits.SWEEPING_DAMAGE_RATIO)
         koishRegistry.registerTrait(KoishTraits.WATER_MOVEMENT_EFFICIENCY)
+        koishRegistry.registerTrait(KoishTraits.ATTACK_COOLDOWN_RATE)
         koishRegistry.registerTrait(KoishTraits.ATTACK_EFFECT_CHANCE)
         koishRegistry.registerTrait(KoishTraits.CRITICAL_STRIKE_CHANCE)
         koishRegistry.registerTrait(KoishTraits.CRITICAL_STRIKE_POWER)

@@ -137,6 +137,7 @@ msg_repair_stone_target_not_repairable: "<red>修复石无法修复该物品."
 msg_voucher_already_redeemed: "<red>该兑换券已被使用过."
 msg_voucher_no_code: "<red>该兑换券无效."
 msg_voucher_server_not_allowed: "<red>该兑换券无法在当前服务器使用."
+msg_err_require_two_handed: "<red>此物品需要双手持握才能使用!"
 
 # 像这样制定一个数字的格式, '#' 是 Java 的 DecimalFormat 的语法
 msg_number_format: "This is a decimal number: <arg:0:'zh-CN':'#'>."

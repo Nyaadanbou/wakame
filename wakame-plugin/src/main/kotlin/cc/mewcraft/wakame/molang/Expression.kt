@@ -12,6 +12,30 @@ import java.lang.reflect.Type
  */
 interface Expression {
     companion object {
+        internal fun serializer(): SimpleSerializer<Expression> {
+            return object : SimpleSerializer<Expression> {
+                override fun deserialize(type: Type, node: ConfigurationNode): Expression {
+                    val string = node.get<String>()
+                    val evalNumber = string?.toDoubleOrNull()
+                    if (evalNumber != null)
+                        return of(evalNumber)
+
+                    val evalString = string?.let { of(it) }
+                    return evalString ?: throw IllegalArgumentException("Cannot deserialize Expression from ${node.path()}")
+                }
+
+                override fun serialize(type: Type, obj: Expression?, node: ConfigurationNode) {
+                    if (obj == null)
+                        return
+                    node.set(obj.asString())
+                }
+
+                override fun emptyValue(specificType: Type, options: ConfigurationOptions): Expression {
+                    return of(0)
+                }
+            }
+        }
+
         /**
          * 从一个字符串创建一个 [Expression].
          */
@@ -28,28 +52,6 @@ interface Expression {
     fun evaluate(engine: MochaEngine<*>): Double
 
     fun evaluate(): Double
-}
-
-object ExpressionSerializer : SimpleSerializer<Expression> {
-    override fun deserialize(type: Type, node: ConfigurationNode): Expression {
-        val string = node.get<String>()
-        val evalNumber = string?.toDoubleOrNull()
-        if (evalNumber != null)
-            return Expression.of(evalNumber)
-
-        val evalString = string?.let { Expression.of(it) }
-        return evalString ?: throw IllegalArgumentException("Cannot deserialize Expression from ${node.path()}")
-    }
-
-    override fun serialize(type: Type, obj: Expression?, node: ConfigurationNode) {
-        if (obj == null)
-            return
-        node.set(obj.asString())
-    }
-
-    override fun emptyValue(specificType: Type, options: ConfigurationOptions): Expression {
-        return Expression.of(0)
-    }
 }
 
 /**

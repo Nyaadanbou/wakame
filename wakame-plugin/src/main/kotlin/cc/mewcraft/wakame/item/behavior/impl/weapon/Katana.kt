@@ -37,7 +37,7 @@ import kotlin.random.Random
 
 private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "damage").orElse(false)
 
-/**
+/** FIXME 重构
  * 太刀的物品行为.
  *
  * 该 `object` 里的所有逻辑都是与事件相关的, 不包含 tick 逻辑.

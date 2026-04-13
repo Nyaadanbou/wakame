@@ -80,129 +80,198 @@ equipment:
     - starve
     - wither
 
-# 伤害显示相关.
-display:
+# 属性修饰符来源
+attribute_modifier_source:
+  # 来源于状态效果
+  effect:
+    resistance:
+      - id: "incoming_damage_rate"
+        operation: add
+        value: 0
+        element: neutral
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: 0.2
+    strength:
+      - id: "attack_damage"
+        operation: add
+        lower: 0
+        upper: 0
+        element: neutral
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: 3
+      - id: "attack_damage"
+        operation: add
+        lower: 0
+        upper: 0
+        element: water
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: 5
+      - id: "attack_damage"
+        operation: add
+        lower: 0
+        upper: 0
+        element: fire
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: 1
+    weakness:
+      - id: "attack_damage"
+        operation: add
+        lower: 0
+        upper: 0
+        element: neutral
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: -4
+    haste:
+      - id: "attack_cooldown_rate"
+        operation: add
+        value: 0
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: -0.1
+    mining_fatigue:
+      - id: "attack_cooldown_rate"
+        operation: add
+        value: 0
+        number_modifier:
+          type: effect_level_linear_bonus
+          per_level: 0.1
 
-  # 伤害数值以何种模式显示.
-  # 可用选项: merged, separated
-  mode: merged
+# TODO 生物护甲、潜影贝盖壳
 
-  # 模式: separated
-  # 每种元素的伤害单独显示.
-  separated:
-
-    # 文本展示实体的变换动画.
-    # 列表的元素为单个变换.
-    # 将按照顺序依次执行.
-    animations:
-
-      - # 该动画开始播放前延迟的 tick 数.
-        delay: 0
-        # 常规状况下该次动画的参数.
-        # 常规动画中的参数未指定时, 将继承默认动画的参数.
-        # default:
-        #   start_interpolation: 0
-        #   interpolation_duration: 0
-        #   translation: [ .0, .0, .0 ]
-        #   scale: [ 1.0, 1.0, 1.0 ]
-        normal:
+display2:
+  normal:
+    type: text_display
+    settings:
+      billboard: center
+      brightness: default
+      glow_color_override: -1
+      height: 0.0
+      width: 0.0
+      shadow_radius: 0.0
+      shadow_strength: 1.0
+      view_range: 1.0
+      text_alignment: center
+      background: 0
+      default_background: false
+      line_width: 200
+      is_see_through: true
+      has_text_shadow: true
+      text:
+        type: damage_hologram_normal_attack
+        # 伤害显示总文本.
+        final_text: <damage_value_text>
+        # 元素文本.
+        # 支持占位符:
+        # - <element_name> 元素名
+        # - <element_style> 元素风格
+        # - <damage_value> 该元素类型具体伤害值
+        damage_value_text: "<element_style><damage_value:0>"
+        # 是否合并各元素伤害值.
+        is_damage_value_merged: false
+        # 各元素类型的伤害文本之间的分隔字符串.
+        # 仅当 merge_damage_value 为 false 时有意义.
+        separator: " "
+    frames:
+      0:
+        start_interpolation: 0
+        interpolation_duration: 0
+        teleport_duration: 0
+        transformation:
           translation: [ .0, -1.0, .0 ]
           scale: [ 1.5, 1.5, 1.5 ]
-        # 正暴击时该次动画的参数.
-        # 暴击动画的参数未指定时, 将继承常规动画参数.
-        positive_critical_strike: {}
-        # 负暴击时该次动画的参数.
-        negative_critical_strike: {}
-
-      - delay: 2
-        normal:
-          interpolation_duration: 5
+          left_rotation: [ .0, .0, .0, 1.0 ]
+          right_rotation: [ .0, .0, .0, 1.0 ]
+      2:
+        start_interpolation: 0
+        interpolation_duration: 5
+        teleport_duration: 0
+        transformation:
           translation: [ .0, -0.5, .0 ]
           scale: [ 2.5, 2.5, 2.5 ]
-        positive_critical_strike:
-          scale: [ 4.5, 4.5, 4.5 ]
-        negative_critical_strike:
-          scale: [ 4.5, 4.5, 4.5 ]
-
-      - delay: 8
-        normal:
-          interpolation_duration: 20
+          left_rotation: [ .0, .0, .0, 1.0 ]
+          right_rotation: [ .0, .0, .0, 1.0 ]
+      8:
+        start_interpolation: 0
+        interpolation_duration: 20
+        teleport_duration: 0
+        transformation:
           translation: [ .0, 0.5, .0 ]
           scale: [ 1.0, 1.0, 1.0 ]
-
-    # 动画持续的总 tick 数
-    # 即该时长后伤害显示文本不再显示
-    animation_duration: 32
-
-    # 伤害显示总文本.
-    final_text: <critical_strike_style><critical_strike_text><damage_value_text>
-
-    # 暴击状态风格.
-    critical_strike_style:
-      positive: <bold>
-      negative: <bold>
-      none: ""
-
-    # 暴击状态文本.
-    critical_strike_text:
-      positive: <color:#FF9900>💥</color:#FF9900>
-      negative: <color:#02AFFF>💥</color:#02AFFF>
-      none: ""
-
-    # 元素文本.
-    # 支持占位符:
-    # - <element_name> 元素名
-    # - <element_style> 元素风格
-    # - <damage_value> 该元素类型具体伤害值
-    damage_value_text: "<element_style><damage_value:0>"
-
-    # 各元素类型的伤害文本之间的分隔字符串.
-    separator: " "
-
-  # 模式: merged
-  # 只显示所有元素的伤害之和.
-  merged:
-
-    animations:
-
-      - delay: 0
-        normal:
-          translation: [ .0, -0.4, .0 ]
+          left_rotation: [ .0, .0, .0, 1.0 ]
+          right_rotation: [ .0, .0, .0, 1.0 ]
+  positive_critical_strike:
+    type: text_display
+    settings:
+      billboard: center
+      background: 0
+      is_see_through: true
+      has_text_shadow: true
+      text:
+        type: damage_hologram_critical_strike
+        # 伤害显示总文本.
+        final_text: <critical_strike_style><critical_strike_text><damage_value_text>
+        # 暴击状态风格.
+        critical_strike_style: <bold>
+        # 暴击状态文本.
+        critical_strike_text: <color:#FF9900>💥</color:#FF9900>
+        # 元素文本.
+        # 支持占位符:
+        # - <element_name> 元素名
+        # - <element_style> 元素风格
+        # - <damage_value> 该元素类型具体伤害值
+        damage_value_text: "<element_style><damage_value:0>"
+        # 是否合并各元素伤害值.
+        merge_damage_value: false
+        # 各元素类型的伤害文本之间的分隔字符串.
+        # 仅当 merge_damage_value 为 false 时有意义.
+        separator: " "
+    frames:
+      0:
+        interpolation_duration: 0
+        transformation:
+          translation: [ .0, -1.0, .0 ]
           scale: [ 1.5, 1.5, 1.5 ]
-
-      - delay: 2
-        normal:
-          interpolation_duration: 4
-          translation: [ .0, -0.1, .0 ]
+      2:
+        interpolation_duration: 5
+        transformation:
+          translation: [ .0, -0.5, .0 ]
+          scale: [ 4.5, 4.5, 4.5 ]
+      8:
+        interpolation_duration: 20
+        transformation:
+          translation: [ .0, 0.5, .0 ]
+  negative_critical_strike:
+    type: text_display
+    settings:
+      billboard: center
+      background: 0
+      is_see_through: true
+      has_text_shadow: true
+      text:
+        type: damage_hologram_critical_strike
+        final_text: <critical_strike_style><critical_strike_text><damage_value_text>
+        critical_strike_style: <bold>
+        critical_strike_text: <color:#02AFFF>💥</color:#02AFFF>
+        damage_value_text: "<element_style><damage_value:0>"
+        merge_damage_value: false
+        separator: " "
+    frames:
+      0:
+        interpolation_duration: 0
+        transformation:
+          translation: [ .0, -1.0, .0 ]
           scale: [ 1.5, 1.5, 1.5 ]
-
-      - delay: 6
-        normal:
-          interpolation_duration: 3
-          translation: [ .0, .0, .0 ]
-          scale: [ 1.5, 1.5, 1.5 ]
-
-      - delay: 9
-        normal:
-          interpolation_duration: 4
-          translation: [ .0, .2, .0 ]
-          scale: [ .8, .8, .8 ]
-    animation_duration: 14
-    final_text: <critical_strike_style><critical_strike_text><damage_value_text>
-
-    critical_strike_style:
-      positive: <bold>
-      negative: <bold>
-      none: ""
-
-    critical_strike_text:
-      positive: <color:#FF9900>💥</color:#FF9900>
-      negative: <color:#02AFFF>💥</color:#02AFFF>
-      none: ""
-
-    # 元素文本.
-    # 支持占位符:
-    # - <element_name> 伤害占比最高的元素类型的元素名.
-    # - <element_style> 伤害占比最高的元素类型的风格.
-    # - <damage_value> 总伤害值.
-    damage_value_text: "<element_style><damage_value:0>"
+      2:
+        interpolation_duration: 5
+        transformation:
+          translation: [ .0, -0.5, .0 ]
+          scale: [ 4.5, 4.5, 4.5 ]
+      8:
+        interpolation_duration: 20
+        transformation:
+          translation: [ .0, 0.5, .0 ]

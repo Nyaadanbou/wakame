@@ -45,7 +45,7 @@ object Castable : SimpleInteract {
         // 处理组合键序列输入
         sequenceComboHandler?.handleInput(player, castable, GenericCastableTrigger.RIGHT_CLICK)
 
-        return InteractionResult.PASS
+        return InteractionResult.SUCCESS
     }
 
     // Implements the following triggers in castable:
@@ -62,7 +62,7 @@ object Castable : SimpleInteract {
         // 处理组合键序列输入
         sequenceComboHandler?.handleInput(player, castable, GenericCastableTrigger.LEFT_CLICK)
 
-        return InteractionResult.PASS
+        return InteractionResult.SUCCESS
     }
 
     // Implements the following triggers in castable:
@@ -75,7 +75,7 @@ object Castable : SimpleInteract {
             handleTrigger(player, entry, SpecialCastableTrigger.ON_CONSUME)
         }
 
-        return BehaviorResult.PASS
+        return BehaviorResult.FINISH
     }
 
     /**

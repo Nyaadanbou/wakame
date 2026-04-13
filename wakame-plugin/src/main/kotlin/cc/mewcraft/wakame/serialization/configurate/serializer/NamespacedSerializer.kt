@@ -11,7 +11,7 @@ import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 import java.util.function.Predicate
 
-object KoishKeySerializer : ScalarSerializer<KoishKey>(KoishKey::class.java) {
+internal object KoishKeySerializer : ScalarSerializer<KoishKey>(KoishKey::class.java) {
     override fun deserialize(type: Type, obj: Any): KoishKey {
         return try {
             KoishKeys.of(obj.toString()) // 默认使用 "koish" 命名空间
@@ -25,7 +25,7 @@ object KoishKeySerializer : ScalarSerializer<KoishKey>(KoishKey::class.java) {
     }
 }
 
-object NamespacedKeySerializer : ScalarSerializer<NamespacedKey>(NamespacedKey::class.java) {
+internal object NamespacedKeySerializer : ScalarSerializer<NamespacedKey>(NamespacedKey::class.java) {
     override fun deserialize(type: Type, obj: Any): NamespacedKey {
         val string = obj.toString()
         val index = string.indexOf(':');
@@ -39,7 +39,7 @@ object NamespacedKeySerializer : ScalarSerializer<NamespacedKey>(NamespacedKey::
     }
 }
 
-object IdentifierSerializer : ScalarSerializer<Identifier>(Identifier::class.java) {
+internal object IdentifierSerializer : ScalarSerializer<Identifier>(Identifier::class.java) {
     override fun deserialize(type: Type, obj: Any): Identifier {
         val string = obj.toString()
         return Identifier.parse(string)
