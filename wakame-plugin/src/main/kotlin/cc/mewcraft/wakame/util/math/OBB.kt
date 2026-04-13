@@ -1,12 +1,10 @@
-package cc.mewcraft.wakame.util.collision
+package cc.mewcraft.wakame.util.math
 
 import cc.mewcraft.wakame.particle.LinePath
 import cc.mewcraft.wakame.particle.ParticleConfiguration
 import cc.mewcraft.wakame.particle.ParticleEffect
 import cc.mewcraft.wakame.particle.ParticleManager
-import cc.mewcraft.wakame.util.math.Vec3f.isOrthonormalBasis
 import cc.mewcraft.wakame.util.math.Vec3f.toLocation
-import cc.mewcraft.wakame.util.math.copy
 import com.destroystokyo.paper.ParticleBuilder
 import org.bukkit.Particle
 import org.bukkit.entity.Player
@@ -18,7 +16,7 @@ import kotlin.math.abs
 /**
  * 有向包围盒 (Oriented Bounding Box).
  */
-data class OBB constructor(
+data class OBB(
     private val centerX: Float,
     private val centerY: Float,
     private val centerZ: Float,
@@ -64,7 +62,7 @@ data class OBB constructor(
      * 每次调用都返回新对象.
      */
     val axisZ: Vector3f
-        get() = Vector3f(axisZX, axisZZ, axisZZ)
+        get() = Vector3f(axisZX, axisZY, axisZZ)
 
     /**
      * 该 OBB 在局部坐标系三轴上的半长向量.
@@ -76,7 +74,7 @@ data class OBB constructor(
     init {
         require(halfExtentX > 0 && halfExtentY > 0 && halfExtentZ > 0) { "The half extents of obb must more than 0." }
         require(
-            isOrthonormalBasis(
+            Vec3f.isOrthonormalBasis(
                 axisXX, axisXY, axisXZ,
                 axisYX, axisYY, axisYZ,
                 axisZX, axisZY, axisZZ,

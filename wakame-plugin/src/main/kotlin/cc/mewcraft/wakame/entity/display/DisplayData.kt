@@ -125,7 +125,7 @@ fun Billboard.toMojang(): MojangDisplay.BillboardConstraints {
  */
 sealed interface Brightness {
     companion object {
-        internal  fun serializer(): SimpleSerializer<Brightness> {
+        internal fun serializer(): SimpleSerializer<Brightness> {
             return SimpleSerializer { type, node ->
                 val str = node.rawScalar().toString()
                 if (str == DefaultBrightness.PLACEHOLDER) {
@@ -135,7 +135,7 @@ sealed interface Brightness {
                 val blockLight = node.node("block_light").require<Int>().also {
                     require(it in 0..15) { "The block light must be between 0 and 15" }
                 }
-                val skyLight = node.node("block_light").require<Int>().also {
+                val skyLight = node.node("sky_light").require<Int>().also {
                     require(it in 0..15) { "The sky light must be between 0 and 15" }
                 }
                 SpecifiedBrightness(blockLight, skyLight)

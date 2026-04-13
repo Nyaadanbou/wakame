@@ -16,8 +16,8 @@ interface TextBuilder {
             return DispatchingSerializer.createPartial(
                 mapOf(
                     "fixed" to FixedTextBuilder::class,
-                    "merged_damage_display" to MergedDamageHologramTextBuilder::class,
-                    "separated_damage_display" to SeparatedDamageHologramTextBuilder::class,
+                    "damage_hologram_normal_attack" to NormalAttackDamageHologramTextBuilder::class,
+                    "damage_hologram_critical_strike" to CriticalStrikeDamageHologramTextBuilder::class,
                 )
             )
         }

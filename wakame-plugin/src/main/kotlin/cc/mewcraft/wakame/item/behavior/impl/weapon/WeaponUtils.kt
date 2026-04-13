@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
-import cc.mewcraft.wakame.util.collision.OBB
+import cc.mewcraft.wakame.util.math.OBB
 import cc.mewcraft.wakame.util.math.copy
 import cc.mewcraft.wakame.util.math.maxComponentValue
 import cc.mewcraft.wakame.util.math.rotateAroundAxis
