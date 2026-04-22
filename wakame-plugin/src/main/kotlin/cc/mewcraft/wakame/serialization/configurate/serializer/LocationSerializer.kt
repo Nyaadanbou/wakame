@@ -9,7 +9,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializer
 import java.lang.reflect.Type
 
-object LocationSerializer : TypeSerializer<Location> {
+internal object LocationSerializer : TypeSerializer<Location> {
     override fun deserialize(type: Type, node: ConfigurationNode): Location {
         val x = node.node("x").require<Double>()
         val y = node.node("y").require<Double>()

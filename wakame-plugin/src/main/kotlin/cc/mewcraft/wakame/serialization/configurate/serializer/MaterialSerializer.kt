@@ -6,7 +6,7 @@ import org.spongepowered.configurate.serialize.ScalarSerializer
 import java.lang.reflect.Type
 import java.util.function.Predicate
 
-/*internal*/ object MaterialSerializer : ScalarSerializer<Material>(typeTokenOf()) {
+internal object MaterialSerializer : ScalarSerializer<Material>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Material? {
         return Material.matchMaterial(obj.toString())
     }

@@ -15,11 +15,11 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 import java.lang.reflect.Type
 
-object BlockTypeListSerializer : HomogeneousTypeListSerializer<BlockType>(RegistryKey.BLOCK)
+internal object BlockTypeListSerializer : HomogeneousTypeListSerializer<BlockType>(RegistryKey.BLOCK)
 
-object ItemTypeListSerializer : HomogeneousTypeListSerializer<ItemType>(RegistryKey.ITEM)
+internal object ItemTypeListSerializer : HomogeneousTypeListSerializer<ItemType>(RegistryKey.ITEM)
 
-sealed class HomogeneousTypeListSerializer<T : Keyed>(
+internal sealed class HomogeneousTypeListSerializer<T : Keyed>(
     private val registryKey: RegistryKey<T>,
 ) : SimpleSerializer<List<T>> { // 修改泛型为 List<T>
 

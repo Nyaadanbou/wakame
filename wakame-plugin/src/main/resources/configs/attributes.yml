@@ -66,6 +66,17 @@ __default__:
 
 # 从这里开始就是玩家能实际看到和用到的属性
 
+attack_cooldown_rate:
+  display_name: "攻击冷却"
+  tooltips:
+    add: "攻击冷却 <value:+#%;-.%><quality>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    default: 1.0 # 默认值（这个属性不带元素，所以这一级缩进就是属性的默认/最小/最大）
+    min: .0 # 最小值
+    max: 16384.0 # 最大值
+
 attack_damage:
   display_name: "<element>攻击力"
   tooltips:
@@ -137,9 +148,9 @@ attack_effect_chance:
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
-    default: .01 # 默认值（这个属性不带元素，所以这一级缩进就是属性的默认/最小/最大）
-    min: .0 # 最小值
-    max: 1.0 # 最大值
+    default: .01
+    min: .0
+    max: 1.0
 
 attack_knockback:
   display_name: "攻击击退"

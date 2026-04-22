@@ -344,9 +344,9 @@ var MojangStack.isNetworkRewrite: Boolean
 /**
  * 设置该物品堆叠存储于 ItemOrExact.Exact 中时, 是否在配方书移动物品时只匹配 Koish 唯一标识符.
  */
-@get:JvmName("onlyCompareIdInRecipeBook")
-@set:JvmName("onlyCompareIdInRecipeBook")
-var MojangStack.onlyCompareIdInRecipeBook: Boolean
+@get:JvmName("onlyCompareTypeIdInRecipeBook")
+@set:JvmName("onlyCompareTypeIdInRecipeBook")
+var MojangStack.onlyCompareTypeIdInRecipeBook: Boolean
     get() {
         return !hasData(ItemDataTypes.ONLY_COMPARE_TYPE_ID_IN_RECIPE_BOOK)
     }

@@ -17,10 +17,10 @@ class LootTableSerializationTest {
         return yamlLoader {
             withDefaults()
             serializers {
-                register(LootTable.SERIALIZER)
-                register(LootPool.SERIALIZER)
-                register(LootPredicate.SERIALIZER)
-                register(ComposableEntryContainer.SERIALIZER)
+                register(LootTable.serializer())
+                register(LootPool.serializer())
+                register(LootPredicate.serializer())
+                register(ComposableEntryContainer.serializer())
             }
         }
     }

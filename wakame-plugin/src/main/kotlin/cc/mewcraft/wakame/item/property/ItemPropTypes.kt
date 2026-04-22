@@ -173,16 +173,28 @@ data object ItemPropTypes {
     }
 
     /**
+     * 使物品具有双剑行为.
+     */
+    @JvmField
+    val DUAL_SWORD: ItemPropType<DualSword> = typeOf("dual_sword")
+
+    /**
      * 使物品具有太刀行为.
      */
     @JvmField
     val KATANA: ItemPropType<Katana> = typeOf("katana")
 
     /**
-     * 使物品具有双剑行为.
+     * 使物品具有剑行为.
      */
     @JvmField
-    val DUAL_SWORD: ItemPropType<DualSword> = typeOf("dual_sword")
+    val SWORD: ItemPropType<Sword> = typeOf("sword")
+
+    /**
+     * 使物品具有法杖行为.
+     */
+    @JvmField
+    val WAND: ItemPropType<Wand> = typeOf("wand")
 
     /**
      * **原版弓**武器行为所需配置.
@@ -215,6 +227,14 @@ data object ItemPropTypes {
      */
     @JvmField
     val MINECRAFT_MELEE: ItemPropType<Melee> = typeOf("minecraft_melee")
+
+    /**
+     * **原版横扫(剑)**武器行为所需配置.
+     *
+     * @see cc.mewcraft.wakame.item.behavior.impl.weapon.Sweep
+     */
+    @JvmField
+    val MINECRAFT_SWEEP: ItemPropType<Sweep> = typeOf("minecraft_sweep")
 
     /**
      * **原版三叉戟**武器行为所需配置.

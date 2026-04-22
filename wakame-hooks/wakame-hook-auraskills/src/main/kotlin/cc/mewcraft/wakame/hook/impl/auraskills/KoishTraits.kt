@@ -127,6 +127,15 @@ object KoishTraits {
     )
 
     @JvmField
+    val ATTACK_COOLDOWN_RATE: CustomTrait = register(
+        TraitType.ATTRIBUTE,
+        CustomTrait
+            .builder(NamespacedId.of("koish", "attribute_attack_cooldown_rate"))
+            //.displayName("Attack Cooldown rate")
+            .build()
+    )
+
+    @JvmField
     val ATTACK_EFFECT_CHANCE: CustomTrait = register(
         TraitType.ATTRIBUTE,
         CustomTrait
