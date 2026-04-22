@@ -187,7 +187,14 @@ abstract class ConfigsBase : ConfigAccess {
             .nodeStyle(NodeStyle.BLOCK)
             .indent(2)
             .defaultOptions { opts ->
-                opts.serializers(buildSerials(namespace))
+                opts
+                    // 注意: Nyaadanbou fork 的 Configurate 将 shouldCopyDefaults/implicitInitialization 的默认值改成了 true.
+                    // 当 shouldCopyDefaults=true 时, ObjectMapperImpl.load0 会在字段缺失时调用 saveSingle 把 data class 构造器默认值回写到节点,
+                    // 这会触发 TypeSerializer.serialize. 项目里大量使用 SimpleSerializer, 其默认 serialize 实现抛出 NotImplementedError,
+                    // 于是任何缺失字段 + SimpleSerializer 的组合都会崩溃. 我们不依赖 copyDefaults/implicitInitialization, 这里显式关闭.
+                    .shouldCopyDefaults(false)
+                    .implicitInitialization(false)
+                    .serializers(buildSerials(namespace))
             }
     }
 
