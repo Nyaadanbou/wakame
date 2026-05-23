@@ -1,7 +1,3 @@
----
-applyTo: "wakame-plugin/src/**/*.kt"
----
-
 # wakame-plugin 编码指南
 
 wakame-plugin 是 Koish 的运行时实现层，包含所有游戏逻辑：ItemBehavior、ItemProp、CastableTrigger、配置读取、事件监听、tick 系统和 Feature 实现。

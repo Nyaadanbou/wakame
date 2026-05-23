@@ -1,7 +1,3 @@
----
-applyTo: "wakame-mixin/src/**/*.kt"
----
-
 # wakame-mixin 编码指南
 
 wakame-mixin 包含 NMS Mixin 补丁 (Java) 和 Bridge 接口 (Kotlin)，通过 Horizon + Weaver 在服务器启动时加载。**不包含插件运行时逻辑。**

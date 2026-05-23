@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.catalog
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.gui.catalog.enchantment.CatalogEnchantmentMainMenu
+import cc.mewcraft.wakame.gui.catalog.enchantment.CatalogEnchantmentMenuStacks
 import cc.mewcraft.wakame.gui.catalog.item.CatalogItemCategoryMenu
 import cc.mewcraft.wakame.gui.catalog.item.CatalogItemMainMenu
 import cc.mewcraft.wakame.gui.catalog.item.CatalogItemMenuStacks
@@ -24,8 +26,20 @@ object OpenCatalogImpl : SimpleInteract {
         val type = openCatalog.catalogType
         when (type) {
             "item" -> return handleOpenItemCatalog(player, itemstack, openCatalog)
+            "enchantment" -> return handleOpenEnchantmentCatalog(player)
         }
 
+        return InteractionResult.PASS
+    }
+
+    private fun handleOpenEnchantmentCatalog(player: Player): InteractionResult {
+        val last = CatalogEnchantmentMenuStacks.peek(player)
+        if (last != null) {
+            last.open()
+            return InteractionResult.PASS
+        }
+        val menu = CatalogEnchantmentMainMenu(player)
+        CatalogEnchantmentMenuStacks.rewrite(player, menu)
         return InteractionResult.PASS
     }
 

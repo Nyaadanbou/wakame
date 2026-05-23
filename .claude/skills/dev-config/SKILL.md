@@ -1,5 +1,5 @@
 ---
-name: configurate-config
+name: dev-config
 description: >
   Guide for reading, writing, and organizing configuration files in the Koish (wakame) project
   using SpongePowered Configurate and the project's lazyconfig wrapper.

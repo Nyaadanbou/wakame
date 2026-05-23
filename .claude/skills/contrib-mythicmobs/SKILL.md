@@ -1,5 +1,5 @@
 ---
-name: mythicmobs-hook-pr
+name: contrib-mythicmobs
 description: >
   Guide for writing pull request descriptions when adding or modifying
   MythicMobs Mechanic, Condition, ItemDrop, or Placeholder in the

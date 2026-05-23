@@ -5,6 +5,8 @@ import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
 import cc.mewcraft.wakame.command.parser.ItemCatalogCategoryParser
+import cc.mewcraft.wakame.gui.catalog.enchantment.CatalogEnchantmentMainMenu
+import cc.mewcraft.wakame.gui.catalog.enchantment.CatalogEnchantmentMenuStacks
 import cc.mewcraft.wakame.gui.catalog.item.CatalogItemCategoryMenu
 import cc.mewcraft.wakame.gui.catalog.item.CatalogItemMainMenu
 import cc.mewcraft.wakame.gui.catalog.item.CatalogItemMenuStacks
@@ -30,6 +32,15 @@ internal object CatalogCommand : KoishCommandFactory<Source> {
             optional("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
             optional("category", ItemCatalogCategoryParser.categoryParser())
             koishHandler(handler = ::handleOpenItemCatalog)
+        }
+
+        // /<root> catalog enchantment [player]
+        buildAndAdd {
+            permission(CommandPermissions.CATALOG_ENCHANTMENT)
+            literal("catalog")
+            literal("enchantment")
+            optional("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
+            koishHandler(handler = ::handleOpenEnchantmentCatalog)
         }
 
         // /<root> catalog kizami [player]
@@ -61,6 +72,19 @@ internal object CatalogCommand : KoishCommandFactory<Source> {
             val categoryMenu = CatalogItemCategoryMenu(category, viewer)
             withContext(Dispatchers.minecraft) { CatalogItemMenuStacks.rewrite(viewer, mainMenu, categoryMenu) }
         }
+    }
+
+    private suspend fun handleOpenEnchantmentCatalog(ctx: CommandContext<Source>) {
+        val sender = ctx.sender().source()
+        val player = ctx.optional<SinglePlayerSelector>("player").getOrNull()
+        val viewer = player?.single() ?: (sender as? Player) ?: run { sender.sendPlainMessage("Player not found!"); return }
+        val last = CatalogEnchantmentMenuStacks.peek(viewer)
+        if (last != null) {
+            withContext(Dispatchers.minecraft) { last.open() }
+            return
+        }
+        val mainMenu = CatalogEnchantmentMainMenu(viewer)
+        withContext(Dispatchers.minecraft) { CatalogEnchantmentMenuStacks.rewrite(viewer, mainMenu) }
     }
 
     private suspend fun handleOpenKizamiCatalog(ctx: CommandContext<Source>) {

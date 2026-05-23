@@ -1,5 +1,12 @@
 ---
-applyTo: "wakame-plugin/src/**/enchantment/**"
+name: dev-enchantments
+description: >
+  Guide to the Koish custom enchantment framework. Covers architecture, key concepts,
+  data flow, Bootstrap chain, effect types, and step-by-step instructions for adding
+  new enchantment effects. Use this skill when working with enchantment code in
+  wakame-plugin/src/main/kotlin/cc/mewcraft/wakame/enchantment/, or when asked to
+  add, modify, or debug custom enchantments, enchantment effects, enchantment systems,
+  or Codec/data component registration for enchantments.
 ---
 
 # Koish 附魔框架指南
@@ -386,4 +393,3 @@ runningBlock.remove()
 ## Koish 物品与附魔兼容
 
 `MixinEnchantment` 拦截了原版 `Enchantment` 的 `isPrimaryItem`/`isSupportedItem`/`canEnchant` 方法。当物品为 Koish 物品时，通过 `KoishItemBridge` 委托给插件逻辑判断该物品是否支持特定附魔，而非使用原版的 `supported_items` 标签判断。
-

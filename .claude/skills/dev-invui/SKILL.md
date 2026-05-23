@@ -1,5 +1,5 @@
 ---
-name: invui-gui
+name: dev-invui
 description: >
   Guide for creating GUI menus using InvUI2 in the Koish (wakame) project.
   Use this skill when asked to create, modify, or debug GUI/menu code,
