@@ -1,0 +1,30 @@
+# menu class: CatalogEnchantmentAllMenu
+
+# [模式a]菜单设置: 展示所有魔咒
+
+# 菜单标题
+title: "魔咒图鉴 - 所有魔咒"
+
+# 菜单结构
+#
+# 占位符说明:
+# x: 魔咒列表内容
+# .: background
+# <: prev_page
+# >: next_page
+# b: back (返回)
+structure:
+  - ". . . . . . . . ."
+  - ". x x x x x x x ."
+  - ". x x x x x x x ."
+  - ". x x x x x x x ."
+  - ". x x x x x x x ."
+  - "b . . < . > . . ."
+
+# 菜单图标映射
+icons:
+  background: "internal/menu/common/default/background"
+  prev_page: "internal/menu/catalog/default/layout/base/prev_page"
+  next_page: "internal/menu/catalog/default/layout/base/next_page"
+  back: "internal/menu/catalog/default/layout/base/back"
+

@@ -1,0 +1,20 @@
+# 物品类型 Tag 图标配置
+# 格式: tag_value: "萌芽物品ID"
+#
+# tag_value 是 enchantable/ 前缀之后的部分.
+# 例如 #minecraft:enchantable/sword 的 tag_value 为 "sword".
+#
+# 如果某个 tag 没有在此配置, 则使用默认图标.
+
+# sword: "internal/menu/catalog/enchantment/icon_sword"
+# mining: "internal/menu/catalog/enchantment/icon_mining"
+# armor: "internal/menu/catalog/enchantment/icon_armor"
+# mining_loot: "internal/menu/catalog/enchantment/icon_mining_loot"
+# fishing: "internal/menu/catalog/enchantment/icon_fishing"
+# trident: "internal/menu/catalog/enchantment/icon_trident"
+# bow: "internal/menu/catalog/enchantment/icon_bow"
+# crossbow: "internal/menu/catalog/enchantment/icon_crossbow"
+# equippable: "internal/menu/catalog/enchantment/icon_equippable"
+# durability: "internal/menu/catalog/enchantment/icon_durability"
+# vanishing: "internal/menu/catalog/enchantment/icon_vanishing"
+

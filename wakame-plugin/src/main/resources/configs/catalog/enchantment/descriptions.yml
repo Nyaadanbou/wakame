@@ -1,0 +1,20 @@
+# 魔咒效果描述
+# 格式: "命名空间:魔咒ID": "MiniMessage 格式的效果描述文本"
+#
+# 如果某个魔咒没有在此配置, 则图鉴中不展示效果描述行.
+# 原版魔咒和自定义魔咒都可以配置.
+
+# --- Koish 自定义魔咒 ---
+# "koish:veinminer": "<gray>连锁采掘同种矿物方块"
+# "koish:smelter": "<gray>挖掘方块后自动熔炼掉落物"
+# "koish:blast_mining": "<gray>挖掘方块时产生爆炸, 破坏范围内方块"
+# "koish:range_mining": "<gray>范围挖掘周围的方块"
+# "koish:auto_replant": "<gray>右键成熟作物自动收获并补种"
+# "koish:antigrav_shot": "<gray>射出的弹射物不受重力影响"
+# "koish:void_escape": "<gray>受到虚空伤害时随机传送到安全位置"
+# "koish:fragile": "<gray>物品耐久度消耗倍率增加"
+
+# --- 原版魔咒 ---
+# "minecraft:sharpness": "<gray>增加近战攻击伤害"
+# "minecraft:protection": "<gray>减少大部分类型的伤害"
+

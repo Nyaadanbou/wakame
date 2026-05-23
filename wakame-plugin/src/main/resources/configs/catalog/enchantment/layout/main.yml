@@ -1,0 +1,27 @@
+# menu class: CatalogEnchantmentMainMenu
+
+# [入口]菜单设置: 3个入口按钮
+
+# 菜单标题
+title: "魔咒图鉴"
+
+# 菜单结构
+#
+# 占位符说明:
+# a: 查看所有魔咒
+# b: 按物品查询
+# c: 按物品类型查询
+# .: background
+structure:
+  - ". . . . . . . . ."
+  - ". . . . . . . . ."
+  - ". . a . b . c . ."
+  - ". . . . . . . . ."
+
+# 菜单图标映射
+icons:
+  background: "internal/menu/common/default/background"
+  view_all: "internal/menu/catalog/enchantment/view_all"
+  by_item: "internal/menu/catalog/enchantment/by_item"
+  by_type: "internal/menu/catalog/enchantment/by_type"
+

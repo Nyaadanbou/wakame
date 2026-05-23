@@ -1,0 +1,31 @@
+# menu class: CatalogEnchantmentByItemMenu
+
+# [模式b]菜单设置: 按物品查询支持的魔咒
+
+# 菜单标题
+title: "魔咒图鉴 - 按物品查询"
+
+# 菜单结构
+#
+# 占位符说明:
+# i: 输入槽 (VirtualInventory, 放入物品)
+# x: 魔咒列表内容
+# .: background
+# <: prev_page
+# >: next_page
+# b: back (返回)
+structure:
+  - ". . . . i . . . ."
+  - ". x x x x x x x ."
+  - ". x x x x x x x ."
+  - ". x x x x x x x ."
+  - ". x x x x x x x ."
+  - "b . . < . > . . ."
+
+# 菜单图标映射
+icons:
+  background: "internal/menu/common/default/background"
+  prev_page: "internal/menu/catalog/default/layout/base/prev_page"
+  next_page: "internal/menu/catalog/default/layout/base/next_page"
+  back: "internal/menu/catalog/default/layout/base/back"
+
