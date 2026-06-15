@@ -22,6 +22,14 @@
 - Root settings: `settings.gradle.kts`
 - **Paper 1.21+** 服务器
 
+## 构建命令
+
+| 命令 | 说明 |
+|---|---|
+| `./gradlew :wakame-plugin:shadowJar` | 构建插件主产物 (shadow jar，最终可加载的插件) |
+| `./gradlew :wakame-plugin:build` | 构建并测试 wakame-plugin |
+| `./gradlew build` | 构建全部模块 |
+
 ## 关键技术约定
 
 - **语言**: Kotlin (JVM 21)
@@ -33,9 +41,9 @@
 
 |任务|首选工具|说明|
 |---|---|---|
-|检索项目代码 (符号、引用、结构)|Serena|语言感知的代码分析，优于纯文本搜索|
+|检索项目代码 (符号、引用、结构)|codegraph|语言感知的代码图谱，优于纯文本搜索；先查后写|
 |查询第三方库/API 文档|Context7|获取最新的库文档和代码示例|
-|爬取/读取网页|Firecrawl 或 WebFetch|Firecrawl 支持 JS 渲染和结构化提取，WebFetch 适合轻量级抓取|
+|爬取/读取网页|fetch 或 WebFetch|轻量级网页抓取与结构化提取|
 
 > 如果某个 MCP 工具不可用，退而求其次使用 Grep / Bash / Read 等内置工具。
 
