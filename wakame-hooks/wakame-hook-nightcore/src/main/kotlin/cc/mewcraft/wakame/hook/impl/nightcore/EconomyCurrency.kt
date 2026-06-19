@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack
 import su.nightexpress.nightcore.integration.currency.type.AbstractCurrency
 import su.nightexpress.nightcore.util.NumberUtil
 import java.util.*
+import java.util.concurrent.CompletableFuture
 import kotlin.math.floor
 
 class EconomyCurrency(
@@ -47,6 +48,48 @@ class EconomyCurrency(
 
     override fun take(playerId: UUID, amount: Double) {
         EconomyProvider.get().withdraw(playerId, amount, this.currency)
+    }
+
+    // 2.16.2 新增的抽象扩展点: 同步直接操作 (基类的 queryBalance/deposit/withdraw 会调用它们)
+    override fun queryBalanceDirect(player: Player): Double {
+        return getBalance(player)
+    }
+
+    override fun depositDirect(player: Player, amount: Double) {
+        give(player, amount)
+    }
+
+    override fun withdrawDirect(player: Player, amount: Double) {
+        take(player, amount)
+    }
+
+    // 2.16.2 新增的异步接口: 经济操作本身是同步的, 直接包装为已完成的 Future
+    override fun queryBalanceAsync(player: Player): CompletableFuture<Double> {
+        return CompletableFuture.completedFuture(getBalance(player))
+    }
+
+    override fun queryBalanceAsync(playerId: UUID): CompletableFuture<Double> {
+        return CompletableFuture.completedFuture(getBalance(playerId))
+    }
+
+    override fun depositAsync(player: Player, amount: Double): CompletableFuture<Boolean> {
+        give(player, amount)
+        return CompletableFuture.completedFuture(true)
+    }
+
+    override fun depositAsync(playerId: UUID, amount: Double): CompletableFuture<Boolean> {
+        give(playerId, amount)
+        return CompletableFuture.completedFuture(true)
+    }
+
+    override fun withdrawAsync(player: Player, amount: Double): CompletableFuture<Boolean> {
+        take(player, amount)
+        return CompletableFuture.completedFuture(true)
+    }
+
+    override fun withdrawAsync(playerId: UUID, amount: Double): CompletableFuture<Boolean> {
+        take(playerId, amount)
+        return CompletableFuture.completedFuture(true)
     }
 
     override fun canHandleDecimals(): Boolean {

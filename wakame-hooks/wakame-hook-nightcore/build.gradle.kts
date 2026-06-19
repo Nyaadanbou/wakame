@@ -20,5 +20,5 @@ dependencies {
     compileOnly(local.economy)
 
     // plugin: nightcore
-    compileOnly("su.nightexpress.nightcore:main:2.13.3")
+    compileOnly("su.nightexpress.nightcore:main:2.16.2")
 }
