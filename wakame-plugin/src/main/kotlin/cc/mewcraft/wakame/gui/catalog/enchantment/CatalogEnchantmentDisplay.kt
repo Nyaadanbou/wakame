@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.gui.catalog.enchantment
 
 import cc.mewcraft.wakame.catalog.enchantment.CatalogEnchantmentEntry
 import cc.mewcraft.wakame.catalog.enchantment.EnchantmentItemResolver
+import cc.mewcraft.wakame.gui.catalog.enchantment.CatalogEnchantmentDisplay.MAX_DISPLAY_ITEMS
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.ItemLore
 import net.kyori.adventure.text.Component
