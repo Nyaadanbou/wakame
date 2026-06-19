@@ -19,7 +19,7 @@ internal class CatalogEnchantmentAllMenu(
         .setStructure(*settings.structure)
         .addCommonIngredients(settings)
         .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-        .setContent(CatalogEnchantmentInitializer.allEntries().map { buildEnchantmentItem(it) })
+        .setContent(CatalogEnchantmentInitializer.allEntries().map { CatalogEnchantmentDisplay.buildItem(it) })
         .build()
 
     private val primaryWindow: Window = Window.builder()

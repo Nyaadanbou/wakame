@@ -51,7 +51,7 @@ internal class CatalogEnchantmentByItemMenu(
                 val item = inputSlot.getItem(0)
                 if (item != null) {
                     val entries = CatalogEnchantmentInitializer.entriesForItem(item)
-                    primaryGui.setContent(entries.map { buildEnchantmentItem(it) })
+                    primaryGui.setContent(entries.map { CatalogEnchantmentDisplay.buildItem(it) })
                 }
             }
         }

@@ -28,7 +28,7 @@ include(":standalone:extra-contexts:common")
 include(":standalone:extra-contexts:paper")
 include(":standalone:extra-contexts:velocity")
 include(":wakame-api")
-include(":wakame-hooks:wakame-hook-adventurelevel")
+//include(":wakame-hooks:wakame-hook-adventurelevel") // 不再使用该自研系统，生产环境上已由 AuraSkills 代替
 include(":wakame-hooks:wakame-hook-auraskills")
 include(":wakame-hooks:wakame-hook-betonquest")
 include(":wakame-hooks:wakame-hook-bettergui")

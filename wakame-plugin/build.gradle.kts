@@ -19,7 +19,7 @@ dependencies {
     compileOnlyApi(project(":wakame-mixin"))
 
     // Hooks
-    runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
+    //runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-auraskills"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-betonquest"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-bettergui"))

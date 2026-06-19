@@ -22,7 +22,7 @@ internal class CatalogEnchantmentByTypeResultMenu(
         .addCommonIngredients(settings)
         .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         .setContent(
-            CatalogEnchantmentInitializer.entriesForTag(tagEntry).map { buildEnchantmentItem(it) }
+            CatalogEnchantmentInitializer.entriesForTag(tagEntry).map { CatalogEnchantmentDisplay.buildItem(it) }
         )
         .build()
 
