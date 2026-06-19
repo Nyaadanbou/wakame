@@ -3,14 +3,11 @@ package cc.mewcraft.wakame.gui.catalog.enchantment
 import cc.mewcraft.wakame.catalog.enchantment.CatalogEnchantmentInitializer
 import cc.mewcraft.wakame.catalog.enchantment.CatalogEnchantmentMenuSettings
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.item.resolveToItemWrapper
-import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import xyz.xenondevs.invui.gui.Markers
 import xyz.xenondevs.invui.gui.PagedGui
-import xyz.xenondevs.invui.inventory.UpdateReason
 import xyz.xenondevs.invui.inventory.VirtualInventory
-import xyz.xenondevs.invui.item.BoundItem
+import xyz.xenondevs.invui.inventory.event.UpdateReason
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.window.Window
 
@@ -24,42 +21,8 @@ internal class CatalogEnchantmentByItemMenu(
 
     private val primaryGui: PagedGui<Item> = PagedGui.itemsBuilder()
         .setStructure(*settings.structure)
-        .addIngredient(
-            '.', Item.builder()
-                .setItemProvider { _ -> settings.getIcon("background").resolveToItemWrapper() }
-        )
+        .addCommonIngredients(settings)
         .addIngredient('i', inputSlot)
-        .addIngredient(
-            '<', BoundItem.pagedBuilder()
-                .setItemProvider { _, gui ->
-                    if (gui.page <= 0) settings.getIcon("background").resolveToItemWrapper()
-                    else settings.getIcon("prev_page").resolveToItemWrapper {
-                        standard {
-                            component("current_page", Component.text(gui.page + 1))
-                            component("total_page", Component.text(gui.pageCount))
-                        }
-                    }
-                }
-                .addClickHandler { _, gui, _ -> gui.page -= 1 }
-        )
-        .addIngredient(
-            '>', BoundItem.pagedBuilder()
-                .setItemProvider { _, gui ->
-                    if (gui.page >= gui.pageCount - 1) settings.getIcon("background").resolveToItemWrapper()
-                    else settings.getIcon("next_page").resolveToItemWrapper {
-                        standard {
-                            component("current_page", Component.text(gui.page + 1))
-                            component("total_page", Component.text(gui.pageCount))
-                        }
-                    }
-                }
-                .addClickHandler { _, gui, _ -> gui.page += 1 }
-        )
-        .addIngredient(
-            'b', Item.builder()
-                .setItemProvider { _ -> settings.getIcon("back").resolveToItemWrapper() }
-                .addClickHandler { _, click -> CatalogEnchantmentMenuStacks.pop(click.player) }
-        )
         .addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         .setContent(emptyList())
         .build()
@@ -78,14 +41,7 @@ internal class CatalogEnchantmentByItemMenu(
                 e.isAdd -> { /* allow, processed in post-update */ }
                 e.isRemove -> {
                     e.isCancelled = true
-                    val oldItem = inputSlot.getItem(0)
-                    inputSlot.setItem(UpdateReason.SUPPRESSED, 0, null)
-                    if (oldItem != null) {
-                        val overflow = viewer.inventory.addItem(oldItem)
-                        overflow.forEach { (_, leftover) ->
-                            viewer.world.dropItem(viewer.location, leftover)
-                        }
-                    }
+                    returnInputItem()
                     primaryGui.setContent(emptyList())
                 }
             }
